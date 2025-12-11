@@ -49,13 +49,17 @@ def detect_provider() -> GPUProvider:
         return GPUProvider.COLAB
 
     # Check for provider-specific environment variables
+    # Vast.ai - check env vars first (hostname is usually a container ID)
+    if 'VAST_CONTAINERLABEL' in os.environ or 'VAST_CONTAINER_USER' in os.environ:
+        return GPUProvider.VASTAI
+
     if 'RUNPOD_POD_ID' in os.environ:
         return GPUProvider.RUNPOD
 
     if 'PAPERSPACE_METRIC_URL' in os.environ or os.path.exists('/storage'):
         return GPUProvider.PAPERSPACE
 
-    # Check hostname patterns
+    # Check hostname patterns (fallback)
     hostname = platform.node().lower()
     if 'vast' in hostname or 'vps' in hostname:
         return GPUProvider.VASTAI

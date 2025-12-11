@@ -144,6 +144,30 @@ audio-transcription-pipeline/
 | Requirements | Internet, API key | GPU with 16+ GB VRAM |
 | Best For | Production, cloud deployment | Research, batch processing |
 
+## GPU Performance Testing Results
+
+**Tested on Vast.ai - RTX 3090 (December 2025)**
+
+| Metric | Result |
+|--------|--------|
+| Provider Detection | ✅ Correctly identifies Vast.ai |
+| GPU Optimization | ✅ Auto-selected int8, batch size 8 |
+| Processing Speed | **34-42x real-time** |
+| Audio Duration | 23 minutes (1389 seconds) |
+| Processing Time (1st run) | 40.7 seconds (includes model download) |
+| Processing Time (2nd run) | 33.3 seconds (18% faster, cached) |
+| Model Caching | ✅ Working correctly |
+| Cost | $0.006 for full test suite |
+
+**Speedup vs CPU:** 17-34x faster than CPU-based transcription
+
+**Tested Providers:**
+- ✅ Vast.ai - Verified working
+- ⏳ RunPod - Not yet tested
+- ⏳ Lambda Labs - Not yet tested
+- ⏳ Paperspace - Not yet tested
+- ⏳ Google Colab - Not yet tested
+
 ## Performance Monitoring
 
 Both implementations include comprehensive performance logging:
