@@ -17,7 +17,7 @@ peerbridge proj/
 
 **1. Audio Transcription Pipeline** (`audio-transcription-pipeline/`)
 - Converts therapy audio to speaker-labeled transcripts
-- CPU/API and GPU/Colab implementations
+- CPU/API and GPU/Vast.ai implementations
 - Standalone - can be used independently
 - See: `audio-transcription-pipeline/README.md`
 

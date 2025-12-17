@@ -1,0 +1,22 @@
+# GPU Pipeline Dependencies
+# For Vast.ai and other GPU cloud providers
+
+# Core ML frameworks (PyTorch usually pre-installed in PyTorch Docker images)
+torch>=2.0.0
+torchaudio>=2.0.0
+
+# GPU-accelerated transcription
+faster-whisper>=1.0.0
+ctranslate2>=4.0.0
+
+# Speaker diarization
+pyannote.audio>=3.1.0
+
+# GPU audio processing
+julius>=0.2.7
+
+# Environment management
+python-dotenv>=1.0.0
+
+# Note: These requirements are optimized for GPU environments with CUDA
+# The PyTorch Docker image typically includes torch, torchaudio already

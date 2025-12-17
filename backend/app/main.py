@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.database import init_db, close_db
 from app.routers import sessions, patients
+from app.auth.router import router as auth_router
 
 
 @asynccontextmanager
@@ -43,6 +44,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(auth_router, prefix="/api/v1", tags=["authentication"])
 app.include_router(sessions.router, prefix="/api/sessions", tags=["Sessions"])
 app.include_router(patients.router, prefix="/api/patients", tags=["Patients"])
 

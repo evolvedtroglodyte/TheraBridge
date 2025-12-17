@@ -1,0 +1,16 @@
+# Example YouTube CBT Therapy Sessions
+# These are public educational videos for testing the pipeline
+
+# Single CBT Session Videos
+https://www.youtube.com/watch?v=VLDDUL3HBIg  # Person-Centred Therapy Session
+https://www.youtube.com/watch?v=XV2i_8dVJv0  # LIVE Cognitive Behavioral Therapy Session
+https://www.youtube.com/watch?v=BN_z9hv0aH4  # CBT Role Play Session
+
+# Playlists (use with caution - can be many videos)
+# https://www.youtube.com/playlist?list=PLAYLIST_ID
+
+# Search queries to try:
+# "cognitive behavioral therapy session"
+# "CBT therapy demonstration"
+# "psychotherapy session recording"
+# "counseling session example"

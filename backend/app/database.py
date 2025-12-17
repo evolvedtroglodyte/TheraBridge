@@ -6,7 +6,8 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
 from dotenv import load_dotenv
 
 load_dotenv("../audio-transcription-pipeline/.env")
@@ -40,6 +41,22 @@ AsyncSessionLocal = async_sessionmaker(
     engine,
     class_=AsyncSession,
     expire_on_commit=False,
+)
+
+# Create synchronous engine for auth endpoints (which use sync operations)
+SYNC_DATABASE_URL = DATABASE_URL.replace("postgresql+asyncpg://", "postgresql://")
+sync_engine = create_engine(
+    SYNC_DATABASE_URL,
+    echo=True,
+    pool_pre_ping=True,
+    connect_args={"sslmode": "require"}
+)
+
+# Create synchronous session factory for auth
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=sync_engine
 )
 
 # Base class for ORM models

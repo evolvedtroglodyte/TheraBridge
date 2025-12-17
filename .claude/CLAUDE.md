@@ -1,5 +1,26 @@
 # Repository Organization Rules
 
+## 🚨 CRITICAL RULE - GIT FIRST, ALWAYS
+**BEFORE MAKING ANY CHANGES (deletions, modifications, cleanup):**
+1. **STOP** - Do not proceed with any deletions or modifications
+2. **CHECK GIT STATUS** - Run `git status` to see what is tracked vs untracked
+3. **COMMIT EVERYTHING** - Run `git add -A && git commit -m "Backup before cleanup"`
+4. **VERIFY COMMIT** - Run `git log -1` to confirm commit was created
+5. **THEN AND ONLY THEN** - Proceed with changes
+
+**This rule applies to:**
+- Deleting any files or folders
+- Major refactoring or reorganization
+- Consolidating documentation
+- Cleaning up code
+- ANY operation that removes or significantly modifies files
+
+**Why this matters:**
+- Untracked files CANNOT be recovered from git
+- A commit creates a safety net for ALL files (tracked and untracked)
+- Users may have work-in-progress that isn't committed yet
+- Better to have an extra commit than lose important work
+
 ## Core Principles
 1. **Minimize file count** - Every file must earn its place. If info can live in an existing file, it goes there.
 2. **One README per component** - Each major folder gets ONE README.md. No additional .md files.
@@ -55,7 +76,7 @@ peerbridge proj/
 ├── audio-transcription-pipeline/  # STANDALONE PROJECT
 │   ├── src/
 │   │   ├── pipeline.py        # CPU/API pipeline
-│   │   ├── pipeline_colab.py  # GPU/Colab pipeline
+│   │   ├── pipeline_gpu.py    # GPU/Vast.ai pipeline
 │   │   ├── gpu_audio_ops.py
 │   │   └── performance_logger.py
 │   ├── tests/
@@ -64,7 +85,6 @@ peerbridge proj/
 │   │   └── outputs/           # JSON only
 │   ├── scripts/
 │   │   ├── setup.sh
-│   │   ├── setup_colab.sh
 │   │   └── setup_gpu.sh
 │   ├── venv/                  # Independent venv
 │   ├── .env                   # Pipeline-specific env
@@ -72,7 +92,6 @@ peerbridge proj/
 │   ├── .gitignore             # Pipeline-specific
 │   ├── .python-version
 │   ├── requirements.txt
-│   ├── requirements_colab.txt
 │   └── README.md
 │
 └── backend/                   # STANDALONE PROJECT
@@ -112,8 +131,15 @@ peerbridge proj/
 - ✅ AI note extraction service (GPT-4o)
 - ✅ Session endpoints
 
-**Frontend:**
-- ⏳ Pending (Next.js + Tailwind)
+**Frontend (Initial Prototype):**
+- ✅ Next.js 16 + React 19 + Tailwind CSS setup
+- ✅ Therapist dashboard with patient cards
+- ✅ Patient dashboard with session summaries
+- ✅ Session detail pages with transcript viewer
+- ✅ Error boundary for crash prevention
+- ✅ API client layer (real & mock modes)
+- ✅ Upload modal with processing indicator
+- ⏳ Backend API integration (toggle via env flag)
 
 ---
 
@@ -137,30 +163,49 @@ uvicorn app.main:app --reload
 
 ## Next Steps
 
-- [ ] **CURRENT**: Test Google Colab GPU pipeline (see `thoughts/shared/plans/2025-12-10-colab-gpu-audio-pipeline.md`)
-- [ ] Build frontend therapist dashboard
+- [ ] **CURRENT**: Test frontend with live backend (set NEXT_PUBLIC_USE_REAL_API=true)
+- [ ] Fix remaining ESLint errors in pre-existing components
 - [ ] Deploy backend to AWS Lambda
-- [ ] Integrate frontend with backend API
 - [ ] Add authentication (Auth.js)
+- [ ] Test Vast.ai GPU pipeline for production workloads
 
 ---
 
 ## Session Log
 
-### 2025-12-10 - Google Colab GPU Pipeline Plan
-- Created comprehensive plan to fix `torchaudio.AudioMetaData` error
-- Root cause: torchaudio 2.9+ removed AudioMetaData class, breaking pyannote.audio 3.x
-- Solution: Use pyannote.audio 4.0.3 (uses torchcodec instead of torchaudio)
-- Fallback: Pin torch==2.3.1, torchaudio==2.3.1, pyannote.audio==3.3.2
-- Plan file: `thoughts/shared/plans/2025-12-10-colab-gpu-audio-pipeline.md`
-- Contains 8 copy-paste ready Colab cells with exact code
-- Next: Test cells in Colab with compressed-cbt-session.m4a
+### 2025-12-11 - Frontend Fixes & API Integration Layer
+- **Fixed server crashes**: Added ErrorBoundary component wrapping all pages
+- **Fixed disabled buttons**: Created ComingSoonButton with hover tooltips
+- **Created API layer**: api-config.ts + api-client.ts for backend communication
+- **Created useSessionProcessing hook**: Real API polling for upload progress
+- **Created useSessionData hook**: Fetch session details from backend
+- **Created UploadModal component**: Modal UI for audio upload flow
+- **Feature flag**: NEXT_PUBLIC_USE_REAL_API toggles between mock and real backend
+- **Build verified**: npm run build passes successfully
+
+**New files created:**
+- components/error-boundary.tsx
+- components/providers.tsx
+- components/ui/coming-soon-button.tsx
+- components/session/UploadModal.tsx
+- hooks/use-session-processing.ts
+- hooks/use-session-data.ts
+- lib/api-config.ts
+- lib/api-client.ts
+- .env.local (API_URL + USE_REAL_API flags)
+
+### 2025-12-10 - Vast.ai GPU Pipeline Clarification
+- **Corrected**: Project uses Vast.ai for GPU instances, NOT Google Colab
+- Vast.ai billing: charged per second, must destroy instance to stop charges
+- GPU pipeline files: pipeline_gpu.py, gpu_audio_ops.py, transcribe_gpu.py
+- Requirements: requirements.txt (contains GPU dependencies)
+- Cleanup: Removed incorrect Colab references from documentation
 
 ### 2025-12-10 - Major Cleanup & Monorepo Organization
 - Deleted duplicate .claude/ folders in subfolders
 - Consolidated 6 scattered Project MDs into TherapyBridge.md
 - Removed thoughts/ folder (implementation plans)
-- Deleted unused GPU provider scripts (Lambda, Paperspace, RunPod, VastAI)
+- Deleted unused GPU provider scripts (Lambda, Paperspace, RunPod)
 - Deleted docker/ folder and README_GPU.md (redundant)
 - Cleaned test outputs (removed HTML/MD, kept JSON)
 - Removed __pycache__ files from backend

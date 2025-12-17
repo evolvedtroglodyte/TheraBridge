@@ -15,6 +15,7 @@ from uuid import UUID
 class UserRole(str, Enum):
     therapist = "therapist"
     patient = "patient"
+    admin = "admin"
 
 
 class SessionStatus(str, Enum):

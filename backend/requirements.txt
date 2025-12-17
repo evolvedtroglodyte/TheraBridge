@@ -3,10 +3,13 @@ fastapi==0.109.0
 uvicorn[standard]==0.27.0
 python-multipart==0.0.6  # For file uploads
 
-# Database
-sqlalchemy[asyncio]==2.0.25
-asyncpg==0.29.0  # PostgreSQL async driver
-psycopg2-binary==2.9.9  # For migrations
+# Database (Python 3.14 compatible versions)
+# Note: Using SQLAlchemy 2.1.0b1 from GitHub for Python 3.14 support
+# Install with: pip install "git+https://github.com/sqlalchemy/sqlalchemy.git@main#egg=sqlalchemy[asyncio]"
+sqlalchemy[asyncio]>=2.1.0b1
+psycopg[binary]>=3.3.2  # Modern PostgreSQL driver (Python 3.14 compatible)
+asyncpg>=0.31.0  # PostgreSQL async driver (Python 3.14+ compatible)
+psycopg2-binary>=2.9.11  # Legacy driver for migrations if needed
 alembic==1.13.1  # Migrations (future use)
 
 # OpenAI
@@ -14,6 +17,13 @@ openai>=1.59.5
 
 # Environment
 python-dotenv>=1.0.0
+pydantic-settings>=2.0.0  # For AuthConfig
+
+# Authentication
+python-jose[cryptography]>=3.3.0  # JWT token creation and validation
+passlib>=1.7.4  # Password hashing
+bcrypt>=4.0.0,<5.0.0  # Bcrypt backend for passlib (4.x for compatibility)
+email-validator>=2.0.0  # Required for Pydantic EmailStr validation
 
 # Testing
 pytest==7.4.4
