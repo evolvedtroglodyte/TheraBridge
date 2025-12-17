@@ -63,7 +63,7 @@
 **Two implementations available:**
 
 1. **CPU/API** - Production-ready, uses OpenAI Whisper API (~5-7 min for 23 min audio)
-2. **GPU/Colab** - Research, uses faster-whisper locally on L4 GPU (~1.5 min for 23 min audio)
+2. **GPU/Vast.ai** - Research, uses faster-whisper locally on GPU (~1.5 min for 23 min audio)
 
 **Pipeline stages:**
 - Audio preprocessing (silence trim, normalize, format conversion) ✅
@@ -80,11 +80,23 @@ source venv/bin/activate
 python tests/test_full_pipeline.py
 ```
 
-**GPU quick start (Google Colab L4):**
-```python
-# See GPU_PROVIDER_SETUP_GUIDE.md in pipeline folder
-!python process_colab.py /content/audio.m4a --num-speakers 2
-```
+### GPU Pipeline (Vast.ai)
+
+**Provider:** Vast.ai (NOT Google Colab)
+**Instance Type:** GPU with CUDA 12.1 support
+**Cost:** Billed per second (must destroy instance to stop charges)
+
+**Files:**
+- `pipeline_gpu.py` - GPU-optimized pipeline
+- `gpu_audio_ops.py` - GPU audio operations
+- `requirements.txt` - Includes GPU dependencies
+
+**Key Constraints (2025-12):**
+- `ctranslate2==4.4.0` required (>= 4.5.0 needs cuDNN 9.x, unavailable on most cloud GPUs)
+- Google Colab L4 has compatibility issues with pyannote.audio >= 3.3.x (torchaudio.AudioMetaData error)
+- Vast.ai recommended for production GPU workloads
+
+**Performance:** 10-15x realtime for 52-min audio files
 
 ---
 
