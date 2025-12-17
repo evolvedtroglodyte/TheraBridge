@@ -3,9 +3,6 @@ import { tokenStorage } from './token-storage';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
 class ApiClient {
-  private isRefreshing = false;
-  private refreshSubscribers: ((token: string) => void)[] = [];
-
   /**
    * Make authenticated API request.
    * Automatically adds Authorization header and handles token refresh.
