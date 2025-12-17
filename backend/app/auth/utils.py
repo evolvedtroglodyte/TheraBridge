@@ -8,7 +8,7 @@ as well as securely hashing and verifying passwords using bcrypt.
 import secrets
 import hashlib
 from datetime import datetime, timedelta
-from typing import Dict
+from typing import Any, Dict
 from uuid import UUID
 from fastapi import HTTPException, status
 from jose import jwt, JWTError
@@ -52,7 +52,7 @@ def create_access_token(user_id: UUID, role: str) -> str:
     return token
 
 
-def decode_access_token(token: str) -> Dict[str, any]:
+def decode_access_token(token: str) -> Dict[str, Any]:
     """
     Decode and verify a JWT access token.
 

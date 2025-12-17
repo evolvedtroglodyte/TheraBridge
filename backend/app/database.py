@@ -17,6 +17,9 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL not found in environment")
 
+# Control SQL echo logging via environment variable (disabled by default for performance)
+SQL_ECHO = os.getenv("SQL_ECHO", "false").lower() in ("true", "1", "yes")
+
 # Convert postgres:// to postgresql+asyncpg://
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
@@ -31,7 +34,7 @@ DATABASE_URL = re.sub(r'[&?]channel_binding=\w+', '', DATABASE_URL)
 # Create async engine with SSL enabled
 engine = create_async_engine(
     DATABASE_URL,
-    echo=True,  # Log SQL queries (disable in production)
+    echo=SQL_ECHO,  # Log SQL queries (controlled by SQL_ECHO env var, disabled by default for performance)
     pool_pre_ping=True,  # Verify connections before using
     connect_args={"ssl": "require"}  # Enable SSL for Neon
 )
@@ -47,7 +50,7 @@ AsyncSessionLocal = async_sessionmaker(
 SYNC_DATABASE_URL = DATABASE_URL.replace("postgresql+asyncpg://", "postgresql://")
 sync_engine = create_engine(
     SYNC_DATABASE_URL,
-    echo=True,
+    echo=SQL_ECHO,  # Log SQL queries (controlled by SQL_ECHO env var, disabled by default for performance)
     pool_pre_ping=True,
     connect_args={"sslmode": "require"}
 )
