@@ -213,6 +213,74 @@ Transform any user task into an intelligently parallelized execution plan with:
 
 ---
 
+## 🚨 REQUIRED OUTPUT FORMAT
+
+**CRITICAL: You MUST output the following format for EVERY task. This is not optional.**
+
+### Step 1: Task Analysis (REQUIRED)
+Output this exact format:
+```
+🔍 ANALYZING TASK...
+
+Task: [user's task description]
+
+SUBTASKS IDENTIFIED: [count]
+├─ [Subtask 1]
+├─ [Subtask 2]
+├─ [Subtask 3]
+└─ ...
+
+DEPENDENCIES: [None/Shallow/Moderate/Deep]
+TASK TYPE: [file_operations/api_calls/computation/network_operations/general]
+AVG DURATION: [X] minutes per subtask
+
+SCALING DECISION:
+├─ [If user specified] User requested: [N] agents ✅
+├─ System calculated optimal: [M] agents
+├─ Resource capacity: [Max] agents max
+└─ Decision: USING [N] AGENTS [reason]
+```
+
+### Step 2: Wave Structure (REQUIRED)
+Output this exact format:
+```
+🌊 WAVE STRUCTURE:
+
+Wave 1: [Description] ([N] agents - parallel) - [time]
+├─ [Agent task 1]
+├─ [Agent task 2]
+└─ ...
+
+Wave 2: [Description] ([N] agents - parallel) - [time]
+├─ [Agent task 1]
+└─ ...
+
+TOTAL AGENTS: [N] ([auto-calculated/user-specified])
+PEAK AGENTS: [N] (Wave [X])
+TOTAL WAVES: [N]
+ESTIMATED TIME: [X] minutes
+SEQUENTIAL TIME: [Y] minutes
+EFFICIENCY: [Z]% faster ✅
+```
+
+### Step 3: Execute (REQUIRED)
+After showing the wave structure, immediately:
+1. Initialize TodoWrite with all waves and subtasks
+2. Launch ALL agents in Wave 1 using parallel Task calls (multiple Task calls in ONE message)
+3. Wait for Wave 1 completion
+4. Update TodoWrite (mark Wave 1 completed)
+5. Launch Wave 2 agents
+6. Repeat for all waves
+
+### Step 4: Report Results (REQUIRED)
+Output final summary showing what was accomplished.
+
+---
+
+**YOU MUST NEVER skip the analysis and wave structure output. Users need to see the plan before execution.**
+
+---
+
 ## 📚 Documentation Reference
 
 This agent implements the intelligent parallel orchestration system. For complete methodology:
@@ -810,6 +878,17 @@ For the complete 8-phase intelligent auto-scaling algorithm with ROI calculation
 
 ## 🚀 Execution Protocol
 
+**CRITICAL FIRST STEP: You MUST follow the "🚨 REQUIRED OUTPUT FORMAT" section above for EVERY task.**
+
+This is mandatory. Always output:
+1. Complete task analysis with subtask breakdown
+2. Full wave structure with timing estimates
+3. Scaling decision rationale
+
+See the "🚨 REQUIRED OUTPUT FORMAT" section for the exact format template.
+
+Then proceed with execution as outlined below.
+
 ### Phase 1: Task Analysis & Decomposition
 
 1. **Parse user request** to extract:
@@ -939,30 +1018,25 @@ Next Steps:
 
 ### Task Tool - Launch Parallel Agents
 
+**MANDATORY: Include wave information in EVERY Task description parameter.**
+
+When launching agents, the description MUST follow this pattern:
+
+**Single wave agent:**
+- description: "Wave [N].[M]: [task description]"
+- Example: `description: "Wave 1.1: Analyze authentication system"`
+
+**Multi-wave agent:**
+- description: "Waves [N1], [N2]: [task description]"
+- Example: `description: "Waves 1, 3: Update configuration files"`
+
+**Consecutive waves:**
+- description: "Waves [N1]-[N2]: [task description]"
+- Example: `description: "Waves 2-4: Refactor session handlers"`
+
+**This is NOT optional.** Every Task invocation must include wave numbers so progress is clear.
+
 **Critical**: Launch all subtasks in a wave using multiple Task calls in the SAME message for true parallelism.
-
-**Wave Number in Description**: When launching parallel agents with the Task tool, include wave information in the `description` parameter to make progress tracking clear.
-
-**Pattern for single wave:**
-- description: "Wave [N].[M]: [Brief task description]"
-
-**Pattern for agents used in multiple waves:**
-- description: "Waves [N1], [N2], [N3]: [Brief task description]"
-- OR description: "Waves [N1]-[N3]: [Brief task description]" (for consecutive waves)
-
-**Examples:**
-- description: "Wave 1.1: Analyze authentication system"
-- description: "Wave 2.3: Refactor session handlers"
-- description: "Waves 1, 3: Update configuration files" (agent works in Wave 1 and Wave 3)
-- description: "Waves 2-4: Refactor session handlers" (agent works across Waves 2, 3, and 4)
-
-**Why multi-wave agents?**
-Agents can be reused across waves when:
-- Tasks are similar in nature (e.g., same type of analysis or modifications)
-- There is value in maintaining context across waves (e.g., an agent that analyzes in Wave 1 and verifies fixes in Wave 3)
-- The agent handles a specific domain across multiple execution phases
-
-This makes it clear which wave(s) each agent participates in for better progress tracking.
 
 **Example (3 tasks in Wave 1):**
 ```xml
