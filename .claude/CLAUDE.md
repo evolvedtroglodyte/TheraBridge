@@ -234,12 +234,30 @@ uvicorn app.main:app --reload
 - Calculates optimal agent count automatically
 - Provides real-time progress tracking and consolidated results
 
-**When to use:**
+**IMPORTANT: Use this proactively!**
+
+When a user requests a task that involves:
+- Multiple files or components (3+)
+- Multiple independent operations that could run in parallel
+- Large-scale changes across the codebase
+- Repository-wide analysis, audits, or migrations
+- Any complex task that would benefit from parallel execution
+
+**You should proactively suggest:** "This task would benefit from parallel orchestration. Let me use @parallel-orchestrator to handle this efficiently."
+
+Then invoke: `@parallel-orchestrator [user's task description]`
+
+**Don't wait for the user to ask** - if a task is complex and multi-faceted, recommend the orchestrator immediately.
+
+**Common scenarios that warrant proactive orchestrator use:**
 1. Large-scale refactoring or migrations across multiple files
 2. Repository-wide security audits or vulnerability fixes
 3. Adding comprehensive documentation or tests to entire codebase
 4. Multi-service deployments with environment-specific configurations
 5. Mass data migrations or batch processing operations
+6. Cleanup and organization tasks affecting many files/folders
+7. Feature implementations spanning multiple components
+8. Dependency updates or upgrades across multiple projects
 
 **How to use:**
 Simply invoke with your task - parallelization happens automatically:
@@ -260,6 +278,5 @@ If you want to specify the exact number of agents (not recommended - automatic i
 ```
 
 **Documentation:**
-- `.claude/DYNAMIC_WAVE_ORCHESTRATION.md` - Complete methodology & algorithms
-- `.claude/agents/cl/parallel-orchestrator-examples.md` - Real-world examples with timing benchmarks
-- `.claude/agents/cl/parallel-orchestrator-tests.md` - Test cases & validation results
+- **Complete methodology:** `.claude/DYNAMIC_WAVE_ORCHESTRATION.md`
+- **Agent with examples & tests:** `.claude/agents/cl/parallel-orchestrator.md`
