@@ -115,13 +115,16 @@ def signup(request: Request, user_data: UserCreate, db: Session = Depends(get_db
             detail="Email already registered"
         )
 
-    # Create new user
+    # Create new user with first_name/last_name and computed full_name
     new_user = User(
         email=user_data.email,
         hashed_password=get_password_hash(user_data.password),
-        full_name=user_data.full_name,
+        first_name=user_data.first_name,
+        last_name=user_data.last_name,
+        full_name=user_data.full_name,  # Computed from first_name + last_name
         role=user_data.role,
-        is_active=True
+        is_active=True,
+        is_verified=False  # Requires email verification (future feature)
     )
 
     try:

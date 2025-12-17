@@ -29,7 +29,8 @@ class TestSignup:
             json={
                 "email": "newuser@example.com",
                 "password": "NewPass123!",
-                "full_name": "New User",
+                "first_name": "New",
+                "last_name": "User",
                 "role": "therapist"
             }
         )
@@ -62,7 +63,8 @@ class TestSignup:
             json={
                 "email": "patient@example.com",
                 "password": "PatientPass123!",
-                "full_name": "Patient User",
+                "first_name": "Patient",
+                "last_name": "User",
                 "role": "patient"
             }
         )
@@ -78,7 +80,8 @@ class TestSignup:
             json={
                 "email": "test@example.com",  # Already exists from test_user fixture
                 "password": "AnotherPass123!",
-                "full_name": "Another User",
+                "first_name": "Another",
+                "last_name": "User",
                 "role": "therapist"
             }
         )
@@ -93,7 +96,8 @@ class TestSignup:
             json={
                 "email": "not-an-email",
                 "password": "ValidPass123!",
-                "full_name": "Test User",
+                "first_name": "Test",
+                "last_name": "User",
                 "role": "therapist"
             }
         )
@@ -106,8 +110,9 @@ class TestSignup:
             f"{AUTH_PREFIX}/signup",
             json={
                 "email": "newuser@example.com",
-                "password": "short",  # Less than 8 characters
-                "full_name": "Test User",
+                "password": "short",  # Less than 12 characters
+                "first_name": "Test",
+                "last_name": "User",
                 "role": "therapist"
             }
         )
@@ -413,7 +418,8 @@ class TestAuthenticationFlow:
             json={
                 "email": "flowtest@example.com",
                 "password": "FlowPass123!",
-                "full_name": "Flow Test User",
+                "first_name": "Flow Test",
+                "last_name": "User",
                 "role": "therapist"
             }
         )

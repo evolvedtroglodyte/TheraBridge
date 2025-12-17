@@ -156,9 +156,11 @@ Estimated: [X] min vs [Y] min sequential
 ### Agent Pool Strategy:
 
 1. **Parse user request** - Check if explicit agent count specified
-2. **Determine pool size**:
+2. **Determine pool size using MAXIMUM strategy**:
    - **If user specified count**: Pool size = user-requested count (MUST honor exactly)
-   - **If auto-scaling**: Pool size = calculated optimal count
+   - **If auto-scaling**: Pool size = MAXIMUM agents needed across ALL waves (not average, MAXIMUM)
+   - **Goal**: Maximize agent reuse across multiple waves
+   - **Example**: If Wave 1 needs 15 agents, Wave 2 needs 8, Wave 3 needs 12 → Create 15-agent pool (not 8 or 12)
 3. **Assign clear roles to each agent** based on tasks:
    - File operations → "File Reader #1-N", "File Processor #1-N", "Consolidator"
    - Database → "Database Analyst", "Migration Engineer #1-N", "Schema Validator"
@@ -250,20 +252,52 @@ Pool Statistics:
 [Each Task description includes: "Wave 1.X: [Role] - [Task description]"]
 ```
 
+**🚨 CRITICAL: Agent roles MUST be in the prompt at launch, not just in description**
+
 **Example Task invocations:**
 ```xml
 <function_calls>
 <invoke name="Task">
 <parameter name="subagent_type">general-purpose</parameter>
 <parameter name="description">Wave 1.1: Backend Dev #1 - Implement auth endpoint</parameter>
-<parameter name="prompt">As Backend Dev #1, implement the authentication endpoint...</parameter>
+<parameter name="prompt">You are Backend Dev #1 (Instance I1) working on Wave 1.
+
+Your role: Backend developer specializing in authentication endpoints
+Your task: Implement the authentication endpoint at backend/app/routers/auth.py
+
+Context: You are part of a 6-agent team implementing a full-stack feature. Your specialty is backend API development.
+
+Requirements:
+- Create POST /auth/login endpoint
+- Validate email/password input
+- Return JWT token on success
+- Follow existing patterns in auth.py
+
+Success criteria: Endpoint functional, follows project patterns, returns proper JWT token
+
+When complete, report your deliverables with specific metrics (e.g., "Created /auth/login endpoint, 45 lines, JWT token generation with 24h expiry").</parameter>
 </invoke>
 <invoke name="Task">
 <parameter name="subagent_type">general-purpose</parameter>
 <parameter name="description">Wave 1.2: Backend Dev #2 - Implement session endpoint</parameter>
-<parameter name="prompt">As Backend Dev #2, implement the session management endpoint...</parameter>
+<parameter name="prompt">You are Backend Dev #2 (Instance I2) working on Wave 1.
+
+Your role: Backend developer specializing in session management
+Your task: Implement the session creation endpoint at backend/app/routers/sessions.py
+
+Context: You are part of a 6-agent team. Backend Dev #1 is working on auth, you're handling sessions.
+
+Requirements:
+- Create POST /sessions/create endpoint
+- Accept session data payload
+- Store in database
+- Return session ID
+
+Success criteria: Endpoint functional, database integration working
+
+When complete, report your deliverables with specific metrics.</parameter>
 </invoke>
-... (more agents)
+... (more agents with roles in prompts)
 </function_calls>
 ```
 
@@ -282,6 +316,83 @@ Pool Statistics:
 [Assign tasks to M agents from pool by their roles]
 [Tasks given to agents match their expertise/role]
 ```
+
+**Step 3e: After Wave Completion - Provide Continuation Prompt**
+
+**🚨 CRITICAL: After EVERY wave completes, if there are pending waves remaining, provide the user with a continuation prompt to work in another window.**
+
+After wave completes and before launching next wave:
+
+```
+✅ WAVE [X] COMPLETE
+
+[Summary of what was accomplished in this wave]
+
+📋 REMAINING WORK:
+- Wave [X+1]: [Description] ([N] agents)
+- Wave [X+2]: [Description] ([M] agents)
+- ... ([Y] waves remaining)
+
+💡 CONTINUATION PROMPT (copy to another window if needed):
+
+Continue the orchestration from Wave [X+1]:
+
+Current state:
+- Pool: [N] agents initialized with roles (I1-I[N])
+- Completed: Waves 1-[X]
+- Next: Wave [X+1] - [Description]
+
+Agent pool status:
+- I1 (Backend Dev #1): Available for Wave [X+1] task
+- I2 (Backend Dev #2): Available for Wave [X+1] task
+- ...
+
+Ready to proceed with Wave [X+1]? (yes/no)
+```
+
+**Example:**
+```
+✅ WAVE 1 COMPLETE
+
+Accomplished:
+- I1 (Backend Dev #1): Created /auth/login endpoint (45 lines, JWT generation)
+- I2 (Backend Dev #2): Created /auth/signup endpoint (52 lines, password hashing)
+- I3 (Backend Dev #3): Created /sessions/create endpoint (38 lines)
+- I4 (Frontend Dev #1): Created LoginForm component (120 lines)
+- I5 (Frontend Dev #2): Created SignupForm component (135 lines)
+- I6 (Frontend Dev #3): Created SessionCard component (95 lines)
+
+📋 REMAINING WORK:
+- Wave 2: Add validation and error handling (4 agents)
+- Wave 3: Write tests (2 agents)
+- Wave 4: Documentation (1 agent)
+(3 waves remaining)
+
+💡 CONTINUATION PROMPT (copy to another window if needed):
+
+Continue the orchestration from Wave 2:
+
+Current state:
+- Pool: 6 agents initialized (I1-I6)
+- Completed: Wave 1 (backend/frontend endpoints implemented)
+- Next: Wave 2 - Add validation and error handling
+
+Agent pool status:
+- I1 (Backend Dev #1): Available for validation work
+- I2 (Backend Dev #2): Available for validation work
+- I4 (Frontend Dev #1): Available for error handling
+- I5 (Frontend Dev #2): Available for error handling
+
+Task: Add input validation to login/signup endpoints and error handling to forms.
+
+Ready to proceed with Wave 2? (yes/no)
+```
+
+This allows you to:
+1. **Pause between waves** without losing context
+2. **Continue in a new window** if main window is running low on context
+3. **Resume from any wave** with full agent pool state
+4. **Parallelize orchestration work** across multiple Claude windows
 
 **If wave needs MORE agents than pool capacity:**
 ```

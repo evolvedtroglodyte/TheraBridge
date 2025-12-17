@@ -29,6 +29,8 @@ email-validator>=2.0.0  # Required for Pydantic EmailStr validation
 pytest==7.4.4
 pytest-asyncio==0.23.3
 httpx==0.26.0  # For testing async FastAPI
+aiosqlite>=0.19.0  # Async SQLite driver for async test fixtures
+faker>=20.0.0  # Realistic test data generation
 
 # Audio pipeline dependencies (reuse from transcription pipeline)
 pydub==0.25.1
@@ -39,3 +41,9 @@ slowapi==0.1.9
 
 # Testing coverage
 pytest-cov==4.1.0  # Code coverage reporting
+
+# Performance testing (optional - install separately for load testing)
+# pip install locust pytest-xdist psutil
+# locust>=2.20.0  # Web-based load testing
+# pytest-xdist>=3.5.0  # Parallel pytest execution
+# psutil>=5.9.0  # System resource monitoring

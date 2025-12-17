@@ -163,15 +163,58 @@ uvicorn app.main:app --reload
 
 ## Next Steps
 
-- [ ] **CURRENT**: Test frontend with live backend (set NEXT_PUBLIC_USE_REAL_API=true)
+- [ ] **CURRENT**: Run migration `alembic upgrade head` to apply Feature 1 schema fixes
+- [ ] Test frontend with live backend (set NEXT_PUBLIC_USE_REAL_API=true)
 - [ ] Fix remaining ESLint errors in pre-existing components
 - [ ] Deploy backend to AWS Lambda
-- [ ] Add authentication (Auth.js)
+- [ ] Implement Feature 2: Analytics Dashboard
 - [ ] Test Vast.ai GPU pipeline for production workloads
 
 ---
 
 ## Session Log
+
+### 2025-12-17 - Feature 1 Authentication Completion (100%)
+**Fixed critical bugs and gaps in authentication implementation:**
+
+1. **Fixed table naming conflict** - Migration created `sessions` but model expected `auth_sessions`
+   - Created new migration `a1b2c3d4e5f6_fix_auth_and_add_missing_tables.py`
+   - Renames `sessions` → `auth_sessions` for refresh tokens
+   - Creates `therapy_sessions` table for therapy data
+
+2. **Added missing user columns** per FEATURE_1_AUTH.md spec:
+   - `first_name` VARCHAR(100)
+   - `last_name` VARCHAR(100)
+   - `is_verified` BOOLEAN (for future email verification)
+
+3. **Created `therapist_patients` junction table** for many-to-many relationships:
+   - Allows multiple therapists per patient
+   - Includes `relationship_type`, `is_active`, `started_at`, `ended_at`
+   - UNIQUE constraint on (therapist_id, patient_id)
+
+4. **Updated SQLAlchemy models**:
+   - `User` model: added new columns and relationships
+   - `TherapySession` model: renamed from `Session`, uses `therapy_sessions` table
+   - `TherapistPatient` model: new junction table model
+   - Backwards compatibility: `Session = TherapySession` alias
+
+5. **Updated auth schemas and router**:
+   - `UserCreate` now uses `first_name`/`last_name` instead of `full_name`
+   - `UserResponse` includes new fields
+   - Signup endpoint populates all new fields
+
+6. **Updated test fixtures** to use new schema
+
+**Files modified:**
+- `backend/alembic/versions/a1b2c3d4e5f6_fix_auth_and_add_missing_tables.py` (NEW)
+- `backend/app/models/db_models.py`
+- `backend/app/auth/schemas.py`
+- `backend/app/auth/router.py`
+- `backend/tests/conftest.py`
+- `backend/tests/test_auth_integration.py`
+- `backend/tests/test_e2e_auth_flow.py`
+
+**To apply changes:** Run `alembic upgrade head` in backend directory
 
 ### 2025-12-11 - Frontend Fixes & API Integration Layer
 - **Fixed server crashes**: Added ErrorBoundary component wrapping all pages

@@ -17,7 +17,8 @@ class UserCreate(BaseModel):
         min_length=12,
         description="Password must be at least 12 characters with uppercase, lowercase, number, and special character"
     )
-    full_name: str = Field(..., min_length=1)
+    first_name: str = Field(..., min_length=1, max_length=100)
+    last_name: str = Field(..., min_length=1, max_length=100)
     role: UserRole
 
     @field_validator('password')
@@ -29,6 +30,11 @@ class UserCreate(BaseModel):
         except ValueError as e:
             raise ValueError(str(e))
         return v
+
+    @property
+    def full_name(self) -> str:
+        """Computed full_name for backwards compatibility"""
+        return f"{self.first_name} {self.last_name}".strip()
 
 
 class UserLogin(BaseModel):
@@ -42,8 +48,11 @@ class UserResponse(BaseModel):
     id: UUID
     email: str
     full_name: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
     role: UserRole
     is_active: bool
+    is_verified: bool = False
     created_at: datetime
 
     class Config:

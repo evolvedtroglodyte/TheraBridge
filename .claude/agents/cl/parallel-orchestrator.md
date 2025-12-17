@@ -1163,7 +1163,9 @@ Constraints: Preserve all functionality, maintain existing prop interfaces
 **🚨 CRITICAL OPTIMIZATION: Use persistent agent pool with maximum reuse across waves.**
 
 **Core Strategy:**
-- Create agent pool upfront based on maximum wave size
+- **Create agent pool using MAXIMUM strategy**: Pool size = max(agents needed in Wave 1, Wave 2, ..., Wave N)
+- **NOT average, NOT optimal - MAXIMUM**: If Wave 1 needs 15, Wave 2 needs 8, Wave 3 needs 12 → Create 15-agent pool
+- **Maximize reuse**: With 15-agent pool, all waves can reuse from same pool (no expansion needed)
 - Reuse idle agents from previous waves instead of creating new ones
 - Keep agents on standby between waves (don't destroy them)
 - Only expand pool if current wave exceeds pool capacity
@@ -1173,6 +1175,7 @@ Constraints: Preserve all functionality, maintain existing prop interfaces
 - Lower total resource consumption
 - Faster wave transitions (agents already warmed up)
 - Better agent utilization (load balancing across waves)
+- Maximum reuse rate (more waves can reuse from initial pool)
 
 ---
 
@@ -1308,6 +1311,8 @@ Wave 3: Cleanup files (1 agent - reuse from pool) (pending)
 
 #### Step 3: Execute Waves with Role-Based Agent Assignment
 
+**🚨 CRITICAL: Agent roles MUST be included in the Task prompt parameter, not just description.**
+
 **For each wave sequentially, assign tasks to agents by their roles:**
 
 ```python
@@ -1326,7 +1331,25 @@ print("└─ Status: Launching 6 agents in parallel... 🆕")
 print()
 
 # Launch ALL 6 agents in parallel (ONE message with 6 Task calls)
-# Each Task description includes role: "Wave 1.1: Backend Dev #1 - [task]"
+# CRITICAL: Each Task prompt MUST start with: "You are [Role] (Instance I[N]) working on Wave [X]."
+# Example prompt template:
+"""
+You are Backend Dev #1 (Instance I1) working on Wave 1.
+
+Your role: Backend developer specializing in authentication endpoints
+Your task: Implement the authentication endpoint at backend/app/routers/auth.py
+
+Context: You are part of a 6-agent team. Your specialty is backend API development.
+
+Requirements:
+- Create POST /auth/login endpoint
+- Validate email/password input
+- Return JWT token on success
+
+Success criteria: Endpoint functional, follows project patterns
+
+When complete, report deliverables with metrics (e.g., "Created /auth/login endpoint, 45 lines, JWT generation with 24h expiry").
+"""
 # These agents persist in pool after completion
 
 # Mark wave 1 completed in TodoWrite
@@ -1365,6 +1388,34 @@ print()
 # Agents can adapt to different roles as needed
 
 # Mark wave 3 completed in TodoWrite
+
+# CRITICAL: After each wave completion, provide continuation prompt
+print()
+print("✅ WAVE 3 COMPLETE")
+print()
+print("Accomplished:")
+print("- I3 (Backend Dev #3 → Test Engineer): Wrote 25 backend unit tests")
+print("- I6 (Frontend Dev #3 → Test Engineer): Wrote 18 frontend component tests")
+print()
+print("📋 REMAINING WORK:")
+print("- Wave 4: Documentation (1 agent)")
+print("- Wave 5: Final review (1 agent)")
+print("(2 waves remaining)")
+print()
+print("💡 CONTINUATION PROMPT (copy to another window if needed):")
+print()
+print("Continue the orchestration from Wave 4:")
+print()
+print("Current state:")
+print("- Pool: 6 agents initialized (I1-I6)")
+print("- Completed: Waves 1-3 (endpoints, validation, tests)")
+print("- Next: Wave 4 - Documentation")
+print()
+print("Agent pool status:")
+print("- All agents available for documentation work")
+print()
+print("Ready to proceed with Wave 4? (yes/no)")
+print()
 ```
 
 **Output example:**

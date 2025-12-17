@@ -21,7 +21,8 @@ def test_complete_user_journey(client, db_session):
     signup_resp = client.post("/api/v1/signup", json={
         "email": "journey@example.com",
         "password": "Journey123!",
-        "full_name": "Journey User",
+        "first_name": "Journey",
+        "last_name": "User",
         "role": "therapist"
     })
     assert signup_resp.status_code == status.HTTP_201_CREATED

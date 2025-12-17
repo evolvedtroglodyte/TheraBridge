@@ -17,14 +17,32 @@ class User(Base):
     email = Column(String(255), nullable=False, unique=True, index=True)
     hashed_password = Column(String, nullable=False)
     full_name = Column(String(255), nullable=False)
-    name = Column(String(255))
+    first_name = Column(String(100), nullable=True)  # Added for Feature 1 spec compliance
+    last_name = Column(String(100), nullable=True)   # Added for Feature 1 spec compliance
     role = Column(Enum(UserRole), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
+    is_verified = Column(Boolean, default=False, nullable=False)  # Added for email verification
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationship to auth sessions (for refresh token management)
     auth_sessions = relationship("AuthSession", back_populates="user", cascade="all, delete-orphan")
+
+    # Relationship to therapist-patient assignments (for many-to-many)
+    # As therapist: patients I treat
+    patients_assigned = relationship(
+        "TherapistPatient",
+        foreign_keys="TherapistPatient.therapist_id",
+        back_populates="therapist",
+        cascade="all, delete-orphan"
+    )
+    # As patient: therapists treating me
+    therapists_assigned = relationship(
+        "TherapistPatient",
+        foreign_keys="TherapistPatient.patient_id",
+        back_populates="patient",
+        cascade="all, delete-orphan"
+    )
 
 
 class Patient(Base):
@@ -39,12 +57,37 @@ class Patient(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
-class Session(Base):
-    __tablename__ = "sessions"
+class TherapistPatient(Base):
+    """
+    Junction table for many-to-many therapist-patient relationships.
+    Allows multiple therapists per patient and vice versa.
+    """
+    __tablename__ = "therapist_patients"
 
     id = Column(SQLUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    patient_id = Column(SQLUUID(as_uuid=True), ForeignKey("patients.id"), index=True)
-    therapist_id = Column(SQLUUID(as_uuid=True), ForeignKey("users.id"), index=True)
+    therapist_id = Column(SQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    patient_id = Column(SQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    relationship_type = Column(String(50), default="primary")  # 'primary', 'secondary', 'consulting'
+    is_active = Column(Boolean, default=True, nullable=False)
+    started_at = Column(DateTime, default=datetime.utcnow)
+    ended_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    # Relationships back to User
+    therapist = relationship("User", foreign_keys=[therapist_id], back_populates="patients_assigned")
+    patient = relationship("User", foreign_keys=[patient_id], back_populates="therapists_assigned")
+
+
+class TherapySession(Base):
+    """
+    Therapy session records (renamed from Session to avoid conflict with auth sessions).
+    Stores transcripts, notes, and processing status.
+    """
+    __tablename__ = "therapy_sessions"
+
+    id = Column(SQLUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    patient_id = Column(SQLUUID(as_uuid=True), ForeignKey("patients.id", ondelete="SET NULL"), index=True)
+    therapist_id = Column(SQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), index=True)
     session_date = Column(DateTime, nullable=False)
     duration_seconds = Column(Integer)
 
@@ -65,3 +108,7 @@ class Session(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     processed_at = Column(DateTime)
+
+
+# Backwards compatibility alias - allows existing code to use 'Session' name
+Session = TherapySession

@@ -1,0 +1,115 @@
+# Coverage.py Configuration
+# Documentation: https://coverage.readthedocs.io/
+
+[run]
+# Source code directories to measure coverage for
+source = app
+
+# Enable branch coverage (not just line coverage)
+branch = True
+
+# Measure multiprocessing if needed
+parallel = False
+
+# Files/directories to omit from coverage
+omit =
+    # Test files
+    tests/*
+    */tests/*
+    */test_*.py
+    *_test.py
+
+    # Virtual environment
+    venv/*
+    */venv/*
+    .venv/*
+    */.venv/*
+
+    # Migrations
+    migrations/*
+    */migrations/*
+    alembic/*
+    */alembic/*
+
+    # Python cache
+    __pycache__/*
+    */__pycache__/*
+    *.pyc
+
+    # Configuration files
+    setup.py
+    */setup.py
+
+    # Generated files
+    *_pb2.py
+    */pb2/*
+
+    # Example/demo files
+    */examples/*
+    */demos/*
+    *example.py
+    *demo.py
+    correlation_id_example.py
+
+[report]
+# Show missing line numbers in terminal report
+show_missing = True
+
+# Precision for coverage percentage
+precision = 2
+
+# Skip files with 100% coverage in report (optional, can remove if you want to see them)
+skip_covered = False
+
+# Skip empty files
+skip_empty = True
+
+# Sort report by coverage percentage (lowest first)
+sort = Cover
+
+# Exclude lines from coverage (use with # pragma: no cover)
+exclude_lines =
+    # Standard pragma
+    pragma: no cover
+
+    # Don't complain about missing debug-only code
+    def __repr__
+    def __str__
+
+    # Don't complain if tests don't hit defensive assertion code
+    raise AssertionError
+    raise NotImplementedError
+
+    # Don't complain if non-runnable code isn't run
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    if typing.TYPE_CHECKING:
+    @typing.overload
+    @overload
+
+    # Don't complain about abstract methods
+    @abstractmethod
+    @abc.abstractmethod
+
+    # Don't complain about pass statements
+    pass
+
+    # Don't complain about ellipsis in protocols/stubs
+    \.\.\.
+
+[html]
+# Directory for HTML coverage report
+directory = htmlcov
+
+# Title for HTML report
+title = TherapyBridge Backend Coverage Report
+
+[xml]
+# Output file for XML coverage report (for CI tools)
+output = coverage.xml
+
+[json]
+# Output file for JSON coverage report
+output = coverage.json
+# Pretty print JSON
+pretty_print = True
