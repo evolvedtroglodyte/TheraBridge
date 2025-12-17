@@ -31,6 +31,10 @@ You are executing a parallel orchestration command. When invoked with `/cl:orche
 
 **First, read `.claude/DYNAMIC_WAVE_ORCHESTRATION.md` to understand the intelligent_auto_scale() algorithm.**
 
+**CRITICAL: Parse user request for explicit agent count:**
+- If user says "using X agents" or "with X agents" → MUST use exactly X agents
+- If no explicit count specified → Use intelligent auto-scaling
+
 Then output:
 
 ```
@@ -49,8 +53,17 @@ AVG DURATION: [X] minutes per subtask
 
 SCALING DECISION:
 ├─ System calculated optimal: [N] agents
+├─ User requested: [X] agents (if specified, otherwise "auto")
 ├─ Resource capacity: [Max] agents
-└─ Decision: USING [N] AGENTS [reason]
+└─ Decision: USING [X] AGENTS [reason]
+```
+
+**If user specified agent count:**
+```
+SCALING DECISION:
+├─ User requested: [X] agents 🎯
+├─ System calculated optimal: [N] agents
+└─ Decision: USING [X] AGENTS (user override - honored exactly) ✅
 ```
 
 ## STEP 2: Output Wave Structure (REQUIRED)
@@ -76,14 +89,19 @@ Estimated: [X] min vs [Y] min sequential
 
 ### Agent Pool Strategy:
 
-1. **Analyze wave structure** - Determine pool size (max agents in any wave)
-2. **Output pool statistics** - Show reuse rate and overhead savings
-3. **Initialize TodoWrite** - Include pool information in wave descriptions
-4. **Execute waves** - Reuse agents from pool instead of creating new ones
+1. **Parse user request** - Check if explicit agent count specified
+2. **Determine pool size**:
+   - **If user specified count**: Pool size = user-requested count (MUST honor exactly)
+   - **If auto-scaling**: Pool size = max agents needed in any wave
+3. **Output pool statistics** - Show reuse rate and overhead savings
+4. **Initialize TodoWrite** - Include pool information in wave descriptions
+5. **Execute waves** - Reuse agents from pool instead of creating new ones
+
+**🚨 CRITICAL RULE: If user requests X agents, create exactly X agents in the pool, even if fewer would be optimal.**
 
 ### Execution Steps:
 
-**Before Wave 1:**
+**Before Wave 1 (Auto-scaling mode):**
 ```
 🏊 AGENT POOL STRATEGY:
 ├─ Pool size: [N] agents (based on largest wave)
@@ -92,6 +110,17 @@ Estimated: [X] min vs [Y] min sequential
 ├─ Without pooling: [X] agents created
 ├─ With pooling: [N] agents created (reuse [Y]%)
 └─ Overhead saved: [Z]s ♻️
+```
+
+**Before Wave 1 (User-requested agent count):**
+```
+🏊 AGENT POOL STRATEGY:
+├─ User requested: [X] agents 🎯
+├─ Pool size: [X] agents (honoring user request exactly)
+├─ System optimal: [N] agents
+├─ Total waves: [W]
+├─ Decision: Creating pool of [X] agents as requested ✅
+└─ Note: [More/Fewer] than optimal, but user preference honored
 ```
 
 **Wave 1 (Pool Initialization):**

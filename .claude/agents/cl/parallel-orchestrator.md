@@ -961,6 +961,34 @@ Constraints: Preserve all functionality, maintain existing prop interfaces
 
 #### Step 1: Analyze Wave Structure & Create Agent Pool
 
+**🚨 CRITICAL: Parse user request for explicit agent count FIRST**
+
+```python
+import re
+
+def parse_agent_count_from_request(user_input: str) -> int | None:
+    """
+    Extract explicit agent count from user request
+    Returns: agent count if specified, None if auto-scaling
+    """
+    patterns = [
+        r'using (\d+) agents?',
+        r'with (\d+) agents?',
+        r'(\d+) parallel agents?'
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, user_input, re.IGNORECASE)
+        if match:
+            return int(match.group(1))
+
+    return None  # Auto-scaling mode
+
+# Example:
+user_request = "Consolidate files using 10 agents"
+user_agent_count = parse_agent_count_from_request(user_request)  # Returns 10
+```
+
 **Before executing any waves:**
 
 ```python
@@ -971,20 +999,42 @@ wave_structure = [
     {'wave': 3, 'tasks': 1, 'description': 'Cleanup files'}
 ]
 
-# Calculate pool size (max agents needed in any single wave)
-max_wave_size = max(wave['tasks'] for wave in wave_structure)  # 6
+# CRITICAL: Check if user specified agent count
+user_agent_count = parse_agent_count_from_request(original_user_request)
 
-# Calculate reuse statistics
-total_agent_slots = sum(wave['tasks'] for wave in wave_structure)  # 8
-reuse_rate = ((total_agent_slots - max_wave_size) / total_agent_slots) * 100  # 25%
+if user_agent_count is not None:
+    # USER OVERRIDE: Use exact count requested
+    pool_size = user_agent_count
+    system_optimal = max(wave['tasks'] for wave in wave_structure)
 
-print(f"🏊 AGENT POOL STRATEGY:")
-print(f"├─ Pool size: {max_wave_size} agents (based on Wave 1)")
-print(f"├─ Total waves: {len(wave_structure)}")
-print(f"├─ Total agent slots needed: {total_agent_slots}")
-print(f"├─ Without pooling: {total_agent_slots} agents created")
-print(f"├─ With pooling: {max_wave_size} agents created (reuse {reuse_rate:.0f}%)")
-print(f"└─ Overhead saved: {(total_agent_slots - max_wave_size) * 0.3}s ♻️")
+    print(f"🏊 AGENT POOL STRATEGY:")
+    print(f"├─ User requested: {user_agent_count} agents 🎯")
+    print(f"├─ Pool size: {pool_size} agents (honoring user request exactly)")
+    print(f"├─ System optimal: {system_optimal} agents")
+    print(f"├─ Total waves: {len(wave_structure)}")
+    print(f"├─ Decision: Creating pool of {pool_size} agents as requested ✅")
+    if pool_size > system_optimal:
+        print(f"└─ Note: More than optimal, but user preference honored")
+    elif pool_size < system_optimal:
+        print(f"└─ Note: Fewer than optimal, will distribute work across {pool_size} agents")
+    else:
+        print(f"└─ Note: Matches system optimal (perfect alignment)")
+else:
+    # AUTO-SCALING: Calculate optimal pool size
+    pool_size = max(wave['tasks'] for wave in wave_structure)  # 6
+
+    # Calculate reuse statistics
+    total_agent_slots = sum(wave['tasks'] for wave in wave_structure)  # 8
+    reuse_rate = ((total_agent_slots - pool_size) / total_agent_slots) * 100  # 25%
+
+    print(f"🏊 AGENT POOL STRATEGY:")
+    print(f"├─ Pool size: {pool_size} agents (based on largest wave)")
+    print(f"├─ Total waves: {len(wave_structure)}")
+    print(f"├─ Total agent slots needed: {total_agent_slots}")
+    print(f"├─ Without pooling: {total_agent_slots} agents created")
+    print(f"├─ With pooling: {pool_size} agents created (reuse {reuse_rate:.0f}%)")
+    print(f"└─ Overhead saved: {(total_agent_slots - pool_size) * 0.3}s ♻️")
+
 print()
 ```
 

@@ -82,7 +82,10 @@ def intelligent_auto_scale(subtasks, dependencies, avg_duration_min, task_type, 
 
     # Handle user override (explicit agent count)
     if user_override is not None:
-        # Validate against resource constraints
+        # 🚨 CRITICAL: User-specified count MUST be honored exactly
+        # Do NOT reduce, do NOT optimize, return exactly what user requested
+
+        # Optional: Validate against resource constraints (informational only)
         resource_limit = estimate_resource_capacity()
         max_safe_agents = min(resource_limit.values())
 
@@ -91,7 +94,8 @@ def intelligent_auto_scale(subtasks, dependencies, avg_duration_min, task_type, 
             print(f"   Recommend: Use auto-scaling or reduce to {max_safe_agents} agents")
             print(f"   Proceeding with {user_override} agents as requested...")
 
-        # Use user's agent count, skip optimization algorithm
+        # ALWAYS return user's exact count - no modifications
+        print(f"✅ Using {user_override} agents (user-specified, honored exactly)")
         return user_override
     # Phase 1: Calculate maximum theoretical parallelism
     max_parallel = calculate_max_parallel_depth(subtasks, dependencies)
