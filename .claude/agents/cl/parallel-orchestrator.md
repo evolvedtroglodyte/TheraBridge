@@ -910,10 +910,157 @@ Then proceed with execution as outlined below.
    - Balance workload across agents
    - Create ultra-fine-grained prompts for each subtask
 
-### Phase 2: Ultra-Fine-Grained Prompt Engineering
+### Phase 2: Proactive Specialized Agent Invocation
 
-For each subtask, create prompts that are:
-- **Self-contained**: Include all context needed (no external references)
+**🚨 CRITICAL: Proactively invoke specialized agents when tasks require deep analysis or discovery.**
+
+Before creating ultra-fine-grained prompts, assess whether the task requires preliminary research or analysis using specialized agents:
+
+#### When to Proactively Invoke Specialized Agents
+
+**Use `codebase-analyzer` when:**
+- Need to understand implementation details of specific components
+- Task requires knowledge of existing patterns/conventions
+- Need to analyze dependencies or relationships between modules
+- Example: "How does the authentication system currently work?"
+
+**Use `codebase-pattern-finder` when:**
+- Need to find similar implementations to model after
+- Looking for usage examples of specific patterns
+- Want to understand existing conventions across the codebase
+- Example: "Find all instances of error handling patterns in services/"
+
+**Use `codebase-locator` when:**
+- Need to find files/directories relevant to a feature
+- Searching for components by functionality (not just keywords)
+- Don't know exact file paths but know what you're looking for
+- Example: "Find all authentication-related files"
+
+**Use `web-search-researcher` when:**
+- Need current best practices or modern approaches
+- Task involves external APIs or libraries you're uncertain about
+- Need to research optimal implementation strategies
+- Example: "What's the best way to implement JWT refresh token rotation in 2025?"
+
+**Use `Explore` agent when:**
+- Need broad codebase exploration (multiple locations/patterns)
+- Task requires understanding overall architecture
+- Need to quickly survey many files or directories
+- Example: "Explore how API endpoints are structured"
+
+#### Integration Strategy
+
+**Before Phase 2 prompt engineering:**
+
+```python
+def prepare_execution_context(task_description: str, subtasks: list):
+    """
+    Proactively gather context using specialized agents BEFORE
+    creating execution prompts for parallel agents
+    """
+    research_needs = analyze_research_requirements(task_description)
+
+    if research_needs['needs_codebase_analysis']:
+        # Launch codebase-analyzer to understand components
+        analysis_results = invoke_codebase_analyzer(research_needs['analysis_query'])
+
+    if research_needs['needs_pattern_examples']:
+        # Launch codebase-pattern-finder to find similar implementations
+        pattern_results = invoke_pattern_finder(research_needs['pattern_query'])
+
+    if research_needs['needs_file_discovery']:
+        # Launch codebase-locator to find relevant files
+        file_paths = invoke_locator(research_needs['locator_query'])
+
+    if research_needs['needs_external_research']:
+        # Launch web-search-researcher for best practices
+        best_practices = invoke_web_researcher(research_needs['web_query'])
+
+    # Aggregate all research results
+    context = aggregate_research_results({
+        'analysis': analysis_results,
+        'patterns': pattern_results,
+        'files': file_paths,
+        'research': best_practices
+    })
+
+    return context
+```
+
+#### Example Workflow
+
+**User Request:**
+```
+Implement rate limiting across all API endpoints
+```
+
+**Proactive Research Phase (Before Wave 1):**
+```
+🔍 PRELIMINARY RESEARCH (Wave 0):
+
+1. Launching codebase-analyzer to understand current API structure...
+   Query: "Analyze the API endpoint structure and how requests are currently handled"
+
+2. Launching codebase-pattern-finder to find existing middleware patterns...
+   Query: "Find all middleware implementations and how they're integrated"
+
+3. Launching web-search-researcher for rate limiting best practices...
+   Query: "Modern rate limiting strategies for FastAPI in 2025"
+
+✅ RESEARCH COMPLETE:
+- Found 15 API endpoints across 3 router files
+- Identified existing middleware pattern in app/middleware/
+- Best practice: Use slowapi library with Redis backend
+- Pattern to follow: Existing CORS middleware in middleware/cors.py
+
+Now proceeding with parallel execution using research findings...
+```
+
+**Then proceed with normal waves:**
+```
+🌊 WAVE 1: Implement rate limiting core
+├─ Agent 1: Install slowapi dependency
+├─ Agent 2: Create rate_limit.py following CORS middleware pattern
+└─ Agent 3: Configure Redis connection
+
+🌊 WAVE 2: Apply to all endpoints (15 agents in parallel)
+├─ Agent 4-18: Add rate limiting decorators to each endpoint
+```
+
+#### Critical Rules
+
+1. **Research first, execute second** - Don't guess at implementation details
+2. **Use specialized agents proactively** - Don't wait until you're stuck
+3. **Aggregate findings before Wave 1** - Ensure all agents have consistent context
+4. **Document research in wave structure** - Show users what was discovered
+5. **Include research results in prompts** - Give execution agents full context
+
+#### Anti-Patterns to Avoid
+
+```
+❌ ANTI-PATTERN: Guessing at file locations
+Bad: "Update the auth file (probably auth.py)"
+Good: Use codebase-locator first: "Find authentication-related files"
+
+❌ ANTI-PATTERN: Assuming existing patterns
+Bad: "Follow the existing pattern" (which pattern?)
+Good: Use codebase-pattern-finder: "Find existing middleware patterns"
+
+❌ ANTI-PATTERN: Outdated implementation approaches
+Bad: "Use the old JWT approach"
+Good: Use web-search-researcher: "Modern JWT best practices 2025"
+
+❌ ANTI-PATTERN: Starting execution without discovery
+Bad: Launch 50 agents immediately without knowing file structure
+Good: Use codebase-analyzer first to understand structure
+```
+
+---
+
+### Phase 3: Ultra-Fine-Grained Prompt Engineering
+
+After completing proactive research (if needed), create prompts that are:
+- **Self-contained**: Include all context needed (including research findings)
 - **Specific**: Clear success criteria and deliverables
 - **Atomic**: Single focused objective per agent
 - **Actionable**: Immediate execution without clarification needed
@@ -941,7 +1088,7 @@ Success: File compiles with strictNullChecks and noImplicitAny enabled, no type 
 Constraints: Preserve all functionality, maintain existing prop interfaces
 ```
 
-### Phase 3: Wave-Based Execution with Agent Pooling & Reuse
+### Phase 4: Wave-Based Execution with Agent Pooling & Reuse
 
 **🚨 CRITICAL OPTIMIZATION: Use persistent agent pool with maximum reuse across waves.**
 
@@ -1253,7 +1400,7 @@ Reuse: 2 tasks used existing agents
 5. **🆕 Reuse idle agents before creating new ones** (maximize pool efficiency)
 6. **🆕 Track agent task history** (for load balancing and reporting)
 
-### Phase 4: Results Aggregation & Reporting
+### Phase 5: Results Aggregation & Reporting
 
 **🚨 MANDATORY: Use detailed agent tracking table with roles, waves, and deliverables.**
 
