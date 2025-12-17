@@ -236,15 +236,14 @@ The pipeline generates JSON output with the following structure:
 Run the test suite:
 
 ```bash
-# CPU version tests
+# CPU version tests (default, uses Whisper API)
 python tests/test_full_pipeline.py
 
-# GPU version tests (on Vast.ai or other provider)
-python tests/test_gpu_pipeline.py
-
-# Performance logging tests
+# Performance logging tests (includes GPU performance monitoring)
 python tests/test_performance_logging.py
 ```
+
+**Note:** GPU pipeline testing is performed on Vast.ai or equivalent provider. See GPU_PROVIDER_SETUP_GUIDE.md for setup instructions.
 
 ## Next Steps
 

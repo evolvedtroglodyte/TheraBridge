@@ -51,15 +51,21 @@ backend/
 │   │   └── db_models.py        # SQLAlchemy ORM models
 │   ├── routers/
 │   │   ├── sessions.py         # Session upload & management (324 lines)
-│   │   ├── patients.py         # Patient endpoints (71 lines)
-│   │   └── auth.py             # Authentication (signup, login, logout)
+│   │   └── patients.py         # Patient endpoints (71 lines)
+│   ├── auth/
+│   │   ├── router.py           # Authentication routes (signup, login, logout)
+│   │   ├── utils.py            # Auth utilities (JWT, password hashing)
+│   │   ├── models.py           # Auth database models
+│   │   ├── schemas.py          # Auth request/response models
+│   │   ├── dependencies.py     # Auth dependencies (get_current_user)
+│   │   └── config.py           # Auth configuration
 │   ├── services/
 │   │   ├── transcription.py    # Whisper/Pipeline wrapper (27 lines)
 │   │   ├── note_extraction.py  # GPT-4o extraction service (187 lines)
 │   │   └── __init__.py         # Service initialization
 │   ├── middleware/
-│   │   └── auth.py             # JWT verification middleware
-│   └── middleware.py           # CORS, rate limiting
+│   │   ├── rate_limit.py       # Rate limiting middleware
+│   │   └── __init__.py         # Middleware initialization
 ├── alembic/                    # Database migrations
 │   ├── env.py                  # Migration environment
 │   ├── versions/               # Migration files
