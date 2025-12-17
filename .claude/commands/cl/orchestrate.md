@@ -317,82 +317,16 @@ When complete, report your deliverables with specific metrics.</parameter>
 [Tasks given to agents match their expertise/role]
 ```
 
-**Step 3e: After Wave Completion - Provide Continuation Prompt**
+**Step 3e: Execute All Remaining Waves**
 
-**🚨 CRITICAL: After EVERY wave completes, if there are pending waves remaining, provide the user with a continuation prompt to work in another window.**
+Continue executing waves sequentially until all planned waves complete.
 
-After wave completes and before launching next wave:
-
-```
-✅ WAVE [X] COMPLETE
-
-[Summary of what was accomplished in this wave]
-
-📋 REMAINING WORK:
-- Wave [X+1]: [Description] ([N] agents)
-- Wave [X+2]: [Description] ([M] agents)
-- ... ([Y] waves remaining)
-
-💡 CONTINUATION PROMPT (copy to another window if needed):
-
-Continue the orchestration from Wave [X+1]:
-
-Current state:
-- Pool: [N] agents initialized with roles (I1-I[N])
-- Completed: Waves 1-[X]
-- Next: Wave [X+1] - [Description]
-
-Agent pool status:
-- I1 (Backend Dev #1): Available for Wave [X+1] task
-- I2 (Backend Dev #2): Available for Wave [X+1] task
-- ...
-
-Ready to proceed with Wave [X+1]? (yes/no)
-```
-
-**Example:**
-```
-✅ WAVE 1 COMPLETE
-
-Accomplished:
-- I1 (Backend Dev #1): Created /auth/login endpoint (45 lines, JWT generation)
-- I2 (Backend Dev #2): Created /auth/signup endpoint (52 lines, password hashing)
-- I3 (Backend Dev #3): Created /sessions/create endpoint (38 lines)
-- I4 (Frontend Dev #1): Created LoginForm component (120 lines)
-- I5 (Frontend Dev #2): Created SignupForm component (135 lines)
-- I6 (Frontend Dev #3): Created SessionCard component (95 lines)
-
-📋 REMAINING WORK:
-- Wave 2: Add validation and error handling (4 agents)
-- Wave 3: Write tests (2 agents)
-- Wave 4: Documentation (1 agent)
-(3 waves remaining)
-
-💡 CONTINUATION PROMPT (copy to another window if needed):
-
-Continue the orchestration from Wave 2:
-
-Current state:
-- Pool: 6 agents initialized (I1-I6)
-- Completed: Wave 1 (backend/frontend endpoints implemented)
-- Next: Wave 2 - Add validation and error handling
-
-Agent pool status:
-- I1 (Backend Dev #1): Available for validation work
-- I2 (Backend Dev #2): Available for validation work
-- I4 (Frontend Dev #1): Available for error handling
-- I5 (Frontend Dev #2): Available for error handling
-
-Task: Add input validation to login/signup endpoints and error handling to forms.
-
-Ready to proceed with Wave 2? (yes/no)
-```
-
-This allows you to:
-1. **Pause between waves** without losing context
-2. **Continue in a new window** if main window is running low on context
-3. **Resume from any wave** with full agent pool state
-4. **Parallelize orchestration work** across multiple Claude windows
+For each subsequent wave:
+1. Output wave header with assignments
+2. Launch agents in parallel (reusing from pool)
+3. Wait for completion
+4. Update TodoWrite
+5. Move to next wave
 
 **If wave needs MORE agents than pool capacity:**
 ```
@@ -414,9 +348,11 @@ This allows you to:
 4. **Expand only when needed** - If wave exceeds pool capacity
 5. **Track utilization** - Report which agents did multiple tasks
 
-## STEP 4: Report Results
+## STEP 4: Report Results and Continuation Prompt
 
 **🚨 MANDATORY FORMAT: Use detailed agent tracking table with roles, waves, and deliverables.**
+
+### Step 4a: Comprehensive Execution Summary
 
 ### Required Reporting Format:
 
@@ -504,6 +440,70 @@ This allows you to:
 - ✅ Eliminated redundancy while preserving all unique information
 - ✅ Removed scattered files: SECURITY_ANALYSIS.md, SECURITY_SUMMARY.txt, SECURITY_REPORT_INDEX.md, VULNERABILITY_CHECKLIST.md, SECURITY_FIX_PATCH.py, SECURITY_REPORT_EXECUTIVE_SUMMARY.txt
 ```
+
+---
+
+### Step 4b: Provide Orchestration Continuation Prompt (REQUIRED)
+
+**🚨 CRITICAL: After completing ALL waves and providing the execution summary, provide a continuation prompt for follow-up orchestration.**
+
+After the execution summary, output:
+
+```
+---
+
+💡 FOLLOW-UP ORCHESTRATION PROMPT:
+
+If there are additional improvements or follow-up tasks to address, you can run:
+
+/cl:orchestrate [describe the follow-up task]
+
+Example follow-up tasks based on what was just completed:
+- Further refinements or enhancements
+- Testing and validation of changes
+- Documentation updates
+- Performance optimization
+- Additional features building on this work
+
+Current project state:
+- [Brief summary of what was just accomplished]
+- [Any known gaps or future work identified]
+
+Ready to continue with another orchestration? (Copy the command above and describe your task)
+```
+
+**Example:**
+```
+---
+
+💡 FOLLOW-UP ORCHESTRATION PROMPT:
+
+If there are additional improvements or follow-up tasks to address, you can run:
+
+/cl:orchestrate [describe the follow-up task]
+
+Example follow-up tasks based on what was just completed:
+- Add comprehensive test coverage for all new endpoints
+- Implement frontend components to consume the new API endpoints
+- Add API documentation (OpenAPI/Swagger)
+- Set up monitoring and logging for the new features
+- Performance testing and optimization
+
+Current project state:
+- ✅ Authentication system fully implemented (6 endpoints, JWT rotation)
+- ✅ Database migrations configured with Alembic
+- ✅ 66 tests created with 84% coverage
+- 📋 Frontend integration pending
+- 📋 API documentation pending
+
+Ready to continue with another orchestration? (Copy the command above and describe your task)
+```
+
+**Benefits:**
+1. **Seamless workflow** - User can immediately continue with next task
+2. **Context preservation** - Reminds user of what was just done
+3. **Suggests logical next steps** - Helps identify follow-up work
+4. **Easy to use** - Just copy and modify the command
 
 ---
 

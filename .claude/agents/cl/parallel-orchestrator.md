@@ -1389,33 +1389,8 @@ print()
 
 # Mark wave 3 completed in TodoWrite
 
-# CRITICAL: After each wave completion, provide continuation prompt
-print()
-print("✅ WAVE 3 COMPLETE")
-print()
-print("Accomplished:")
-print("- I3 (Backend Dev #3 → Test Engineer): Wrote 25 backend unit tests")
-print("- I6 (Frontend Dev #3 → Test Engineer): Wrote 18 frontend component tests")
-print()
-print("📋 REMAINING WORK:")
-print("- Wave 4: Documentation (1 agent)")
-print("- Wave 5: Final review (1 agent)")
-print("(2 waves remaining)")
-print()
-print("💡 CONTINUATION PROMPT (copy to another window if needed):")
-print()
-print("Continue the orchestration from Wave 4:")
-print()
-print("Current state:")
-print("- Pool: 6 agents initialized (I1-I6)")
-print("- Completed: Waves 1-3 (endpoints, validation, tests)")
-print("- Next: Wave 4 - Documentation")
-print()
-print("Agent pool status:")
-print("- All agents available for documentation work")
-print()
-print("Ready to proceed with Wave 4? (yes/no)")
-print()
+# Continue with remaining waves (Wave 4, Wave 5, etc.)
+# Execute each wave sequentially until all planned waves complete
 ```
 
 **Output example:**
@@ -1576,7 +1551,7 @@ Reuse: 2 tasks used existing agents
 5. **🆕 Reuse idle agents before creating new ones** (maximize pool efficiency)
 6. **🆕 Track agent task history** (for load balancing and reporting)
 
-### Phase 4: Results Aggregation & Reporting
+### Phase 4: Results Aggregation, Reporting & Continuation Prompt
 
 **🚨 MANDATORY: Use detailed agent tracking table with roles, waves, and deliverables.**
 
@@ -1684,6 +1659,30 @@ Be SPECIFIC with metrics - include numbers, file sizes, line counts, test counts
 - ✅ Security features: rate limiting, duplicate prevention, role-based access
 - ✅ Documentation updated (678 lines across 2 files)
 - ✅ Security audit passed 9.5/10 - APPROVED for production deployment
+
+---
+
+💡 FOLLOW-UP ORCHESTRATION PROMPT:
+
+If there are additional improvements or follow-up tasks to address, you can run:
+
+/cl:orchestrate [describe the follow-up task]
+
+Example follow-up tasks based on what was just completed:
+- Add comprehensive test coverage for all new endpoints
+- Implement frontend components to consume the new API endpoints
+- Add API documentation (OpenAPI/Swagger)
+- Set up monitoring and logging for the new features
+- Performance testing and optimization
+
+Current project state:
+- ✅ Authentication system fully implemented (6 endpoints, JWT rotation)
+- ✅ Database migrations configured with Alembic
+- ✅ 66 tests created with 84% coverage
+- 📋 Frontend integration pending
+- 📋 API documentation pending
+
+Ready to continue with another orchestration? (Copy the command above and describe your task)
 ```
 
 ## 🛠️ Tool Usage Guidelines
