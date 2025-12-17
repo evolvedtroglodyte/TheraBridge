@@ -6,7 +6,32 @@ description: Orchestrate complex tasks using intelligent parallel execution
 
 You are executing a parallel orchestration command. When invoked with `/cl:orchestrate [task]`, you MUST follow this protocol:
 
+## 📚 Reference Documentation
+
+**IMPORTANT: Read these files for complete methodology before executing:**
+
+1. **`.claude/DYNAMIC_WAVE_ORCHESTRATION.md`** - Contains:
+   - Intelligent auto-scaling algorithm (how to calculate optimal agent count)
+   - Task type classification (file_operations, api_calls, deployment, etc.)
+   - ROI analysis methodology
+   - Extreme scaling scenarios and examples
+
+2. **`.claude/agents/cl/parallel-orchestrator.md`** - Contains:
+   - Complete execution protocol
+   - Task decomposition methodology (how to break tasks into subtasks)
+   - Dependency analysis (how to build DAG)
+   - Wave generation rules (how to organize tasks into waves)
+   - Tool usage guidelines
+
+**Use these files to inform your decisions when calculating agent counts and structuring waves.**
+
+---
+
 ## STEP 1: Output Task Analysis (REQUIRED)
+
+**First, read `.claude/DYNAMIC_WAVE_ORCHESTRATION.md` to understand the intelligent_auto_scale() algorithm.**
+
+Then output:
 
 ```
 🔍 ANALYZING TASK...
@@ -19,7 +44,13 @@ SUBTASKS: [count]
 └─ ...
 
 DEPENDENCIES: [None/Shallow/Deep]
-AGENT COUNT: [N] agents (auto-calculated)
+TASK TYPE: [file_operations/api_calls/deployment/code_analysis/general]
+AVG DURATION: [X] minutes per subtask
+
+SCALING DECISION:
+├─ System calculated optimal: [N] agents
+├─ Resource capacity: [Max] agents
+└─ Decision: USING [N] AGENTS [reason]
 ```
 
 ## STEP 2: Output Wave Structure (REQUIRED)
