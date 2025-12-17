@@ -228,9 +228,10 @@ uvicorn app.main:app --reload
 ## Parallel Workflow Orchestration
 
 **What it does:**
-- Intelligent wave-based parallel execution using multiple Claude agents (10x+ faster on large tasks)
-- Automatically breaks down complex tasks into independent operations
-- Executes work in dependency-aware waves (e.g., Wave 1: search, Wave 2: modify based on search results)
+- Automatically parallelizes complex tasks using multiple Claude agents (10x+ faster on large tasks)
+- Intelligently breaks down work into independent operations
+- Executes in dependency-aware waves (e.g., Wave 1: search, Wave 2: modify based on results)
+- Calculates optimal agent count automatically
 - Provides real-time progress tracking and consolidated results
 
 **When to use:**
@@ -240,15 +241,23 @@ uvicorn app.main:app --reload
 4. Multi-service deployments with environment-specific configurations
 5. Mass data migrations or batch processing operations
 
-**Two modes:**
-1. **Automatic (Recommended)**: `@parallel-orchestrator [task]` - Agent determines optimal agent count based on task complexity
-2. **Explicit (Manual Control)**: `@parallel-orchestrator [task] using [N] agents` - You specify the number of parallel agents (max 50)
+**How to use:**
+Simply invoke with your task - parallelization happens automatically:
+```
+@parallel-orchestrator [task description]
+```
 
 **Example prompts:**
+- `@parallel-orchestrator Clean up and enhance navigability of this repo`
+- `@parallel-orchestrator Migrate all React class components to functional components`
 - `@parallel-orchestrator Add comprehensive error handling to all API endpoints`
-- `@parallel-orchestrator Migrate all React class components to functional components with hooks`
-- `@parallel-orchestrator Audit and fix all security vulnerabilities in the backend using 20 agents`
 - `@parallel-orchestrator Deploy backend, frontend, and pipeline to staging environments`
+
+**Optional: Manual agent count override**
+If you want to specify the exact number of agents (not recommended - automatic is usually better):
+```
+@parallel-orchestrator [task] using [N] agents
+```
 
 **Documentation:**
 - `.claude/DYNAMIC_WAVE_ORCHESTRATION.md` - Complete methodology & algorithms
