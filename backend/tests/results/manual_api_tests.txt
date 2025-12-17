@@ -1,0 +1,72 @@
+MANUAL API TESTING RESULTS
+======================================================================
+
+Timestamp: 2025-12-17T09:04:42.018518
+Email Used: test0bec59df@example.com
+Base URL: http://localhost:8000/api/v1
+
+
+TEST: POST /signup (fresh user)
+STATUS: PASS
+TIME: 2025-12-17T09:04:43.626503
+DETAILS:
+  status_code: 201
+  has_access_token: True
+  has_refresh_token: True
+  access_token_is_jwt: True
+
+TEST: POST /login
+STATUS: PASS
+TIME: 2025-12-17T09:04:44.158281
+DETAILS:
+  status_code: 200
+  has_access_token: True
+  has_refresh_token: True
+
+TEST: POST /refresh
+STATUS: PASS
+TIME: 2025-12-17T09:04:44.751738
+DETAILS:
+  status_code: 200
+  has_new_access_token: True
+  has_new_refresh_token: True
+  refresh_token_was_rotated: True
+
+TEST: POST /logout
+STATUS: PASS
+TIME: 2025-12-17T09:04:45.017361
+DETAILS:
+  status_code: 200
+  message: Successfully logged out
+
+TEST: GET /me
+STATUS: PASS
+TIME: 2025-12-17T09:04:45.182086
+DETAILS:
+  status_code: 200
+  email: test0bec59df@example.com
+  full_name: Test User
+  role: therapist
+  is_active: True
+
+TEST: POST /login (invalid password)
+STATUS: PASS
+TIME: 2025-12-17T09:04:45.920371
+DETAILS:
+  status_code: 401
+  detail: Incorrect email or password
+
+TEST: POST /signup (duplicate email)
+STATUS: PASS
+TIME: 2025-12-17T09:04:46.131862
+DETAILS:
+  status_code: 409
+  detail: Email already registered
+
+======================================================================
+SUMMARY
+======================================================================
+total_tests: 7
+passed: 7
+failed: 0
+errors: 0
