@@ -187,21 +187,20 @@ async def upload_audio_session(
     Upload an audio file to create a new session
 
     This will:
-    1. Create session record in database
-    2. Save audio file
-    3. Start background processing (transcription + extraction)
+    1. Validate file size (max 500MB) and type (audio/* MIME types only)
+    2. Create session record in database
+    3. Save audio file
+    4. Start background processing (transcription + extraction)
 
     Returns immediately with session_id and status="uploading"
-    """
-    # Validate file
-    if not file.filename:
-        raise HTTPException(400, "No filename provided")
 
-    # Check file extension
-    allowed_extensions = {".mp3", ".wav", ".m4a", ".mp4", ".mpeg", ".mpga", ".webm"}
-    file_ext = Path(file.filename).suffix.lower()
-    if file_ext not in allowed_extensions:
-        raise HTTPException(400, f"File type {file_ext} not supported. Allowed: {allowed_extensions}")
+    Raises:
+    - 400: Invalid filename, extension, or MIME type
+    - 413: File size exceeds 500MB
+    - 415: Unsupported MIME type
+    """
+    # Validate file early before database operations
+    await validate_audio_upload(file)
 
     # Get therapist (for MVP, use the seeded therapist)
     therapist_result = await db.execute(
@@ -230,10 +229,30 @@ async def upload_audio_session(
     file_path = UPLOAD_DIR / f"{new_session.id}{file_ext}"
 
     try:
+        # Write file with streaming size validation
+        bytes_written = 0
         with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+            chunk_size = 1024 * 1024  # 1MB chunks
+            while True:
+                chunk = await file.read(chunk_size)
+                if not chunk:
+                    break
+                bytes_written += len(chunk)
 
-        print(f"[Upload] Saved audio file: {file_path}")
+                # Check file size during write (runtime validation for streamed uploads)
+                if bytes_written > MAX_FILE_SIZE:
+                    buffer.close()
+                    file_path.unlink()
+                    max_size_mb = MAX_FILE_SIZE / (1024 * 1024)
+                    file_size_mb = bytes_written / (1024 * 1024)
+                    raise HTTPException(
+                        status_code=413,
+                        detail=f"File size ({file_size_mb:.1f}MB) exceeds maximum allowed size ({max_size_mb:.0f}MB)"
+                    )
+
+                buffer.write(chunk)
+
+        print(f"[Upload] Saved audio file: {file_path} ({bytes_written / (1024*1024):.1f}MB)")
 
         # Update session with file path
         await db.execute(

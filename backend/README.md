@@ -65,9 +65,15 @@ backend/
 │   ├── versions/               # Migration files
 │   └── alembic.ini            # Alembic config
 ├── tests/
-│   ├── test_extraction_service.py
-│   ├── test_e2e_auth_flow.py
-│   └── results/                # Test reports & analysis
+│   ├── test_extraction_service.py    # Note extraction service tests
+│   ├── test_e2e_auth_flow.py         # End-to-end authentication flow tests
+│   ├── test_auth_integration.py      # Integration tests for auth endpoints
+│   ├── test_auth_rbac.py             # Role-based access control tests
+│   ├── conftest.py                   # Pytest configuration & fixtures
+│   ├── fixtures/
+│   │   ├── sample_transcripts.py      # Sample transcript data for tests
+│   │   └── __init__.py
+│   └── __init__.py
 ├── migrations/
 │   └── analysis/               # Migration documentation
 ├── .env                        # Environment variables (local)
