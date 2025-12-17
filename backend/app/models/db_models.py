@@ -34,7 +34,7 @@ class Patient(Base):
     name = Column(String(255), nullable=False)
     email = Column(String(255))
     phone = Column(String(50))
-    therapist_id = Column(SQLUUID(as_uuid=True), ForeignKey("users.id"))
+    therapist_id = Column(SQLUUID(as_uuid=True), ForeignKey("users.id"), index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -43,8 +43,8 @@ class Session(Base):
     __tablename__ = "sessions"
 
     id = Column(SQLUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    patient_id = Column(SQLUUID(as_uuid=True), ForeignKey("patients.id"))
-    therapist_id = Column(SQLUUID(as_uuid=True), ForeignKey("users.id"))
+    patient_id = Column(SQLUUID(as_uuid=True), ForeignKey("patients.id"), index=True)
+    therapist_id = Column(SQLUUID(as_uuid=True), ForeignKey("users.id"), index=True)
     session_date = Column(DateTime, nullable=False)
     duration_seconds = Column(Integer)
 

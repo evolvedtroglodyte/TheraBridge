@@ -7,7 +7,7 @@ from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker as create_sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
 from dotenv import load_dotenv
 
 load_dotenv("../audio-transcription-pipeline/.env")

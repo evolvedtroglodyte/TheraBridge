@@ -88,17 +88,6 @@ class ApiClient {
       body: JSON.stringify(data),
     });
   }
-
-  patch<T>(endpoint: string, data?: any): Promise<T> {
-    return this.request<T>(endpoint, {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    });
-  }
-
-  delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: 'DELETE' });
-  }
 }
 
 export const apiClient = new ApiClient();

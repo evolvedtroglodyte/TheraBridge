@@ -7,7 +7,7 @@ A comprehensive therapy session transcription system with speaker diarization, s
 This pipeline processes therapy session audio to produce timestamped transcripts with speaker identification (Therapist vs Client). Two implementations are available:
 
 1. **CPU/API-based** (`src/pipeline.py`) - Uses OpenAI Whisper API, portable and cloud-ready
-2. **GPU-accelerated** (`src/pipeline_colab.py`) - Uses faster-whisper locally, optimized for Google Colab L4
+2. **GPU-accelerated** (`src/pipeline_gpu.py`) - Uses faster-whisper locally, optimized for Vast.ai L4 GPUs
 
 ## Features
 
@@ -37,7 +37,7 @@ python tests/test_full_pipeline.py tests/samples/onemintestvid.mp3
 
 ### GPU Version (Provider-Agnostic)
 
-**NEW: Works on Vast.ai, RunPod, Lambda Labs, Paperspace, and Google Colab**
+**NEW: Works on Vast.ai, RunPod, Lambda Labs, and Paperspace**
 
 Quick GPU setup (universal, works on any provider):
 
@@ -55,7 +55,7 @@ source venv/bin/activate
 python transcribe_gpu.py audio.mp3 --speakers 2
 ```
 
-**Note:** `setup_gpu.sh` auto-detects your GPU provider (Vast.ai, RunPod, Lambda, Paperspace, Colab) and configures accordingly.
+**Note:** `setup_gpu.sh` auto-detects your GPU provider (Vast.ai, RunPod, Lambda, Paperspace) and configures accordingly.
 
 ## Project Structure
 
@@ -66,12 +66,10 @@ audio-transcription-pipeline/
 │   ├── pipeline_gpu.py           # NEW: Provider-agnostic GPU pipeline
 │   ├── gpu_config.py             # NEW: Auto-detect GPU provider & optimize
 │   ├── gpu_audio_ops.py          # GPU-accelerated audio operations
-│   ├── pipeline_colab.py         # Legacy: Colab-specific GPU pipeline
 │   └── performance_logger.py     # Performance monitoring
 │
 ├── scripts/
 │   ├── setup.sh                  # CPU setup
-│   ├── setup_colab.sh            # Google Colab setup
 │   └── setup_gpu.sh              # Universal GPU setup (auto-detects provider)
 │
 ├── tests/
@@ -80,7 +78,6 @@ audio-transcription-pipeline/
 │   └── outputs/                  # Generated transcripts
 │
 ├── requirements.txt              # CPU/API dependencies
-├── requirements_colab.txt        # Google Colab dependencies
 └── README.md                     # This file
 ```
 
