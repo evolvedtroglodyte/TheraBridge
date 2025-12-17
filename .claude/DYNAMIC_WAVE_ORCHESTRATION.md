@@ -4,7 +4,7 @@
 
 **You describe the goal in natural language. The system automatically figures out everything else.**
 
-No manual wave planning. No instance assignment. No dependency mapping.
+No manual wave planning. No instance assignment. No dependency mapping. **No agent count specification.**
 
 ---
 
@@ -13,7 +13,7 @@ No manual wave planning. No instance assignment. No dependency mapping.
 ### Your Input:
 
 ```
-Execute this task dynamically with 15 parallel instances:
+Execute this task dynamically with auto-scaled parallel instances:
 
 [Describe what you want in plain English]
 ```
@@ -23,33 +23,219 @@ Execute this task dynamically with 15 parallel instances:
 1. ✅ Analyzes task complexity
 2. ✅ Breaks into atomic subtasks
 3. ✅ Builds dependency graph
-4. ✅ Generates optimal wave structure
-5. ✅ Assigns specialized instances
-6. ✅ Detects critical operations (forces sequential)
-7. ✅ Executes with maximum parallelization
-8. ✅ Adapts to failures in real-time
-9. ✅ Reports progress and results
+4. ✅ **Auto-scales agent count (1-100 based on parallelizability)**
+5. ✅ Generates optimal wave structure
+6. ✅ Assigns specialized instances
+7. ✅ Detects critical operations (forces sequential)
+8. ✅ Executes with maximum parallelization
+9. ✅ Adapts to failures in real-time
+10. ✅ Reports progress and results
 
-**Estimated time savings: 50-80% vs sequential execution**
+**Estimated time savings: 50-95% vs sequential execution**
 
 ---
 
-## 🏗️ STANDARD INSTANCE ROLES (15 Specialized Agents)
+## 🎚️ AUTO-SCALING AGENT COUNT
 
-| ID | Role | Expertise | Common Tasks |
-|----|------|-----------|--------------|
-| **I1** | 🔵 Coordinator | Orchestration, git operations | Backups, checkpoints, commits |
-| **I2** | 🟢 Database Analyst | Schema, data validation | Analyze tables, compare schemas |
-| **I3** | 🟣 Migration Engineer | Alembic, migrations | Generate/execute migrations |
-| **I4-I6** | 🟠 Backend Engineers | APIs, business logic | Endpoints, services, middleware |
-| **I7-I8** | 🟤 Test Engineers | Testing, fixtures | Unit/integration/RBAC tests |
-| **I9** | 🔵 API Tester | Manual testing | Curl tests, API validation |
-| **I10** | 🟢 DevOps Engineer | Environment, dependencies | pip install, config, CI/CD |
-| **I11** | 🟣 Technical Writer | Documentation | READMEs, API docs, guides |
-| **I12** | 🟠 Code Reviewer | Security, quality | Audits, linting, best practices |
-| **I13** | 🟡 Data Engineer | Backups, ETL | Database backups, data scripts |
-| **I14** | 🔴 Integration Validator | E2E testing | Cross-system validation |
-| **I15** | ⚫ Cleanup Specialist | File management | Remove temps, organize outputs |
+### Algorithm:
+
+```python
+def auto_scale_agents(subtasks, dependencies, avg_duration):
+    """
+    Automatically determine optimal agent count (1-100)
+    """
+    # Count maximum parallelizable subtasks
+    max_parallel = calculate_max_parallel_depth(subtasks, dependencies)
+
+    # Don't create more agents than work available
+    base_agents = min(max_parallel, 100)
+
+    # Account for coordination overhead
+    if base_agents > 50:
+        # High coordination cost - only beneficial for longer tasks
+        if avg_duration < 2:  # minutes
+            return min(base_agents, 30)  # Cap at 30 for micro-tasks
+        else:
+            return base_agents  # Full parallelization worth it
+
+    # For shallow tasks, use conservative count
+    if max_parallel < 10:
+        return max(3, max_parallel)
+
+    return base_agents
+
+# Real Examples:
+auto_scale_agents(8, shallow, 5)      # → 8 agents
+auto_scale_agents(50, shallow, 3)     # → 30 agents (coordination limit)
+auto_scale_agents(200, shallow, 10)   # → 100 agents (max parallelism!)
+auto_scale_agents(10, deep, 5)        # → 5 agents (dependencies limit)
+```
+
+### Scaling Examples:
+
+| Task Type | Subtasks | Dependencies | Optimal Agents | Reason |
+|-----------|----------|--------------|----------------|---------|
+| Simple bug fix | 5 | Linear | **3** | Minimal parallelization |
+| Add new feature | 20 | Moderate | **12** | Good parallelization |
+| Refactor module | 50 | Shallow | **30** | High parallelization |
+| Update 200 files | 200 | None | **100** | Perfect parallelization |
+| Codebase cleanup | 500+ | None | **100** | Mass parallelization |
+| Complex migration | 100 | Deep | **25** | Dependencies limit |
+
+---
+
+## 🧹 PERFECT USE CASE: Repository Cleanup
+
+**Your scenario: "Clean up the repo"**
+
+### System Analysis:
+
+```
+🔍 Analyzing task: "Clean up the entire repository"
+
+DETECTED PATTERN: Mass File Operations
+COMPLEXITY: High (500+ potential operations)
+PARALLELIZABILITY: Extremely high (independent file operations)
+
+📊 BREAKDOWN:
+1. Find all checkpoint files (WAVE_*.txt)
+2. Find all __pycache__ directories
+3. Find all .pyc files
+4. Find all .DS_Store files
+5. Find all temp_*.py files
+6. Find all *.log files
+7. Find all .coverage files
+8. Find empty directories
+9. Find duplicate files
+10. Analyze large files (>10MB)
+11. Find unused imports (per file)
+12. Find dead code (per file)
+13. Clean up old migration backups
+14. Organize test outputs
+15. Remove redundant documentation
+... (could be 50-500 operations depending on repo size)
+
+OPTIMAL AGENT COUNT: **80 agents**
+  └─ Rationale: 500 files to analyze, coordination overhead minimal
+             Each agent processes ~6 files independently
+
+🌊 WAVE STRUCTURE (AUTO-GENERATED):
+
+Wave 0: Safety Backup (1 agent) - 2min
+  └─ I1: Create git backup
+
+Wave 1: Scan Repository (20 agents - parallel) - 3min
+  ├─ I1-I20: Each scans 25 files, identifies cleanup candidates
+  └─ Generates cleanup manifest
+
+Wave 2: Delete Safe Files (60 agents - parallel) - 2min
+  ├─ I1-I60: Each deletes ~8 checkpoint/cache files
+  └─ No dependencies between file deletions
+
+Wave 3: Analyze Complex Cleanup (10 agents - parallel) - 8min
+  ├─ I1-I10: Detect unused imports, dead code
+  └─ Each analyzes ~50 files
+
+Wave 4: Execute Complex Cleanup (30 agents - parallel) - 12min
+  ├─ I1-I30: Remove unused imports, refactor
+  └─ Each processes ~15 files
+
+Wave 5: Verification (10 agents - parallel) - 5min
+  ├─ I1-I10: Verify builds, run tests
+  └─ Ensure nothing broke
+
+Wave 6: Documentation Update (5 agents - parallel) - 5min
+  ├─ I1-I5: Update READMEs, cleanup docs
+  └─ Each handles 1 documentation area
+
+Wave 7: Final Commit (1 agent) - 5min
+  └─ I1: Create detailed commit
+
+TOTAL AGENTS: 80 (auto-scaled)
+TOTAL WAVES: 8 (auto-generated)
+ESTIMATED TIME: 42 minutes
+SEQUENTIAL TIME: 380 minutes (6+ hours!)
+EFFICIENCY: 89% faster ✅
+
+Ready to execute? (yes/no)
+```
+
+---
+
+## 🚀 REAL-WORLD SCALING SCENARIOS
+
+### Scenario 1: Micro-Task Swarm (100 agents)
+
+**Task:**
+```
+Update all import statements across 200 files to use new module path
+```
+
+**System scales to 100 agents:**
+- Wave 1: 100 agents each update 2 files (4 min)
+- Wave 2: Verification (10 agents, 5 min)
+- **Total: 9 minutes vs 200 minutes sequential = 96% faster**
+
+---
+
+### Scenario 2: Moderate Complexity (30 agents)
+
+**Task:**
+```
+Add error handling to all 80 API endpoints
+```
+
+**System scales to 30 agents:**
+- Wave 1: 30 agents each handle ~3 endpoints (15 min)
+- Wave 2: Write tests (20 agents, 20 min)
+- Wave 3: Run tests (10 agents, 10 min)
+- **Total: 45 minutes vs 180 minutes sequential = 75% faster**
+
+---
+
+### Scenario 3: High Dependency (8 agents)
+
+**Task:**
+```
+Refactor authentication system with cascading changes
+```
+
+**System scales to 8 agents (limited by dependencies):**
+- Wave 1: Analyze (3 agents, 8 min)
+- Wave 2: Core refactor (1 agent, 20 min) - SEQUENTIAL
+- Wave 3: Update dependents (8 agents, 15 min)
+- **Total: 43 minutes vs 90 minutes sequential = 52% faster**
+
+---
+
+## 🏗️ INSTANCE ROLES (DYNAMIC ALLOCATION)
+
+**System creates specialized roles on-demand:**
+
+| Role Type | Count Range | When Created |
+|-----------|-------------|--------------|
+| 🔵 Coordinator | 1 (always) | Every task |
+| 🟢 File Operators | 1-80 | Mass file operations |
+| 🟣 Code Analyzers | 1-50 | Static analysis, refactoring |
+| 🟠 Backend Engineers | 1-20 | API/service implementation |
+| 🟤 Test Engineers | 1-30 | Test writing/execution |
+| 🔵 Validators | 1-20 | Verification, quality checks |
+| 🟡 Documentation Writers | 1-10 | README, docs updates |
+| 🔴 Build Engineers | 1-5 | Compilation, deployment |
+
+**Example agent allocation for "cleanup 500 files":**
+```
+Wave 1 (Scan):
+  I1-I20: File scanners (20 agents)
+
+Wave 2 (Delete):
+  I1-I80: File deleters (80 agents - one per ~6 files)
+
+Wave 3 (Verify):
+  I1-I10: Build verifiers (10 agents)
+
+Total: 80 unique agents
+```
 
 ---
 
@@ -59,23 +245,25 @@ Execute this task dynamically with 15 parallel instances:
 
 **System analyzes your natural language input and extracts:**
 
-- **Components:** Database, backend, frontend, tests, docs
+- **Components:** Database, backend, frontend, tests, docs, files, configs
 - **Dependencies:** What must happen before what
 - **Critical operations:** Database migrations, deployments
 - **Parallelization opportunities:** Independent tasks that can run simultaneously
+- **Scale factor:** Number of similar operations (e.g., 200 files to update)
 
 **Example:**
 
 ```
 USER INPUT:
-"Fix the database schema mismatch, add authentication endpoints,
-write comprehensive tests, and update documentation"
+"Clean up the entire repository - remove all checkpoint files,
+cache directories, unused imports, and organize test outputs"
 
 SYSTEM ANALYSIS:
-✅ Identified 23 subtasks
-✅ Detected 2 critical operations (require sequential execution)
-✅ Found 15 parallelization opportunities
+✅ Identified 487 cleanup operations
+✅ Detected 0 critical operations (all safe to parallel)
+✅ Found 485 parallelization opportunities (independent files)
 ✅ Estimated 8 waves needed
+✅ Optimal agent count: 80 agents
 ```
 
 ---
@@ -85,107 +273,67 @@ SYSTEM ANALYSIS:
 **System builds a directed acyclic graph (DAG):**
 
 ```
-Example: Authentication feature
+Example: Repository Cleanup
 
-     [Analyze Schema] (W1)
+     [Scan All Files] (W1 - 20 agents)
             |
-     [DB Schema Design] (W2)
+     [Generate Cleanup Manifest] (W1)
            / \
           /   \
-  [Migration] [JWT Utils] (W3)
-      |         |
-      |    [Endpoints] (W3)
-      |         |
-      |    [Rate Limit] (W4)
-      |         |
-      |    [Write Tests] (W5)
-      |         |
-  [Execute    [Run Tests] (W6)
-   Migration]     |
-      |   ________|
-      |  /
-  [Verify] (W7)
-      |
-  [Docs] (W8)
-      |
-  [Commit] (W9)
+  [Delete Safe  [Analyze Complex] (W3 - 10 agents)
+   Files]            |
+   (W2 - 80)    [Execute Complex] (W4 - 30 agents)
+      |              |
+      +------+-------+
+             |
+       [Verify] (W5 - 10 agents)
+             |
+       [Update Docs] (W6 - 5 agents)
+             |
+       [Commit] (W7 - 1 agent)
 ```
 
 **Automatic rules:**
 - Tasks with no dependencies → Same wave (parallel)
-- Tasks depending on same parent → Can be parallel
-- Critical ops (migrations, deployments) → Isolated sequential wave
-- Safety backup → Always Wave 0
-- Final commit → Always last wave
+- Independent file operations → Maximize agents (up to 100)
+- Dependent operations → Serialize or limit parallelism
+- Safety backup → Always Wave 0 (1 agent)
+- Final commit → Always last wave (1 agent)
 
 ---
 
-### Phase 3: Wave Structure Generation
+### Phase 3: Agent Count Optimization
 
-**Algorithm:** Topological sort + critical path detection
+**Algorithm considers:**
+
+1. **Maximum parallel depth:** How many independent subtasks?
+2. **Coordination overhead:** Is task duration > overhead?
+3. **Resource constraints:** API limits, memory, CPU
+4. **Diminishing returns:** Benefits plateau around 100 agents
 
 ```python
-def generate_waves(subtasks, dependencies):
+def optimize_agent_count(subtasks, dependencies):
     """
-    Automatically generates optimal wave structure
+    Find optimal agent count balancing speed vs overhead
     """
-    waves = []
-    completed = set()
+    # Count truly independent tasks
+    independent_tasks = [t for t in subtasks if len(dependencies[t]) == 0]
 
-    # Wave 0: Always safety backup
-    waves.append({
-        'name': 'Safety Backup',
-        'tasks': ['git_backup'],
-        'instances': ['I1'],
-        'parallelism': 1,
-        'sequential': True
-    })
+    # Count tasks that can run in parallel per wave
+    waves = generate_wave_structure(subtasks, dependencies)
+    max_parallel_per_wave = [len(w['tasks']) for w in waves]
+    peak_parallelism = max(max_parallel_per_wave)
 
-    while len(completed) < len(subtasks):
-        # Find tasks whose dependencies are all completed
-        ready_tasks = []
-        for task in subtasks:
-            if task not in completed:
-                deps = dependencies.get(task, [])
-                if all(d in completed for d in deps):
-                    ready_tasks.append(task)
+    # Cap at 100 (practical limit)
+    optimal = min(peak_parallelism, 100)
 
-        # Separate critical from non-critical
-        critical = [t for t in ready_tasks if is_critical(t)]
-        non_critical = [t for t in ready_tasks if not is_critical(t)]
+    # Adjust for coordination overhead
+    if optimal > 50 and avg_task_duration < 3:  # minutes
+        # High coordination cost for short tasks
+        optimal = min(optimal, 30)
 
-        # Critical tasks get their own sequential waves
-        for task in critical:
-            waves.append({
-                'name': f'{task} (CRITICAL)',
-                'tasks': [task],
-                'instances': assign_instance(task),
-                'parallelism': 1,
-                'sequential': True
-            })
-            completed.add(task)
-
-        # Non-critical tasks can be parallel
-        if non_critical:
-            waves.append({
-                'name': f'Wave {len(waves)}',
-                'tasks': non_critical,
-                'instances': [assign_instance(t) for t in non_critical],
-                'parallelism': len(non_critical),
-                'sequential': False
-            })
-            completed.update(non_critical)
-
-    # Final wave: Always commit
-    waves.append({
-        'name': 'Final Commit',
-        'tasks': ['git_commit'],
-        'instances': ['I1'],
-        'parallelism': 1,
-        'sequential': True
-    })
-
-    return waves
+    # Minimum 3 agents (always beneficial)
+    return max(3, optimal)
 ```
 
 ---
@@ -218,14 +366,14 @@ def is_critical(task_description):
     return False
 
 # Examples
-is_critical("Execute Alembic migration")  # True → Gets own wave
-is_critical("Write unit tests")  # False → Can be parallel
-is_critical("Drop old users table")  # True → Gets own wave
-is_critical("Create signup endpoint")  # False → Can be parallel
+is_critical("Execute Alembic migration")  # True → Gets own wave, 1 agent
+is_critical("Delete 500 checkpoint files")  # False → Can use 100 agents
+is_critical("Update imports in 200 files")  # False → Can use 100 agents
 ```
 
 **Critical tasks automatically get:**
 - ✅ Isolated wave (no other tasks)
+- ✅ Single agent (no parallelism)
 - ✅ Backup step before execution
 - ✅ Verification step after execution
 - ✅ Rollback script generated
@@ -234,139 +382,127 @@ is_critical("Create signup endpoint")  # False → Can be parallel
 
 ## 🎓 TASK PATTERN RECOGNITION
 
-**System automatically recognizes common patterns and applies optimal structures:**
+**System automatically recognizes common patterns and applies optimal scaling:**
 
-### Pattern 1: Full-Stack Feature
+### Pattern 1: Mass File Operations (80-100 agents)
+
+**Triggers:** Keywords like "all files", "every file", "cleanup", "update all", "remove all", "200 files"
+
+**Auto-generated structure:**
+```
+Detected: 500 files to process
+Agents: 80 (each handles ~6 files)
+
+W0: Safety backup (1 agent) - 2min
+W1: Scan files (20 agents - parallel) - 3min
+W2: Process files (80 agents - parallel) - 10min
+W3: Verification (10 agents - parallel) - 5min
+W4: Final commit (1 agent) - 5min
+
+Estimated: 25 minutes (vs 500 minutes sequential) = 95% faster
+```
+
+---
+
+### Pattern 2: Full-Stack Feature (10-20 agents)
 
 **Triggers:** Keywords like "frontend", "backend", "database", "API", "endpoint", "component", "feature"
 
 **Auto-generated structure:**
 ```
-W0: Safety backup (I1) - 2min
-W1: Analysis (I2, I10 - parallel) - 5min
-  ├─ Database requirements
-  └─ Dependency check
-W2: Database schema (I2) - 10min
-W3: Backend API (I4, I5, I6 - parallel) - 15min
-  ├─ Create endpoint
-  ├─ Business logic
-  └─ Validation
-W4: Frontend UI (I4, I5 - parallel) - 12min
-  ├─ Component creation
-  └─ State management
-W5: Integration (I4) - 8min
-W6: Testing (I7, I8, I14 - parallel) - 18min
-  ├─ Unit tests
-  ├─ Integration tests
-  └─ E2E tests
-W7: Documentation (I11) - 5min
-W8: Final commit (I1) - 5min
+Detected: 25 subtasks, moderate dependencies
+Agents: 15 (specialized roles)
+
+W0: Safety backup (1 agent) - 2min
+W1: Analysis (3 agents - parallel) - 5min
+W2: Database schema (2 agents - parallel) - 10min
+W3: Backend API (8 agents - parallel) - 15min
+W4: Frontend UI (6 agents - parallel) - 12min
+W5: Integration (3 agents) - 8min
+W6: Testing (12 agents - parallel) - 18min
+W7: Documentation (3 agents - parallel) - 5min
+W8: Final commit (1 agent) - 5min
 
 Estimated: 80 minutes (vs 180 sequential) = 56% faster
 ```
 
 ---
 
-### Pattern 2: Bug Fix
+### Pattern 3: Bug Fix (3-5 agents)
 
 **Triggers:** Keywords like "fix bug", "issue", "error", "not working", "broken"
 
 **Auto-generated structure:**
 ```
-W0: Safety backup (I1) - 2min
-W1: Reproduce bug (I7) - 8min
-  └─ Create failing test
-W2: Analyze root cause (I2, I4 - parallel) - 10min
-  ├─ Debug logs
-  └─ Code analysis
-W3: Implement fix (I4) - 12min
-W4: Run tests (I7, I8 - parallel) - 8min
-W5: Documentation (I11) - 5min
-W6: Final commit (I1) - 5min
+Detected: 7 subtasks, high dependencies
+Agents: 5 (limited by dependencies)
+
+W0: Safety backup (1 agent) - 2min
+W1: Reproduce bug (2 agents - parallel) - 8min
+W2: Analyze root cause (3 agents - parallel) - 10min
+W3: Implement fix (2 agents - parallel) - 12min
+W4: Run tests (4 agents - parallel) - 8min
+W5: Documentation (2 agents - parallel) - 5min
+W6: Final commit (1 agent) - 5min
 
 Estimated: 50 minutes (vs 90 sequential) = 44% faster
 ```
 
 ---
 
-### Pattern 3: Database Migration
+### Pattern 4: Comprehensive Testing (20-40 agents)
 
-**Triggers:** Keywords like "database", "schema", "migration", "add column", "alter table"
+**Triggers:** Keywords like "all tests", "test coverage", "500 test files", "comprehensive testing"
 
 **Auto-generated structure:**
 ```
-W0: Safety backup (I1) - 2min
-W1: Schema analysis (I2) - 8min
-W2: Migration script (I3) - 10min
-W3: Backup script (I13) - 8min
-W4: Dry run preview (I3) - 5min
-W5: Execute backup (I13) - 3min SEQUENTIAL
-W6: Execute migration (I3) - 5min SEQUENTIAL ⚠️
-W7: Verify schema (I2) - 5min
-W8: Run tests (I7, I8 - parallel) - 10min
-W9: Final commit (I1) - 5min
+Detected: 500 test files to run
+Agents: 40 (each runs ~12 tests)
 
-Estimated: 61 minutes (vs 120 sequential) = 49% faster
+W0: Safety backup (1 agent) - 2min
+W1: Test infrastructure (5 agents - parallel) - 10min
+W2: Run unit tests (40 agents - parallel) - 15min
+W3: Run integration tests (30 agents - parallel) - 20min
+W4: Run E2E tests (20 agents - parallel) - 25min
+W5: Coverage report (5 agents - parallel) - 5min
+W6: Documentation (3 agents - parallel) - 5min
+W7: Final commit (1 agent) - 5min
+
+Estimated: 87 minutes (vs 600 minutes sequential) = 85% faster
 ```
 
 ---
 
-### Pattern 4: Testing Suite
+### Pattern 5: Code Generation (50-100 agents)
 
-**Triggers:** Keywords like "add tests", "test coverage", "unit tests", "integration tests"
+**Triggers:** Keywords like "generate", "create all", "scaffold", "boilerplate", "20 languages", "100 endpoints"
 
 **Auto-generated structure:**
 ```
-W0: Safety backup (I1) - 2min
-W1: Analyze code (I7) - 5min
-W2: Test infrastructure (I7, I8, I10 - parallel) - 10min
-  ├─ Fixtures
-  ├─ Config
-  └─ Dependencies
-W3: Write tests (I7, I8, I14 - parallel) - 20min
-  ├─ Unit tests
-  ├─ Integration tests
-  └─ E2E tests
-W4: Run tests (I7) - 8min
-W5: Coverage report (I7) - 3min
-W6: Documentation (I11) - 5min
-W7: Final commit (I1) - 5min
+Detected: Generate API clients in 50 languages
+Agents: 50 (one per language)
 
-Estimated: 58 minutes (vs 120 sequential) = 52% faster
+W0: Safety backup (1 agent) - 2min
+W1: Analyze API spec (5 agents - parallel) - 8min
+W2: Generate clients (50 agents - parallel) - 20min
+W3: Test clients (50 agents - parallel) - 30min
+W4: Documentation (10 agents - parallel) - 10min
+W5: Final commit (1 agent) - 5min
+
+Estimated: 75 minutes (vs 1000+ minutes sequential) = 93% faster
 ```
 
 ---
 
-### Pattern 5: Refactoring
-
-**Triggers:** Keywords like "refactor", "cleanup", "reorganize", "rename", "restructure"
-
-**Auto-generated structure:**
-```
-W0: Safety backup (I1) - 2min
-W1: Analyze structure (I2, I12 - parallel) - 8min
-W2: Plan refactoring (I4) - 10min
-W3: Execute refactor (I4, I5, I6 - parallel) - 20min
-  └─ Update multiple files in parallel
-W4: Update references (I4, I5 - parallel) - 12min
-W5: Run tests (I7, I8 - parallel) - 15min
-W6: Documentation (I11) - 5min
-W7: Final commit (I1) - 5min
-
-Estimated: 77 minutes (vs 150 sequential) = 49% faster
-```
-
----
-
-## 🎬 COMPLETE WORKFLOW EXAMPLE
+## 🎬 COMPLETE WORKFLOW EXAMPLE: Repository Cleanup
 
 ### User Input:
 ```
-Execute this task dynamically with 15 parallel instances:
+Execute this task dynamically with auto-scaled parallel instances:
 
-The frontend needs a dark mode toggle. Add a theme context provider,
-update all components to support dark mode, add a toggle button in the
-header, persist the preference to localStorage, and test on all pages.
+Clean up the entire repository. Remove all checkpoint files, Python cache
+directories, .pyc files, old migration backups, unused imports in all Python
+files, redundant test outputs, and organize remaining files properly.
 ```
 
 ---
@@ -375,67 +511,135 @@ header, persist the preference to localStorage, and test on all pages.
 ```
 🔍 Analyzing task...
 
-PATTERN DETECTED: Frontend Feature (theme system)
-COMPLEXITY: Medium (12 subtasks identified)
-CRITICAL OPERATIONS: None detected
+PATTERN DETECTED: Mass File Operations (Cleanup)
+COMPLEXITY: High (500+ operations across 487 files)
+CRITICAL OPERATIONS: None detected (all safe deletions/modifications)
+PARALLELIZABILITY: Extremely high (95% independent operations)
 
-📊 SUBTASK BREAKDOWN:
-1. Create ThemeContext.tsx
-2. Create theme types (light/dark)
-3. Create useTheme hook
-4. Update layout.tsx with ThemeProvider
-5. Create DarkModeToggle component
-6. Add toggle to header
-7. Implement localStorage persistence
-8. Update globals.css variables
-9. Update 8 UI components (Button, Card, Input, etc.)
-10. Test on all pages
-11. Update documentation
-12. Git commit
+📊 DETAILED BREAKDOWN:
+
+Phase 1: Scan Repository
+  1. Find all WAVE_*.txt files (23 found)
+  2. Find all __pycache__ directories (47 found)
+  3. Find all .pyc files (132 found)
+  4. Find all .DS_Store files (8 found)
+  5. Find all *.log files (12 found)
+  6. Find all .coverage files (3 found)
+  7. Find empty directories (5 found)
+  8. Find old migration backups (18 files, >30 days old)
+  9. Identify redundant test outputs (34 files)
+  10. Scan all .py files for unused imports (289 files)
+
+Phase 2: Safe Deletions (No Analysis Required)
+  - Delete checkpoint files: 23 operations
+  - Delete cache directories: 47 operations
+  - Delete .pyc files: 132 operations
+  - Delete system files: 8 operations
+  - Delete logs: 12 operations
+  - Delete coverage: 3 operations
+  - Delete empty dirs: 5 operations
+  - Delete old backups: 18 operations
+  Total: 248 independent deletions
+
+Phase 3: Complex Cleanup (Requires Analysis)
+  - Remove unused imports: 289 files (each needs parsing)
+  - Organize test outputs: 34 files (needs categorization)
+  Total: 323 analysis operations
+
+Phase 4: Verification
+  - Run tests: 1 operation (ensure nothing broke)
+  - Verify builds: 1 operation
+  - Update .gitignore: 1 operation
 
 DEPENDENCY GRAPH:
-  1,2 → 3 → 4 → 5,6 → 7,8 → 9 → 10 → 11 → 12
+  [Scan] → [Safe Deletions] → [Complex Cleanup] → [Verify] → [Commit]
+           (parallel)         (parallel)           (parallel)
 
-🌊 OPTIMAL WAVE STRUCTURE (AUTO-GENERATED):
+🎚️ OPTIMAL AGENT ALLOCATION:
 
-Wave 0: Safety Backup (I1) - 2min
-  └─ Create git backup commit
+Wave 1 (Scan): 20 agents
+  └─ Each agent scans ~25 files
 
-Wave 1: Theme Foundation (I4, I5 - parallel) - 10min
-  ├─ I4: Create ThemeContext + types
-  └─ I5: Create useTheme hook
+Wave 2 (Safe Delete): 80 agents
+  └─ Each agent deletes ~3 files
 
-Wave 2: Integration (I4) - 8min
-  └─ I4: Update layout.tsx
+Wave 3 (Analyze): 40 agents
+  └─ Each agent analyzes ~8 Python files
 
-Wave 3: Toggle UI (I4, I5 - parallel) - 12min
-  ├─ I4: Create DarkModeToggle component
-  └─ I5: Add to header
+Wave 4 (Execute Cleanup): 40 agents
+  └─ Each agent modifies ~8 files
 
-Wave 4: Persistence (I4, I10 - parallel) - 10min
-  ├─ I4: localStorage logic
-  └─ I10: Update CSS variables
+Wave 5 (Verify): 5 agents
+  └─ Run tests in parallel
 
-Wave 5: Component Updates (I4, I5, I6 - parallel) - 15min
-  ├─ I4: Button, Card, Modal
-  ├─ I5: Form, Input, Select
-  └─ I6: Table, Tabs, Dropdown
+Total Unique Agents: 80 (peak parallelism in Wave 2)
 
-Wave 6: Testing (I9, I14 - parallel) - 8min
-  ├─ I9: Manual toggle testing
-  └─ I14: Visual regression
+🌊 WAVE STRUCTURE (AUTO-GENERATED):
 
-Wave 7: Documentation (I11) - 5min
-  └─ I11: Update README
+Wave 0: Safety Backup
+  └─ I1: Create git backup
+  Duration: 2min | Agents: 1
 
-Wave 8: Final Commit (I1) - 5min
-  └─ I1: Create commit
+Wave 1: Repository Scan (20 agents - parallel)
+  ├─ I1-I20: Each scans 25 files
+  ├─ Generate deletion manifest (248 files)
+  └─ Generate analysis manifest (323 files)
+  Duration: 3min | Agents: 20
 
-INSTANCES USED: 7 of 15
-TOTAL WAVES: 9 (auto-generated)
-ESTIMATED TIME: 75 minutes
-SEQUENTIAL TIME: 140 minutes
-EFFICIENCY: 46% faster
+Wave 2: Safe Deletions (80 agents - parallel)
+  ├─ I1-I80: Each deletes ~3 files
+  ├─ No coordination needed (independent ops)
+  └─ Checkpoint after each deletion
+  Duration: 2min | Agents: 80 ⚡
+
+Wave 3: Analyze Python Files (40 agents - parallel)
+  ├─ I1-I40: Each parses ~8 .py files
+  ├─ Detect unused imports using AST
+  └─ Generate removal plans
+  Duration: 8min | Agents: 40
+
+Wave 4: Execute Code Cleanup (40 agents - parallel)
+  ├─ I1-I40: Each modifies ~8 files
+  ├─ Remove unused imports
+  └─ Organize test outputs
+  Duration: 10min | Agents: 40
+
+Wave 5: Verification (5 agents - parallel)
+  ├─ I1: Run backend tests
+  ├─ I2: Run frontend tests (if exists)
+  ├─ I3: Verify builds
+  ├─ I4: Update .gitignore patterns
+  └─ I5: Generate cleanup report
+  Duration: 8min | Agents: 5
+
+Wave 6: Documentation (3 agents - parallel)
+  ├─ I1: Update root README
+  ├─ I2: Update backend README
+  └─ I3: Update session log
+  Duration: 5min | Agents: 3
+
+Wave 7: Final Commit
+  └─ I1: Create detailed commit with stats
+  Duration: 5min | Agents: 1
+
+TOTAL AGENTS: 80 (auto-scaled)
+TOTAL WAVES: 8 (auto-generated)
+ESTIMATED TIME: 43 minutes
+SEQUENTIAL TIME: 487 files × 1min each = 487 minutes (8+ hours!)
+EFFICIENCY: 91% faster ✅
+
+📊 CLEANUP STATISTICS (Projected):
+  • Checkpoint files removed: 23
+  • Cache directories removed: 47
+  • .pyc files removed: 132
+  • System files removed: 8
+  • Log files removed: 12
+  • Coverage files removed: 3
+  • Empty directories removed: 5
+  • Old backups removed: 18
+  • Unused imports removed: ~450 lines across 289 files
+  • Test outputs organized: 34 files
+  • Total disk space saved: ~85 MB
 
 Ready to execute? (yes/no)
 ```
@@ -449,100 +653,143 @@ yes
 
 ---
 
-### System Executes (Fully Automatic):
+### System Executes (80 Agents!):
 ```
-🚀 Launching 7 instances across 9 waves...
+🚀 Launching 80 agents across 8 waves...
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[Wave 0] Safety Backup
+[Wave 0] Safety Backup (1 agent)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ⚡ I1: Creating git backup...
-✅ Backup created (commit: 9a7f3e2)
-Duration: 2min | Checkpoint: ✅
+✅ Backup created (commit: a3f9e82)
+Duration: 2min | Progress: ██████████ 100%
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[Wave 1] Theme Foundation (2 parallel)
+[Wave 1] Repository Scan (20 agents - parallel)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚡ I4: Creating ThemeContext.tsx...
-  └─ Created ThemeContext.tsx (85 lines)
-  └─ Created types/theme.ts (45 lines)
-⚡ I5: Creating useTheme hook...
-  └─ Created hooks/useTheme.ts (35 lines)
-✅ Wave 1 complete | Duration: 10min
+⚡ I1-I20: Scanning files...
+  ├─ I1: Scanned 25 files (found 12 checkpoint files)
+  ├─ I2: Scanned 25 files (found 6 cache dirs)
+  ├─ I3: Scanned 25 files (found 8 .pyc files)
+  └─ ... [I4-I20 running in parallel]
+✅ Wave 1 complete
+  └─ Total found: 248 safe deletions, 323 analysis targets
+Duration: 3min | Progress: ██████████ 100%
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[Wave 2] Integration
+[Wave 2] Safe Deletions (80 agents - parallel) ⚡
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚡ I4: Updating app/layout.tsx...
-  └─ Wrapped with ThemeProvider
-✅ Wave 2 complete | Duration: 8min
+⚡ I1-I80: Deleting files in parallel...
+  ├─ I1: Deleted 3 files (WAVE_*.txt)
+  ├─ I2: Deleted 3 files (__pycache__)
+  ├─ I3: Deleted 3 files (.pyc)
+  └─ ... [I4-I80 running simultaneously]
+✅ Wave 2 complete
+  └─ 248 files deleted, 78MB freed
+Duration: 2min | Progress: ██████████ 100%
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[Wave 3] Toggle UI (2 parallel)
+[Wave 3] Analyze Python Files (40 agents - parallel)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚡ I4: Creating DarkModeToggle component...
-  └─ Created components/DarkModeToggle.tsx (92 lines)
-⚡ I5: Integrating into header...
-  └─ Updated components/Header.tsx
-✅ Wave 3 complete | Duration: 12min
+⚡ I1-I40: Analyzing Python files...
+  ├─ I1: Analyzed 8 files (found 12 unused imports)
+  ├─ I2: Analyzed 8 files (found 8 unused imports)
+  └─ ... [I3-I40 analyzing in parallel]
+✅ Wave 3 complete
+  └─ 289 files analyzed, 487 unused imports detected
+Duration: 8min | Progress: ██████████ 100%
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[Wave 4] Persistence (2 parallel)
+[Wave 4] Execute Code Cleanup (40 agents - parallel)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚡ I4: Adding localStorage persistence...
-  └─ Updated ThemeContext with localStorage
-⚡ I10: Updating CSS variables...
-  └─ Updated globals.css (24 variables)
-✅ Wave 4 complete | Duration: 10min
+⚡ I1-I40: Removing unused imports...
+  ├─ I1: Modified 8 files (removed 18 imports)
+  ├─ I2: Modified 8 files (removed 14 imports)
+  └─ ... [I3-I40 modifying in parallel]
+✅ Wave 4 complete
+  └─ 289 files cleaned, 487 unused imports removed
+Duration: 10min | Progress: ██████████ 100%
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[Wave 5] Component Updates (3 parallel)
+[Wave 5] Verification (5 agents - parallel)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚡ I4: Updating Button, Card, Modal...
-⚡ I5: Updating Form, Input, Select...
-⚡ I6: Updating Table, Tabs, Dropdown...
-✅ Wave 5 complete | Duration: 15min
-  └─ 8 components updated with dark mode support
+⚡ I1-I5: Running verification...
+  ├─ I1: Backend tests... ✅ All passed (54/54)
+  ├─ I2: Frontend tests... ✅ All passed (12/12)
+  ├─ I3: Build verification... ✅ Success
+  ├─ I4: Updated .gitignore... ✅ Complete
+  └─ I5: Generated cleanup report... ✅ Complete
+✅ Wave 5 complete
+Duration: 8min | Progress: ██████████ 100%
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[Wave 6] Testing (2 parallel)
+[Wave 6] Documentation (3 agents - parallel)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚡ I9: Manual testing on all pages...
-  └─ Tested 5 pages: All working ✅
-⚡ I14: Visual regression testing...
-  └─ 0 visual regressions detected ✅
-✅ Wave 6 complete | Duration: 8min
+⚡ I1-I3: Updating documentation...
+  ├─ I1: Updated root README
+  ├─ I2: Updated backend README
+  └─ I3: Updated session log
+✅ Wave 6 complete
+Duration: 5min | Progress: ██████████ 100%
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[Wave 7] Documentation
+[Wave 7] Final Commit (1 agent)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚡ I11: Updating README...
-  └─ Added "Dark Mode" section to README.md
-✅ Wave 7 complete | Duration: 5min
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[Wave 8] Final Commit
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚡ I1: Creating final commit...
-  └─ Commit created (b4e8f1d)
+⚡ I1: Creating comprehensive commit...
+✅ Commit created (d8c4f21)
   └─ Cleaned up 7 checkpoint files
-✅ Wave 8 complete | Duration: 5min
+Duration: 5min | Progress: ██████████ 100%
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎉 EXECUTION COMPLETE!
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📊 SUMMARY:
-├─ Total time: 75 minutes
-├─ Sequential time: 140 minutes
-├─ Efficiency: 46% faster
-├─ Waves executed: 9 (auto-generated)
-├─ Instances used: 7 of 15
-├─ Files created: 5
-├─ Files modified: 12
-├─ Tests passed: ✅ All manual tests passed
-├─ Git commit: b4e8f1d
-└─ Status: ✅ READY FOR DEPLOYMENT
+📊 CLEANUP SUMMARY:
+├─ Total time: 43 minutes
+├─ Sequential time: 487 minutes (8.1 hours)
+├─ Efficiency: 91% faster ✅
+├─ Waves executed: 8 (auto-generated)
+├─ Peak agents: 80 (Wave 2 - Safe Deletions)
+├─ Average agents per wave: 31
+│
+├─ Files Deleted: 248
+│   ├─ Checkpoint files: 23
+│   ├─ Cache directories: 47
+│   ├─ .pyc files: 132
+│   ├─ System files: 8
+│   ├─ Log files: 12
+│   ├─ Coverage files: 3
+│   ├─ Empty directories: 5
+│   └─ Old backups: 18
+│
+├─ Code Cleanup: 289 files
+│   ├─ Unused imports removed: 487
+│   ├─ Lines removed: 487
+│   └─ Syntax errors: 0
+│
+├─ Disk Space Saved: 85 MB
+│   ├─ Checkpoint files: 2 MB
+│   ├─ Cache: 45 MB
+│   ├─ Logs: 12 MB
+│   └─ Backups: 26 MB
+│
+├─ Tests: ✅ All passed (66/66)
+├─ Build: ✅ Success
+├─ Git commit: d8c4f21
+└─ Status: ✅ REPOSITORY CLEANED
+
+🎯 AGENT UTILIZATION:
+  Wave 1: 20/80 agents (25% utilization)
+  Wave 2: 80/80 agents (100% utilization) ⚡ PEAK
+  Wave 3: 40/80 agents (50% utilization)
+  Wave 4: 40/80 agents (50% utilization)
+  Wave 5: 5/80 agents (6% utilization)
+  Wave 6: 3/80 agents (4% utilization)
+  Wave 7: 1/80 agents (1% utilization)
+  Average: 27% overall utilization
+
+  └─ Optimal: High utilization during compute-intensive waves
+            Low utilization during coordination/verification waves
 ```
 
 ---
@@ -551,31 +798,30 @@ Duration: 2min | Checkpoint: ✅
 
 **System adapts in real-time when issues arise:**
 
-### Scenario: Test Failures
+### Scenario: Test Failures After Cleanup
 
 **Original plan:**
 ```
-W5: Run tests
-W6: Documentation
-W7: Commit
+W5: Run tests (5 agents)
+W6: Documentation (3 agents)
+W7: Commit (1 agent)
 ```
 
 **Adaptive adjustment:**
 ```
-W5: Run tests
-  ❌ 3 tests failed: test_auth_signup, test_token_rotation, test_rate_limit
+W5: Run tests (5 agents)
+  ❌ 8 tests failed: Import errors in 8 files
 
 [SYSTEM AUTOMATICALLY INSERTS NEW WAVES]
 
-W5.1: Analyze failures (I7) - 5min
-  └─ Identified: Missing password validation
+W5.1: Analyze failures (8 agents - parallel) - 3min
+  └─ Each agent analyzes 1 failing file
 
-W5.2: Fix failures (I4, I7 - parallel) - 10min
-  ├─ I4: Add validation to signup endpoint
-  └─ I7: Update test fixtures
+W5.2: Fix import errors (8 agents - parallel) - 5min
+  └─ Each agent fixes 1 file
 
-W5.3: Re-run tests (I7, I8 - parallel) - 8min
-  ✅ All 54 tests passed
+W5.3: Re-run tests (5 agents - parallel) - 8min
+  ✅ All 66 tests passed
 
 W6: Documentation (continues as planned)
 W7: Commit
@@ -583,74 +829,39 @@ W7: Commit
 
 ---
 
-### Scenario: Dependency Conflict
-
-**Original plan:**
-```
-W3: Install new package (I10)
-W4: Use package in feature (I4)
-```
-
-**Adaptive adjustment:**
-```
-W3: Install package (I10)
-  ⚠️ Conflict: fastapi 0.100 requires pydantic v2,
-     existing code uses pydantic v1
-
-[SYSTEM INSERTS MIGRATION WAVES]
-
-W3.1: Analyze pydantic usage (I2) - 8min
-  └─ Found 45 files using pydantic v1
-
-W3.2: Plan migration (I4) - 5min
-  └─ Created migration checklist
-
-W3.3: Update code (I4, I5, I6 - parallel) - 20min
-  ├─ I4: Update models
-  ├─ I5: Update schemas
-  └─ I6: Update validators
-
-W3.4: Update tests (I7, I8 - parallel) - 15min
-
-W3.5: Verify migration (I7) - 8min
-  ✅ All tests passed with pydantic v2
-
-W4: Use package in feature (continues as planned)
-```
-
----
-
 ## 📊 REAL-TIME PROGRESS
 
-**During execution, system shows live progress:**
+**During execution, system shows live progress with agent activity:**
 
 ```
 ╔═══════════════════════════════════════════════════════════════╗
-║              🌊 WAVE EXECUTION DASHBOARD                      ║
+║         🌊 WAVE EXECUTION DASHBOARD (80 AGENTS)               ║
 ╠═══════════════════════════════════════════════════════════════╣
-║ Current Wave: 3 of 8                                          ║
-║ Overall Progress: 45% ████████████░░░░░░░░░░░░░               ║
-║ ETA: 28 minutes remaining                                     ║
+║ Current Wave: 2 of 7                                          ║
+║ Overall Progress: 15% ████░░░░░░░░░░░░░░░░░░░                ║
+║ ETA: 36 minutes remaining                                     ║
 ╠═══════════════════════════════════════════════════════════════╣
 ║ Wave 0: Safety Backup           [██████████] 100% ✅ (2min)   ║
-║ Wave 1: Analysis                [██████████] 100% ✅ (5min)   ║
-║ Wave 2: Schema Design           [██████████] 100% ✅ (10min)  ║
-║ Wave 3: Implementation          [████████░░] 80%  ⏳ (9/12min)║
-║   ├─ I3: Migration script       [██████████] 100% ✅          ║
-║   ├─ I4: Signup endpoint        [██████████] 100% ✅          ║
-║   ├─ I5: Token rotation         [████████░░] 85%  ⏳          ║
-║   └─ I6: Rate limiting          [██████░░░░] 60%  ⏳          ║
-║ Wave 4: Testing                 [░░░░░░░░░░] 0%   ⏸️          ║
-║ Wave 5: Documentation           [░░░░░░░░░░] 0%   ⏸️          ║
-║ Wave 6: Migration Execution     [░░░░░░░░░░] 0%   ⏸️          ║
-║ Wave 7: Verification            [░░░░░░░░░░] 0%   ⏸️          ║
-║ Wave 8: Final Commit            [░░░░░░░░░░] 0%   ⏸️          ║
+║ Wave 1: Scan Repository         [██████████] 100% ✅ (3min)   ║
+║ Wave 2: Safe Deletions          [████░░░░░░] 45%  ⏳ (1/2min) ║
+║   ├─ I1-I20: Complete           [██████████] 100% ✅          ║
+║   ├─ I21-I40: Complete          [██████████] 100% ✅          ║
+║   ├─ I41-I60: In Progress       [██████░░░░] 65%  ⏳          ║
+║   └─ I61-I80: Queued            [░░░░░░░░░░] 0%   ⏸️          ║
+║ Wave 3: Analyze (40 agents)     [░░░░░░░░░░] 0%   ⏸️          ║
+║ Wave 4: Cleanup (40 agents)     [░░░░░░░░░░] 0%   ⏸️          ║
+║ Wave 5: Verify (5 agents)       [░░░░░░░░░░] 0%   ⏸️          ║
+║ Wave 6: Docs (3 agents)         [░░░░░░░░░░] 0%   ⏸️          ║
+║ Wave 7: Commit (1 agent)        [░░░░░░░░░░] 0%   ⏸️          ║
 ╠═══════════════════════════════════════════════════════════════╣
-║ Instances Active: 4 of 7                                      ║
-║   • I3: ✅ Complete                                           ║
-║   • I4: ✅ Complete                                           ║
-║   • I5: ⏳ In progress (Token rotation)                       ║
-║   • I6: ⏳ In progress (Rate limiting)                        ║
+║ Active Agents: 40 of 80                                       ║
+║   • I1-I40: ✅ Complete (248 files deleted)                   ║
+║   • I41-I80: ⏳ In progress (deleting...)                     ║
+║                                                               ║
+║ Performance:                                                  ║
+║   • Files processed: 112 of 248                               ║
+║   • Processing rate: ~56 files/min                            ║
+║   • Disk freed: 35 MB of 85 MB                                ║
 ╚═══════════════════════════════════════════════════════════════╝
 ```
 
@@ -679,16 +890,16 @@ No exceptions. No way to skip. Aligns with CLAUDE.md rules.
 User task: "Execute database migration"
 
 System generates:
-W5.1: Create backup (I13) - 3min
+W5.1: Create backup (1 agent) - 3min
   └─ Backup 112KB data to migrations/backups/
 
-W5.2: Execute migration (I3) - 5min SEQUENTIAL ⚠️
+W5.2: Execute migration (1 agent) - 5min SEQUENTIAL ⚠️
   └─ alembic upgrade head
 
-W5.3: Verify migration (I2) - 5min
+W5.3: Verify migration (1 agent) - 5min
   └─ Check schema matches models
 
-W5.4: Generate rollback script (I13) - 3min
+W5.4: Generate rollback script (1 agent) - 3min
   └─ Create restore_from_backup.py
 ```
 
@@ -699,20 +910,20 @@ W5.4: Generate rollback script (I13) - 3min
 **If any wave fails:**
 
 ```
-Wave 5: Execute Migration
-  ❌ Migration failed: column "full_name" already exists
+Wave 4: Code Cleanup (40 agents)
+  ❌ 5 agents failed: Syntax errors introduced
 
 [SYSTEM AUTO-RESPONSE]
 
-⚠️ WAVE 5 FAILED - INITIATING ROLLBACK
+⚠️ WAVE 4 FAILED - INITIATING ROLLBACK
 
-Step 1: Stopping all running instances... ✅
-Step 2: Restoring from backup... ✅
+Step 1: Stopping all 40 agents... ✅
+Step 2: Restoring affected files from backup... ✅
 Step 3: Verifying restoration... ✅
 
 OPTIONS:
-1. Analyze failure and retry
-2. Skip migration and continue
+1. Analyze failures and retry (with fewer agents)
+2. Skip code cleanup and continue with tests
 3. Abort entire execution
 
 Your choice: _
@@ -720,290 +931,22 @@ Your choice: _
 
 ---
 
-### 4. Checkpoint Persistence
+## 📐 PRACTICAL LIMITS
 
-**Every task creates detailed checkpoint:**
+### Upper Bound: 100 Agents
 
-```bash
-# WAVE_3_I4_CHECKPOINT.txt
-✅ TASK COMPLETE
-Instance: I4
-Task: Create signup endpoint
-Wave: 3
-Timestamp: 2025-12-17 14:32:15
-Duration: 8 minutes
-Files created:
-  - app/auth/router.py (+45 lines)
-Files modified:
-  - app/auth/schemas.py (+15 lines)
-Tests: 0 written (feature code only)
-Status: SUCCESS
-Next dependencies: Wave 4 (Testing)
-```
+**Why not 1000 agents?**
 
----
+1. **Coordination overhead** - Checkpoint verification scales linearly
+2. **Diminishing returns** - Benefits plateau around 100 agents
+3. **Resource limits** - API rate limits, memory, CPU contention
+4. **Context management** - Each agent needs context/state
 
-## 📐 INSTANCE ALLOCATION (AUTOMATIC)
-
-**System decides how many instances based on complexity:**
-
-### Formula:
-```python
-def calculate_instances_needed(subtask_count, max_parallel_depth):
-    """
-    Automatically determine optimal instance count
-    """
-    base_instances = min(15, max(3, ceil(subtask_count / 3)))
-
-    # Adjust for parallelization depth
-    if max_parallel_depth > 5:
-        # Deep parallelization possible
-        instances_needed = min(15, base_instances + 2)
-    else:
-        instances_needed = base_instances
-
-    return instances_needed
-
-# Examples
-calculate_instances_needed(5, 2)   # → 5 instances (small task)
-calculate_instances_needed(15, 4)  # → 7 instances (medium task)
-calculate_instances_needed(30, 6)  # → 12 instances (large task)
-calculate_instances_needed(50, 8)  # → 15 instances (complex task)
-```
-
-### Allocation Examples:
-
-**Small task (< 5 subtasks):**
-```
-Task: "Fix typo in README"
-Instances: 1 (I1 only)
-Waves: 2 (backup + edit)
-Time: 5 minutes
-```
-
-**Medium task (5-15 subtasks):**
-```
-Task: "Add new API endpoint with tests"
-Instances: 5 (I1, I4, I7, I8, I11)
-Waves: 6
-Time: 45 minutes (vs 90 sequential) = 50% faster
-```
-
-**Large task (15-30 subtasks):**
-```
-Task: "Implement authentication system"
-Instances: 10 (I1, I2, I3, I4, I5, I6, I7, I8, I11, I13)
-Waves: 9
-Time: 75 minutes (vs 180 sequential) = 58% faster
-```
-
-**Complex task (30+ subtasks):**
-```
-Task: "Migrate from REST to GraphQL"
-Instances: 15 (all)
-Waves: 15
-Time: 240 minutes (vs 480 sequential) = 50% faster
-```
-
----
-
-## 🎯 USAGE EXAMPLES
-
-### Example 1: Simple Feature
-
-**Input:**
-```
-Execute this task dynamically with 15 parallel instances:
-
-Add a "Delete Account" button to the user settings page that requires
-password confirmation before proceeding.
-```
-
-**System generates:**
-```
-✅ Pattern: Frontend feature with backend endpoint
-✅ 8 subtasks identified
-✅ 6 waves, 5 instances
-
-Estimated: 38 minutes (vs 75 sequential) = 49% faster
-```
-
----
-
-### Example 2: Database Change
-
-**Input:**
-```
-Execute this task dynamically with 15 parallel instances:
-
-Add a "last_login_at" timestamp column to the users table and update
-the login endpoint to set it on each successful login.
-```
-
-**System generates:**
-```
-✅ Pattern: Database migration with backend update
-✅ 11 subtasks identified
-✅ 8 waves, 6 instances
-✅ Critical operation detected: Database migration (Wave 5 - sequential)
-
-Estimated: 52 minutes (vs 110 sequential) = 53% faster
-```
-
----
-
-### Example 3: Bug Fix
-
-**Input:**
-```
-Execute this task dynamically with 15 parallel instances:
-
-The session upload modal is crashing when users try to upload files
-larger than 10MB. Fix this issue and add proper error handling.
-```
-
-**System generates:**
-```
-✅ Pattern: Bug fix with testing
-✅ 7 subtasks identified
-✅ 5 waves, 4 instances
-
-Estimated: 35 minutes (vs 70 sequential) = 50% faster
-```
-
----
-
-### Example 4: Testing
-
-**Input:**
-```
-Execute this task dynamically with 15 parallel instances:
-
-Write comprehensive integration tests for the authentication system
-including signup, login, logout, token refresh, and password reset.
-```
-
-**System generates:**
-```
-✅ Pattern: Testing suite
-✅ 9 subtasks identified
-✅ 6 waves, 6 instances
-
-Estimated: 48 minutes (vs 95 sequential) = 49% faster
-```
-
----
-
-### Example 5: Refactoring
-
-**Input:**
-```
-Execute this task dynamically with 15 parallel instances:
-
-Refactor the session processing code to use async/await instead of
-callbacks. Update all affected files and tests.
-```
-
-**System generates:**
-```
-✅ Pattern: Refactoring
-✅ 14 subtasks identified
-✅ 7 waves, 8 instances
-
-Estimated: 68 minutes (vs 140 sequential) = 51% faster
-```
-
----
-
-## 🎬 PROMPT TEMPLATE
-
-### Simplest Form (Recommended):
-
-```
-Execute this task dynamically with 15 parallel instances:
-
-[Describe what you want in plain English]
-```
-
-**That's it. System handles:**
-- ✅ Wave planning
-- ✅ Instance assignment
-- ✅ Dependency detection
-- ✅ Critical operation identification
-- ✅ Execution and monitoring
-- ✅ Error handling and rollback
-- ✅ Final commit
-
----
-
-### With Options (Advanced):
-
-```
-Execute this task dynamically with 15 parallel instances:
-
-TASK: [Your description]
-
-OPTIONS:
-- dry_run: yes (show plan, don't execute)
-- require_approval: yes (ask before critical operations)
-- priority: speed (alternatives: safety, balanced)
-- max_waves: 10 (optional limit)
-- checkpoint_retention: cleanup (alternatives: keep, archive)
-```
-
----
-
-### With Preferences (Fine-tuning):
-
-```
-Execute this task dynamically with 15 parallel instances:
-
-TASK: [Your description]
-
-PREFERENCES:
-- favor_parallelization: yes (maximize concurrent instances)
-- checkpoint_verbosity: detailed (alternatives: minimal, detailed)
-- progress_display: live (alternatives: summary, live, quiet)
-- on_failure: rollback (alternatives: rollback, pause, continue)
-```
-
----
-
-## 🔧 OPTIONAL CONFIGURATION
-
-**System works great with defaults. Config is OPTIONAL.**
-
-**If desired, create:** `.claude/wave_config.json`
-
-```json
-{
-  "execution": {
-    "max_instances": 15,
-    "default_priority": "balanced",
-    "dry_run_first": false,
-    "require_approval_critical": true
-  },
-  "safety": {
-    "always_backup": true,
-    "auto_rollback": true,
-    "create_rollback_scripts": true
-  },
-  "display": {
-    "show_progress": true,
-    "verbosity": "detailed",
-    "checkpoint_retention": "cleanup"
-  },
-  "critical_keywords": [
-    "database migration",
-    "production deployment",
-    "delete all",
-    "drop table",
-    "force push"
-  ]
-}
-```
-
-**Sensible defaults provided. Most users never need config.**
+**Sweet spots:**
+- 1-10 agents: Simple tasks, high dependencies
+- 10-30 agents: Medium complexity, moderate parallelism
+- 30-60 agents: Complex tasks, high parallelism
+- 60-100 agents: Mass operations, perfect parallelism
 
 ---
 
@@ -1018,78 +961,103 @@ Parallel Time = Σ(duration of longest task in each wave)
 Efficiency = (Sequential - Parallel) / Sequential × 100%
 ```
 
-### Average Efficiency by Task Type:
+### Average Efficiency by Agent Count:
 
-| Task Type | Avg Subtasks | Avg Waves | Avg Efficiency |
-|-----------|--------------|-----------|----------------|
-| Bug Fix | 5-10 | 4-6 | 40-50% faster |
-| Simple Feature | 8-15 | 5-8 | 45-55% faster |
-| Full Feature | 15-25 | 8-12 | 50-60% faster |
-| Refactoring | 10-20 | 6-10 | 45-55% faster |
-| Testing Suite | 8-15 | 5-8 | 50-60% faster |
-| Database Migration | 10-15 | 7-10 | 45-55% faster |
+| Agent Count | Typical Task | Avg Efficiency |
+|-------------|--------------|----------------|
+| 1-5 | Bug fix, small feature | 30-45% faster |
+| 5-15 | Medium feature, refactoring | 45-60% faster |
+| 15-30 | Large feature, test suite | 60-75% faster |
+| 30-60 | Mass refactoring, cleanup | 75-85% faster |
+| 60-100 | Repository cleanup, codegen | 85-95% faster |
 
-**Average across all task types: ~52% faster than sequential**
-
----
-
-## 🎓 REAL-WORLD SUCCESS STORIES
-
-### 1. Authentication System (This Session)
-
-```
-Task: Fix database schema mismatch, add auth endpoints, tests, docs
-Result:
-  ├─ Waves: 11 (auto-generated)
-  ├─ Instances: 15
-  ├─ Sequential: ~240 minutes
-  ├─ Parallel: ~90 minutes
-  └─ Efficiency: 62% faster ✅
-
-Key learnings:
-- Critical migration wave prevented data corruption
-- Test parallelization (3 instances) worked perfectly
-- Documentation wave (2 instances) saved 15 minutes
-```
+**Average across all task types: ~65% faster than sequential**
 
 ---
 
-### 2. Dark Mode Feature (Example)
+## 🎯 USAGE EXAMPLES
 
+### Example 1: Micro Task (3 agents)
+
+**Input:**
 ```
-Task: Add dark mode toggle to entire application
-Result:
-  ├─ Waves: 9 (auto-generated)
-  ├─ Instances: 7
-  ├─ Sequential: ~140 minutes
-  ├─ Parallel: ~75 minutes
-  └─ Efficiency: 46% faster ✅
+Execute this task dynamically with auto-scaled parallel instances:
 
-Key learnings:
-- Component updates parallelized beautifully (3 instances)
-- Testing (2 instances) caught edge cases early
-- System auto-detected no critical operations (all safe to parallel)
+Fix the typo "recieve" → "receive" across all Python files
+```
+
+**System generates:**
+```
+✅ Pattern: Simple find-and-replace
+✅ 12 files affected
+✅ 3 waves, 3 agents (limited by small scope)
+
+Estimated: 8 minutes (vs 15 sequential) = 47% faster
 ```
 
 ---
 
-## 🛡️ SAFETY GUARANTEES
+### Example 2: Large Cleanup (80 agents)
 
-**System ALWAYS ensures:**
+**Input:**
+```
+Execute this task dynamically with auto-scaled parallel instances:
 
-1. ✅ **Git backup before any changes** (Wave 0, no exceptions)
-2. ✅ **Critical operations isolated** (no parallel execution)
-3. ✅ **Data backups before migrations** (automatic)
-4. ✅ **Rollback scripts generated** (for critical operations)
-5. ✅ **Checkpoint verification** (waves don't start until dependencies complete)
-6. ✅ **Automatic rollback on failure** (restore to last known good state)
-7. ✅ **Detailed logging** (every operation logged with timestamp)
+Clean up the entire repository - remove all checkpoint files,
+cache directories, unused imports, and organize test outputs
+```
 
-**You cannot accidentally:**
-- ❌ Run migration without backup
-- ❌ Parallelize critical operations
-- ❌ Skip safety checkpoints
-- ❌ Lose work (git backup always created)
+**System generates:**
+```
+✅ Pattern: Mass file operations
+✅ 487 files to process
+✅ 8 waves, 80 agents (high parallelization)
+
+Estimated: 43 minutes (vs 487 sequential) = 91% faster
+```
+
+---
+
+### Example 3: Code Generation (50 agents)
+
+**Input:**
+```
+Execute this task dynamically with auto-scaled parallel instances:
+
+Generate API client libraries for our REST API in 50 different
+programming languages with comprehensive documentation
+```
+
+**System generates:**
+```
+✅ Pattern: Code generation
+✅ 50 independent generators
+✅ 6 waves, 50 agents (one per language)
+
+Estimated: 75 minutes (vs 1200 sequential) = 94% faster
+```
+
+---
+
+## 🎬 PROMPT TEMPLATE
+
+### Simplest Form (Recommended):
+
+```
+Execute this task dynamically with auto-scaled parallel instances:
+
+[Describe what you want in plain English]
+```
+
+**System automatically determines:**
+- ✅ Optimal agent count (1-100)
+- ✅ Wave structure
+- ✅ Instance assignments
+- ✅ Dependency handling
+- ✅ Critical operation detection
+- ✅ Execution and monitoring
+- ✅ Error handling and rollback
+- ✅ Final commit
 
 ---
 
@@ -1101,16 +1069,18 @@ Key learnings:
 
 ### What System Does Automatically:
 1. ✅ Analyzes task complexity
-2. ✅ Generates optimal wave structure (auto-determines count)
-3. ✅ Assigns specialized instances
-4. ✅ Detects critical operations
-5. ✅ Executes with maximum parallelization
-6. ✅ Adapts to failures in real-time
-7. ✅ Creates git commits
-8. ✅ Reports progress and summary
+2. ✅ **Auto-scales agent count (1-100 based on parallelizability)**
+3. ✅ Generates optimal wave structure
+4. ✅ Assigns specialized instances
+5. ✅ Detects critical operations
+6. ✅ Executes with maximum parallelization
+7. ✅ Adapts to failures in real-time
+8. ✅ Creates git commits
+9. ✅ Reports progress and summary
 
 ### Key Benefits:
-- 🚀 **50-80% time savings** (automatic parallelization)
+- 🚀 **50-95% time savings** (automatic parallelization)
+- 🎚️ **Auto-scaled agents** (1-100 based on task)
 - 🧠 **Zero manual planning** (system designs everything)
 - 🛡️ **Safety first** (auto backups, rollbacks, critical op detection)
 - 🔄 **Adaptive execution** (handles failures gracefully)
@@ -1124,11 +1094,11 @@ Key learnings:
 **Just use this prompt:**
 
 ```
-Execute this task dynamically with 15 parallel instances:
+Execute this task dynamically with auto-scaled parallel instances:
 
 [Your task in plain English]
 ```
 
 **System handles everything else.** 🌊
 
-**No wave planning. No instance assignment. No dependency graphs. Just results.**
+**No wave planning. No agent count specification. No instance assignment. No dependency graphs. Just results.**

@@ -1,0 +1,136 @@
+WAVE 5 - Instance 11 (I11) - Documentation Specialist
+========================================================
+
+Mission: Update backend documentation with authentication features
+Status: ✅ COMPLETE
+Date: 2025-12-17
+
+DOCUMENTATION UPDATES
+---------------------
+
+File: /Users/newdldewdl/Global Domination 2/peerbridge proj/backend/README.md
+
+1. ✅ AUTHENTICATION SECTION (Lines 145-369)
+   Already comprehensive with:
+   - Overview of JWT-based authentication system
+   - 5 endpoint documentation blocks (signup, login, refresh, logout, /me)
+   - Complete curl examples for each endpoint
+   - Request/response JSON schemas
+   - Token format and expiration details (access: 30min, refresh: 7 days)
+   - Rate limiting information (login: 5/min, signup: 3/hr, refresh: 10/min)
+   - Password requirements (min 8 chars, bcrypt hashing)
+   - Quick start authentication flow with bash example
+
+2. ✅ SECURITY FEATURES SECTION (Lines 360-368)
+   Documented:
+   - Password hashing (Bcrypt with 12 rounds)
+   - Token rotation (refresh tokens rotated on use)
+   - Rate limiting (prevents brute force attacks)
+   - JWT signing (HS256 algorithm with 32-byte secret key)
+   - Token revocation (refresh tokens stored in DB, can be revoked)
+   - SQL injection protection (parameterized queries via SQLAlchemy ORM)
+   - CORS configuration (frontend origin only)
+
+3. ✅ TROUBLESHOOTING SECTION (Lines 370-548) - NEW
+   Added comprehensive troubleshooting guide covering:
+
+   a) "401 Unauthorized" - Token invalid or expired
+      - Symptoms and error messages
+      - 3 solution approaches (refresh token, verify format, check whitespace)
+      - Working curl examples
+
+   b) "429 Too Many Requests" - Rate limit exceeded
+      - Symptoms with retry_after field
+      - Wait times for each endpoint
+      - Development workaround (comment out decorators)
+
+   c) "Invalid refresh token" when using /refresh
+      - 3 common causes (already used, revoked, expired)
+      - Re-login solution with curl example
+
+   d) "Email already registered" during signup
+      - Symptoms (HTTP 409 Conflict)
+      - 3 solutions (different email, login, manual DB delete)
+
+   e) JWT secret key changes invalidate all tokens
+      - Symptoms (all users logged out)
+      - Root cause (SECRET_KEY regenerated)
+      - Solutions (persistent .env configuration)
+
+   f) Database migration errors
+      - Symptoms (SQLAlchemy errors, missing columns)
+      - 4-step troubleshooting process (check status, upgrade, verify, rollback)
+
+   g) Password validation errors
+      - 422 Unprocessable Entity symptoms
+      - Password requirements explanation
+      - Valid signup example
+
+   h) Testing authentication in development
+      - Complete 6-step authentication flow test script
+      - Token extraction using Python
+      - Verification of token rotation (old token should fail)
+
+QUALITY METRICS
+---------------
+
+Documentation Coverage:
+✅ All 5 auth endpoints documented
+✅ All error codes explained (401, 409, 422, 429)
+✅ All security features listed
+✅ 8 common issues with solutions
+✅ Working curl examples for every operation
+✅ Complete test script for development
+
+Accessibility:
+✅ Clear section headings
+✅ Symptoms → Solutions structure
+✅ Copy-pastable bash commands
+✅ JSON formatted examples
+✅ Inline comments explaining each step
+
+Technical Accuracy:
+✅ Verified against actual implementation (backend/app/auth/router.py)
+✅ Correct HTTP status codes
+✅ Accurate rate limits (5/min, 3/hr, 10/min)
+✅ Correct token expiration times (30min, 7 days)
+✅ Valid curl command syntax
+
+CROSS-REFERENCES
+----------------
+
+Documentation references these implementation files:
+- backend/app/auth/router.py - Auth endpoints
+- backend/app/auth/models.py - User and AuthSession models
+- backend/app/auth/schemas.py - Pydantic validation
+- backend/app/auth/utils.py - Password hashing, JWT creation
+- backend/app/auth/config.py - Token expiration settings
+- backend/app/auth/dependencies.py - get_current_user dependency
+- backend/app/middleware/rate_limit.py - Rate limiting config
+- backend/alembic/ - Database migrations
+
+WAVE 5 DELIVERABLES
+-------------------
+
+✅ Authentication section review (already comprehensive)
+✅ Security features section (already documented)
+✅ Troubleshooting section (ADDED - 178 lines of new content)
+✅ Working curl examples (verified and tested)
+✅ Token format documentation (complete)
+✅ Rate limiting information (all endpoints covered)
+
+NEXT STEPS (FUTURE ENHANCEMENTS)
+---------------------------------
+
+Potential documentation improvements for future waves:
+1. Add OpenAPI/Swagger annotations for auto-generated docs
+2. Create Postman collection for API testing
+3. Add sequence diagrams for auth flows
+4. Document Redis configuration for distributed rate limiting
+5. Add security audit checklist for production deployment
+
+WAVE 5 INSTANCE 11 STATUS: ✅ COMPLETE
+
+Instance I11 successfully completed all Wave 5 documentation tasks.
+Backend README.md now has comprehensive authentication documentation
+with troubleshooting guide for developers and operators.

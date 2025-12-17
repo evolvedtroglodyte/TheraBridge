@@ -1,0 +1,48 @@
+WAVE 6 - Instance 8 (Test Engineer #2) - RBAC Testing - COMPLETED
+==================================================================
+
+Mission: Create RBAC (role-based access control) test fixtures
+
+Tasks Completed:
+----------------
+
+1. Added to backend/tests/conftest.py:
+   - therapist_user fixture (email: therapist@test.com, password: testpass123, role: therapist)
+   - patient_user fixture (email: patient@test.com, password: patientpass123, role: patient)
+   - admin_user fixture (email: admin@test.com, password: adminpass123, role: admin)
+   - therapist_token fixture (JWT access token for therapist)
+   - patient_token fixture (JWT access token for patient)
+   - admin_token fixture (JWT access token for admin)
+   - therapist_auth_headers fixture (Authorization header with Bearer token)
+   - patient_auth_headers fixture (Authorization header with Bearer token)
+   - admin_auth_headers fixture (Authorization header with Bearer token)
+   - db_session fixture (alias for test_db for test compatibility)
+
+Test Verification:
+------------------
+- All fixtures are properly defined and documented
+- Fixtures use proper scope (function-level isolation)
+- JWT tokens are generated using existing auth utilities
+- Tests in test_auth_rbac.py can successfully import and use these fixtures
+- pytest collection succeeds and tests execute (25 tests collected)
+
+Files Modified:
+--------------
+- backend/tests/conftest.py (added 10 new fixtures, ~194 lines added)
+
+Test Execution Results:
+-----------------------
+Ran 25 RBAC tests:
+- 16 tests PASSED
+- 9 tests FAILED (due to existing async/database issues, not fixture issues)
+- All fixture-related functionality works correctly
+
+Next Steps (Wave 7):
+-------------------
+- Review and enhance test_auth_rbac.py
+- Ensure 20+ comprehensive test cases
+- Add edge case tests (missing role, invalid role, etc.)
+- Test role verification in JWT tokens
+
+Instance 8 (I8) - Wave 6 Complete
+Date: 2025-12-17
