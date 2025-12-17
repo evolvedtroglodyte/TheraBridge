@@ -1,5 +1,6 @@
 # Python
 venv/
+.venv/
 __pycache__/
 *.pyc
 *.pyo
@@ -12,17 +13,31 @@ __pycache__/
 # Environment
 .env
 .env.local
+# Note: .env.example IS committed (do not ignore)
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Logs
+*.log
 
 # OS
 .DS_Store
 .DS_Store?
 ._*
+Thumbs.db
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*.sublime-project
+*.sublime-workspace
 
 # Sync tools
 .stfolder/
