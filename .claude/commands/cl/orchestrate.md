@@ -27,24 +27,90 @@ You are executing a parallel orchestration command. When invoked with `/cl:orche
 
 ---
 
-## STEP 1: Output Task Analysis (REQUIRED)
+## STEP 1: Wave 0 - Deep Analysis Using Parallel Research Agents (REQUIRED)
 
-**First, read `.claude/DYNAMIC_WAVE_ORCHESTRATION.md` to understand the intelligent_auto_scale() algorithm.**
+**🚨 CRITICAL: Launch parallel research agents BEFORE planning execution waves.**
 
-**CRITICAL: Parse user request for explicit agent count:**
-- If user says "using X agents" or "with X agents" → MUST use exactly X agents
-- If no explicit count specified → Use intelligent auto-scaling
+**DO NOT use surface-level tool calls (Grep/Glob/Read).** Instead, launch specialized parallel agents to conduct deep research.
 
-Then output:
+### Step 1a: Parse User Request
 
+Extract:
+- Task description
+- Explicit agent count (if user says "using X agents") - MUST honor exactly if specified
+- Target files/directories
+
+### Step 1b: Identify Research Needs
+
+Determine what research is required:
+- File discovery? → Use `codebase-locator`
+- Implementation analysis? → Use `codebase-analyzer`
+- Pattern discovery? → Use `codebase-pattern-finder`
+- Architecture understanding? → Use `Explore` (very thorough)
+- Best practices? → Use `web-search-researcher`
+
+### Step 1c: Launch Wave 0 Research Agents (In Parallel)
+
+**Output format:**
 ```
 🔍 ANALYZING TASK...
 
 Task: [user's task]
 
-SUBTASKS: [count]
-├─ Subtask 1
-├─ Subtask 2
+📋 RESEARCH REQUIREMENTS IDENTIFIED:
+- [Research need 1] (agent type)
+- [Research need 2] (agent type)
+- [Research need 3] (agent type)
+
+🌊 WAVE 0: PARALLEL RESEARCH ([N] agents launching...)
+
+Launching [N] specialized research agents in parallel:
+├─ Agent R1 ([agent-type]): [Research task 1]
+├─ Agent R2 ([agent-type]): [Research task 2]
+└─ Agent R[N] ([agent-type]): [Research task N]
+```
+
+**Then ACTUALLY LAUNCH the agents using multiple Task tool calls in ONE message:**
+```xml
+<function_calls>
+<invoke name="Task">
+<parameter name="subagent_type">codebase-locator</parameter>
+<parameter name="description">Wave 0.1: Locate relevant files</parameter>
+<parameter name="prompt">Find all files and components relevant to: [task]</parameter>
+</invoke>
+<invoke name="Task">
+<parameter name="subagent_type">codebase-analyzer</parameter>
+<parameter name="description">Wave 0.2: Analyze implementation</parameter>
+<parameter name="prompt">Analyze implementation details for: [task]</parameter>
+</invoke>
+... (additional research agents)
+</function_calls>
+```
+
+### Step 1d: Aggregate Research Findings
+
+**After Wave 0 completes, output:**
+```
+⏳ Waiting for Wave 0 research to complete...
+
+✅ WAVE 0 COMPLETE - Research Findings:
+
+Agent R1 ([agent-type]) found:
+- [Specific finding with details]
+- [Specific finding with details]
+
+Agent R2 ([agent-type]) discovered:
+- [Specific finding with details]
+
+... (all research findings)
+
+📊 PLANNING EXECUTION WAVES...
+
+Based on research findings:
+SUBTASKS IDENTIFIED: [count]
+├─ [Subtask 1]
+├─ [Subtask 2]
+├─ [Subtask 3]
 └─ ...
 
 DEPENDENCIES: [None/Shallow/Deep]
