@@ -33,9 +33,3 @@ httpx==0.26.0  # For testing async FastAPI
 # Audio pipeline dependencies (reuse from transcription pipeline)
 pydub==0.25.1
 audioop-lts>=0.2.1
-
-# Rate limiting
-slowapi==0.1.9
-
-# Testing coverage
-pytest-cov==4.1.0  # Code coverage reporting

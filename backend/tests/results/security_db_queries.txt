@@ -1,0 +1,15 @@
+app/routers/sessions.py:        await db.execute(
+app/routers/sessions.py:        await db.execute(
+app/routers/sessions.py:        await db.execute(
+app/routers/sessions.py:        await db.execute(
+app/routers/sessions.py:        await db.execute(
+app/routers/sessions.py:    therapist_result = await db.execute(
+app/routers/sessions.py:        await db.execute(
+app/routers/sessions.py:        await db.execute(
+app/routers/sessions.py:    result = await db.execute(
+app/routers/sessions.py:    result = await db.execute(
+app/routers/sessions.py:    result = await db.execute(query)
+app/routers/sessions.py:    result = await db.execute(
+app/routers/sessions.py:    await db.execute(
+app/routers/patients.py:    result = await db.execute(
+app/routers/patients.py:    result = await db.execute(query)

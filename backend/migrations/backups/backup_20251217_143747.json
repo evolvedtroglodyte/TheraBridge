@@ -1,0 +1,2476 @@
+{
+  "timestamp": "2025-12-17T14:37:46.827687",
+  "tables": {
+    "users": [
+      {
+        "id": "88297f6a-b4f2-40b1-b156-8d08b1ad8877",
+        "email": "therapist@therapybridge.com",
+        "name": "Dr. Sarah Johnson",
+        "role": "therapist",
+        "created_at": "2025-12-11 00:14:35.415946",
+        "updated_at": "2025-12-11 00:14:35.415946",
+        "hashed_password": "temp"
+      }
+    ],
+    "sessions": [
+      {
+        "id": "35fdacd4-4797-47ad-9f72-5e6fd2373fd6",
+        "patient_id": "9f2b1a1a-968a-4bf2-8013-4794ed63451e",
+        "therapist_id": "88297f6a-b4f2-40b1-b156-8d08b1ad8877",
+        "session_date": "2025-12-11 01:13:50.741006",
+        "duration_seconds": 1387,
+        "audio_filename": "compressed-cbt-session.m4a",
+        "audio_url": "uploads/audio/35fdacd4-4797-47ad-9f72-5e6fd2373fd6.m4a",
+        "transcript_text": "Watch this full series at the links in the description below and subscribe to our YouTube channel to watch new mental health videos every week. In our MedCircle series on cognitive behavioral therapy, Dr. Judy and I sat down to discuss the ins and outs of how that therapy works and how it can be used to change your thoughts, your emotions, and ultimately your behaviors. And then we decided that we would do a mock therapy session with myself portraying somebody who has a cognitive belief, or what is it called again? Yeah, a certain kind of core belief that you might have. Core belief, core belief, yes. And you're going to walk me through that belief and show the viewers how CBT can actually bring them closer to the truth and closer to a more healthy way to think and react and behave when it comes to our emotions and thoughts. So my core belief in this mock therapy session is going to be that I feel like I'm unlovable by everybody, right? That's my core belief. I feel like I'm pretty lovable by most people. I'm sure not everybody. This is not Kyle's actual core belief, but you are playing a patient in which has that core belief and I think it's a common core belief for people whether they want to admit it or not. And it makes sense because it's one of our basic drives is to be loved by people. I mean, that's just a basic human drive. And it's not just about emotional wellness that you feel loved. It's actually about physical survival. If you're not loved and nurtured, then you might die. Your physical being will actually perish if you're not nurtured well, if you're not taken care of well. And so I think this is a good one for us to role play. Cool. Well, this will be great for the viewers to see what a therapy session could be like and also how CBT is used. So I'll let you take it away. Okay, great. So Kyle, what brings you in today? I recently broke up with a long, long-term partner and it's been one of many breakups I've had in my life. And at this point I'm getting older, I have gray hair, I feel like the clock is ticking and I don't feel like I will ever find somebody who loves me. I don't feel like, I feel like I would have found them already. I feel like I've dated enough people to make that happen and it's not happening and I don't see anything changing and my depression is through the roof because of it. Okay. So I'm sorry about your breakup and I'm sorry that that kind of led to a cascade of thoughts in your head about what this really means about your future for relationships and about you ultimately. So we're going to do a practice technique right now and this technique is called laddering. And what this is going to help us with is getting some of those negative automatic thoughts. I mean, you said many right now actually just in your description. We're going to work with one of those and it helps us to get them organized in a way so that you can actually see what that automatic thought leads to. Sort of like if you think about automatic thoughts being kind of like an iceberg and the automatic thoughts is the tip of the iceberg that you can see above the water. It's conscious, but you have to kind of attune your awareness to it. But deeper thoughts are actually submerged. You can't see them. They're below the water level and that's what we need to get to because that's the crux of the issue. These core beliefs drive how you feel, how you think, and even the rules that you have in life about how you should behave in order to have safety in many ways. And so let's start with an automatic thought. I heard you say that you were thinking based on this breakup and other ones that I might never find somebody who will love me. So let's work with that automatic thought. There were other ones, but I think this one is a good one to work with. So if your automatic thought is, I'm not going to find somebody who loves me. What might that mean? What does that thought mean to you? I look around at my friends and my family who are in relationships, who are having kids, who are posting pictures, who are sending out Christmas cards with their significant others, and I don't feel like I will have that. I feel like while everyone else will have love in their life and meaning and purpose, I will have nothing. I will be alone, and I am alone, and I am also lonely, and that is devastating. So what might it mean if you were alone? Let's take that part of it. So you kind of broke it down, like, well, I don't think that I'm going to find anybody to love me or who I'll love or who I'll have this relationship with, and to me, that means that I'll be alone. So what would it mean if you were alone? What if that did happen? What would that mean about you? Well, on one hand, it means that nobody... On one hand, it means that people wouldn't... If I'm alone, it means that people don't want to be with me, which is awful. It's an awful thought. And it also means that I won't be able to enjoy life how I could. I will miss out on dinners and holidays and weekend trips and children and legacy and memories. There's a laundry list of consequences from being alone. Right. And you had just said that one of the things that being alone means would be that maybe that means nobody wants to be with you. And so what would that thought mean if it was true? What if nobody wanted to be with you? What if that was an actual fact? What would that mean? That there's something wrong with me. And if there is something wrong with you, if that thought was true, then what would that mean? That I haven't done a good job in my life becoming... I haven't done a good job becoming somebody that people want to be around, that people want to be in a relationship with. And what would that mean about you if people didn't want to be in a relationship with you, that you haven't done a good job and people didn't want to be around you? That I'm worthless, that I'm a waste of time. Yeah. Well, that's the core belief. The core belief is I'm worthless or sometimes people will say I'm unlovable. Sometimes they're interchangeable. But that's how we got to the core belief is we keep doing this laddering technique where any negative thought you have, I ask you, what does that mean? If that thought was true, what would that mean about you? Okay. Well, if that thought was true, that would mean that I would be alone. Okay. Well, what would that mean if that was true, if you were alone? Well, that would mean that nobody would want to be around me. And you kept breaking it down to the deeper and deeper level until you got to this idea of that would mean that I was worthless, that maybe I'm just not capable of being loved, that I'm undeserving of love. And that's what we mean by a core belief, which is like a horrible thing to have to think about. And I want to be clear that core beliefs are not necessarily what you actually believe about yourself, but core beliefs are your biggest fear, meaning that if it was true, it would be devastating. If you truly were worthless or if you truly were unlovable, that would be devastating. I don't feel... If you would have asked me three minutes ago or four minutes ago, do you think you're a worthless person? I would have said no, not at all. Right. Yeah. And I think that when people first encounter what could be their core belief, they have that kind of reaction of, but I don't really believe it's true, at least not intellectually, but it's really about the fear of, man, but what if it was true? What would that mean about my life and what I could even amount to and what kind of legacy would I leave behind if that was true? And everybody has different fears for different reasons. Some people's core belief is, I'm incapable, and that to them is paralyzing, like, man, if I wasn't capable, that could ruin my life. And it's not that they actually believe they're incapable, but it's just like, oh my gosh, if that was true, the consequences to my life would be devastating, and I wouldn't even be able to tolerate it. And so this is sort of what we're working with, and I always say when we get to a core belief, it doesn't necessarily have to be your core belief, but let's work with it. Let's see if it is. Part of this is sort of like hypothesis testing, like let's work with that and see if that could be true for you. When people have core beliefs, they usually then have conditional rules and assumptions about how the world will work and how they should act within that world. So what I mean by this is when you have such a core belief like I'm worthless or I'm unlovable, there will be certain things that you believe are scripts that you have to follow in order to have any semblance of emotional safety or to prevent yourself from having that core belief come true. And so we're going to talk about what some of those things could be for you. When somebody has a I'm worthless core belief, what might that do in terms of your expression of your needs and wants to other people? What rule might you have if you actually believe that you might be worthless or that you fear that that might be true? What kind of rule would you put on yourself in terms of how you could communicate your needs and wants to others? Well, I would probably only, in terms of a romantic relationship, I would probably only date someone who I felt was like below my league, I guess. I don't know if that's a rude thing to say. No, it's honest and I think you're not alone in that. Because if I truly was worthless, then I would need to be with somebody else who couldn't see that, who would never know that I was worthless. And so I would need to date accordingly. I wouldn't go after the people that I actually wanted to date because they're too smart to figure it out. That's at least, I think that's what happened. That would be like a possible thinking there. And I would also try to show my worth a lot. Even though I believed I'm worthless, I would try to show, well, look at the great house I have and look at how happy I'm being and look how fun my friends are and look at my cool job and look at, look at, look at, look at, see, I'm not worthless. I'm not worthless. I'm not worthless. Right. Yeah. So those are excellent examples of the types of rules you might have when that is your core belief. And might you also have a type of rule where you felt like in certain situations you had to contribute something so that there would be worth. So like even in friendships, for example, like how are you like always about them as opposed to, oh, now we can talk about me for 20 minutes. Right. Do you find yourself sometimes doing that with your friends? Yes. Okay. So for as long as I can remember, constantly making sure that the other person was happy with our interaction first, professionally, friendship, romantic, familial. Are you happy with our, constantly, I constantly remember thinking, are you happy about this? Because I want to make sure you're happy about this because I don't want you to have an interaction with me where you're not happy. Right. Right. Okay. So that's another great example of a possible assumption or a rule that you might put on yourself when this is the core belief. And so as you might imagine, there's a long list of these. If we sat here for two hours, we could probably come up with like 20 other rules that probably play some role in your life. But I want to move on to the problem solving phase, you know, because that's what CBT is all about is like, let's solve the problem. So yeah, I love that part. So we've identified the issue and there's been very many different ways in which you can work with your core beliefs, but you have to remember that these core beliefs have been there for a long time and they're kind of pervasive, like this idea of I'm worthless. As you just demonstrated, it's not just about your romantic relationships, it's about how you interact with friends, with professional people, with colleagues, whatever. There's permeating of sorts in almost all the domains of your life. And so what we're going to do now is one of my favorite ways to work with core beliefs and assumptions once we've identified them, and that is to create an individualized behavioral experiment. Okay. So the way that we work with your core beliefs and the assumptions that follow them actually apply to every single situation. As I mentioned, core beliefs feel pervasive and we want to make them more conditional. You know, we want to make it so that, well, you know, in certain situations and with certain people, they may make me feel this way and maybe that even comes from childhood, but it doesn't apply to every single thing, right? And the way that we shake that is to actually get evidence. CBT is a scientific program and this is kind of like our mini science experiment that we're going to do together. So there's only a couple of rules for this experiment. We're going to design an experiment around one of your rules or assumptions and the one that I want to use, which I think is a good one to do because you want to start with a lower hanging fruit that's not too activating. Like we shouldn't start with the rule of you dating people who might be of a different level than you because that one is a little bit deeper, but we start with something that feels like you can approach it and there's a little bit of risk. It makes you a little uncomfortable, but not like the worst thing that could happen. And I think that that would apply to the rule of, I always have to take care of other people's needs first because there's a lot of people that applies to it. It can apply to your intimate relationships, but it can also apply to friends, colleagues, anybody else that you meet. So let's take that rule and let's try to test it with a person in your life. And I would also say that, again, this person should not be the most activating person, but this should be a person who there's some stakes in it, there's some skin in the game, but this is not a person in which if this experiment failed, meaning that like you tried to challenge this assumption and they failed it in some way and actually made your core belief feel more significant to you, that you would feel bad about it, but you wouldn't be so bad that you would be in pieces. So is there a person like that who you're like, huh, like I've always taken care of this person's needs first, like as I usually do, and I could probably test something out with them and if it didn't work out, I'd be kind of sad about it, but like I wouldn't be devastated. Um, well, I, I have a friend in mind. Okay. Great. Okay. And so this is somebody that, how long have you known this friend? 10, 10, more than 10 years. Oh wow. Okay. So 10 years. Right. But you guys have been familiar and like most of the times you're probably taking care of this friend. Right. How are you? Like, Oh, let me give you advice. Like, what can I bring you? You're sick. Like that kind of relationship. All right. So this experiment is going to be very time limited. It's going to be very specific. So I need you to set like a specific date and time that you're going to do this in the next seven days. Oh, okay. Yeah. It was going to be real specific cause we need to get that data and it's going to be something that's kind of, uh, contained, meaning it should be something where it's not like a free for all. Like from now on, I'm just going to be, you know, we're vomit and always talk all about my problems first, but it's more about, okay, in this particular conversation, I'm going to go with him with a problem. And once I talk about the problem and get his advice, I'm going to be like, that was so helpful. Thank you. Goodbye. And not make that about him at all. Because that's the other thing where with your type of poor belief and assumptions, sometimes you'll be like, and how are you? And then you spend another 45 minutes absolutely. So we're not going to do that. This is literally going to be you going to him to express a need of yours, to express a problem, have this person give you the advice and then be like, thank you. That was super helpful. Talk to you later. So that's the experiment. And I have to go do that. And you have to go do that. And then what are you expecting me to report back with? So first we're going to predict how you think that's going to go. So based on your beliefs or maybe your assumptions and rules, like how do you think that might go? Like in terms of maybe how you might feel or what they might feel or do? Well, I mean, I think it will go fine. Okay. Do you think that he's going to have some kind of inner judgment of you? Like Kyle's selfish. He didn't even ask about me today. I mean, maybe, I don't know. Yeah. Well, let's get specific. I mean, do you think that that's a possibility? Yes. Okay. Yes. And you obviously don't want that to be anybody's thoughts about you. No. No. Okay. All right. So you're going to hold that distress a little bit for yourself. And then you said it's going to probably go fine, meaning like you think you can carry it through, but it might make you a little uncomfortable. Yeah. And I'm hoping I don't slip up. And start being like, and how are you? Uh-huh. And go, oh, well, I'm sorry that you went through something. You know, like. And then just completely turn around. Yeah. Yeah, exactly. Okay. So we've laid out a couple of expectations. One is, well, I'm sure he'll be fine with giving me the advice, but maybe in his mind he'll be like, whoa, Kyle's being selfish today. He didn't even ask about how I am. And then also you might just feel kind of like icky and then you're afraid that you might like break and just start to like take care of him so you feel better about yourself again. Exactly. Okay. So those are the expectations. All right. So then you're going to do this experiment. So when do you think you can do something like this? Tomorrow. Give me a day. Okay. Tomorrow. And then what problem do you think you're going to bring him? Um, I'll bring him a, a, a, just, I'm so stressed out. I'm so busy. Okay. Yeah. Tomorrow. Great. So you'll just talk about that and, oh my gosh, I need help with this. It's on a level that I've never experienced before. Okay, great. That's perfect. And then we'll kind of keep it time limited. So how long do you think the conversation will be? Just give me a... 15 minutes. Perfect. Okay. And remember, we're not going to make it another 20 minutes. Make it about him. Yeah. Okay. Awesome. So then we're going to do this and we've already talked about the expectations. And after you do it, I want to, I want you to do two things. One is I want you to actually ask him at the end of that conversation, was this okay with you that today we just talked about me, I'm just really stressed. You literally ask him that very specific question because you want to get some level of feedback. Of course he can still lie to you, but it at least gives you some semblance of what he might be thinking. And I don't think he's expecting that kind of question from you. No. So it'd be like, Hey, I got to run cause I'm busy. But just so, just so I know, like, was this okay that I called you just to get your advice today? And we didn't get to talk about how you're doing. I can do that. Okay, cool. I can totally do that. Awesome. So then he'll give you some feedback about that. You will write that down and you will write down just your feelings leading up to it. Like, was it that discomforting? And then once you get that feedback from him, how did you feel then? And I will say that what I'm expecting is this guy has been your friend for 10 years that he's probably going to be like, dude, it's cool. Like that's what friends are for something like that. And then using that experience, we're going to now go back to your assumptions again and say, did that assumption really hold? I mean, do you always have to take care of people or are there at least certain people in your life who you can have a back and forth with? And this is the first step. Then we do another experiment with a different person and a different kind of experiment so that we can loosen these assumptions, make them more conditional. And that will feed back to that core belief. Like, is it truly as universal as you think it is? And that's really going to be the process. So it'll take a few weeks for us to execute it all the way through. But this is the first step. And I think if you can do this first step, it's going to start to shake that assumption enough for the rest of our work. Wow. Cool, right? It's really good. It's going to be fun. Now I'm like morphing into Kyle Kittleson. Do I need to be patient anymore? No. You're done. Okay. That is really good because I was really committed to the patient role, you know? And I was like, where is she going with this? Like, I'm just talking about how I don't feel like I'll ever find love and she wants me to go complain to a friend, you know? And so I was like, this has got to come together somehow, but it definitely did. Yeah. Yeah. And it's really, I mean, again, it's a process. So the core belief was, it was a process to develop that core belief. But the more that you can design these behavioral experiments to challenge the specific assumptions and to realize that those assumptions don't hold, then the core beliefs gets shaken because it's like, wait, if this assumption doesn't hold and there are people who like seem to love me for me, even if I'm being a little negative today or a little selfish today, whatever it is that I'm labeling this as in my head, what does that mean about me truly being unlovable? Am I really unlovable? Yeah. Or is it that I just have to find the right people to love me? Yeah. Yeah. Yeah. Yeah. And it's such a good thing to note or realize that a core belief does not mean necessarily that it is true. It is just your belief hidden way deep down on the iceberg. And it's more like your fear, like, dude, if this was true, that would suck so bad. Yeah. I want our YouTube viewers, I want you to leave a comment if you watch the entire session because it is a little longer than normal. So I want to know who watched that whole session. And then if you feel comfortable enough, I want you to share one of your core beliefs or something that you believe is a core belief because we all have them. Like Dr. Judy said, we all have them, but they're living down there unnoticed and they're affecting every part of our life. And through CBT therapy, we can uncover something that's deep, deep, deep within us and bring light on it and bring awareness to it. And just that awareness changes everything. Absolutely. Everything. That's what starts everything. That's what starts you on the right path. Yes. If you got motivated watching this, go to medcircle.com and check out the entire series on cognitive behavioral therapy. Dr. Judy. Amazing. Super fun. Thank you. Thank you. That was great. I'm Kyle Kittleson. Remember, whatever you're going through, you got this. Thanks for watching. If you liked what you just saw, then why not subscribe? Click right here for new episodes and new series every week. And to access exclusive mental health videos that we only release at medcircle.com, check out the links below.",
+        "transcript_segments": [
+          {
+            "end": 8.760000228881836,
+            "text": "Watch this full series at the links in the description below and subscribe to our YouTube",
+            "start": 0.0
+          },
+          {
+            "end": 11.880000114440918,
+            "text": "channel to watch new mental health videos every week.",
+            "start": 8.760000228881836
+          },
+          {
+            "end": 17.579999923706055,
+            "text": "In our MedCircle series on cognitive behavioral therapy, Dr. Judy and I sat down to discuss",
+            "start": 11.880000114440918
+          },
+          {
+            "end": 22.34000015258789,
+            "text": "the ins and outs of how that therapy works and how it can be used to change your thoughts,",
+            "start": 17.579999923706055
+          },
+          {
+            "end": 25.18000030517578,
+            "text": "your emotions, and ultimately your behaviors.",
+            "start": 22.34000015258789
+          },
+          {
+            "end": 32.060001373291016,
+            "text": "And then we decided that we would do a mock therapy session with myself portraying somebody",
+            "start": 25.18000030517578
+          },
+          {
+            "end": 36.220001220703125,
+            "text": "who has a cognitive belief, or what is it called again?",
+            "start": 32.060001373291016
+          },
+          {
+            "end": 38.220001220703125,
+            "text": "Yeah, a certain kind of core belief that you might have.",
+            "start": 36.220001220703125
+          },
+          {
+            "end": 39.220001220703125,
+            "text": "Core belief, core belief, yes.",
+            "start": 38.220001220703125
+          },
+          {
+            "end": 45.65999984741211,
+            "text": "And you're going to walk me through that belief and show the viewers how CBT can actually",
+            "start": 39.220001220703125
+          },
+          {
+            "end": 52.65999984741211,
+            "text": "bring them closer to the truth and closer to a more healthy way to think and react and",
+            "start": 45.65999984741211
+          },
+          {
+            "end": 56.900001525878906,
+            "text": "behave when it comes to our emotions and thoughts.",
+            "start": 52.7400016784668
+          },
+          {
+            "end": 63.900001525878906,
+            "text": "So my core belief in this mock therapy session is going to be that I feel like I'm unlovable",
+            "start": 56.900001525878906
+          },
+          {
+            "end": 66.45999908447266,
+            "text": "by everybody, right?",
+            "start": 64.22000122070312
+          },
+          {
+            "end": 67.45999908447266,
+            "text": "That's my core belief.",
+            "start": 66.45999908447266
+          },
+          {
+            "end": 70.41999816894531,
+            "text": "I feel like I'm pretty lovable by most people.",
+            "start": 67.45999908447266
+          },
+          {
+            "end": 71.41999816894531,
+            "text": "I'm sure not everybody.",
+            "start": 70.41999816894531
+          },
+          {
+            "end": 77.30000305175781,
+            "text": "This is not Kyle's actual core belief, but you are playing a patient in which has that",
+            "start": 71.41999816894531
+          },
+          {
+            "end": 80.81999969482422,
+            "text": "core belief and I think it's a common core belief for people whether they want to admit",
+            "start": 77.30000305175781
+          },
+          {
+            "end": 81.81999969482422,
+            "text": "it or not.",
+            "start": 80.81999969482422
+          },
+          {
+            "end": 86.0199966430664,
+            "text": "And it makes sense because it's one of our basic drives is to be loved by people.",
+            "start": 81.9800033569336
+          },
+          {
+            "end": 88.5,
+            "text": "I mean, that's just a basic human drive.",
+            "start": 86.0199966430664
+          },
+          {
+            "end": 92.0999984741211,
+            "text": "And it's not just about emotional wellness that you feel loved.",
+            "start": 88.5
+          },
+          {
+            "end": 94.58000183105469,
+            "text": "It's actually about physical survival.",
+            "start": 92.0999984741211
+          },
+          {
+            "end": 97.66000366210938,
+            "text": "If you're not loved and nurtured, then you might die.",
+            "start": 94.58000183105469
+          },
+          {
+            "end": 101.66000366210938,
+            "text": "Your physical being will actually perish if you're not nurtured well, if you're not taken",
+            "start": 97.66000366210938
+          },
+          {
+            "end": 102.66000366210938,
+            "text": "care of well.",
+            "start": 101.66000366210938
+          },
+          {
+            "end": 104.77999877929688,
+            "text": "And so I think this is a good one for us to role play.",
+            "start": 102.66000366210938
+          },
+          {
+            "end": 105.77999877929688,
+            "text": "Cool.",
+            "start": 104.77999877929688
+          },
+          {
+            "end": 108.77999877929688,
+            "text": "Well, this will be great for the viewers to see what a therapy session could be like and",
+            "start": 105.77999877929688
+          },
+          {
+            "end": 110.30000305175781,
+            "text": "also how CBT is used.",
+            "start": 108.77999877929688
+          },
+          {
+            "end": 111.5,
+            "text": "So I'll let you take it away.",
+            "start": 110.30000305175781
+          },
+          {
+            "end": 113.18000030517578,
+            "text": "Okay, great.",
+            "start": 112.18000030517578
+          },
+          {
+            "end": 114.69999694824219,
+            "text": "So Kyle, what brings you in today?",
+            "start": 113.18000030517578
+          },
+          {
+            "end": 125.33999633789062,
+            "text": "I recently broke up with a long, long-term partner and it's been one of many breakups",
+            "start": 114.69999694824219
+          },
+          {
+            "end": 127.45999908447266,
+            "text": "I've had in my life.",
+            "start": 125.33999633789062
+          },
+          {
+            "end": 133.94000244140625,
+            "text": "And at this point I'm getting older, I have gray hair, I feel like the clock is ticking",
+            "start": 127.45999908447266
+          },
+          {
+            "end": 140.86000061035156,
+            "text": "and I don't feel like I will ever find somebody who loves me.",
+            "start": 133.94000244140625
+          },
+          {
+            "end": 144.3000030517578,
+            "text": "I don't feel like, I feel like I would have found them already.",
+            "start": 140.89999389648438
+          },
+          {
+            "end": 150.6999969482422,
+            "text": "I feel like I've dated enough people to make that happen and it's not happening and I don't",
+            "start": 144.3000030517578
+          },
+          {
+            "end": 156.02000427246094,
+            "text": "see anything changing and my depression is through the roof because of it.",
+            "start": 150.6999969482422
+          },
+          {
+            "end": 157.02000427246094,
+            "text": "Okay.",
+            "start": 156.02000427246094
+          },
+          {
+            "end": 160.5,
+            "text": "So I'm sorry about your breakup and I'm sorry that that kind of led to a cascade of thoughts",
+            "start": 157.02000427246094
+          },
+          {
+            "end": 164.77999877929688,
+            "text": "in your head about what this really means about your future for relationships and about",
+            "start": 160.5
+          },
+          {
+            "end": 165.77999877929688,
+            "text": "you ultimately.",
+            "start": 164.77999877929688
+          },
+          {
+            "end": 172.66000366210938,
+            "text": "So we're going to do a practice technique right now and this technique is called laddering.",
+            "start": 165.77999877929688
+          },
+          {
+            "end": 177.02000427246094,
+            "text": "And what this is going to help us with is getting some of those negative automatic thoughts.",
+            "start": 172.66000366210938
+          },
+          {
+            "end": 180.3800048828125,
+            "text": "I mean, you said many right now actually just in your description.",
+            "start": 177.02000427246094
+          },
+          {
+            "end": 183.86000061035156,
+            "text": "We're going to work with one of those and it helps us to get them organized in a way",
+            "start": 180.3800048828125
+          },
+          {
+            "end": 187.22000122070312,
+            "text": "so that you can actually see what that automatic thought leads to.",
+            "start": 183.86000061035156
+          },
+          {
+            "end": 192.22000122070312,
+            "text": "Sort of like if you think about automatic thoughts being kind of like an iceberg and",
+            "start": 187.22000122070312
+          },
+          {
+            "end": 195.77999877929688,
+            "text": "the automatic thoughts is the tip of the iceberg that you can see above the water.",
+            "start": 192.22000122070312
+          },
+          {
+            "end": 199.6999969482422,
+            "text": "It's conscious, but you have to kind of attune your awareness to it.",
+            "start": 195.77999877929688
+          },
+          {
+            "end": 202.66000366210938,
+            "text": "But deeper thoughts are actually submerged.",
+            "start": 199.6999969482422
+          },
+          {
+            "end": 203.66000366210938,
+            "text": "You can't see them.",
+            "start": 202.66000366210938
+          },
+          {
+            "end": 206.89999389648438,
+            "text": "They're below the water level and that's what we need to get to because that's the crux",
+            "start": 203.66000366210938
+          },
+          {
+            "end": 207.89999389648438,
+            "text": "of the issue.",
+            "start": 206.89999389648438
+          },
+          {
+            "end": 212.94000244140625,
+            "text": "These core beliefs drive how you feel, how you think, and even the rules that you have",
+            "start": 207.89999389648438
+          },
+          {
+            "end": 218.5399932861328,
+            "text": "in life about how you should behave in order to have safety in many ways.",
+            "start": 212.94000244140625
+          },
+          {
+            "end": 220.22000122070312,
+            "text": "And so let's start with an automatic thought.",
+            "start": 218.5399932861328
+          },
+          {
+            "end": 226.5,
+            "text": "I heard you say that you were thinking based on this breakup and other ones that I might",
+            "start": 220.22000122070312
+          },
+          {
+            "end": 230.33999633789062,
+            "text": "never find somebody who will love me.",
+            "start": 226.5
+          },
+          {
+            "end": 231.86000061035156,
+            "text": "So let's work with that automatic thought.",
+            "start": 230.33999633789062
+          },
+          {
+            "end": 233.97999572753906,
+            "text": "There were other ones, but I think this one is a good one to work with.",
+            "start": 231.86000061035156
+          },
+          {
+            "end": 239.33999633789062,
+            "text": "So if your automatic thought is, I'm not going to find somebody who loves me.",
+            "start": 233.97999572753906
+          },
+          {
+            "end": 240.89999389648438,
+            "text": "What might that mean?",
+            "start": 239.33999633789062
+          },
+          {
+            "end": 243.82000732421875,
+            "text": "What does that thought mean to you?",
+            "start": 240.89999389648438
+          },
+          {
+            "end": 251.4600067138672,
+            "text": "I look around at my friends and my family who are in relationships, who are having kids,",
+            "start": 244.5399932861328
+          },
+          {
+            "end": 258.17999267578125,
+            "text": "who are posting pictures, who are sending out Christmas cards with their significant",
+            "start": 251.4600067138672
+          },
+          {
+            "end": 262.6199951171875,
+            "text": "others, and I don't feel like I will have that.",
+            "start": 258.17999267578125
+          },
+          {
+            "end": 270.8999938964844,
+            "text": "I feel like while everyone else will have love in their life and meaning and purpose,",
+            "start": 262.6199951171875
+          },
+          {
+            "end": 272.5,
+            "text": "I will have nothing.",
+            "start": 270.8999938964844
+          },
+          {
+            "end": 282.7799987792969,
+            "text": "I will be alone, and I am alone, and I am also lonely, and that is devastating.",
+            "start": 272.5
+          },
+          {
+            "end": 285.6199951171875,
+            "text": "So what might it mean if you were alone?",
+            "start": 282.7799987792969
+          },
+          {
+            "end": 286.6199951171875,
+            "text": "Let's take that part of it.",
+            "start": 285.6199951171875
+          },
+          {
+            "end": 290.5400085449219,
+            "text": "So you kind of broke it down, like, well, I don't think that I'm going to find anybody",
+            "start": 286.6199951171875
+          },
+          {
+            "end": 294.94000244140625,
+            "text": "to love me or who I'll love or who I'll have this relationship with, and to me, that means",
+            "start": 290.5400085449219
+          },
+          {
+            "end": 296.29998779296875,
+            "text": "that I'll be alone.",
+            "start": 294.94000244140625
+          },
+          {
+            "end": 298.7799987792969,
+            "text": "So what would it mean if you were alone?",
+            "start": 296.29998779296875
+          },
+          {
+            "end": 299.7799987792969,
+            "text": "What if that did happen?",
+            "start": 298.7799987792969
+          },
+          {
+            "end": 301.4599914550781,
+            "text": "What would that mean about you?",
+            "start": 299.7799987792969
+          },
+          {
+            "end": 305.7799987792969,
+            "text": "Well, on one hand, it means that nobody...",
+            "start": 301.8599853515625
+          },
+          {
+            "end": 309.5,
+            "text": "On one hand, it means that people wouldn't...",
+            "start": 305.7799987792969
+          },
+          {
+            "end": 314.260009765625,
+            "text": "If I'm alone, it means that people don't want to be with me, which is awful.",
+            "start": 309.5
+          },
+          {
+            "end": 316.70001220703125,
+            "text": "It's an awful thought.",
+            "start": 314.260009765625
+          },
+          {
+            "end": 323.2200012207031,
+            "text": "And it also means that I won't be able to enjoy life how I could.",
+            "start": 316.70001220703125
+          },
+          {
+            "end": 332.05999755859375,
+            "text": "I will miss out on dinners and holidays and weekend trips and children and legacy and",
+            "start": 323.2200012207031
+          },
+          {
+            "end": 335.6600036621094,
+            "text": "memories.",
+            "start": 332.05999755859375
+          },
+          {
+            "end": 338.6199951171875,
+            "text": "There's a laundry list of consequences from being alone.",
+            "start": 335.6600036621094
+          },
+          {
+            "end": 339.6199951171875,
+            "text": "Right.",
+            "start": 338.6199951171875
+          },
+          {
+            "end": 344.94000244140625,
+            "text": "And you had just said that one of the things that being alone means would be that maybe",
+            "start": 339.6199951171875
+          },
+          {
+            "end": 347.1400146484375,
+            "text": "that means nobody wants to be with you.",
+            "start": 344.94000244140625
+          },
+          {
+            "end": 350.29998779296875,
+            "text": "And so what would that thought mean if it was true?",
+            "start": 347.1400146484375
+          },
+          {
+            "end": 351.6600036621094,
+            "text": "What if nobody wanted to be with you?",
+            "start": 350.29998779296875
+          },
+          {
+            "end": 353.7799987792969,
+            "text": "What if that was an actual fact?",
+            "start": 351.6600036621094
+          },
+          {
+            "end": 357.8599853515625,
+            "text": "What would that mean?",
+            "start": 353.7799987792969
+          },
+          {
+            "end": 361.1400146484375,
+            "text": "That there's something wrong with me.",
+            "start": 357.8599853515625
+          },
+          {
+            "end": 365.1400146484375,
+            "text": "And if there is something wrong with you, if that thought was true, then what would",
+            "start": 361.1400146484375
+          },
+          {
+            "end": 368.1400146484375,
+            "text": "that mean?",
+            "start": 365.1400146484375
+          },
+          {
+            "end": 372.5799865722656,
+            "text": "That I haven't done a good job in my life becoming...",
+            "start": 368.1400146484375
+          },
+          {
+            "end": 378.1000061035156,
+            "text": "I haven't done a good job becoming somebody that people want to be around, that people",
+            "start": 372.5799865722656
+          },
+          {
+            "end": 380.3399963378906,
+            "text": "want to be in a relationship with.",
+            "start": 378.1000061035156
+          },
+          {
+            "end": 384.17999267578125,
+            "text": "And what would that mean about you if people didn't want to be in a relationship with you,",
+            "start": 380.3399963378906
+          },
+          {
+            "end": 391.0199890136719,
+            "text": "that you haven't done a good job and people didn't want to be around you?",
+            "start": 384.17999267578125
+          },
+          {
+            "end": 395.260009765625,
+            "text": "That I'm worthless, that I'm a waste of time.",
+            "start": 391.0199890136719
+          },
+          {
+            "end": 396.260009765625,
+            "text": "Yeah.",
+            "start": 395.260009765625
+          },
+          {
+            "end": 398.3800048828125,
+            "text": "Well, that's the core belief.",
+            "start": 396.260009765625
+          },
+          {
+            "end": 404.5400085449219,
+            "text": "The core belief is I'm worthless or sometimes people will say I'm unlovable.",
+            "start": 398.3800048828125
+          },
+          {
+            "end": 405.5400085449219,
+            "text": "Sometimes they're interchangeable.",
+            "start": 404.5400085449219
+          },
+          {
+            "end": 410.1000061035156,
+            "text": "But that's how we got to the core belief is we keep doing this laddering technique",
+            "start": 405.5400085449219
+          },
+          {
+            "end": 414.8999938964844,
+            "text": "where any negative thought you have, I ask you, what does that mean?",
+            "start": 410.1000061035156
+          },
+          {
+            "end": 417.29998779296875,
+            "text": "If that thought was true, what would that mean about you?",
+            "start": 414.8999938964844
+          },
+          {
+            "end": 418.29998779296875,
+            "text": "Okay.",
+            "start": 417.29998779296875
+          },
+          {
+            "end": 420.260009765625,
+            "text": "Well, if that thought was true, that would mean that I would be alone.",
+            "start": 418.29998779296875
+          },
+          {
+            "end": 421.260009765625,
+            "text": "Okay.",
+            "start": 420.260009765625
+          },
+          {
+            "end": 423.5,
+            "text": "Well, what would that mean if that was true, if you were alone?",
+            "start": 421.260009765625
+          },
+          {
+            "end": 426.1400146484375,
+            "text": "Well, that would mean that nobody would want to be around me.",
+            "start": 423.5
+          },
+          {
+            "end": 430.05999755859375,
+            "text": "And you kept breaking it down to the deeper and deeper level until you got to this idea",
+            "start": 426.1400146484375
+          },
+          {
+            "end": 435.17999267578125,
+            "text": "of that would mean that I was worthless, that maybe I'm just not capable of being loved,",
+            "start": 430.05999755859375
+          },
+          {
+            "end": 437.2200012207031,
+            "text": "that I'm undeserving of love.",
+            "start": 435.82000732421875
+          },
+          {
+            "end": 441.17999267578125,
+            "text": "And that's what we mean by a core belief, which is like a horrible thing to have to",
+            "start": 437.2200012207031
+          },
+          {
+            "end": 442.17999267578125,
+            "text": "think about.",
+            "start": 441.17999267578125
+          },
+          {
+            "end": 445.4200134277344,
+            "text": "And I want to be clear that core beliefs are not necessarily what you actually believe",
+            "start": 442.17999267578125
+          },
+          {
+            "end": 452.260009765625,
+            "text": "about yourself, but core beliefs are your biggest fear, meaning that if it was true,",
+            "start": 445.4200134277344
+          },
+          {
+            "end": 453.94000244140625,
+            "text": "it would be devastating.",
+            "start": 452.260009765625
+          },
+          {
+            "end": 460.4599914550781,
+            "text": "If you truly were worthless or if you truly were unlovable, that would be devastating.",
+            "start": 453.94000244140625
+          },
+          {
+            "end": 462.6600036621094,
+            "text": "I don't feel...",
+            "start": 460.4599914550781
+          },
+          {
+            "end": 468.3399963378906,
+            "text": "If you would have asked me three minutes ago or four minutes ago, do you think you're a",
+            "start": 462.6600036621094
+          },
+          {
+            "end": 469.3399963378906,
+            "text": "worthless person?",
+            "start": 468.3399963378906
+          },
+          {
+            "end": 472.6199951171875,
+            "text": "I would have said no, not at all.",
+            "start": 469.3399963378906
+          },
+          {
+            "end": 473.6199951171875,
+            "text": "Right.",
+            "start": 472.6199951171875
+          },
+          {
+            "end": 474.6199951171875,
+            "text": "Yeah.",
+            "start": 473.6199951171875
+          },
+          {
+            "end": 480.8599853515625,
+            "text": "And I think that when people first encounter what could be their core belief, they have",
+            "start": 474.6199951171875
+          },
+          {
+            "end": 487.260009765625,
+            "text": "that kind of reaction of, but I don't really believe it's true, at least not intellectually,",
+            "start": 480.8599853515625
+          },
+          {
+            "end": 491.739990234375,
+            "text": "but it's really about the fear of, man, but what if it was true?",
+            "start": 487.260009765625
+          },
+          {
+            "end": 496.94000244140625,
+            "text": "What would that mean about my life and what I could even amount to and what kind of legacy",
+            "start": 491.739990234375
+          },
+          {
+            "end": 499.5,
+            "text": "would I leave behind if that was true?",
+            "start": 496.94000244140625
+          },
+          {
+            "end": 501.760009765625,
+            "text": "And everybody has different fears for different reasons.",
+            "start": 499.5
+          },
+          {
+            "end": 508.4599914550781,
+            "text": "Some people's core belief is, I'm incapable, and that to them is paralyzing, like, man,",
+            "start": 501.760009765625
+          },
+          {
+            "end": 512.8200073242188,
+            "text": "if I wasn't capable, that could ruin my life.",
+            "start": 508.4599914550781
+          },
+          {
+            "end": 515.97998046875,
+            "text": "And it's not that they actually believe they're incapable, but it's just like, oh my gosh,",
+            "start": 512.8200073242188
+          },
+          {
+            "end": 520.8200073242188,
+            "text": "if that was true, the consequences to my life would be devastating, and I wouldn't even",
+            "start": 516.1799926757812
+          },
+          {
+            "end": 523.0599975585938,
+            "text": "be able to tolerate it.",
+            "start": 520.8200073242188
+          },
+          {
+            "end": 526.1400146484375,
+            "text": "And so this is sort of what we're working with, and I always say when we get to a core",
+            "start": 523.0599975585938
+          },
+          {
+            "end": 531.0999755859375,
+            "text": "belief, it doesn't necessarily have to be your core belief, but let's work with it.",
+            "start": 526.1400146484375
+          },
+          {
+            "end": 532.2999877929688,
+            "text": "Let's see if it is.",
+            "start": 531.0999755859375
+          },
+          {
+            "end": 535.6199951171875,
+            "text": "Part of this is sort of like hypothesis testing, like let's work with that and see if that",
+            "start": 532.2999877929688
+          },
+          {
+            "end": 537.1799926757812,
+            "text": "could be true for you.",
+            "start": 535.6199951171875
+          },
+          {
+            "end": 543.260009765625,
+            "text": "When people have core beliefs, they usually then have conditional rules and assumptions",
+            "start": 537.1799926757812
+          },
+          {
+            "end": 548.260009765625,
+            "text": "about how the world will work and how they should act within that world.",
+            "start": 543.260009765625
+          },
+          {
+            "end": 553.02001953125,
+            "text": "So what I mean by this is when you have such a core belief like I'm worthless or I'm unlovable,",
+            "start": 548.260009765625
+          },
+          {
+            "end": 558.1400146484375,
+            "text": "there will be certain things that you believe are scripts that you have to follow in order",
+            "start": 553.02001953125
+          },
+          {
+            "end": 562.97998046875,
+            "text": "to have any semblance of emotional safety or to prevent yourself from having that core",
+            "start": 558.1400146484375
+          },
+          {
+            "end": 564.739990234375,
+            "text": "belief come true.",
+            "start": 562.97998046875
+          },
+          {
+            "end": 567.8200073242188,
+            "text": "And so we're going to talk about what some of those things could be for you.",
+            "start": 564.739990234375
+          },
+          {
+            "end": 577.5800170898438,
+            "text": "When somebody has a I'm worthless core belief, what might that do in terms of your expression",
+            "start": 567.8200073242188
+          },
+          {
+            "end": 581.4000244140625,
+            "text": "of your needs and wants to other people?",
+            "start": 577.5800170898438
+          },
+          {
+            "end": 586.8200073242188,
+            "text": "What rule might you have if you actually believe that you might be worthless or that you fear",
+            "start": 581.4000244140625
+          },
+          {
+            "end": 588.6199951171875,
+            "text": "that that might be true?",
+            "start": 586.8200073242188
+          },
+          {
+            "end": 593.8599853515625,
+            "text": "What kind of rule would you put on yourself in terms of how you could communicate your",
+            "start": 588.6199951171875
+          },
+          {
+            "end": 596.97998046875,
+            "text": "needs and wants to others?",
+            "start": 593.8599853515625
+          },
+          {
+            "end": 607.4600219726562,
+            "text": "Well, I would probably only, in terms of a romantic relationship, I would probably only",
+            "start": 597.1400146484375
+          },
+          {
+            "end": 616.02001953125,
+            "text": "date someone who I felt was like below my league, I guess.",
+            "start": 607.4600219726562
+          },
+          {
+            "end": 617.9000244140625,
+            "text": "I don't know if that's a rude thing to say.",
+            "start": 616.02001953125
+          },
+          {
+            "end": 623.5800170898438,
+            "text": "No, it's honest and I think you're not alone in that.",
+            "start": 617.9000244140625
+          },
+          {
+            "end": 629.739990234375,
+            "text": "Because if I truly was worthless, then I would need to be with somebody else who couldn't",
+            "start": 623.5800170898438
+          },
+          {
+            "end": 633.8200073242188,
+            "text": "see that, who would never know that I was worthless.",
+            "start": 629.739990234375
+          },
+          {
+            "end": 638.3800048828125,
+            "text": "And so I would need to date accordingly.",
+            "start": 633.8200073242188
+          },
+          {
+            "end": 643.5,
+            "text": "I wouldn't go after the people that I actually wanted to date because they're too smart to",
+            "start": 638.3800048828125
+          },
+          {
+            "end": 644.97998046875,
+            "text": "figure it out.",
+            "start": 643.5
+          },
+          {
+            "end": 646.5,
+            "text": "That's at least, I think that's what happened.",
+            "start": 644.97998046875
+          },
+          {
+            "end": 649.6599731445312,
+            "text": "That would be like a possible thinking there.",
+            "start": 646.5
+          },
+          {
+            "end": 655.6400146484375,
+            "text": "And I would also try to show my worth a lot.",
+            "start": 649.6599731445312
+          },
+          {
+            "end": 662.0599975585938,
+            "text": "Even though I believed I'm worthless, I would try to show, well, look at the great house",
+            "start": 655.6400146484375
+          },
+          {
+            "end": 669.3800048828125,
+            "text": "I have and look at how happy I'm being and look how fun my friends are and look at my",
+            "start": 662.0599975585938
+          },
+          {
+            "end": 672.9000244140625,
+            "text": "cool job and look at, look at, look at, look at, see, I'm not worthless.",
+            "start": 669.3800048828125
+          },
+          {
+            "end": 673.9000244140625,
+            "text": "I'm not worthless.",
+            "start": 672.9000244140625
+          },
+          {
+            "end": 674.9000244140625,
+            "text": "I'm not worthless.",
+            "start": 673.9000244140625
+          },
+          {
+            "end": 675.9000244140625,
+            "text": "Right.",
+            "start": 674.9000244140625
+          },
+          {
+            "end": 676.9000244140625,
+            "text": "Yeah.",
+            "start": 675.9000244140625
+          },
+          {
+            "end": 680.8200073242188,
+            "text": "So those are excellent examples of the types of rules you might have when that is your",
+            "start": 676.9000244140625
+          },
+          {
+            "end": 682.260009765625,
+            "text": "core belief.",
+            "start": 680.8200073242188
+          },
+          {
+            "end": 686.8200073242188,
+            "text": "And might you also have a type of rule where you felt like in certain situations you had",
+            "start": 682.260009765625
+          },
+          {
+            "end": 689.5800170898438,
+            "text": "to contribute something so that there would be worth.",
+            "start": 686.8200073242188
+          },
+          {
+            "end": 694.2999877929688,
+            "text": "So like even in friendships, for example, like how are you like always about them as",
+            "start": 689.5800170898438
+          },
+          {
+            "end": 697.1799926757812,
+            "text": "opposed to, oh, now we can talk about me for 20 minutes.",
+            "start": 694.2999877929688
+          },
+          {
+            "end": 698.1799926757812,
+            "text": "Right.",
+            "start": 697.1799926757812
+          },
+          {
+            "end": 700.1799926757812,
+            "text": "Do you find yourself sometimes doing that with your friends?",
+            "start": 698.1799926757812
+          },
+          {
+            "end": 701.1799926757812,
+            "text": "Yes.",
+            "start": 700.1799926757812
+          },
+          {
+            "end": 702.1799926757812,
+            "text": "Okay.",
+            "start": 701.1799926757812
+          },
+          {
+            "end": 711.02001953125,
+            "text": "So for as long as I can remember, constantly making sure that the other person was happy",
+            "start": 703.1799926757812
+          },
+          {
+            "end": 718.3400268554688,
+            "text": "with our interaction first, professionally, friendship, romantic, familial.",
+            "start": 711.02001953125
+          },
+          {
+            "end": 723.6599731445312,
+            "text": "Are you happy with our, constantly, I constantly remember thinking, are you happy about this?",
+            "start": 718.3400268554688
+          },
+          {
+            "end": 726.739990234375,
+            "text": "Because I want to make sure you're happy about this because I don't want you to have an interaction",
+            "start": 723.6599731445312
+          },
+          {
+            "end": 728.1799926757812,
+            "text": "with me where you're not happy.",
+            "start": 726.739990234375
+          },
+          {
+            "end": 729.1799926757812,
+            "text": "Right.",
+            "start": 728.1799926757812
+          },
+          {
+            "end": 730.1799926757812,
+            "text": "Right.",
+            "start": 729.1799926757812
+          },
+          {
+            "end": 731.1799926757812,
+            "text": "Okay.",
+            "start": 730.1799926757812
+          },
+          {
+            "end": 735.0599975585938,
+            "text": "So that's another great example of a possible assumption or a rule that you might put on",
+            "start": 731.1799926757812
+          },
+          {
+            "end": 737.02001953125,
+            "text": "yourself when this is the core belief.",
+            "start": 735.0599975585938
+          },
+          {
+            "end": 740.02001953125,
+            "text": "And so as you might imagine, there's a long list of these.",
+            "start": 737.02001953125
+          },
+          {
+            "end": 743.9400024414062,
+            "text": "If we sat here for two hours, we could probably come up with like 20 other rules that probably",
+            "start": 740.02001953125
+          },
+          {
+            "end": 745.4600219726562,
+            "text": "play some role in your life.",
+            "start": 743.9400024414062
+          },
+          {
+            "end": 748.739990234375,
+            "text": "But I want to move on to the problem solving phase, you know, because that's what CBT is",
+            "start": 745.4600219726562
+          },
+          {
+            "end": 750.780029296875,
+            "text": "all about is like, let's solve the problem.",
+            "start": 748.739990234375
+          },
+          {
+            "end": 752.260009765625,
+            "text": "So yeah, I love that part.",
+            "start": 750.780029296875
+          },
+          {
+            "end": 756.6199951171875,
+            "text": "So we've identified the issue and there's been very many different ways in which you",
+            "start": 752.260009765625
+          },
+          {
+            "end": 759.3800048828125,
+            "text": "can work with your core beliefs, but you have to remember that these core beliefs have been",
+            "start": 756.6199951171875
+          },
+          {
+            "end": 764.6599731445312,
+            "text": "there for a long time and they're kind of pervasive, like this idea of I'm worthless.",
+            "start": 759.3800048828125
+          },
+          {
+            "end": 767.9400024414062,
+            "text": "As you just demonstrated, it's not just about your romantic relationships, it's about how",
+            "start": 764.6599731445312
+          },
+          {
+            "end": 772.4600219726562,
+            "text": "you interact with friends, with professional people, with colleagues, whatever.",
+            "start": 767.9400024414062
+          },
+          {
+            "end": 776.4199829101562,
+            "text": "There's permeating of sorts in almost all the domains of your life.",
+            "start": 772.4600219726562
+          },
+          {
+            "end": 780.5,
+            "text": "And so what we're going to do now is one of my favorite ways to work with core beliefs",
+            "start": 776.4199829101562
+          },
+          {
+            "end": 785.02001953125,
+            "text": "and assumptions once we've identified them, and that is to create an individualized behavioral",
+            "start": 780.5
+          },
+          {
+            "end": 786.02001953125,
+            "text": "experiment.",
+            "start": 785.02001953125
+          },
+          {
+            "end": 787.02001953125,
+            "text": "Okay.",
+            "start": 786.02001953125
+          },
+          {
+            "end": 789.9000244140625,
+            "text": "So the way that we work with your core beliefs and the assumptions that follow them actually",
+            "start": 787.02001953125
+          },
+          {
+            "end": 791.9000244140625,
+            "text": "apply to every single situation.",
+            "start": 789.9000244140625
+          },
+          {
+            "end": 798.4600219726562,
+            "text": "As I mentioned, core beliefs feel pervasive and we want to make them more conditional.",
+            "start": 791.9000244140625
+          },
+          {
+            "end": 802.0599975585938,
+            "text": "You know, we want to make it so that, well, you know, in certain situations and with certain",
+            "start": 798.4600219726562
+          },
+          {
+            "end": 806.1799926757812,
+            "text": "people, they may make me feel this way and maybe that even comes from childhood, but",
+            "start": 802.0599975585938
+          },
+          {
+            "end": 808.97998046875,
+            "text": "it doesn't apply to every single thing, right?",
+            "start": 806.1799926757812
+          },
+          {
+            "end": 811.8200073242188,
+            "text": "And the way that we shake that is to actually get evidence.",
+            "start": 808.97998046875
+          },
+          {
+            "end": 817.8200073242188,
+            "text": "CBT is a scientific program and this is kind of like our mini science experiment that we're",
+            "start": 812.8200073242188
+          },
+          {
+            "end": 819.2999877929688,
+            "text": "going to do together.",
+            "start": 817.8200073242188
+          },
+          {
+            "end": 822.260009765625,
+            "text": "So there's only a couple of rules for this experiment.",
+            "start": 819.2999877929688
+          },
+          {
+            "end": 826.0599975585938,
+            "text": "We're going to design an experiment around one of your rules or assumptions and the one",
+            "start": 822.260009765625
+          },
+          {
+            "end": 829.2999877929688,
+            "text": "that I want to use, which I think is a good one to do because you want to start with a",
+            "start": 826.0599975585938
+          },
+          {
+            "end": 832.2999877929688,
+            "text": "lower hanging fruit that's not too activating.",
+            "start": 829.2999877929688
+          },
+          {
+            "end": 837.8599853515625,
+            "text": "Like we shouldn't start with the rule of you dating people who might be of a different",
+            "start": 832.2999877929688
+          },
+          {
+            "end": 841.3800048828125,
+            "text": "level than you because that one is a little bit deeper, but we start with something that",
+            "start": 837.8599853515625
+          },
+          {
+            "end": 844.5800170898438,
+            "text": "feels like you can approach it and there's a little bit of risk.",
+            "start": 841.3800048828125
+          },
+          {
+            "end": 848.739990234375,
+            "text": "It makes you a little uncomfortable, but not like the worst thing that could happen.",
+            "start": 844.5800170898438
+          },
+          {
+            "end": 852.5800170898438,
+            "text": "And I think that that would apply to the rule of, I always have to take care of other people's",
+            "start": 848.739990234375
+          },
+          {
+            "end": 856.3800048828125,
+            "text": "needs first because there's a lot of people that applies to it.",
+            "start": 852.5800170898438
+          },
+          {
+            "end": 860.219970703125,
+            "text": "It can apply to your intimate relationships, but it can also apply to friends, colleagues,",
+            "start": 856.3800048828125
+          },
+          {
+            "end": 861.9000244140625,
+            "text": "anybody else that you meet.",
+            "start": 860.219970703125
+          },
+          {
+            "end": 868.0999755859375,
+            "text": "So let's take that rule and let's try to test it with a person in your life.",
+            "start": 861.9000244140625
+          },
+          {
+            "end": 871.5800170898438,
+            "text": "And I would also say that, again, this person should not be the most activating person,",
+            "start": 868.0999755859375
+          },
+          {
+            "end": 874.9400024414062,
+            "text": "but this should be a person who there's some stakes in it, there's some skin in the game,",
+            "start": 871.5800170898438
+          },
+          {
+            "end": 880.3400268554688,
+            "text": "but this is not a person in which if this experiment failed, meaning that like you tried",
+            "start": 874.9400024414062
+          },
+          {
+            "end": 885.3400268554688,
+            "text": "to challenge this assumption and they failed it in some way and actually made your core",
+            "start": 880.3400268554688
+          },
+          {
+            "end": 891.739990234375,
+            "text": "belief feel more significant to you, that you would feel bad about it, but you wouldn't",
+            "start": 885.3400268554688
+          },
+          {
+            "end": 893.9000244140625,
+            "text": "be so bad that you would be in pieces.",
+            "start": 891.739990234375
+          },
+          {
+            "end": 898.260009765625,
+            "text": "So is there a person like that who you're like, huh, like I've always taken care of",
+            "start": 893.9000244140625
+          },
+          {
+            "end": 903.1799926757812,
+            "text": "this person's needs first, like as I usually do, and I could probably test something out",
+            "start": 898.260009765625
+          },
+          {
+            "end": 907.219970703125,
+            "text": "with them and if it didn't work out, I'd be kind of sad about it, but like I wouldn't",
+            "start": 903.1799926757812
+          },
+          {
+            "end": 908.8599853515625,
+            "text": "be devastated.",
+            "start": 907.219970703125
+          },
+          {
+            "end": 914.6199951171875,
+            "text": "Um, well, I, I have a friend in mind.",
+            "start": 908.8599853515625
+          },
+          {
+            "end": 915.6199951171875,
+            "text": "Okay.",
+            "start": 914.6199951171875
+          },
+          {
+            "end": 916.6199951171875,
+            "text": "Great.",
+            "start": 915.6199951171875
+          },
+          {
+            "end": 917.6199951171875,
+            "text": "Okay.",
+            "start": 916.6199951171875
+          },
+          {
+            "end": 918.6199951171875,
+            "text": "And so this is somebody that, how long have you known this friend?",
+            "start": 917.6199951171875
+          },
+          {
+            "end": 920.6199951171875,
+            "text": "10, 10, more than 10 years.",
+            "start": 918.6199951171875
+          },
+          {
+            "end": 921.6199951171875,
+            "text": "Oh wow.",
+            "start": 920.6199951171875
+          },
+          {
+            "end": 922.6199951171875,
+            "text": "Okay.",
+            "start": 921.6199951171875
+          },
+          {
+            "end": 923.6199951171875,
+            "text": "So 10 years.",
+            "start": 922.6199951171875
+          },
+          {
+            "end": 925.3400268554688,
+            "text": "Right.",
+            "start": 924.3400268554688
+          },
+          {
+            "end": 928.9000244140625,
+            "text": "But you guys have been familiar and like most of the times you're probably taking care of",
+            "start": 925.3400268554688
+          },
+          {
+            "end": 929.9000244140625,
+            "text": "this friend.",
+            "start": 928.9000244140625
+          },
+          {
+            "end": 930.9000244140625,
+            "text": "Right.",
+            "start": 929.9000244140625
+          },
+          {
+            "end": 931.9000244140625,
+            "text": "How are you?",
+            "start": 930.9000244140625
+          },
+          {
+            "end": 932.9000244140625,
+            "text": "Like, Oh, let me give you advice.",
+            "start": 931.9000244140625
+          },
+          {
+            "end": 933.9000244140625,
+            "text": "Like, what can I bring you?",
+            "start": 932.9000244140625
+          },
+          {
+            "end": 934.9000244140625,
+            "text": "You're sick.",
+            "start": 933.9000244140625
+          },
+          {
+            "end": 935.9000244140625,
+            "text": "Like that kind of relationship.",
+            "start": 934.9000244140625
+          },
+          {
+            "end": 936.9000244140625,
+            "text": "All right.",
+            "start": 935.9000244140625
+          },
+          {
+            "end": 937.9000244140625,
+            "text": "So this experiment is going to be very time limited.",
+            "start": 936.9000244140625
+          },
+          {
+            "end": 938.9000244140625,
+            "text": "It's going to be very specific.",
+            "start": 937.9000244140625
+          },
+          {
+            "end": 941.97998046875,
+            "text": "So I need you to set like a specific date and time that you're going to do this in the",
+            "start": 938.9000244140625
+          },
+          {
+            "end": 942.97998046875,
+            "text": "next seven days.",
+            "start": 941.97998046875
+          },
+          {
+            "end": 943.97998046875,
+            "text": "Oh, okay.",
+            "start": 942.97998046875
+          },
+          {
+            "end": 944.97998046875,
+            "text": "Yeah.",
+            "start": 943.97998046875
+          },
+          {
+            "end": 947.2999877929688,
+            "text": "It was going to be real specific cause we need to get that data and it's going to be",
+            "start": 944.97998046875
+          },
+          {
+            "end": 952.5399780273438,
+            "text": "something that's kind of, uh, contained, meaning it should be something where it's not like",
+            "start": 947.2999877929688
+          },
+          {
+            "end": 953.5399780273438,
+            "text": "a free for all.",
+            "start": 952.5399780273438
+          },
+          {
+            "end": 957.1400146484375,
+            "text": "Like from now on, I'm just going to be, you know, we're vomit and always talk all about",
+            "start": 953.5399780273438
+          },
+          {
+            "end": 961.8200073242188,
+            "text": "my problems first, but it's more about, okay, in this particular conversation, I'm going",
+            "start": 957.1400146484375
+          },
+          {
+            "end": 964.1400146484375,
+            "text": "to go with him with a problem.",
+            "start": 961.8200073242188
+          },
+          {
+            "end": 967.6199951171875,
+            "text": "And once I talk about the problem and get his advice, I'm going to be like, that was",
+            "start": 964.1400146484375
+          },
+          {
+            "end": 968.6199951171875,
+            "text": "so helpful.",
+            "start": 967.6199951171875
+          },
+          {
+            "end": 969.6199951171875,
+            "text": "Thank you.",
+            "start": 968.6199951171875
+          },
+          {
+            "end": 970.6199951171875,
+            "text": "Goodbye.",
+            "start": 969.6199951171875
+          },
+          {
+            "end": 972.0599975585938,
+            "text": "And not make that about him at all.",
+            "start": 970.6199951171875
+          },
+          {
+            "end": 975.8599853515625,
+            "text": "Because that's the other thing where with your type of poor belief and assumptions,",
+            "start": 972.0599975585938
+          },
+          {
+            "end": 977.2999877929688,
+            "text": "sometimes you'll be like, and how are you?",
+            "start": 975.8599853515625
+          },
+          {
+            "end": 980.780029296875,
+            "text": "And then you spend another 45 minutes absolutely.",
+            "start": 977.2999877929688
+          },
+          {
+            "end": 981.9000244140625,
+            "text": "So we're not going to do that.",
+            "start": 980.780029296875
+          },
+          {
+            "end": 985.6599731445312,
+            "text": "This is literally going to be you going to him to express a need of yours, to express",
+            "start": 982.260009765625
+          },
+          {
+            "end": 989.8200073242188,
+            "text": "a problem, have this person give you the advice and then be like, thank you.",
+            "start": 985.6599731445312
+          },
+          {
+            "end": 991.3400268554688,
+            "text": "That was super helpful.",
+            "start": 989.8200073242188
+          },
+          {
+            "end": 993.6599731445312,
+            "text": "Talk to you later.",
+            "start": 991.3400268554688
+          },
+          {
+            "end": 995.780029296875,
+            "text": "So that's the experiment.",
+            "start": 993.6599731445312
+          },
+          {
+            "end": 996.780029296875,
+            "text": "And I have to go do that.",
+            "start": 995.780029296875
+          },
+          {
+            "end": 998.02001953125,
+            "text": "And you have to go do that.",
+            "start": 996.780029296875
+          },
+          {
+            "end": 1000.5800170898438,
+            "text": "And then what are you expecting me to report back with?",
+            "start": 998.02001953125
+          },
+          {
+            "end": 1003.5399780273438,
+            "text": "So first we're going to predict how you think that's going to go.",
+            "start": 1000.5800170898438
+          },
+          {
+            "end": 1009.0599975585938,
+            "text": "So based on your beliefs or maybe your assumptions and rules, like how do you think that might",
+            "start": 1003.5399780273438
+          },
+          {
+            "end": 1010.0599975585938,
+            "text": "go?",
+            "start": 1009.0599975585938
+          },
+          {
+            "end": 1013.8599853515625,
+            "text": "Like in terms of maybe how you might feel or what they might feel or do?",
+            "start": 1010.0599975585938
+          },
+          {
+            "end": 1018.3800048828125,
+            "text": "Well, I mean, I think it will go fine.",
+            "start": 1013.8599853515625
+          },
+          {
+            "end": 1019.4199829101562,
+            "text": "Okay.",
+            "start": 1018.3800048828125
+          },
+          {
+            "end": 1021.5800170898438,
+            "text": "Do you think that he's going to have some kind of inner judgment of you?",
+            "start": 1019.4199829101562
+          },
+          {
+            "end": 1025.4599609375,
+            "text": "Like Kyle's selfish.",
+            "start": 1021.5800170898438
+          },
+          {
+            "end": 1026.8599853515625,
+            "text": "He didn't even ask about me today.",
+            "start": 1025.4599609375
+          },
+          {
+            "end": 1030.4200439453125,
+            "text": "I mean, maybe, I don't know.",
+            "start": 1026.8599853515625
+          },
+          {
+            "end": 1031.4200439453125,
+            "text": "Yeah.",
+            "start": 1030.4200439453125
+          },
+          {
+            "end": 1032.4200439453125,
+            "text": "Well, let's get specific.",
+            "start": 1031.4200439453125
+          },
+          {
+            "end": 1034.0999755859375,
+            "text": "I mean, do you think that that's a possibility?",
+            "start": 1032.4200439453125
+          },
+          {
+            "end": 1035.0999755859375,
+            "text": "Yes.",
+            "start": 1034.0999755859375
+          },
+          {
+            "end": 1036.0999755859375,
+            "text": "Okay.",
+            "start": 1035.0999755859375
+          },
+          {
+            "end": 1037.0999755859375,
+            "text": "Yes.",
+            "start": 1036.0999755859375
+          },
+          {
+            "end": 1038.0999755859375,
+            "text": "And you obviously don't want that to be anybody's thoughts about you.",
+            "start": 1037.0999755859375
+          },
+          {
+            "end": 1039.1400146484375,
+            "text": "No.",
+            "start": 1038.1400146484375
+          },
+          {
+            "end": 1040.1400146484375,
+            "text": "No.",
+            "start": 1039.1400146484375
+          },
+          {
+            "end": 1041.1400146484375,
+            "text": "Okay.",
+            "start": 1040.1400146484375
+          },
+          {
+            "end": 1042.1400146484375,
+            "text": "All right.",
+            "start": 1041.1400146484375
+          },
+          {
+            "end": 1043.1400146484375,
+            "text": "So you're going to hold that distress a little bit for yourself.",
+            "start": 1042.1400146484375
+          },
+          {
+            "end": 1045.3800048828125,
+            "text": "And then you said it's going to probably go fine, meaning like you think you can carry",
+            "start": 1043.1400146484375
+          },
+          {
+            "end": 1048.260009765625,
+            "text": "it through, but it might make you a little uncomfortable.",
+            "start": 1045.3800048828125
+          },
+          {
+            "end": 1049.260009765625,
+            "text": "Yeah.",
+            "start": 1048.260009765625
+          },
+          {
+            "end": 1051.6600341796875,
+            "text": "And I'm hoping I don't slip up.",
+            "start": 1049.260009765625
+          },
+          {
+            "end": 1052.6600341796875,
+            "text": "And start being like, and how are you?",
+            "start": 1051.6600341796875
+          },
+          {
+            "end": 1053.6600341796875,
+            "text": "Uh-huh.",
+            "start": 1052.6600341796875
+          },
+          {
+            "end": 1056.1400146484375,
+            "text": "And go, oh, well, I'm sorry that you went through something.",
+            "start": 1053.6600341796875
+          },
+          {
+            "end": 1057.1400146484375,
+            "text": "You know, like.",
+            "start": 1056.1400146484375
+          },
+          {
+            "end": 1058.1400146484375,
+            "text": "And then just completely turn around.",
+            "start": 1057.1400146484375
+          },
+          {
+            "end": 1059.1400146484375,
+            "text": "Yeah.",
+            "start": 1058.1400146484375
+          },
+          {
+            "end": 1060.1400146484375,
+            "text": "Yeah, exactly.",
+            "start": 1059.1400146484375
+          },
+          {
+            "end": 1061.1400146484375,
+            "text": "Okay.",
+            "start": 1060.1400146484375
+          },
+          {
+            "end": 1062.1400146484375,
+            "text": "So we've laid out a couple of expectations.",
+            "start": 1061.1400146484375
+          },
+          {
+            "end": 1065.02001953125,
+            "text": "One is, well, I'm sure he'll be fine with giving me the advice, but maybe in his mind",
+            "start": 1062.1400146484375
+          },
+          {
+            "end": 1067.06005859375,
+            "text": "he'll be like, whoa, Kyle's being selfish today.",
+            "start": 1065.02001953125
+          },
+          {
+            "end": 1068.97998046875,
+            "text": "He didn't even ask about how I am.",
+            "start": 1067.06005859375
+          },
+          {
+            "end": 1073.0999755859375,
+            "text": "And then also you might just feel kind of like icky and then you're afraid that you",
+            "start": 1068.97998046875
+          },
+          {
+            "end": 1077.4599609375,
+            "text": "might like break and just start to like take care of him so you feel better about yourself",
+            "start": 1073.0999755859375
+          },
+          {
+            "end": 1078.4599609375,
+            "text": "again.",
+            "start": 1077.4599609375
+          },
+          {
+            "end": 1079.4599609375,
+            "text": "Exactly.",
+            "start": 1078.4599609375
+          },
+          {
+            "end": 1080.4599609375,
+            "text": "Okay.",
+            "start": 1079.4599609375
+          },
+          {
+            "end": 1081.4599609375,
+            "text": "So those are the expectations.",
+            "start": 1080.4599609375
+          },
+          {
+            "end": 1082.4599609375,
+            "text": "All right.",
+            "start": 1081.4599609375
+          },
+          {
+            "end": 1083.4599609375,
+            "text": "So then you're going to do this experiment.",
+            "start": 1082.4599609375
+          },
+          {
+            "end": 1084.4599609375,
+            "text": "So when do you think you can do something like this?",
+            "start": 1083.4599609375
+          },
+          {
+            "end": 1085.4599609375,
+            "text": "Tomorrow.",
+            "start": 1084.4599609375
+          },
+          {
+            "end": 1086.4599609375,
+            "text": "Give me a day.",
+            "start": 1085.4599609375
+          },
+          {
+            "end": 1087.4599609375,
+            "text": "Okay.",
+            "start": 1086.4599609375
+          },
+          {
+            "end": 1088.4599609375,
+            "text": "Tomorrow.",
+            "start": 1087.4599609375
+          },
+          {
+            "end": 1089.4599609375,
+            "text": "And then what problem do you think you're going to bring him?",
+            "start": 1088.4599609375
+          },
+          {
+            "end": 1094.8599853515625,
+            "text": "Um, I'll bring him a, a, a, just, I'm so stressed out.",
+            "start": 1089.4599609375
+          },
+          {
+            "end": 1095.8599853515625,
+            "text": "I'm so busy.",
+            "start": 1094.8599853515625
+          },
+          {
+            "end": 1096.8599853515625,
+            "text": "Okay.",
+            "start": 1095.8599853515625
+          },
+          {
+            "end": 1098.6600341796875,
+            "text": "Yeah.",
+            "start": 1097.6600341796875
+          },
+          {
+            "end": 1099.6600341796875,
+            "text": "Tomorrow.",
+            "start": 1098.6600341796875
+          },
+          {
+            "end": 1100.6600341796875,
+            "text": "Great.",
+            "start": 1099.6600341796875
+          },
+          {
+            "end": 1101.6600341796875,
+            "text": "So you'll just talk about that and, oh my gosh, I need help with this.",
+            "start": 1100.6600341796875
+          },
+          {
+            "end": 1104.0999755859375,
+            "text": "It's on a level that I've never experienced before.",
+            "start": 1101.6600341796875
+          },
+          {
+            "end": 1105.0999755859375,
+            "text": "Okay, great.",
+            "start": 1104.0999755859375
+          },
+          {
+            "end": 1106.0999755859375,
+            "text": "That's perfect.",
+            "start": 1105.0999755859375
+          },
+          {
+            "end": 1107.0999755859375,
+            "text": "And then we'll kind of keep it time limited.",
+            "start": 1106.0999755859375
+          },
+          {
+            "end": 1108.8599853515625,
+            "text": "So how long do you think the conversation will be?",
+            "start": 1107.0999755859375
+          },
+          {
+            "end": 1109.8599853515625,
+            "text": "Just give me a...",
+            "start": 1108.8599853515625
+          },
+          {
+            "end": 1110.8599853515625,
+            "text": "15 minutes.",
+            "start": 1109.8599853515625
+          },
+          {
+            "end": 1111.8599853515625,
+            "text": "Perfect.",
+            "start": 1110.8599853515625
+          },
+          {
+            "end": 1112.8599853515625,
+            "text": "Okay.",
+            "start": 1111.8599853515625
+          },
+          {
+            "end": 1113.8599853515625,
+            "text": "And remember, we're not going to make it another 20 minutes.",
+            "start": 1112.8599853515625
+          },
+          {
+            "end": 1114.8599853515625,
+            "text": "Make it about him.",
+            "start": 1113.8599853515625
+          },
+          {
+            "end": 1115.8599853515625,
+            "text": "Yeah.",
+            "start": 1114.8599853515625
+          },
+          {
+            "end": 1116.8599853515625,
+            "text": "Okay.",
+            "start": 1115.8599853515625
+          },
+          {
+            "end": 1117.8599853515625,
+            "text": "Awesome.",
+            "start": 1116.8599853515625
+          },
+          {
+            "end": 1121.300048828125,
+            "text": "So then we're going to do this and we've already talked about the expectations.",
+            "start": 1117.8599853515625
+          },
+          {
+            "end": 1124.219970703125,
+            "text": "And after you do it, I want to, I want you to do two things.",
+            "start": 1121.300048828125
+          },
+          {
+            "end": 1130.0999755859375,
+            "text": "One is I want you to actually ask him at the end of that conversation, was this okay with",
+            "start": 1124.219970703125
+          },
+          {
+            "end": 1134.4599609375,
+            "text": "you that today we just talked about me, I'm just really stressed.",
+            "start": 1130.0999755859375
+          },
+          {
+            "end": 1139.219970703125,
+            "text": "You literally ask him that very specific question because you want to get some level of feedback.",
+            "start": 1134.4599609375
+          },
+          {
+            "end": 1142.97998046875,
+            "text": "Of course he can still lie to you, but it at least gives you some semblance of what",
+            "start": 1139.219970703125
+          },
+          {
+            "end": 1143.97998046875,
+            "text": "he might be thinking.",
+            "start": 1142.97998046875
+          },
+          {
+            "end": 1145.93994140625,
+            "text": "And I don't think he's expecting that kind of question from you.",
+            "start": 1143.97998046875
+          },
+          {
+            "end": 1146.93994140625,
+            "text": "No.",
+            "start": 1145.93994140625
+          },
+          {
+            "end": 1149.6600341796875,
+            "text": "So it'd be like, Hey, I got to run cause I'm busy.",
+            "start": 1146.93994140625
+          },
+          {
+            "end": 1153.5,
+            "text": "But just so, just so I know, like, was this okay that I called you just to get your advice",
+            "start": 1149.6600341796875
+          },
+          {
+            "end": 1154.5,
+            "text": "today?",
+            "start": 1153.5
+          },
+          {
+            "end": 1156.5,
+            "text": "And we didn't get to talk about how you're doing.",
+            "start": 1154.5
+          },
+          {
+            "end": 1157.5,
+            "text": "I can do that.",
+            "start": 1156.5
+          },
+          {
+            "end": 1158.5,
+            "text": "Okay, cool.",
+            "start": 1157.5
+          },
+          {
+            "end": 1159.5,
+            "text": "I can totally do that.",
+            "start": 1158.5
+          },
+          {
+            "end": 1160.5,
+            "text": "Awesome.",
+            "start": 1159.5
+          },
+          {
+            "end": 1162.260009765625,
+            "text": "So then he'll give you some feedback about that.",
+            "start": 1160.5
+          },
+          {
+            "end": 1165.5,
+            "text": "You will write that down and you will write down just your feelings leading up to it.",
+            "start": 1162.260009765625
+          },
+          {
+            "end": 1167.1400146484375,
+            "text": "Like, was it that discomforting?",
+            "start": 1165.5
+          },
+          {
+            "end": 1170.6600341796875,
+            "text": "And then once you get that feedback from him, how did you feel then?",
+            "start": 1167.1400146484375
+          },
+          {
+            "end": 1174.5400390625,
+            "text": "And I will say that what I'm expecting is this guy has been your friend for 10 years",
+            "start": 1170.6600341796875
+          },
+          {
+            "end": 1176.3800048828125,
+            "text": "that he's probably going to be like, dude, it's cool.",
+            "start": 1174.5400390625
+          },
+          {
+            "end": 1180.06005859375,
+            "text": "Like that's what friends are for something like that.",
+            "start": 1176.3800048828125
+          },
+          {
+            "end": 1185.4200439453125,
+            "text": "And then using that experience, we're going to now go back to your assumptions again and",
+            "start": 1180.06005859375
+          },
+          {
+            "end": 1187.1800537109375,
+            "text": "say, did that assumption really hold?",
+            "start": 1185.4200439453125
+          },
+          {
+            "end": 1190.6199951171875,
+            "text": "I mean, do you always have to take care of people or are there at least certain people",
+            "start": 1187.1800537109375
+          },
+          {
+            "end": 1194.5,
+            "text": "in your life who you can have a back and forth with?",
+            "start": 1190.6199951171875
+          },
+          {
+            "end": 1195.93994140625,
+            "text": "And this is the first step.",
+            "start": 1194.5
+          },
+          {
+            "end": 1200.4599609375,
+            "text": "Then we do another experiment with a different person and a different kind of experiment",
+            "start": 1195.93994140625
+          },
+          {
+            "end": 1204.4200439453125,
+            "text": "so that we can loosen these assumptions, make them more conditional.",
+            "start": 1200.4599609375
+          },
+          {
+            "end": 1206.219970703125,
+            "text": "And that will feed back to that core belief.",
+            "start": 1204.4200439453125
+          },
+          {
+            "end": 1209.5400390625,
+            "text": "Like, is it truly as universal as you think it is?",
+            "start": 1206.219970703125
+          },
+          {
+            "end": 1210.97998046875,
+            "text": "And that's really going to be the process.",
+            "start": 1209.5400390625
+          },
+          {
+            "end": 1214.0999755859375,
+            "text": "So it'll take a few weeks for us to execute it all the way through.",
+            "start": 1210.97998046875
+          },
+          {
+            "end": 1215.0999755859375,
+            "text": "But this is the first step.",
+            "start": 1214.0999755859375
+          },
+          {
+            "end": 1218.780029296875,
+            "text": "And I think if you can do this first step, it's going to start to shake that assumption",
+            "start": 1215.0999755859375
+          },
+          {
+            "end": 1221.219970703125,
+            "text": "enough for the rest of our work.",
+            "start": 1218.780029296875
+          },
+          {
+            "end": 1222.219970703125,
+            "text": "Wow.",
+            "start": 1221.219970703125
+          },
+          {
+            "end": 1223.219970703125,
+            "text": "Cool, right?",
+            "start": 1222.219970703125
+          },
+          {
+            "end": 1224.219970703125,
+            "text": "It's really good.",
+            "start": 1223.219970703125
+          },
+          {
+            "end": 1225.219970703125,
+            "text": "It's going to be fun.",
+            "start": 1224.219970703125
+          },
+          {
+            "end": 1228.6600341796875,
+            "text": "Now I'm like morphing into Kyle Kittleson.",
+            "start": 1225.219970703125
+          },
+          {
+            "end": 1230.300048828125,
+            "text": "Do I need to be patient anymore?",
+            "start": 1228.6600341796875
+          },
+          {
+            "end": 1231.300048828125,
+            "text": "No.",
+            "start": 1230.300048828125
+          },
+          {
+            "end": 1232.300048828125,
+            "text": "You're done.",
+            "start": 1231.300048828125
+          },
+          {
+            "end": 1233.300048828125,
+            "text": "Okay.",
+            "start": 1232.300048828125
+          },
+          {
+            "end": 1237.699951171875,
+            "text": "That is really good because I was really committed to the patient role, you know?",
+            "start": 1233.300048828125
+          },
+          {
+            "end": 1239.8199462890625,
+            "text": "And I was like, where is she going with this?",
+            "start": 1237.699951171875
+          },
+          {
+            "end": 1244.1400146484375,
+            "text": "Like, I'm just talking about how I don't feel like I'll ever find love and she wants me",
+            "start": 1239.8199462890625
+          },
+          {
+            "end": 1246.5,
+            "text": "to go complain to a friend, you know?",
+            "start": 1244.1400146484375
+          },
+          {
+            "end": 1250.5799560546875,
+            "text": "And so I was like, this has got to come together somehow, but it definitely did.",
+            "start": 1246.5
+          },
+          {
+            "end": 1251.5799560546875,
+            "text": "Yeah.",
+            "start": 1250.5799560546875
+          },
+          {
+            "end": 1252.5799560546875,
+            "text": "Yeah.",
+            "start": 1251.5799560546875
+          },
+          {
+            "end": 1253.5799560546875,
+            "text": "And it's really, I mean, again, it's a process.",
+            "start": 1252.5799560546875
+          },
+          {
+            "end": 1256.1800537109375,
+            "text": "So the core belief was, it was a process to develop that core belief.",
+            "start": 1253.5799560546875
+          },
+          {
+            "end": 1260.780029296875,
+            "text": "But the more that you can design these behavioral experiments to challenge the specific assumptions",
+            "start": 1256.1800537109375
+          },
+          {
+            "end": 1266.3399658203125,
+            "text": "and to realize that those assumptions don't hold, then the core beliefs gets shaken because",
+            "start": 1260.780029296875
+          },
+          {
+            "end": 1269.8599853515625,
+            "text": "it's like, wait, if this assumption doesn't hold and there are people who like seem to",
+            "start": 1266.3399658203125
+          },
+          {
+            "end": 1274.06005859375,
+            "text": "love me for me, even if I'm being a little negative today or a little selfish today,",
+            "start": 1269.8599853515625
+          },
+          {
+            "end": 1278.8199462890625,
+            "text": "whatever it is that I'm labeling this as in my head, what does that mean about me truly",
+            "start": 1274.06005859375
+          },
+          {
+            "end": 1279.8199462890625,
+            "text": "being unlovable?",
+            "start": 1278.8199462890625
+          },
+          {
+            "end": 1280.8199462890625,
+            "text": "Am I really unlovable?",
+            "start": 1279.8199462890625
+          },
+          {
+            "end": 1281.8199462890625,
+            "text": "Yeah.",
+            "start": 1280.8199462890625
+          },
+          {
+            "end": 1284.06005859375,
+            "text": "Or is it that I just have to find the right people to love me?",
+            "start": 1281.8199462890625
+          },
+          {
+            "end": 1285.06005859375,
+            "text": "Yeah.",
+            "start": 1284.06005859375
+          },
+          {
+            "end": 1286.06005859375,
+            "text": "Yeah.",
+            "start": 1285.06005859375
+          },
+          {
+            "end": 1287.06005859375,
+            "text": "Yeah.",
+            "start": 1286.06005859375
+          },
+          {
+            "end": 1288.06005859375,
+            "text": "Yeah.",
+            "start": 1287.06005859375
+          },
+          {
+            "end": 1294.93994140625,
+            "text": "And it's such a good thing to note or realize that a core belief does not mean necessarily",
+            "start": 1288.06005859375
+          },
+          {
+            "end": 1296.6600341796875,
+            "text": "that it is true.",
+            "start": 1294.93994140625
+          },
+          {
+            "end": 1300.739990234375,
+            "text": "It is just your belief hidden way deep down on the iceberg.",
+            "start": 1296.6600341796875
+          },
+          {
+            "end": 1305.1400146484375,
+            "text": "And it's more like your fear, like, dude, if this was true, that would suck so bad.",
+            "start": 1300.739990234375
+          },
+          {
+            "end": 1306.1400146484375,
+            "text": "Yeah.",
+            "start": 1305.1400146484375
+          },
+          {
+            "end": 1311.97998046875,
+            "text": "I want our YouTube viewers, I want you to leave a comment if you watch the entire session",
+            "start": 1306.1400146484375
+          },
+          {
+            "end": 1314.6600341796875,
+            "text": "because it is a little longer than normal.",
+            "start": 1311.97998046875
+          },
+          {
+            "end": 1317.9200439453125,
+            "text": "So I want to know who watched that whole session.",
+            "start": 1314.6600341796875
+          },
+          {
+            "end": 1324.1400146484375,
+            "text": "And then if you feel comfortable enough, I want you to share one of your core beliefs",
+            "start": 1317.9200439453125
+          },
+          {
+            "end": 1329.6199951171875,
+            "text": "or something that you believe is a core belief because we all have them.",
+            "start": 1324.5400390625
+          },
+          {
+            "end": 1335.6199951171875,
+            "text": "Like Dr. Judy said, we all have them, but they're living down there unnoticed and they're",
+            "start": 1329.6199951171875
+          },
+          {
+            "end": 1338.3399658203125,
+            "text": "affecting every part of our life.",
+            "start": 1335.6199951171875
+          },
+          {
+            "end": 1344.5799560546875,
+            "text": "And through CBT therapy, we can uncover something that's deep, deep, deep within us and bring",
+            "start": 1338.3399658203125
+          },
+          {
+            "end": 1347.93994140625,
+            "text": "light on it and bring awareness to it.",
+            "start": 1344.5799560546875
+          },
+          {
+            "end": 1350.93994140625,
+            "text": "And just that awareness changes everything.",
+            "start": 1347.93994140625
+          },
+          {
+            "end": 1351.93994140625,
+            "text": "Absolutely.",
+            "start": 1350.93994140625
+          },
+          {
+            "end": 1352.93994140625,
+            "text": "Everything.",
+            "start": 1351.93994140625
+          },
+          {
+            "end": 1353.93994140625,
+            "text": "That's what starts everything.",
+            "start": 1352.93994140625
+          },
+          {
+            "end": 1355.739990234375,
+            "text": "That's what starts you on the right path.",
+            "start": 1354.739990234375
+          },
+          {
+            "end": 1356.739990234375,
+            "text": "Yes.",
+            "start": 1355.739990234375
+          },
+          {
+            "end": 1361.02001953125,
+            "text": "If you got motivated watching this, go to medcircle.com and check out the entire series",
+            "start": 1356.739990234375
+          },
+          {
+            "end": 1362.780029296875,
+            "text": "on cognitive behavioral therapy.",
+            "start": 1361.02001953125
+          },
+          {
+            "end": 1363.780029296875,
+            "text": "Dr. Judy.",
+            "start": 1362.780029296875
+          },
+          {
+            "end": 1364.780029296875,
+            "text": "Amazing.",
+            "start": 1363.780029296875
+          },
+          {
+            "end": 1365.780029296875,
+            "text": "Super fun.",
+            "start": 1364.780029296875
+          },
+          {
+            "end": 1366.780029296875,
+            "text": "Thank you.",
+            "start": 1365.780029296875
+          },
+          {
+            "end": 1367.780029296875,
+            "text": "Thank you.",
+            "start": 1366.780029296875
+          },
+          {
+            "end": 1368.780029296875,
+            "text": "That was great.",
+            "start": 1367.780029296875
+          },
+          {
+            "end": 1369.780029296875,
+            "text": "I'm Kyle Kittleson.",
+            "start": 1368.780029296875
+          },
+          {
+            "end": 1370.780029296875,
+            "text": "Remember, whatever you're going through, you got this.",
+            "start": 1369.780029296875
+          },
+          {
+            "end": 1371.780029296875,
+            "text": "Thanks for watching.",
+            "start": 1370.780029296875
+          },
+          {
+            "end": 1373.300048828125,
+            "text": "If you liked what you just saw, then why not subscribe?",
+            "start": 1371.780029296875
+          },
+          {
+            "end": 1377.0,
+            "text": "Click right here for new episodes and new series every week.",
+            "start": 1373.300048828125
+          },
+          {
+            "end": 1381.6199951171875,
+            "text": "And to access exclusive mental health videos that we only release at medcircle.com, check",
+            "start": 1377.0
+          },
+          {
+            "end": 1382.93994140625,
+            "text": "out the links below.",
+            "start": 1381.6199951171875
+          }
+        ],
+        "extracted_notes": {
+          "triggers": [
+            {
+              "context": "Discussed as a recent event leading to feelings of being unlovable and fears about future relationships.",
+              "trigger": "Breakup with a long-term partner",
+              "severity": "severe"
+            }
+          ],
+          "key_topics": [
+            "Core Beliefs",
+            "Cognitive Behavioral Therapy (CBT)",
+            "Relationship Challenges",
+            "Self-Worth",
+            "Behavioral Experiments"
+          ],
+          "risk_flags": [],
+          "strategies": [
+            {
+              "name": "Laddering",
+              "status": "practiced",
+              "context": "Used to explore and break down negative automatic thoughts to uncover deeper core beliefs.",
+              "category": "cognitive"
+            },
+            {
+              "name": "Behavioral Experiment",
+              "status": "introduced",
+              "context": "Designed to test the assumption that the patient must always take care of others' needs first.",
+              "category": "behavioral"
+            }
+          ],
+          "action_items": [
+            {
+              "task": "Conduct a behavioral experiment with a friend",
+              "details": "Discuss a personal problem with a friend without reciprocating the focus on them, and ask for feedback.",
+              "category": "interpersonal"
+            }
+          ],
+          "session_mood": "neutral",
+          "topic_summary": "The session focused on exploring the core belief of feeling unlovable and how it impacts various aspects of life. Through a mock therapy session, techniques like laddering and behavioral experiments were introduced to challenge and reframe negative automatic thoughts and assumptions.",
+          "mood_trajectory": "fluctuating",
+          "patient_summary": "You discussed feeling unlovable after a recent breakup, which has been a recurring theme in your relationships. Through the session, we identified a core belief of worthlessness, which affects how you interact with others. We introduced a behavioral experiment to challenge this belief by focusing on your needs in a conversation with a friend. This exercise aims to provide evidence that your assumptions may not hold true, helping you to see that you are indeed worthy of love and connection. Remember, this is a process, and each step you take is progress.",
+          "therapist_notes": "The session effectively utilized CBT techniques to explore and challenge the patient's core belief of being unlovable. The patient expressed significant distress related to recent relationship failures, which was addressed through laddering to uncover deeper fears of worthlessness. A behavioral experiment was introduced to test assumptions about interpersonal interactions, aiming to provide evidence against the core belief. The patient is tasked with conducting this experiment and reporting back on the outcomes, which will help in reshaping their perception of self-worth and relational dynamics.",
+          "emotional_themes": [
+            "sadness",
+            "anxiety",
+            "fear",
+            "hope"
+          ],
+          "follow_up_topics": [
+            "Further exploration of core beliefs",
+            "Additional behavioral experiments"
+          ],
+          "significant_quotes": [
+            {
+              "quote": "I don't feel like I will ever find somebody who loves me.",
+              "context": "Expressed as a core belief stemming from repeated relationship failures.",
+              "timestamp_start": null
+            },
+            {
+              "quote": "If I'm alone, it means that people don't want to be with me, which is awful.",
+              "context": "Describing the perceived implications of being alone.",
+              "timestamp_start": null
+            },
+            {
+              "quote": "That I'm worthless, that I'm a waste of time.",
+              "context": "Revealing the core belief uncovered through laddering.",
+              "timestamp_start": null
+            }
+          ],
+          "unresolved_concerns": [
+            "Long-term impact of core beliefs on relationships"
+          ]
+        },
+        "therapist_summary": "The session effectively utilized CBT techniques to explore and challenge the patient's core belief of being unlovable. The patient expressed significant distress related to recent relationship failures, which was addressed through laddering to uncover deeper fears of worthlessness. A behavioral experiment was introduced to test assumptions about interpersonal interactions, aiming to provide evidence against the core belief. The patient is tasked with conducting this experiment and reporting back on the outcomes, which will help in reshaping their perception of self-worth and relational dynamics.",
+        "patient_summary": "You discussed feeling unlovable after a recent breakup, which has been a recurring theme in your relationships. Through the session, we identified a core belief of worthlessness, which affects how you interact with others. We introduced a behavioral experiment to challenge this belief by focusing on your needs in a conversation with a friend. This exercise aims to provide evidence that your assumptions may not hold true, helping you to see that you are indeed worthy of love and connection. Remember, this is a process, and each step you take is progress.",
+        "risk_flags": [],
+        "status": "processed",
+        "error_message": "2 validation errors for ExtractedNotes\nstrategies.0.status\n  Input should be 'introduced', 'practiced', 'assigned' or 'reviewed' [type=enum, input_value='Practiced', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.12/v/enum\nstrategies.1.status\n  Input should be 'introduced', 'practiced', 'assigned' or 'reviewed' [type=enum, input_value='Assigned', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.12/v/enum",
+        "created_at": "2025-12-11 01:13:50.742348",
+        "updated_at": "2025-12-11 01:16:12.129140",
+        "processed_at": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+USERS TABLE SCHEMA
+================================================================================
+
+id                             uuid                     NULL:NO  DEFAULT:uuid_generate_v4()
+email                          character varying(255)                NULL:NO  DEFAULT:None
+name                           character varying(255)                NULL:YES DEFAULT:None
+role                           character varying(50)                 NULL:NO  DEFAULT:None
+created_at                     timestamp without time zone                     NULL:YES DEFAULT:now()
+updated_at                     timestamp without time zone                     NULL:YES DEFAULT:now()
+hashed_password                character varying                     NULL:NO  DEFAULT:'temp'::character varying
+
+Total: 7 columns

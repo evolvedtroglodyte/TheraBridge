@@ -2,31 +2,38 @@
 Authentication endpoints for user login, signup, and token management.
 """
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from app.auth.dependencies import get_db, get_current_user
 from app.auth.models import AuthSession
 from app.models.db_models import User
-from app.auth.schemas import UserLogin, TokenResponse, TokenRefresh, UserResponse
+from app.auth.schemas import UserLogin, UserCreate, TokenResponse, TokenRefresh, UserResponse
 from app.auth.utils import (
     verify_password,
+    get_password_hash,
     create_access_token,
     create_refresh_token,
     hash_refresh_token
 )
 from app.auth.config import auth_config
+from app.middleware.rate_limit import limiter
 
 
 router = APIRouter()
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(credentials: UserLogin, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def login(request: Request, credentials: UserLogin, db: Session = Depends(get_db)):
     """
     Authenticate user and create new session.
 
+    Rate limit: 5 requests per minute per IP address (prevents brute force attacks)
+
     Args:
+        request: FastAPI request object (required for rate limiting)
         credentials: Email and password
         db: Database session
 
@@ -35,6 +42,7 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
 
     Raises:
         HTTPException 401: If email/password incorrect or account inactive
+        HTTPException 429: If rate limit exceeded
     """
     # Find user by email
     user = db.query(User).filter(User.email == credentials.email).first()
@@ -79,20 +87,96 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
     )
 
 
-@router.post("/refresh", response_model=TokenResponse)
-def refresh_token(token_data: TokenRefresh, db: Session = Depends(get_db)):
+@router.post("/signup", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit("3/hour")
+def signup(request: Request, user_data: UserCreate, db: Session = Depends(get_db)):
     """
-    Get new access token using refresh token.
+    Create new user account and return authentication tokens.
+
+    Rate limit: 3 requests per hour per IP address (prevents account spam)
 
     Args:
+        request: FastAPI request object (required for rate limiting)
+        user_data: Email, password, full name, and role
+        db: Database session
+
+    Returns:
+        Access token, refresh token, and expiration info
+
+    Raises:
+        HTTPException 422: If email already registered
+        HTTPException 429: If rate limit exceeded
+    """
+    # Check if email already exists
+    existing_user = db.query(User).filter(User.email == user_data.email).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Email already registered"
+        )
+
+    # Create new user
+    new_user = User(
+        email=user_data.email,
+        hashed_password=get_password_hash(user_data.password),
+        full_name=user_data.full_name,
+        role=user_data.role,
+        is_active=True
+    )
+
+    try:
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Email already registered"
+        )
+
+    # Generate tokens
+    access_token = create_access_token(new_user.id, new_user.role.value)
+    refresh_token = create_refresh_token()
+
+    # Store refresh token in database
+    auth_session = AuthSession(
+        user_id=new_user.id,
+        refresh_token=hash_refresh_token(refresh_token),
+        expires_at=datetime.utcnow() + timedelta(days=auth_config.REFRESH_TOKEN_EXPIRE_DAYS)
+    )
+    db.add(auth_session)
+    db.commit()
+
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        expires_in=auth_config.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    )
+
+
+@router.post("/refresh", response_model=TokenResponse)
+@limiter.limit("10/minute")
+def refresh_token(request: Request, token_data: TokenRefresh, db: Session = Depends(get_db)):
+    """
+    Get new access token using refresh token (with rotation).
+
+    Token rotation is a security best practice: the old refresh token is revoked
+    and a new one is issued, preventing replay attacks if a token is compromised.
+
+    Rate limit: 10 requests per minute per IP address
+
+    Args:
+        request: FastAPI request object (required for rate limiting)
         token_data: Refresh token
         db: Database session
 
     Returns:
-        New access token (same refresh token)
+        New access token AND new refresh token (rotation)
 
     Raises:
         HTTPException 401: If refresh token invalid/expired/revoked
+        HTTPException 429: If rate limit exceeded
     """
     # Find session with this refresh token
     session = db.query(AuthSession).filter(
@@ -122,12 +206,32 @@ def refresh_token(token_data: TokenRefresh, db: Session = Depends(get_db)):
     # Get user
     user = db.query(User).filter(User.id == session.user_id).first()
 
-    # Generate new access token
-    access_token = create_access_token(user.id, user.role.value)
+    if not user or not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found or inactive"
+        )
+
+    # REVOKE OLD TOKEN (rotation security)
+    session.is_revoked = True
+    db.commit()
+
+    # Generate NEW tokens
+    new_access_token = create_access_token(user.id, user.role.value)
+    new_refresh_token = create_refresh_token()
+
+    # Create NEW session with new refresh token
+    new_session = AuthSession(
+        user_id=user.id,
+        refresh_token=hash_refresh_token(new_refresh_token),
+        expires_at=datetime.utcnow() + timedelta(days=auth_config.REFRESH_TOKEN_EXPIRE_DAYS)
+    )
+    db.add(new_session)
+    db.commit()
 
     return TokenResponse(
-        access_token=access_token,
-        refresh_token=token_data.refresh_token,  # Return same refresh token
+        access_token=new_access_token,
+        refresh_token=new_refresh_token,  # Return NEW refresh token
         expires_in=auth_config.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
 

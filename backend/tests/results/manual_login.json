@@ -1,0 +1,7 @@
+{
+  "error": "Database schema mismatch",
+  "status_code": 500,
+  "details": "column users.full_name does not exist",
+  "endpoint": "/api/v1/login",
+  "issue": "Same schema issue as signup - User model expects full_name column"
+}

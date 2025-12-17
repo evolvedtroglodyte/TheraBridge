@@ -1,0 +1,4 @@
+Binary file app/__pycache__/main.cpython-314.pyc matches
+app/main.py:from fastapi.middleware.cors import CORSMiddleware
+app/main.py:    CORSMiddleware,
+app/main.py:    allow_origins=["http://localhost:3000", "http://localhost:5173"],  # Frontend URLs

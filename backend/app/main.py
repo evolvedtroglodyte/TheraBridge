@@ -5,9 +5,12 @@ FastAPI application for therapy session management and AI note extraction
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from slowapi.errors import RateLimitExceeded
+
 from app.database import init_db, close_db
 from app.routers import sessions, patients
 from app.auth.router import router as auth_router
+from app.middleware.rate_limit import limiter, custom_rate_limit_handler
 
 
 @asynccontextmanager
@@ -33,6 +36,10 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+# Configure rate limiter
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, custom_rate_limit_handler)
 
 # CORS middleware (allow frontend to connect)
 app.add_middleware(

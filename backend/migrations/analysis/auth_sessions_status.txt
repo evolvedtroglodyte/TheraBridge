@@ -1,0 +1,7 @@
+✅ auth_sessions table EXISTS
+  - id: uuid
+  - user_id: uuid
+  - refresh_token: character varying
+  - expires_at: timestamp without time zone
+  - is_revoked: boolean
+  - created_at: timestamp without time zone

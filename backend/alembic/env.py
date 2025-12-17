@@ -17,9 +17,11 @@ load_dotenv()
 # Import Base and all models for autogenerate support
 from app.database import Base
 
-# Import auth models (User, Session for authentication)
-# Note: Only importing auth models to avoid conflicts with therapy models
-from app.auth.models import User, Session
+# Import auth models (User, AuthSession for authentication)
+from app.auth.models import User, AuthSession
+
+# Import therapy session models
+from app.models.db_models import Session as DBSession
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

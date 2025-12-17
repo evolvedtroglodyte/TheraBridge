@@ -1,0 +1,1204 @@
+INFO:     Will watch for changes in these directories: ['/Users/newdldewdl/Global Domination 2/peerbridge proj/backend']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [8570] using WatchFiles
+INFO:     Started server process [8575]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:36:33,125 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:36:33,125 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:33,302 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:36:33,302 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:33,520 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:36:33,520 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:33,673 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:36:33,677 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:33,677 INFO sqlalchemy.engine.Engine [generated in 0.00038s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:33,863 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:33,863 INFO sqlalchemy.engine.Engine [cached since 0.1864s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:33,915 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:33,915 INFO sqlalchemy.engine.Engine [cached since 0.2388s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:33,970 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:33,970 INFO sqlalchemy.engine.Engine [cached since 0.2941s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:34,026 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:36:34,026 INFO sqlalchemy.engine.Engine [generated in 0.00015s] ('userrole', 'pg_catalog')
+2025-12-17 08:36:34,141 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'venv/lib/python3.14/site-packages/limits/storage/redis_sentinel.py', 'venv/lib/python3.14/site-packages/wrapt/decorators.py', 'venv/lib/python3.14/site-packages/limits/aio/storage/redis/redispy.py', 'venv/lib/python3.14/site-packages/limits/util.py', 'venv/lib/python3.14/site-packages/limits/typing.py', 'venv/lib/python3.14/site-packages/wrapt/arguments.py', 'venv/lib/python3.14/site-packages/limits/aio/storage/mongodb.py', 'venv/lib/python3.14/site-packages/deprecated/__init__.py', 'venv/lib/python3.14/site-packages/limits/storage/__init__.py', 'venv/lib/python3.14/site-packages/limits/storage/registry.py', 'venv/lib/python3.14/site-packages/limits/aio/storage/memcached/emcache.py', 'venv/lib/python3.14/site-packages/deprecated/params.py', 'venv/lib/python3.14/site-packages/limits/aio/strategies.py', 'venv/lib/python3.14/site-packages/slowapi/errors.py', 'venv/lib/python3.14/site-packages/wrapt/importer.py', 'venv/lib/python3.14/site-packages/limits/storage/memcached.py', 'venv/lib/python3.14/site-packages/limits/aio/storage/redis/valkey.py', 'venv/lib/python3.14/site-packages/limits/_version.py', 'venv/lib/python3.14/site-packages/wrapt/__init__.py', 'venv/lib/python3.14/site-packages/limits/aio/storage/redis/coredis.py', 'venv/lib/python3.14/site-packages/limits/aio/storage/__init__.py', 'venv/lib/python3.14/site-packages/wrapt/wrappers.py', 'venv/lib/python3.14/site-packages/limits/storage/redis.py', 'venv/lib/python3.14/site-packages/limits/aio/__init__.py', 'venv/lib/python3.14/site-packages/limits/aio/storage/memcached/__init__.py', 'venv/lib/python3.14/site-packages/limits/aio/storage/memcached/memcachio.py', 'venv/lib/python3.14/site-packages/slowapi/extension.py', 'venv/lib/python3.14/site-packages/deprecated/sphinx.py', 'venv/lib/python3.14/site-packages/slowapi/middleware.py', 'venv/lib/python3.14/site-packages/limits/strategies.py', 'venv/lib/python3.14/site-packages/limits/storage/memory.py', 'venv/lib/python3.14/site-packages/limits/limits.py', 'venv/lib/python3.14/site-packages/wrapt/patches.py', 'venv/lib/python3.14/site-packages/limits/aio/storage/redis/__init__.py', 'venv/lib/python3.14/site-packages/deprecated/classic.py', 'venv/lib/python3.14/site-packages/limits/storage/base.py', 'venv/lib/python3.14/site-packages/limits/storage/mongodb.py', 'venv/lib/python3.14/site-packages/limits/storage/redis_cluster.py', 'venv/lib/python3.14/site-packages/slowapi/util.py', 'venv/lib/python3.14/site-packages/wrapt/proxies.py', 'venv/lib/python3.14/site-packages/wrapt/weakrefs.py', 'venv/lib/python3.14/site-packages/limits/errors.py', 'venv/lib/python3.14/site-packages/slowapi/__init__.py', 'venv/lib/python3.14/site-packages/limits/aio/storage/memory.py', 'venv/lib/python3.14/site-packages/slowapi/wrappers.py', 'venv/lib/python3.14/site-packages/limits/__init__.py', 'venv/lib/python3.14/site-packages/limits/aio/storage/redis/bridge.py', 'venv/lib/python3.14/site-packages/wrapt/__wrapt__.py', 'venv/lib/python3.14/site-packages/limits/aio/storage/base.py', 'venv/lib/python3.14/site-packages/limits/aio/storage/memcached/bridge.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8575]
+INFO:     Started server process [8607]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:36:36,405 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:36:36,405 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:36,572 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:36:36,572 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:36,793 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:36:36,793 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:36,966 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:36:36,970 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:36,971 INFO sqlalchemy.engine.Engine [generated in 0.00025s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:37,138 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:37,138 INFO sqlalchemy.engine.Engine [cached since 0.1681s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:37,188 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:37,189 INFO sqlalchemy.engine.Engine [cached since 0.2183s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:37,244 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:37,244 INFO sqlalchemy.engine.Engine [cached since 0.2737s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:37,302 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:36:37,302 INFO sqlalchemy.engine.Engine [generated in 0.00017s] ('userrole', 'pg_catalog')
+2025-12-17 08:36:37,409 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app/auth/router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8607]
+INFO:     Started server process [8684]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:36:39,176 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:36:39,176 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:39,344 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:36:39,344 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:39,558 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:36:39,558 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:39,719 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:36:39,723 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:39,723 INFO sqlalchemy.engine.Engine [generated in 0.00014s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:39,882 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:39,882 INFO sqlalchemy.engine.Engine [cached since 0.1595s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:39,935 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:39,935 INFO sqlalchemy.engine.Engine [cached since 0.2118s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:39,992 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:39,992 INFO sqlalchemy.engine.Engine [cached since 0.269s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:40,050 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:36:40,050 INFO sqlalchemy.engine.Engine [generated in 0.00014s] ('userrole', 'pg_catalog')
+WARNING:  WatchFiles detected changes in 'alembic/env.py'. Reloading...
+2025-12-17 08:36:40,161 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+INFO:     Started server process [8693]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:36:41,231 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:36:41,231 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:41,388 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:36:41,388 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:41,607 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:36:41,607 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:41,766 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:36:41,771 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:41,771 INFO sqlalchemy.engine.Engine [generated in 0.00022s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:41,936 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:41,936 INFO sqlalchemy.engine.Engine [cached since 0.165s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:41,988 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:41,988 INFO sqlalchemy.engine.Engine [cached since 0.2173s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:42,043 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:42,043 INFO sqlalchemy.engine.Engine [cached since 0.2721s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:42,100 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:36:42,100 INFO sqlalchemy.engine.Engine [generated in 0.00047s] ('userrole', 'pg_catalog')
+2025-12-17 08:36:42,201 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+✅ Database initialized
+INFO:     127.0.0.1:51509 - "POST /api/v1/signup HTTP/1.1" 422 Unprocessable Content
+WARNING:  WatchFiles detected changes in 'scripts/check_auth_sessions.py', 'scripts/export_users_schema.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8693]
+INFO:     Started server process [8867]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:36:48,798 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:36:48,798 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:48,960 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:36:48,960 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:49,168 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:36:49,168 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:49,333 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:36:49,339 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:49,339 INFO sqlalchemy.engine.Engine [generated in 0.00037s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:49,493 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:49,493 INFO sqlalchemy.engine.Engine [cached since 0.1547s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:49,551 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:49,552 INFO sqlalchemy.engine.Engine [cached since 0.2131s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:49,604 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:49,604 INFO sqlalchemy.engine.Engine [cached since 0.2655s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:49,658 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:36:49,658 INFO sqlalchemy.engine.Engine [generated in 0.00015s] ('userrole', 'pg_catalog')
+2025-12-17 08:36:49,765 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app/middleware/__init__.py', 'app/middleware/rate_limit.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8867]
+INFO:     Started server process [8959]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:36:55,741 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:36:55,741 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:55,901 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:36:55,901 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:56,117 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:36:56,117 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:56,278 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:36:56,281 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:56,281 INFO sqlalchemy.engine.Engine [generated in 0.00014s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:56,436 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:56,439 INFO sqlalchemy.engine.Engine [cached since 0.1587s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:56,490 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:56,490 INFO sqlalchemy.engine.Engine [cached since 0.2093s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+WARNING:  WatchFiles detected changes in 'app/auth/router.py'. Reloading...
+2025-12-17 08:36:56,545 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:56,545 INFO sqlalchemy.engine.Engine [cached since 0.2648s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:56,602 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:36:56,603 INFO sqlalchemy.engine.Engine [generated in 0.00013s] ('userrole', 'pg_catalog')
+2025-12-17 08:36:56,711 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+INFO:     Started server process [8976]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:36:57,955 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:36:57,955 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:58,106 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:36:58,106 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:58,333 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:36:58,333 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:36:58,499 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:36:58,501 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:58,501 INFO sqlalchemy.engine.Engine [generated in 0.00017s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:58,658 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:58,658 INFO sqlalchemy.engine.Engine [cached since 0.1567s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:58,709 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:58,709 INFO sqlalchemy.engine.Engine [cached since 0.2076s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:58,772 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:36:58,772 INFO sqlalchemy.engine.Engine [cached since 0.2708s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:36:58,826 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:36:58,826 INFO sqlalchemy.engine.Engine [generated in 0.00016s] ('userrole', 'pg_catalog')
+2025-12-17 08:36:58,930 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'venv/lib/python3.14/site-packages/coverage/collector.py', 'venv/lib/python3.14/site-packages/coverage/control.py', 'venv/lib/python3.14/site-packages/pytest_cov/compat.py', 'venv/lib/python3.14/site-packages/coverage/version.py', 'venv/lib/python3.14/site-packages/coverage/cmdline.py', 'venv/lib/python3.14/site-packages/coverage/core.py', 'venv/lib/python3.14/site-packages/coverage/sysmon.py', 'venv/lib/python3.14/site-packages/coverage/__main__.py', 'venv/lib/python3.14/site-packages/coverage/html.py', 'venv/lib/python3.14/site-packages/coverage/report.py', 'venv/lib/python3.14/site-packages/coverage/plugin.py', 'venv/lib/python3.14/site-packages/coverage/config.py', 'venv/lib/python3.14/site-packages/coverage/exceptions.py', 'venv/lib/python3.14/site-packages/coverage/pytracer.py', 'venv/lib/python3.14/site-packages/coverage/annotate.py', 'venv/lib/python3.14/site-packages/coverage/numbits.py', 'venv/lib/python3.14/site-packages/coverage/pth_file.py', 'venv/lib/python3.14/site-packages/coverage/execfile.py', 'venv/lib/python3.14/site-packages/coverage/parser.py', 'venv/lib/python3.14/site-packages/coverage/types.py', 'venv/lib/python3.14/site-packages/coverage/bytecode.py', 'venv/lib/python3.14/site-packages/coverage/regions.py', 'venv/lib/python3.14/site-packages/coverage/patch.py', 'venv/lib/python3.14/site-packages/coverage/multiproc.py', 'venv/lib/python3.14/site-packages/coverage/context.py', 'venv/lib/python3.14/site-packages/coverage/tomlconfig.py', 'venv/lib/python3.14/site-packages/coverage/plugin_support.py', 'venv/lib/python3.14/site-packages/coverage/sqlitedb.py', 'venv/lib/python3.14/site-packages/coverage/report_core.py', 'venv/lib/python3.14/site-packages/coverage/lcovreport.py', 'venv/lib/python3.14/site-packages/coverage/phystokens.py', 'venv/lib/python3.14/site-packages/coverage/results.py', 'venv/lib/python3.14/site-packages/coverage/disposition.py', 'venv/lib/python3.14/site-packages/coverage/files.py', 'venv/lib/python3.14/site-packages/coverage/xmlreport.py', 'venv/lib/python3.14/site-packages/coverage/python.py', 'venv/lib/python3.14/site-packages/coverage/sqldata.py', 'venv/lib/python3.14/site-packages/coverage/inorout.py', 'venv/lib/python3.14/site-packages/pytest_cov/plugin.py', 'venv/lib/python3.14/site-packages/pytest_cov/engine.py', 'venv/lib/python3.14/site-packages/coverage/env.py', 'venv/lib/python3.14/site-packages/coverage/templite.py', 'venv/lib/python3.14/site-packages/coverage/data.py', 'venv/lib/python3.14/site-packages/coverage/debug.py', 'venv/lib/python3.14/site-packages/coverage/jsonreport.py', 'venv/lib/python3.14/site-packages/coverage/__init__.py', 'venv/lib/python3.14/site-packages/pytest_cov/embed.py', 'venv/lib/python3.14/site-packages/pytest_cov/__init__.py', 'venv/lib/python3.14/site-packages/coverage/misc.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for connections to close. (CTRL+C to force quit)
+✅ Database initialized
+2025-12-17 08:37:07,822 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:37:07,822 INFO sqlalchemy.engine.Engine [raw sql] {}
+2025-12-17 08:37:07,946 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:37:07,946 INFO sqlalchemy.engine.Engine [raw sql] {}
+2025-12-17 08:37:08,058 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:37:08,059 INFO sqlalchemy.engine.Engine [raw sql] {}
+2025-12-17 08:37:08,322 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:37:08,324 INFO sqlalchemy.engine.Engine SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.full_name AS users_full_name, users.name AS users_name, users.role AS users_role, users.is_active AS users_is_active, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.email = %(email_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER
+2025-12-17 08:37:08,324 INFO sqlalchemy.engine.Engine [generated in 0.00013s] {'email_1': 'manual_test@example.com', 'param_1': 1}
+2025-12-17 08:37:08,436 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:51615 - "POST /api/v1/signup HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1929, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 959, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.UndefinedColumn: column users.full_name does not exist
+LINE 1: ..., users.hashed_password AS users_hashed_password, users.full...
+                                                             ^
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/fastapi/applications.py", line 1139, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/fastapi/routing.py", line 120, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/fastapi/routing.py", line 106, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/fastapi/routing.py", line 430, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/fastapi/routing.py", line 318, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/concurrency.py", line 32, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/anyio/to_thread.py", line 61, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        func, args, abandon_on_cancel=abandon_on_cancel, limiter=limiter
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/anyio/_backends/_asyncio.py", line 2525, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/anyio/_backends/_asyncio.py", line 986, in run
+    result = context.run(func, *args)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/app/auth/router.py", line 100, in signup
+    existing_user = db.query(User).filter(User.email == user_data.email).first()
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/orm/query.py", line 2816, in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/orm/query.py", line 2914, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+        params,
+        ^^^^^^^
+        execution_options={"_sa_orm_load_options": self.load_options},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 2404, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 2294, in _execute_internal
+    compile_state_cls.orm_execute_statement(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/orm/context.py", line 315, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1434, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/sql/elements.py", line 534, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1654, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<9 lines>...
+        param_dict=param_dict,
+    )
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1808, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1948, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 2317, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1929, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 959, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedColumn) column users.full_name does not exist
+LINE 1: ..., users.hashed_password AS users_hashed_password, users.full...
+                                                             ^
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.full_name AS users_full_name, users.name AS users_name, users.role AS users_role, users.is_active AS users_is_active, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.email = %(email_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER]
+[parameters: {'email_1': 'manual_test@example.com', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/21/f405)
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8976]
+INFO:     Started server process [9208]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:37:09,772 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:37:09,772 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:09,938 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:37:09,938 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:10,145 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:37:10,145 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:10,309 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:37:10,312 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:10,312 INFO sqlalchemy.engine.Engine [generated in 0.00014s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:10,473 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:10,473 INFO sqlalchemy.engine.Engine [cached since 0.1614s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:10,532 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:10,532 INFO sqlalchemy.engine.Engine [cached since 0.2206s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:10,584 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:10,584 INFO sqlalchemy.engine.Engine [cached since 0.2723s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:10,638 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:37:10,638 INFO sqlalchemy.engine.Engine [generated in 0.00013s] ('userrole', 'pg_catalog')
+2025-12-17 08:37:10,744 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app/auth/router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [9208]
+INFO:     Started server process [9300]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:37:15,886 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:37:15,886 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:16,044 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:37:16,044 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:16,253 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:37:16,253 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:16,408 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:37:16,410 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:16,410 INFO sqlalchemy.engine.Engine [generated in 0.00012s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:16,575 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:16,575 INFO sqlalchemy.engine.Engine [cached since 0.1652s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:16,631 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:16,631 INFO sqlalchemy.engine.Engine [cached since 0.2211s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:16,686 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:16,686 INFO sqlalchemy.engine.Engine [cached since 0.2758s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:16,740 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:37:16,740 INFO sqlalchemy.engine.Engine [generated in 0.00019s] ('userrole', 'pg_catalog')
+2025-12-17 08:37:16,844 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app/auth/router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [9300]
+INFO:     Started server process [9421]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:37:21,852 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:37:21,852 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:22,010 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:37:22,010 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:22,225 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:37:22,225 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:22,385 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:37:22,387 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:22,388 INFO sqlalchemy.engine.Engine [generated in 0.00014s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:22,540 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:22,540 INFO sqlalchemy.engine.Engine [cached since 0.1526s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:22,595 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:22,596 INFO sqlalchemy.engine.Engine [cached since 0.2081s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:22,648 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:22,648 INFO sqlalchemy.engine.Engine [cached since 0.2604s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:22,702 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:37:22,702 INFO sqlalchemy.engine.Engine [generated in 0.00015s] ('userrole', 'pg_catalog')
+2025-12-17 08:37:22,809 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'tests/conftest.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [9421]
+INFO:     Started server process [9469]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:37:26,591 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:37:26,591 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:26,751 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:37:26,751 INFO sqlalchemy.engine.Engine [raw sql] ()
+WARNING:  WatchFiles detected changes in 'app/auth/router.py'. Reloading...
+2025-12-17 08:37:26,957 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:37:26,957 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:27,119 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:37:27,122 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:27,122 INFO sqlalchemy.engine.Engine [generated in 0.00016s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:27,291 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:27,291 INFO sqlalchemy.engine.Engine [cached since 0.1696s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:27,345 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:27,345 INFO sqlalchemy.engine.Engine [cached since 0.2237s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:27,396 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:27,397 INFO sqlalchemy.engine.Engine [cached since 0.2749s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:27,455 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:37:27,455 INFO sqlalchemy.engine.Engine [generated in 0.00020s] ('userrole', 'pg_catalog')
+2025-12-17 08:37:27,559 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+INFO:     Started server process [9517]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:37:28,766 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:37:28,766 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:28,926 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:37:28,926 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:29,135 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:37:29,135 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:29,295 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:37:29,297 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:29,297 INFO sqlalchemy.engine.Engine [generated in 0.00011s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:29,453 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:29,453 INFO sqlalchemy.engine.Engine [cached since 0.1561s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:29,511 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:29,512 INFO sqlalchemy.engine.Engine [cached since 0.2142s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:29,567 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:29,567 INFO sqlalchemy.engine.Engine [cached since 0.2696s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:29,620 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:37:29,620 INFO sqlalchemy.engine.Engine [generated in 0.00016s] ('userrole', 'pg_catalog')
+2025-12-17 08:37:29,730 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app/auth/router.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [9517]
+INFO:     Started server process [9653]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:37:36,365 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:37:36,365 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:36,541 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:37:36,541 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:36,747 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:37:36,747 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:36,907 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:37:36,910 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:36,910 INFO sqlalchemy.engine.Engine [generated in 0.00025s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:37,077 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:37,077 INFO sqlalchemy.engine.Engine [cached since 0.1673s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:37,127 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:37,127 INFO sqlalchemy.engine.Engine [cached since 0.2179s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:37,182 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:37,182 INFO sqlalchemy.engine.Engine [cached since 0.2728s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:37,237 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:37:37,238 INFO sqlalchemy.engine.Engine [generated in 0.00030s] ('userrole', 'pg_catalog')
+2025-12-17 08:37:37,352 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+✅ Database initialized
+INFO:     127.0.0.1:51784 - "GET / HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'scripts/backup_database.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [9653]
+INFO:     Started server process [9763]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:37:42,738 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:37:42,738 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:42,895 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:37:42,896 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:43,108 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:37:43,108 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:43,268 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:37:43,271 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:43,271 INFO sqlalchemy.engine.Engine [generated in 0.00018s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+WARNING:  WatchFiles detected changes in 'app/main.py'. Reloading...
+2025-12-17 08:37:43,435 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:43,435 INFO sqlalchemy.engine.Engine [cached since 0.1645s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:43,489 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:43,489 INFO sqlalchemy.engine.Engine [cached since 0.2184s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:43,542 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:43,542 INFO sqlalchemy.engine.Engine [cached since 0.2716s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:43,596 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:37:43,597 INFO sqlalchemy.engine.Engine [generated in 0.00017s] ('userrole', 'pg_catalog')
+2025-12-17 08:37:43,704 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'alembic/versions/808b6192c57c_add_authentication_schema_and_missing_.py'. Reloading...
+INFO:     Started server process [9784]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:37:44,835 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:37:44,835 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:44,998 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:37:44,998 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:45,217 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:37:45,217 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:45,389 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:37:45,392 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:45,392 INFO sqlalchemy.engine.Engine [generated in 0.00016s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:45,551 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:45,551 INFO sqlalchemy.engine.Engine [cached since 0.1597s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:45,608 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:45,608 INFO sqlalchemy.engine.Engine [cached since 0.2162s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:45,661 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:45,661 INFO sqlalchemy.engine.Engine [cached since 0.2694s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:45,716 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:37:45,716 INFO sqlalchemy.engine.Engine [generated in 0.00013s] ('userrole', 'pg_catalog')
+2025-12-17 08:37:45,828 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+INFO:     Started server process [9789]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:37:46,956 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:37:46,956 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:47,104 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:37:47,104 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:47,306 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:37:47,306 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:47,472 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:37:47,475 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:47,475 INFO sqlalchemy.engine.Engine [generated in 0.00014s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:47,633 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:47,634 INFO sqlalchemy.engine.Engine [cached since 0.1584s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:47,689 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:47,689 INFO sqlalchemy.engine.Engine [cached since 0.2136s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:47,741 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:47,742 INFO sqlalchemy.engine.Engine [cached since 0.2665s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:47,804 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:37:47,804 INFO sqlalchemy.engine.Engine [generated in 0.00018s] ('userrole', 'pg_catalog')
+2025-12-17 08:37:47,914 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app/main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [9789]
+INFO:     Started server process [9881]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:37:52,026 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:37:52,026 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:52,187 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:37:52,187 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:52,403 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:37:52,403 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:52,566 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:37:52,569 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:52,569 INFO sqlalchemy.engine.Engine [generated in 0.00017s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:52,734 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:52,734 INFO sqlalchemy.engine.Engine [cached since 0.1652s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:52,788 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:52,788 INFO sqlalchemy.engine.Engine [cached since 0.2196s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:52,842 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:52,842 INFO sqlalchemy.engine.Engine [cached since 0.2736s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:52,896 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:37:52,896 INFO sqlalchemy.engine.Engine [generated in 0.00014s] ('userrole', 'pg_catalog')
+2025-12-17 08:37:53,007 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+✅ Database initialized
+INFO:     127.0.0.1:51878 - "POST /api/v1/login HTTP/1.1" 422 Unprocessable Content
+WARNING:  WatchFiles detected changes in 'tests/conftest.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [9881]
+INFO:     Started server process [10011]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:37:56,564 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:37:56,565 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:56,723 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:37:56,723 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:56,940 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:37:56,940 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:37:57,098 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:37:57,101 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:57,101 INFO sqlalchemy.engine.Engine [generated in 0.00022s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:57,255 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:57,255 INFO sqlalchemy.engine.Engine [cached since 0.1543s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:57,310 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:57,310 INFO sqlalchemy.engine.Engine [cached since 0.2095s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:57,364 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:37:57,364 INFO sqlalchemy.engine.Engine [cached since 0.2632s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:37:57,418 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:37:57,418 INFO sqlalchemy.engine.Engine [generated in 0.00017s] ('userrole', 'pg_catalog')
+2025-12-17 08:37:57,521 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+✅ Database initialized
+2025-12-17 08:38:05,499 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:38:05,499 INFO sqlalchemy.engine.Engine [raw sql] {}
+2025-12-17 08:38:05,602 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:38:05,602 INFO sqlalchemy.engine.Engine [raw sql] {}
+2025-12-17 08:38:05,706 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:38:05,706 INFO sqlalchemy.engine.Engine [raw sql] {}
+2025-12-17 08:38:05,982 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:38:05,984 INFO sqlalchemy.engine.Engine SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.full_name AS users_full_name, users.name AS users_name, users.role AS users_role, users.is_active AS users_is_active, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.email = %(email_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER
+2025-12-17 08:38:05,984 INFO sqlalchemy.engine.Engine [generated in 0.00020s] {'email_1': 'therapist@example.com', 'param_1': 1}
+2025-12-17 08:38:06,093 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:51937 - "POST /api/v1/login HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1929, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 959, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.UndefinedColumn: column users.full_name does not exist
+LINE 1: ..., users.hashed_password AS users_hashed_password, users.full...
+                                                             ^
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/fastapi/applications.py", line 1139, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/fastapi/routing.py", line 120, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/fastapi/routing.py", line 106, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/fastapi/routing.py", line 430, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/fastapi/routing.py", line 318, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/starlette/concurrency.py", line 32, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/anyio/to_thread.py", line 61, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        func, args, abandon_on_cancel=abandon_on_cancel, limiter=limiter
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/anyio/_backends/_asyncio.py", line 2525, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/anyio/_backends/_asyncio.py", line 986, in run
+    result = context.run(func, *args)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/slowapi/extension.py", line 766, in sync_wrapper
+    response = func(*args, **kwargs)
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/app/auth/router.py", line 48, in login
+    user = db.query(User).filter(User.email == credentials.email).first()
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/orm/query.py", line 2816, in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/orm/query.py", line 2914, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+        params,
+        ^^^^^^^
+        execution_options={"_sa_orm_load_options": self.load_options},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 2404, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 2294, in _execute_internal
+    compile_state_cls.orm_execute_statement(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/orm/context.py", line 315, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1434, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/sql/elements.py", line 534, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1654, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<9 lines>...
+        param_dict=param_dict,
+    )
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1808, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1948, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 2317, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1929, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 959, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/venv/lib/python3.14/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedColumn) column users.full_name does not exist
+LINE 1: ..., users.hashed_password AS users_hashed_password, users.full...
+                                                             ^
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.full_name AS users_full_name, users.name AS users_name, users.role AS users_role, users.is_active AS users_is_active, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.email = %(email_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER]
+[parameters: {'email_1': 'therapist@example.com', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/21/f405)
+WARNING:  WatchFiles detected changes in 'create_test_user.py', 'reset_db.py', 'add_password_column.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10011]
+INFO:     Started server process [10210]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:38:09,366 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:38:09,366 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:38:09,525 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:38:09,525 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:38:09,727 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:38:09,727 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:38:09,891 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:38:09,897 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:38:09,897 INFO sqlalchemy.engine.Engine [generated in 0.00038s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:38:10,058 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:38:10,058 INFO sqlalchemy.engine.Engine [cached since 0.1615s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:38:10,108 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:38:10,109 INFO sqlalchemy.engine.Engine [cached since 0.2121s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:38:10,168 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:38:10,168 INFO sqlalchemy.engine.Engine [cached since 0.2713s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:38:10,227 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:38:10,227 INFO sqlalchemy.engine.Engine [generated in 0.00045s] ('userrole', 'pg_catalog')
+2025-12-17 08:38:10,335 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'alembic/versions/808b6192c57c_add_authentication_schema_and_missing_.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10210]
+INFO:     Started server process [10300]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:38:16,553 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:38:16,553 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:38:16,708 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:38:16,708 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:38:16,917 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:38:16,917 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:38:17,072 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:38:17,074 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:38:17,074 INFO sqlalchemy.engine.Engine [generated in 0.00015s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:38:17,233 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:38:17,233 INFO sqlalchemy.engine.Engine [cached since 0.1596s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:38:17,285 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:38:17,285 INFO sqlalchemy.engine.Engine [cached since 0.2112s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:38:17,338 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:38:17,338 INFO sqlalchemy.engine.Engine [cached since 0.2642s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:38:17,399 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:38:17,399 INFO sqlalchemy.engine.Engine [generated in 0.00017s] ('userrole', 'pg_catalog')
+2025-12-17 08:38:17,509 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'alembic/versions/808b6192c57c_add_authentication_schema_and_missing_.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10300]
+INFO:     Started server process [10378]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:38:20,910 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:38:20,910 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:38:21,081 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:38:21,082 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:38:21,287 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:38:21,287 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:38:21,444 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:38:21,447 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:38:21,447 INFO sqlalchemy.engine.Engine [generated in 0.00016s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:38:21,603 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:38:21,603 INFO sqlalchemy.engine.Engine [cached since 0.1559s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:38:21,661 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:38:21,661 INFO sqlalchemy.engine.Engine [cached since 0.2138s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:38:21,715 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:38:21,715 INFO sqlalchemy.engine.Engine [cached since 0.2676s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:38:21,770 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:38:21,770 INFO sqlalchemy.engine.Engine [generated in 0.00014s] ('userrole', 'pg_catalog')
+2025-12-17 08:38:21,884 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'tests/test_auth_rbac.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10378]
+INFO:     Started server process [10408]
+INFO:     Waiting for application startup.
+🚀 Starting TherapyBridge API...
+2025-12-17 08:38:24,552 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-12-17 08:38:24,552 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:38:24,706 INFO sqlalchemy.engine.Engine select current_schema()
+2025-12-17 08:38:24,706 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:38:24,926 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-12-17 08:38:24,926 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-17 08:38:25,089 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-17 08:38:25,094 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:38:25,094 INFO sqlalchemy.engine.Engine [generated in 0.00030s] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:38:25,257 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:38:25,258 INFO sqlalchemy.engine.Engine [cached since 0.1642s ago] ('patients', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:38:25,310 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:38:25,310 INFO sqlalchemy.engine.Engine [cached since 0.2168s ago] ('sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:38:25,366 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-12-17 08:38:25,366 INFO sqlalchemy.engine.Engine [cached since 0.2727s ago] ('auth_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-12-17 08:38:25,422 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = $1::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != $2::VARCHAR
+2025-12-17 08:38:25,422 INFO sqlalchemy.engine.Engine [generated in 0.00017s] ('userrole', 'pg_catalog')
+2025-12-17 08:38:25,531 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10408]
+INFO:     Stopping reloader process [8570]
