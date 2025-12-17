@@ -95,11 +95,11 @@ audio-transcription-pipeline/
 - API-dependent (requires internet connection)
 - Lower resource requirements
 
-### GPU Pipeline (`src/pipeline_colab.py`)
+### GPU Pipeline (`src/pipeline_gpu.py`)
 
 **Components:**
 - `GPUAudioProcessor`: All audio operations on GPU (torch-based)
-- `ColabTranscriptionPipeline`: faster-whisper with int8 quantization
+- `GPUTranscriptionPipeline`: faster-whisper with int8 quantization
 - Integrated pyannote diarization on GPU
 
 **Performance:**
@@ -139,7 +139,6 @@ audio-transcription-pipeline/
 - ⏳ RunPod - Not yet tested
 - ⏳ Lambda Labs - Not yet tested
 - ⏳ Paperspace - Not yet tested
-- ⏳ Google Colab - Not yet tested
 
 ## Performance Monitoring
 
@@ -201,7 +200,7 @@ The pipeline generates JSON output with the following structure:
 - pyannote.audio - Speaker diarization
 - python-dotenv - Environment variables
 
-### GPU Version (`requirements_colab.txt`)
+### GPU Version (`requirements.txt`)
 - torch, torchaudio - GPU operations
 - faster-whisper - Local Whisper inference
 - pyannote.audio - Speaker diarization
