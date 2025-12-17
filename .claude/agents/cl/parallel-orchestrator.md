@@ -964,16 +964,31 @@ Next Steps:
 
 **Critical**: Launch all subtasks in a wave using multiple Task calls in the SAME message for true parallelism.
 
+**Wave Number in Description**: When launching parallel agents with the Task tool, include wave information in the `description` parameter to make progress tracking clear.
+
+**Pattern:**
+- description: "Wave [N].[M]: [Brief task description]"
+
+**Examples:**
+- description: "Wave 1.1: Analyze authentication system"
+- description: "Wave 2.3: Refactor session handlers"
+- description: "Wave 3.1: Update documentation"
+
+This makes it clear which wave each agent belongs to and helps with progress tracking.
+
 **Example (3 tasks in Wave 1):**
 ```xml
 <function_calls>
 <invoke name="Task">
+<parameter name="description">Wave 1.1: Analyze file1.tsx for TypeScript violations</parameter>
 <parameter name="prompt">Analyze /abs/path/file1.tsx for TypeScript strict mode violations...</parameter>
 </invoke>
 <invoke name="Task">
+<parameter name="description">Wave 1.2: Analyze file2.tsx for TypeScript violations</parameter>
 <parameter name="prompt">Analyze /abs/path/file2.tsx for TypeScript strict mode violations...</parameter>
 </invoke>
 <invoke name="Task">
+<parameter name="description">Wave 1.3: Analyze file3.tsx for TypeScript violations</parameter>
 <parameter name="prompt">Analyze /abs/path/file3.tsx for TypeScript strict mode violations...</parameter>
 </invoke>
 </function_calls>
@@ -1102,6 +1117,7 @@ Total waves: 3
 ```xml
 <function_calls>
 <invoke name="Task">
+<parameter name="description">Wave 1.1: Analyze SessionCard.tsx for TypeScript violations</parameter>
 <parameter name="prompt">Analyze /abs/path/frontend/components/SessionCard.tsx for TypeScript strict mode violations.
 
 Context: TypeScript 5.0 project migrating to strict mode. Need to identify all 'any' types, missing null checks, and implicit type coercions.
@@ -1111,9 +1127,10 @@ Success: Complete violation report with specific code locations
 </parameter>
 </invoke>
 <invoke name="Task">
+<parameter name="description">Wave 1.2: Analyze PatientList.tsx for TypeScript violations</parameter>
 <parameter name="prompt">Analyze /abs/path/frontend/components/PatientList.tsx for TypeScript strict mode violations...</parameter>
 </invoke>
-... (8 more Task calls for remaining files)
+... (8 more Task calls for remaining files with descriptions: Wave 1.3, Wave 1.4, etc.)
 </function_calls>
 ```
 
@@ -1132,6 +1149,7 @@ Success: Complete violation report with specific code locations
 ```xml
 <function_calls>
 <invoke name="Task">
+<parameter name="description">Wave 2.1: Refactor SessionCard.tsx to strict TypeScript</parameter>
 <parameter name="prompt">Refactor /abs/path/frontend/components/SessionCard.tsx to TypeScript strict mode.
 
 Context: Analysis found 5 'any' types and 3 missing null checks. TypeScript 5.0 with strictNullChecks enabled.
@@ -1141,13 +1159,14 @@ Success: File compiles with strict flags, no type errors
 Constraints: Preserve all functionality, maintain prop interfaces
 </parameter>
 </invoke>
-... (9 more Task calls)
+... (9 more Task calls with descriptions: Wave 2.2, Wave 2.3, etc.)
 </function_calls>
 ```
 
 **Step 6: Execute Wave 3 (1 Task call)**
 ```xml
 <invoke name="Task">
+<parameter name="description">Wave 3.1: Verify TypeScript compilation</parameter>
 <parameter name="prompt">Run TypeScript compiler with strict flags and verify all 23 refactored components compile without errors.
 
 Context: All components refactored to strict mode. Need to verify compilation succeeds.
