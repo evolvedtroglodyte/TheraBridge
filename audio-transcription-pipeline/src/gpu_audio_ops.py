@@ -30,6 +30,23 @@ class GPUAudioProcessor:
             print(f"[GPUAudio] GPU: {torch.cuda.get_device_name(0)}")
             print(f"[GPUAudio] VRAM: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
 
+    def __del__(self):
+        """Cleanup GPU resources when processor is destroyed"""
+        self.cleanup_gpu_memory()
+
+    def cleanup_gpu_memory(self):
+        """
+        Cleanup GPU memory and clear cache
+
+        Clears PyTorch GPU cache to free up VRAM
+        """
+        try:
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                print(f"[GPUAudio] GPU cache cleared")
+        except Exception as e:
+            print(f"[GPUAudio] Warning: Failed to cleanup GPU memory: {str(e)}")
+
     def load_audio(self, audio_path: str) -> Tuple[torch.Tensor, int]:
         """
         Load audio file to GPU memory
@@ -150,20 +167,30 @@ class GPUAudioProcessor:
                       output_path: str,
                       format: str = "mp3",
                       bitrate: str = "64k"):
-        """Save GPU tensor as audio file"""
-        # Move to CPU for saving
-        waveform_cpu = waveform.cpu()
+        """
+        Save GPU tensor as audio file
 
-        # Save using torchaudio with specific encoding
-        if format == "mp3":
-            # For MP3, we need to use a specific backend
-            torchaudio.save(
-                output_path,
-                waveform_cpu,
-                sample_rate,
-                format="mp3",
-                encoding="PCM_S",
-                bits_per_sample=16
-            )
-        else:
-            torchaudio.save(output_path, waveform_cpu, sample_rate)
+        Moves waveform to CPU, saves it, and cleans up GPU memory
+        """
+        try:
+            # Move to CPU for saving
+            waveform_cpu = waveform.cpu()
+
+            # Save using torchaudio with specific encoding
+            if format == "mp3":
+                # For MP3, we need to use a specific backend
+                torchaudio.save(
+                    output_path,
+                    waveform_cpu,
+                    sample_rate,
+                    format="mp3",
+                    encoding="PCM_S",
+                    bits_per_sample=16
+                )
+            else:
+                torchaudio.save(output_path, waveform_cpu, sample_rate)
+        finally:
+            # Cleanup GPU memory after saving
+            del waveform
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()

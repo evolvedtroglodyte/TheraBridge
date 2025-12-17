@@ -59,6 +59,10 @@ class GPUTranscriptionPipeline:
         # Log configuration
         self._log_initialization()
 
+    def __del__(self):
+        """Cleanup GPU resources when pipeline is destroyed"""
+        self.cleanup_models()
+
     def _log_initialization(self):
         """Log pipeline initialization details"""
         print(f"\n{'='*60}")
@@ -156,6 +160,9 @@ class GPUTranscriptionPipeline:
             self.logger.log(f"Pipeline error: {str(e)}", level="ERROR")
             self.logger.end_pipeline()
             raise
+        finally:
+            # Always cleanup GPU memory, even if processing fails
+            self.cleanup_models()
 
     def _preprocess_gpu(self, audio_path: str) -> str:
         """GPU-accelerated audio preprocessing"""
@@ -342,6 +349,55 @@ class GPUTranscriptionPipeline:
                 count += 1
 
         return total_util / count if count > 0 else 0.0
+
+    def cleanup_models(self):
+        """
+        Cleanup GPU VRAM by unloading models
+
+        This method:
+        - Unloads Whisper model from GPU memory
+        - Unloads pyannote diarization model from GPU memory
+        - Clears GPU cache
+        - Logs cleanup status
+        """
+        cleanup_msg = []
+
+        try:
+            # Cleanup Whisper model
+            if self.transcriber is not None:
+                try:
+                    # Delete the transcriber reference
+                    del self.transcriber
+                    self.transcriber = None
+                    cleanup_msg.append("Whisper model unloaded")
+                except Exception as e:
+                    self.logger.log(f"Warning: Failed to cleanup Whisper model: {str(e)}", level="WARNING")
+
+            # Cleanup pyannote diarization model
+            if self.diarizer is not None:
+                try:
+                    # Delete the diarizer reference
+                    del self.diarizer
+                    self.diarizer = None
+                    cleanup_msg.append("Diarization model unloaded")
+                except Exception as e:
+                    self.logger.log(f"Warning: Failed to cleanup diarization model: {str(e)}", level="WARNING")
+
+            # Force GPU cache clear
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                cleanup_msg.append("GPU cache cleared")
+
+                # Log remaining GPU memory
+                remaining_vram = torch.cuda.get_device_properties(0).total_memory - torch.cuda.memory_allocated()
+                remaining_vram_gb = remaining_vram / (1024 ** 3)
+                self.logger.log(f"GPU cleanup complete. Available VRAM: {remaining_vram_gb:.2f} GB")
+
+            if cleanup_msg:
+                print(f"\n[GPU Cleanup] {', '.join(cleanup_msg)}")
+
+        except Exception as e:
+            self.logger.log(f"Error during GPU cleanup: {str(e)}", level="ERROR")
 
 
 def main():

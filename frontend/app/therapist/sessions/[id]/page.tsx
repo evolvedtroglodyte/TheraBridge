@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect } from 'react';
+import { use } from 'react';
 import { useSession } from '@/hooks/useSession';
 import { usePatient } from '@/hooks/usePatients';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -32,18 +32,11 @@ interface PageProps {
 
 export default function SessionDetailPage({ params }: PageProps) {
   const { id } = use(params);
-  const { session, isLoading, isError, isProcessing, refresh } = useSession(id);
+  const { session, isLoading, isError, isProcessing } = useSession(id);
   const { patient } = usePatient(session?.patient_id || null);
 
-  // Auto-refresh while processing
-  useEffect(() => {
-    if (isProcessing) {
-      const interval = setInterval(() => {
-        refresh();
-      }, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [isProcessing, refresh]);
+  // Note: useSession hook automatically handles polling at 5s intervals while processing
+  // No manual polling needed here - the hook's dynamic refreshInterval handles it
 
   if (isLoading) {
     return (
