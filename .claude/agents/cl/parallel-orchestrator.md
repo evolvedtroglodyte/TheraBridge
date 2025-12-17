@@ -966,15 +966,26 @@ Next Steps:
 
 **Wave Number in Description**: When launching parallel agents with the Task tool, include wave information in the `description` parameter to make progress tracking clear.
 
-**Pattern:**
+**Pattern for single wave:**
 - description: "Wave [N].[M]: [Brief task description]"
+
+**Pattern for agents used in multiple waves:**
+- description: "Waves [N1], [N2], [N3]: [Brief task description]"
+- OR description: "Waves [N1]-[N3]: [Brief task description]" (for consecutive waves)
 
 **Examples:**
 - description: "Wave 1.1: Analyze authentication system"
 - description: "Wave 2.3: Refactor session handlers"
-- description: "Wave 3.1: Update documentation"
+- description: "Waves 1, 3: Update configuration files" (agent works in Wave 1 and Wave 3)
+- description: "Waves 2-4: Refactor session handlers" (agent works across Waves 2, 3, and 4)
 
-This makes it clear which wave each agent belongs to and helps with progress tracking.
+**Why multi-wave agents?**
+Agents can be reused across waves when:
+- Tasks are similar in nature (e.g., same type of analysis or modifications)
+- There is value in maintaining context across waves (e.g., an agent that analyzes in Wave 1 and verifies fixes in Wave 3)
+- The agent handles a specific domain across multiple execution phases
+
+This makes it clear which wave(s) each agent participates in for better progress tracking.
 
 **Example (3 tasks in Wave 1):**
 ```xml
