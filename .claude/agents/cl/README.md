@@ -116,8 +116,7 @@ This directory contains specialized AI agents that help you work with your codeb
 
 **Documentation:**
 - **Complete Methodology:** `.claude/DYNAMIC_WAVE_ORCHESTRATION.md`
-- **Real-World Examples:** `.claude/agents/cl/parallel-orchestrator-examples.md`
-- **Test Cases:** `.claude/agents/cl/parallel-orchestrator-tests.md`
+- **Agent Instructions (includes examples & tests):** `.claude/agents/cl/parallel-orchestrator.md`
 
 **Example Prompts:**
 ```
