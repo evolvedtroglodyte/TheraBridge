@@ -104,14 +104,14 @@ def signup(request: Request, user_data: UserCreate, db: Session = Depends(get_db
         Access token, refresh token, and expiration info
 
     Raises:
-        HTTPException 422: If email already registered
+        HTTPException 409: If email already registered
         HTTPException 429: If rate limit exceeded
     """
     # Check if email already exists
     existing_user = db.query(User).filter(User.email == user_data.email).first()
     if existing_user:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_409_CONFLICT,
             detail="Email already registered"
         )
 
@@ -131,7 +131,7 @@ def signup(request: Request, user_data: UserCreate, db: Session = Depends(get_db
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_409_CONFLICT,
             detail="Email already registered"
         )
 

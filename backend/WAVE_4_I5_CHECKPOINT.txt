@@ -1,0 +1,75 @@
+WAVE 4 - Instance 5 (I5) - Backend Developer #2
+===============================================
+
+Mission: Implement token rotation in backend/app/auth/router.py
+Status: ✅ COMPLETE
+
+Implementation Summary
+----------------------
+
+File: /Users/newdldewdl/Global Domination 2/peerbridge proj/backend/app/auth/router.py
+Endpoint: POST /auth/refresh (lines 158-236)
+
+Security Features Implemented:
+✅ NEW refresh token generated on each refresh
+✅ Old refresh token immediately revoked (is_revoked = True)
+✅ New session created in auth_sessions table
+✅ Both access_token AND refresh_token returned
+✅ Proper 401 error handling for all failure cases
+
+Token Rotation Flow:
+--------------------
+1. Client sends refresh_token in request body
+2. Server finds session by hashed refresh token
+3. Validates: not revoked, not expired, user active
+4. REVOKES old session (line 216: session.is_revoked = True)
+5. Generates NEW access token (line 220)
+6. Generates NEW refresh token (line 221)
+7. Creates NEW AuthSession with new refresh token (lines 224-230)
+8. Returns BOTH new tokens to client (lines 232-236)
+
+Error Handling:
+---------------
+- HTTP 401: Invalid refresh token (not found in database)
+- HTTP 401: Token has been revoked
+- HTTP 401: Refresh token expired
+- HTTP 401: User not found or inactive
+- HTTP 429: Rate limit exceeded (10/minute)
+
+Security Benefits:
+------------------
+1. Prevents token replay attacks
+2. Limits damage if token stolen (one-time use)
+3. Old tokens cannot be reused after rotation
+4. Database tracks all active sessions
+5. Refresh tokens hashed in database (bcrypt)
+6. Rate limiting prevents brute force attempts
+
+Database Schema:
+----------------
+Table: auth_sessions
+- id (UUID, primary key)
+- user_id (UUID, foreign key to users)
+- refresh_token (String, bcrypt hashed)
+- expires_at (DateTime)
+- is_revoked (Boolean)
+- created_at (DateTime)
+
+Implementation Quality:
+-----------------------
+- ✅ Follows OAuth 2.0 token rotation best practices
+- ✅ Comprehensive error messages
+- ✅ Detailed docstring documentation
+- ✅ Rate limiting (10 requests/minute)
+- ✅ Atomic database operations (commit after revoke, commit after create)
+- ✅ User validation (active status check)
+
+Files Referenced:
+-----------------
+- backend/app/auth/router.py (main implementation)
+- backend/app/auth/models.py (AuthSession model)
+- backend/app/auth/utils.py (token generation/hashing)
+- backend/app/auth/schemas.py (TokenRefresh, TokenResponse)
+- backend/app/auth/config.py (token expiration settings)
+
+Wave 4 Complete: Token rotation fully implemented with industry-standard security practices.

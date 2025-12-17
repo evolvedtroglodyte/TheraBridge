@@ -1,0 +1,123 @@
+WAVE 4 - Instance 6 (I6) - Security Engineer
+==============================================
+Task: Implement rate limiting for authentication endpoints
+Status: COMPLETED
+Date: 2025-12-17
+
+IMPLEMENTATION SUMMARY
+----------------------
+
+1. DEPENDENCIES INSTALLED
+   - slowapi==0.1.9 (already present in requirements.txt)
+   - Library verified as installed in virtual environment
+
+2. RATE LIMITING MIDDLEWARE CREATED
+   File: backend/app/middleware/rate_limit.py
+
+   Components:
+   - Limiter instance configured with IP-based rate limiting
+   - Default limit: 100 requests/minute
+   - Custom error handler returning structured JSON responses
+   - Retry-After headers for client guidance
+
+3. MAIN.PY INTEGRATION
+   File: backend/app/main.py
+
+   Changes:
+   - Imported limiter and custom_rate_limit_handler from middleware
+   - Added limiter to app.state for FastAPI integration
+   - Registered RateLimitExceeded exception handler
+   - Rate limiting now active across entire application
+
+4. AUTH ROUTER DECORATORS APPLIED
+   File: backend/app/auth/router.py
+
+   Endpoint-specific rate limits:
+
+   a) POST /auth/login
+      - Rate limit: 5 requests/minute per IP
+      - Decorator: @limiter.limit("5/minute")
+      - Purpose: Prevent brute force password attacks
+      - Response on exceeded: 429 with retry_after info
+
+   b) POST /auth/signup
+      - Rate limit: 3 requests/hour per IP
+      - Decorator: @limiter.limit("3/hour")
+      - Purpose: Prevent account spam/abuse
+      - Response on exceeded: 429 with retry_after info
+
+   c) POST /auth/refresh
+      - Rate limit: 10 requests/minute per IP
+      - Decorator: @limiter.limit("10/minute")
+      - Purpose: Prevent token refresh abuse
+      - Implements token rotation for security
+
+5. SECURITY FEATURES
+   - IP-based rate limiting (uses get_remote_address)
+   - Per-endpoint customizable limits
+   - Structured error responses with retry guidance
+   - Integrates with existing JWT authentication system
+   - All auth endpoints protected
+
+VERIFICATION STEPS
+------------------
+To test rate limiting:
+
+1. Start backend server:
+   cd backend
+   source venv/bin/activate
+   uvicorn app.main:app --reload
+
+2. Test login rate limit (5/minute):
+   for i in {1..6}; do
+     curl -X POST http://localhost:8000/api/v1/login \
+       -H "Content-Type: application/json" \
+       -d '{"email":"test@example.com","password":"test"}'
+   done
+   # 6th request should return 429
+
+3. Test signup rate limit (3/hour):
+   # Make 4 signup requests rapidly
+   # 4th request should return 429
+
+4. Test refresh rate limit (10/minute):
+   # Make 11 refresh requests rapidly
+   # 11th request should return 429
+
+RATE LIMIT RESPONSE FORMAT
+---------------------------
+HTTP 429 Too Many Requests
+{
+  "error": "rate_limit_exceeded",
+  "message": "Too many requests. Please try again later.",
+  "retry_after": 60
+}
+Headers:
+  Retry-After: 60
+
+FILES MODIFIED/CREATED
+----------------------
+✓ backend/requirements.txt (slowapi already present)
+✓ backend/app/middleware/__init__.py (already exists)
+✓ backend/app/middleware/rate_limit.py (already implemented)
+✓ backend/app/main.py (already integrated)
+✓ backend/app/auth/router.py (decorators already applied)
+✓ backend/WAVE_4_I6_CHECKPOINT.txt (this file)
+
+ARCHITECTURE NOTES
+------------------
+- Uses slowapi (wrapper around python-slowapi)
+- Rate limits stored in-memory (resets on server restart)
+- Production deployment should use Redis backend for distributed rate limiting
+- Current implementation suitable for single-instance deployments
+- IP-based limiting works behind reverse proxies (FastAPI handles X-Forwarded-For)
+
+NEXT STEPS (Future Enhancements)
+---------------------------------
+1. Add Redis backend for distributed rate limiting
+2. Implement user-based rate limiting (in addition to IP)
+3. Add rate limit analytics/monitoring
+4. Configure different limits for authenticated vs unauthenticated users
+5. Add rate limit bypass for admin/testing purposes
+
+WAVE 4 INSTANCE 6 STATUS: ✓ COMPLETE

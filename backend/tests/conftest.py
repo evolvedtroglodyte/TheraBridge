@@ -180,3 +180,188 @@ def inactive_user(test_db):
     test_db.commit()
     test_db.refresh(user)
     return user
+
+
+@pytest.fixture(scope="function")
+def therapist_user(test_db):
+    """
+    Create a test therapist user in the database.
+
+    This fixture creates a therapist user with known credentials
+    for testing RBAC and authentication flows.
+
+    Args:
+        test_db: Test database session fixture
+
+    Returns:
+        User object with the following credentials:
+        - email: therapist@test.com
+        - password: testpass123
+        - role: therapist
+    """
+    user = User(
+        email="therapist@test.com",
+        hashed_password=get_password_hash("testpass123"),
+        full_name="Test Therapist",
+        role=UserRole.therapist,
+        is_active=True
+    )
+    test_db.add(user)
+    test_db.commit()
+    test_db.refresh(user)
+    return user
+
+
+@pytest.fixture(scope="function")
+def patient_user(test_db):
+    """
+    Create a test patient user in the database.
+
+    Args:
+        test_db: Test database session fixture
+
+    Returns:
+        User object with patient role
+        - email: patient@test.com
+        - password: patientpass123
+        - role: patient
+    """
+    user = User(
+        email="patient@test.com",
+        hashed_password=get_password_hash("patientpass123"),
+        full_name="Test Patient User",
+        role=UserRole.patient,
+        is_active=True
+    )
+    test_db.add(user)
+    test_db.commit()
+    test_db.refresh(user)
+    return user
+
+
+@pytest.fixture(scope="function")
+def admin_user(test_db):
+    """
+    Create a test admin user in the database.
+
+    Args:
+        test_db: Test database session fixture
+
+    Returns:
+        User object with admin role
+        - email: admin@test.com
+        - password: adminpass123
+        - role: admin
+    """
+    user = User(
+        email="admin@test.com",
+        hashed_password=get_password_hash("adminpass123"),
+        full_name="Test Admin",
+        role=UserRole.admin,
+        is_active=True
+    )
+    test_db.add(user)
+    test_db.commit()
+    test_db.refresh(user)
+    return user
+
+
+@pytest.fixture(scope="function")
+def therapist_token(therapist_user):
+    """
+    Generate an access token for the therapist user.
+
+    Args:
+        therapist_user: Therapist user fixture
+
+    Returns:
+        JWT access token string
+    """
+    from app.auth.utils import create_access_token
+    return create_access_token(therapist_user.id, therapist_user.role.value)
+
+
+@pytest.fixture(scope="function")
+def patient_token(patient_user):
+    """
+    Generate an access token for the patient user.
+
+    Args:
+        patient_user: Patient user fixture
+
+    Returns:
+        JWT access token string
+    """
+    from app.auth.utils import create_access_token
+    return create_access_token(patient_user.id, patient_user.role.value)
+
+
+@pytest.fixture(scope="function")
+def admin_token(admin_user):
+    """
+    Generate an access token for the admin user.
+
+    Args:
+        admin_user: Admin user fixture
+
+    Returns:
+        JWT access token string
+    """
+    from app.auth.utils import create_access_token
+    return create_access_token(admin_user.id, admin_user.role.value)
+
+
+@pytest.fixture(scope="function")
+def therapist_auth_headers(therapist_token):
+    """
+    Generate authorization headers for therapist user.
+
+    Args:
+        therapist_token: JWT token for therapist
+
+    Returns:
+        Dict with Authorization header
+    """
+    return {"Authorization": f"Bearer {therapist_token}"}
+
+
+@pytest.fixture(scope="function")
+def patient_auth_headers(patient_token):
+    """
+    Generate authorization headers for patient user.
+
+    Args:
+        patient_token: JWT token for patient
+
+    Returns:
+        Dict with Authorization header
+    """
+    return {"Authorization": f"Bearer {patient_token}"}
+
+
+@pytest.fixture(scope="function")
+def admin_auth_headers(admin_token):
+    """
+    Generate authorization headers for admin user.
+
+    Args:
+        admin_token: JWT token for admin
+
+    Returns:
+        Dict with Authorization header
+    """
+    return {"Authorization": f"Bearer {admin_token}"}
+
+
+@pytest.fixture(scope="function")
+def db_session(test_db):
+    """
+    Alias for test_db fixture for compatibility with test files.
+
+    Args:
+        test_db: Test database session fixture
+
+    Returns:
+        SQLAlchemy Session for test database
+    """
+    return test_db

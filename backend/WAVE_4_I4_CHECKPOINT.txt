@@ -1,0 +1,105 @@
+WAVE 4 - Instance 4 (I4) - Backend Developer #1
+=================================================
+
+Mission: Implement signup endpoint in backend/app/auth/router.py
+
+Status: ✅ COMPLETE
+
+Implementation Details:
+-----------------------
+
+1. **Endpoint Created**: POST /auth/signup
+   - Location: /Users/newdldewdl/Global Domination 2/peerbridge proj/backend/app/auth/router.py
+   - Lines: 90-155
+   - Status Code: 201 CREATED
+   - Rate Limit: 3 requests/hour per IP (prevents account spam)
+
+2. **Email Validation**: ✅
+   - Uses Pydantic EmailStr type in UserCreate schema
+   - Automatically validates @ symbol presence and email format
+   - Schema location: backend/app/auth/schemas.py (lines 11-16)
+
+3. **Password Hashing**: ✅
+   - Uses bcrypt via get_password_hash() utility function
+   - Hashing implemented in: backend/app/auth/utils.py (lines 105-115)
+   - Password context: CryptContext(schemes=["bcrypt"], deprecated="auto")
+   - Password stored in hashed_password field (line 121)
+
+4. **full_name Field**: ✅
+   - Included in UserCreate schema with validation (min_length=1)
+   - Saved to database on user creation (line 122)
+
+5. **role Field**: ✅
+   - Uses UserRole enum type from app.auth.models
+   - Required in UserCreate schema (no default at schema level)
+   - Can be set to "patient", "therapist", or "admin"
+
+6. **JWT Token Response**: ✅
+   - Returns access_token (short-lived JWT)
+   - Returns refresh_token (long-lived random string)
+   - Returns expires_in (seconds until access_token expires)
+   - Response format: TokenResponse schema (lines 151-154)
+
+7. **Error Handling**: ✅
+   - HTTP 409 CONFLICT: Email already registered (duplicate email check)
+   - Duplicate check performed twice for safety:
+     a. Pre-query check (lines 111-116)
+     b. IntegrityError catch during commit (lines 127-136)
+   - Database rollback on IntegrityError
+   - HTTP 429: Rate limit exceeded (handled by @limiter.limit decorator)
+
+8. **Security Features**:
+   - Rate limiting: 3 signups per hour per IP
+   - Password min length: 8 characters (enforced by schema)
+   - Refresh token hashing before database storage
+   - New user set to is_active=True by default
+   - Automatic session creation with hashed refresh token
+
+Code Changes Made:
+------------------
+- Updated HTTP status code from 422 to 409 for duplicate email errors (lines 114, 134)
+- Updated docstring to reflect 409 status code (line 107)
+
+Dependencies Used:
+------------------
+- FastAPI (routing, dependency injection)
+- SQLAlchemy (database ORM)
+- Pydantic (request/response validation)
+- bcrypt (via passlib - password hashing)
+- python-jose (JWT token creation)
+- Rate limiting via custom middleware
+
+Testing Recommendations:
+------------------------
+1. Test successful signup with valid data
+2. Test duplicate email rejection (should return 409)
+3. Test invalid email format (should return 422 from Pydantic)
+4. Test password min length enforcement
+5. Test rate limiting (4th request in hour should fail)
+6. Verify JWT tokens are valid and contain correct claims
+7. Verify refresh token is hashed in database
+8. Test all role types (patient, therapist, admin)
+
+API Endpoint Usage:
+-------------------
+POST /auth/signup
+Content-Type: application/json
+
+{
+  "email": "patient@example.com",
+  "password": "securepass123",
+  "full_name": "John Doe",
+  "role": "patient"
+}
+
+Response (201 CREATED):
+{
+  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+  "refresh_token": "random_secure_string...",
+  "token_type": "bearer",
+  "expires_in": 1800
+}
+
+Checkpoint Created: 2025-12-17
+Instance: I4 - Backend Developer #1
+Wave: 4
