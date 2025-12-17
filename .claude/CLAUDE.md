@@ -222,3 +222,28 @@ uvicorn app.main:app --reload
 - Consolidated all docs into single TherapyBridge.md
 - Deleted archive/, docs/, duplicate .claude/, scattered MDs
 - Simplified to minimal, high-quality structure
+
+---
+
+## Parallel Workflow Orchestration
+
+The **parallel-orchestrator** agent enables complex multi-step tasks to be executed by multiple AI agents working in parallel waves. It uses dynamic wave-based orchestration to break down large operations into coordinated subtasks.
+
+**When to use:**
+- Large-scale refactoring or migrations
+- Multi-file analysis or modifications
+- Complex tasks requiring 5+ independent operations
+- Operations that benefit from parallel execution
+
+**Usage modes:**
+1. **Automatic**: `@parallel-orchestrator [task description]` - Agent determines optimal agent count
+2. **Explicit**: `@parallel-orchestrator with 5 agents [task description]` - Specify exact number
+
+**Example prompts:**
+```
+@parallel-orchestrator Refactor all React components to use TypeScript strict mode
+@parallel-orchestrator with 8 agents Analyze test coverage across entire codebase
+@parallel-orchestrator Migrate all database queries from raw SQL to ORM
+```
+
+**Full methodology:** See `.claude/agents/cl/DYNAMIC_WAVE_ORCHESTRATION.md` for complete orchestration details.
