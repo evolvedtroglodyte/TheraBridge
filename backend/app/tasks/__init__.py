@@ -8,9 +8,11 @@ from app.tasks.aggregation import (
     snapshot_patient_progress,
     register_analytics_jobs
 )
+from app.tasks.scheduled_exports import register_export_jobs
 
 __all__ = [
     "aggregate_daily_stats",
     "snapshot_patient_progress",
-    "register_analytics_jobs"
+    "register_analytics_jobs",
+    "register_export_jobs"
 ]

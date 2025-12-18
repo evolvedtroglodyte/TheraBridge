@@ -44,6 +44,23 @@ class User(Base):
         cascade="all, delete-orphan"
     )
 
+    # Export & Reporting relationships (Feature 7)
+    export_templates = relationship(
+        "ExportTemplate",
+        back_populates="creator",
+        foreign_keys="ExportTemplate.created_by"
+    )
+    export_jobs = relationship(
+        "ExportJob",
+        back_populates="user",
+        foreign_keys="ExportJob.user_id"
+    )
+    scheduled_reports = relationship(
+        "ScheduledReport",
+        back_populates="user",
+        foreign_keys="ScheduledReport.user_id"
+    )
+
 
 class Patient(Base):
     __tablename__ = "patients"
@@ -137,7 +154,7 @@ class TimelineEvent(Base):
     event_date = Column(DateTime, nullable=False)  # When the event occurred
     title = Column(String(200), nullable=False)  # Short event title
     description = Column(Text, nullable=True)  # Detailed description
-    metadata = Column(JSONB, nullable=True)  # Type-specific data (e.g., session metrics, goal progress)
+    event_metadata = Column(JSONB, nullable=True)  # Type-specific data (e.g., session metrics, goal progress)
 
     # Polymorphic reference to related entities
     related_entity_type = Column(String(50), nullable=True)  # e.g., 'session', 'goal', 'plan'
@@ -154,3 +171,55 @@ class TimelineEvent(Base):
     __table_args__ = (
         Index('ix_timeline_events_patient_date', 'patient_id', 'event_date', postgresql_ops={'event_date': 'DESC'}),
     )
+
+
+class NoteTemplate(Base):
+    """
+    Note templates for structured clinical documentation.
+    Supports system templates (SOAP, DAP, BIRP) and custom user-created templates.
+    Templates define the structure for SessionNote records.
+    """
+    __tablename__ = "note_templates"
+
+    id = Column(SQLUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String(100), nullable=False)
+    description = Column(Text, nullable=True)
+    template_type = Column(String(50), nullable=False)  # 'soap', 'dap', 'birp', 'progress', 'custom'
+    is_system = Column(Boolean, default=False, nullable=False)  # True for built-in templates
+    created_by = Column(SQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
+    is_shared = Column(Boolean, default=False, nullable=False)  # Shared within practice
+    structure = Column(JSONB, nullable=False)  # Template structure definition
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class SessionNote(Base):
+    """
+    Clinical notes for therapy sessions.
+    Links sessions to note templates and stores filled template content.
+    Supports draft/completed/signed workflow with audit trail.
+    """
+    __tablename__ = "session_notes"
+
+    id = Column(SQLUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    session_id = Column(SQLUUID(as_uuid=True), ForeignKey("therapy_sessions.id", ondelete="CASCADE"), nullable=False, index=True)
+    template_id = Column(SQLUUID(as_uuid=True), ForeignKey("note_templates.id", ondelete="SET NULL"), nullable=True, index=True)
+    content = Column(JSONB, nullable=False)  # Filled template data
+    status = Column(String(20), default='draft', nullable=False)  # 'draft', 'completed', 'signed'
+    signed_at = Column(DateTime, nullable=True)
+    signed_by = Column(SQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class TemplateUsage(Base):
+    """
+    Tracks template usage for analytics and recommendations.
+    Records each time a template is used by a user.
+    """
+    __tablename__ = "template_usage"
+
+    id = Column(SQLUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    template_id = Column(SQLUUID(as_uuid=True), ForeignKey("note_templates.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(SQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    used_at = Column(DateTime, default=datetime.utcnow)

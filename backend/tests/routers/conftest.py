@@ -10,9 +10,11 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.postgresql import JSONB
 from uuid import uuid4
 
+# CRITICAL: Import app.models BEFORE Base to register all model tables with Base.metadata
+import app.models  # This triggers all model registrations
 from app.database import Base, get_db
 from app.main import app
-from app.models.db_models import User, Patient, Session
+from app.models.db_models import User, Patient, Session, TherapistPatient, TherapySession, TimelineEvent, NoteTemplate, SessionNote, TemplateUsage
 from app.auth.utils import get_password_hash
 from app.models.schemas import UserRole
 
@@ -20,8 +22,10 @@ from app.models.schemas import UserRole
 import os
 import tempfile
 
-# Create a temporary file for the test database
-_test_db_path = os.path.join(tempfile.gettempdir(), "test_routers_sessions.db")
+# Create a database file in current working directory (more reliable than tempdir)
+_test_db_dir = os.path.join(os.getcwd(), ".test_tmp")
+os.makedirs(_test_db_dir, exist_ok=True)
+_test_db_path = os.path.join(_test_db_dir, "test_routers_sessions.db")
 
 SQLALCHEMY_DATABASE_URL = f"sqlite+aiosqlite:///{_test_db_path}"
 SQLALCHEMY_SYNC_DATABASE_URL = f"sqlite:///{_test_db_path}"
@@ -75,18 +79,13 @@ async def setup_database():
     """
     Setup and teardown database for each test.
     Creates tables before test and drops them after.
+    Uses local .test_tmp directory to avoid permission issues.
     """
     # Create all tables using sync engine
     Base.metadata.create_all(bind=test_sync_engine)
     yield
     # Drop all tables
     Base.metadata.drop_all(bind=test_sync_engine)
-    # Clean up database file
-    if os.path.exists(_test_db_path):
-        try:
-            os.remove(_test_db_path)
-        except:
-            pass
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -318,3 +317,33 @@ def test_db():
         yield db
     finally:
         db.close()
+
+
+@pytest.fixture(scope="function")
+def async_db_client(test_db):
+    """
+    Sync TestClient for testing async endpoints with SQLite test database.
+
+    This fixture creates a sync TestClient that wraps async endpoints,
+    but uses a shared SQLite database that can be accessed both synchronously
+    (for test setup) and asynchronously (by the endpoint).
+
+    This overrides the root conftest's async_db_client which uses PostgreSQL.
+
+    Args:
+        test_db: Sync test database session (for test setup/assertions)
+
+    Yields:
+        TestClient for making API requests to async endpoints
+    """
+    async def override_get_db():
+        async with TestingAsyncSessionLocal() as session:
+            yield session
+
+    app.dependency_overrides[get_db] = override_get_db
+
+    with TestClient(app) as client:
+        yield client
+
+    # Clean up overrides
+    app.dependency_overrides.clear()

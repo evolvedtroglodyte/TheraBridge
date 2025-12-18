@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}Complete Patient Record - {{ patient.full_name }}{% endblock %}
+
+{% block header %}
+<h1 style="font-size: 18pt; margin: 0;">Complete Patient Record</h1>
+<div style="margin-top: 10px;">
+    <p style="margin: 5px 0;"><strong>Patient Name:</strong> {{ patient.full_name }}</p>
+    <p style="margin: 5px 0;"><strong>Patient ID:</strong> {{ patient.id }}</p>
+    {% if date_range %}
+    <p style="margin: 5px 0;"><strong>Date Range:</strong> {{ date_range.start.strftime('%B %d, %Y') }} - {{ date_range.end.strftime('%B %d, %Y') }}</p>
+    {% endif %}
+    <p style="margin: 5px 0;"><strong>Export Date:</strong> {{ generated_at.strftime('%B %d, %Y') }}</p>
+    {% if therapist %}
+    <p style="margin: 5px 0;"><strong>Primary Therapist:</strong> {{ therapist.full_name }}</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+
+{% if include_sections.demographics %}
+<div class="section" style="page-break-after: avoid;">
+    <div class="section-title">Patient Demographics</div>
+    <table style="width: 100%;">
+        <tr>
+            <th style="width: 30%;">Field</th>
+            <th style="width: 70%;">Information</th>
+        </tr>
+        <tr>
+            <td><strong>Full Name</strong></td>
+            <td>{{ patient.full_name }}</td>
+        </tr>
+        <tr>
+            <td><strong>Patient ID</strong></td>
+            <td>{{ patient.id }}</td>
+        </tr>
+        <tr>
+            <td><strong>Date of Birth</strong></td>
+            <td>{{ patient.dob.strftime('%B %d, %Y') if patient.dob else 'Not provided' }}</td>
+        </tr>
+        <tr>
+            <td><strong>Email Address</strong></td>
+            <td>{{ patient.email }}</td>
+        </tr>
+        <tr>
+            <td><strong>Phone Number</strong></td>
+            <td>{{ patient.phone if patient.phone else 'Not provided' }}</td>
+        </tr>
+        <tr>
+            <td><strong>Account Created</strong></td>
+            <td>{{ patient.created_at.strftime('%B %d, %Y') if patient.created_at else 'N/A' }}</td>
+        </tr>
+    </table>
+</div>
+{% endif %}
+
+{% if include_sections.treatment_plans and treatment_plans %}
+<div class="section" style="page-break-before: auto;">
+    <div class="section-title">Treatment Plans</div>
+    {% for plan in treatment_plans %}
+    <div style="margin-bottom: 20px; border-left: 3px solid #666; padding-left: 15px;">
+        <h3 style="font-size: 12pt; margin: 5px 0;">{{ plan.name }}</h3>
+        <p style="margin: 5px 0;"><strong>Created:</strong> {{ plan.created_at.strftime('%B %d, %Y') }}</p>
+        <p style="margin: 5px 0;"><strong>Status:</strong> {{ plan.status }}</p>
+        {% if plan.description %}
+        <p style="margin: 10px 0;"><strong>Description:</strong> {{ plan.description }}</p>
+        {% endif %}
+        {% if plan.goals %}
+        <p style="margin: 10px 0;"><strong>Goals:</strong></p>
+        <ul style="margin: 5px 0;">
+            {% for goal in plan.goals %}
+            <li>{{ goal }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if include_sections.sessions and sessions %}
+<div class="section" style="page-break-before: always;">
+    <div class="section-title">Session History</div>
+    <p style="margin-bottom: 10px;"><strong>Total Sessions:</strong> {{ sessions|length }}</p>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 15%;">Date</th>
+                <th style="width: 15%;">Duration</th>
+                <th style="width: 15%;">Status</th>
+                <th style="width: 55%;">Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for session in sessions %}
+            <tr>
+                <td>{{ session.session_date.strftime('%m/%d/%Y') if session.session_date else 'N/A' }}</td>
+                <td>{{ session.duration_minutes|round(0) }} min</td>
+                <td>{{ session.status|capitalize }}</td>
+                <td>{{ session.therapist_summary[:200] if session.therapist_summary else 'No summary available' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if include_sections.notes and detailed_notes %}
+<div class="section" style="page-break-before: always;">
+    <div class="section-title">Clinical Notes & Observations</div>
+    {% for note in detailed_notes %}
+    <div style="margin-bottom: 25px; border: 1px solid #ddd; padding: 15px;">
+        <p style="margin: 5px 0;"><strong>Date:</strong> {{ note.date.strftime('%B %d, %Y') }}</p>
+        <p style="margin: 5px 0;"><strong>Session ID:</strong> {{ note.session_id }}</p>
+        {% if note.presenting_problem %}
+        <p style="margin: 10px 0 5px 0;"><strong>Presenting Problem:</strong></p>
+        <p style="margin: 0;">{{ note.presenting_problem }}</p>
+        {% endif %}
+        {% if note.interventions %}
+        <p style="margin: 10px 0 5px 0;"><strong>Interventions:</strong></p>
+        <ul style="margin: 5px 0;">
+            {% for intervention in note.interventions %}
+            <li>{{ intervention }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% if note.clinical_observations %}
+        <p style="margin: 10px 0 5px 0;"><strong>Clinical Observations:</strong></p>
+        <p style="margin: 0;">{{ note.clinical_observations }}</p>
+        {% endif %}
+        {% if note.risk_assessment %}
+        <p style="margin: 10px 0 5px 0;"><strong>Risk Assessment:</strong></p>
+        <p style="margin: 0; color: #d32f2f;"><strong>{{ note.risk_assessment }}</strong></p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if include_sections.assessments and assessments %}
+<div class="section" style="page-break-before: always;">
+    <div class="section-title">Assessment Results</div>
+    {% for assessment in assessments %}
+    <div style="margin-bottom: 20px; border-left: 3px solid #333; padding-left: 15px;">
+        <h3 style="font-size: 12pt; margin: 5px 0;">{{ assessment.name }}</h3>
+        <p style="margin: 5px 0;"><strong>Date Administered:</strong> {{ assessment.date.strftime('%B %d, %Y') }}</p>
+        {% if assessment.type %}
+        <p style="margin: 5px 0;"><strong>Type:</strong> {{ assessment.type }}</p>
+        {% endif %}
+        {% if assessment.score %}
+        <p style="margin: 5px 0;"><strong>Score:</strong> {{ assessment.score }}</p>
+        {% endif %}
+        {% if assessment.interpretation %}
+        <p style="margin: 10px 0 5px 0;"><strong>Interpretation:</strong></p>
+        <p style="margin: 0;">{{ assessment.interpretation }}</p>
+        {% endif %}
+        {% if assessment.recommendations %}
+        <p style="margin: 10px 0 5px 0;"><strong>Recommendations:</strong></p>
+        <ul style="margin: 5px 0;">
+            {% for rec in assessment.recommendations %}
+            <li>{{ rec }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if include_sections.timeline and timeline_events %}
+<div class="section" style="page-break-before: always;">
+    <div class="section-title">Treatment Timeline</div>
+    <p style="margin-bottom: 15px; font-style: italic;">Chronological record of significant events and milestones</p>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 20%;">Date</th>
+                <th style="width: 25%;">Event Type</th>
+                <th style="width: 55%;">Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in timeline_events %}
+            <tr>
+                <td>{{ event.date.strftime('%m/%d/%Y') }}</td>
+                <td>{{ event.event_type|capitalize }}</td>
+                <td>{{ event.description }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if include_sections.attachments and attachments %}
+<div class="section" style="page-break-before: auto;">
+    <div class="section-title">Attached Files & Documents</div>
+    <p style="margin-bottom: 10px; font-style: italic;">Metadata only - actual files not included in this export</p>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 35%;">File Name</th>
+                <th style="width: 20%;">Type</th>
+                <th style="width: 15%;">Size</th>
+                <th style="width: 30%;">Upload Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for attachment in attachments %}
+            <tr>
+                <td>{{ attachment.filename }}</td>
+                <td>{{ attachment.file_type|upper }}</td>
+                <td>{{ (attachment.size_bytes / 1024)|round(2) }} KB</td>
+                <td>{{ attachment.uploaded_at.strftime('%B %d, %Y') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if include_sections.medications and medications %}
+<div class="section" style="page-break-before: auto;">
+    <div class="section-title">Medication History</div>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 25%;">Medication</th>
+                <th style="width: 15%;">Dosage</th>
+                <th style="width: 20%;">Start Date</th>
+                <th style="width: 20%;">End Date</th>
+                <th style="width: 20%;">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for med in medications %}
+            <tr>
+                <td>{{ med.name }}</td>
+                <td>{{ med.dosage }}</td>
+                <td>{{ med.start_date.strftime('%m/%d/%Y') if med.start_date else 'N/A' }}</td>
+                <td>{{ med.end_date.strftime('%m/%d/%Y') if med.end_date else 'Ongoing' }}</td>
+                <td>{{ med.status|capitalize }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<div class="section" style="page-break-before: always; margin-top: 30px; border-top: 2px solid #333; padding-top: 20px;">
+    <div class="section-title">Record Certification</div>
+    <p style="margin: 10px 0;">This document represents a complete and accurate record of treatment services provided to the above-named patient for the specified date range.</p>
+    <p style="margin: 10px 0;"><strong>Generated by:</strong> TherapyBridge Export System</p>
+    <p style="margin: 10px 0;"><strong>Export Date:</strong> {{ generated_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+    <p style="margin: 10px 0;"><strong>Record ID:</strong> {{ export_id if export_id else 'N/A' }}</p>
+    <div style="margin-top: 40px; padding: 15px; background-color: #f9f9f9; border: 1px solid #ddd;">
+        <p style="margin: 5px 0; font-size: 9pt; color: #666;">
+            <strong>Confidentiality Notice:</strong> This document contains Protected Health Information (PHI)
+            as defined by HIPAA regulations. Unauthorized disclosure, copying, or distribution of this information
+            is strictly prohibited and may result in civil or criminal penalties.
+        </p>
+        <p style="margin: 5px 0; font-size: 9pt; color: #666;">
+            <strong>Legal Notice:</strong> This record is intended for authorized healthcare providers,
+            legal representatives, or insurance agencies with proper patient authorization. If you have
+            received this document in error, please contact the issuing provider immediately.
+        </p>
+    </div>
+</div>
+
+{% endblock %}

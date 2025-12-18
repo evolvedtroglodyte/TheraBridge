@@ -248,6 +248,37 @@ class Settings(BaseSettings):
     )
 
     # ============================================
+    # Security & HIPAA Compliance (Feature 8)
+    # ============================================
+
+    ENCRYPTION_MASTER_KEY: Optional[str] = Field(
+        default=None,
+        description="Master encryption key for field-level encryption (AES-256-GCM)"
+    )
+
+    MFA_ISSUER: str = Field(
+        default="TherapyBridge",
+        description="MFA TOTP issuer name displayed in authenticator apps"
+    )
+
+    SECURITY_HSTS_ENABLED: bool = Field(
+        default=True,
+        description="Enable HTTP Strict Transport Security (HSTS) header"
+    )
+
+    CSP_POLICY: Optional[str] = Field(
+        default=None,
+        description="Custom Content-Security-Policy header (defaults to strict policy)"
+    )
+
+    AUDIT_LOG_RETENTION_DAYS: int = Field(
+        default=2555,
+        ge=1,
+        le=3650,
+        description="Audit log retention period in days (default: 7 years for HIPAA compliance)"
+    )
+
+    # ============================================
     # Rate Limiting Configuration
     # ============================================
 
@@ -417,6 +448,25 @@ class Settings(BaseSettings):
                     "WARNING: CORS_ORIGINS contains 'localhost' in production. "
                     "Ensure only production frontend URLs are whitelisted."
                 )
+
+            # Feature 8: Encryption key validation
+            if not self.ENCRYPTION_MASTER_KEY:
+                print(
+                    "WARNING: ENCRYPTION_MASTER_KEY not set in production. "
+                    "Field-level encryption will not be available. "
+                    "Set ENCRYPTION_MASTER_KEY environment variable for HIPAA compliance."
+                )
+
+        # Development: Generate encryption key if not set
+        if self.ENVIRONMENT == Environment.DEVELOPMENT and not self.ENCRYPTION_MASTER_KEY:
+            # Generate a random 32-byte key for development
+            dev_key = secrets.token_urlsafe(32)
+            object.__setattr__(self, 'ENCRYPTION_MASTER_KEY', dev_key)
+            print(
+                f"WARNING: Generated temporary ENCRYPTION_MASTER_KEY for development: {dev_key[:16]}... "
+                f"Data encrypted with this key will be lost on restart. "
+                f"Set ENCRYPTION_MASTER_KEY in .env for persistent encryption."
+            )
 
         # Create upload directory if it doesn't exist
         self.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)

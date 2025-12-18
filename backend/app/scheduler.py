@@ -37,6 +37,10 @@ def start_scheduler():
         logger.info("Analytics scheduler disabled via config (ENABLE_ANALYTICS_SCHEDULER=False)")
         return
 
+    from app.tasks import register_analytics_jobs, register_export_jobs
+
+    register_analytics_jobs()
+    register_export_jobs()
     scheduler.start()
     logger.info("✅ Analytics scheduler started")
 

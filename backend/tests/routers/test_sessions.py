@@ -861,3 +861,447 @@ def test_session_status_transitions(test_db, test_session):
     # In production, you'd test the full pipeline with integration tests
     assert SessionStatus.pending.value in valid_transitions
     assert SessionStatus.processed.value in valid_transitions
+
+
+# ============================================================================
+# Timeline Integration Tests
+# ============================================================================
+
+@pytest.mark.asyncio
+async def test_get_timeline_success(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test successful timeline retrieval for a patient"""
+    from app.models.db_models import TimelineEvent
+    from datetime import datetime, timedelta
+
+    # Create 3 timeline events for the patient
+    now = datetime.utcnow()
+    events_data = [
+        {
+            "event_type": "session",
+            "event_date": now - timedelta(days=7),
+            "title": "Session #1",
+            "description": "Initial consultation",
+            "importance": "normal"
+        },
+        {
+            "event_type": "milestone",
+            "event_date": now - timedelta(days=3),
+            "title": "First breakthrough",
+            "description": "Patient showed significant progress",
+            "importance": "milestone"
+        },
+        {
+            "event_type": "note",
+            "event_date": now - timedelta(days=1),
+            "title": "Clinical note",
+            "description": "Follow-up observations",
+            "importance": "normal"
+        }
+    ]
+
+    for event_data in events_data:
+        event = TimelineEvent(
+            patient_id=patient_user.id,
+            therapist_id=therapist_user.id,
+            **event_data
+        )
+        test_db.add(event)
+    test_db.commit()
+
+    # Make request as therapist
+    response = async_db_client.get(
+        f"/api/sessions/patients/{patient_user.id}/timeline",
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify response structure
+    assert "events" in data
+    assert "next_cursor" in data
+    assert "has_more" in data
+    assert "total_count" in data
+
+    # Verify events were returned
+    assert len(data["events"]) == 3
+    assert data["total_count"] == 3
+    assert data["has_more"] is False
+
+    # Verify events are sorted by date (newest first)
+    event_dates = [event["event_date"] for event in data["events"]]
+    assert event_dates == sorted(event_dates, reverse=True)
+
+
+@pytest.mark.asyncio
+async def test_get_timeline_unauthorized(async_db_client, test_db, patient_user, test_patient_user, patient_auth_headers):
+    """Test authorization failure when patient tries to access another patient's timeline"""
+    from app.models.db_models import TimelineEvent
+    from datetime import datetime
+
+    # Create timeline event for test_patient_user
+    event = TimelineEvent(
+        patient_id=test_patient_user.id,
+        therapist_id=None,
+        event_type="session",
+        event_date=datetime.utcnow(),
+        title="Session #1",
+        description="Test session",
+        importance="normal"
+    )
+    test_db.add(event)
+    test_db.commit()
+
+    # Try to access another patient's timeline (using patient_user credentials, accessing test_patient_user timeline)
+    response = async_db_client.get(
+        f"/api/sessions/patients/{test_patient_user.id}/timeline",
+        headers=patient_auth_headers
+    )
+
+    assert response.status_code == 403
+    assert "not authorized" in response.json()["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_get_timeline_with_filters(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test timeline with query parameters (event_types, dates, importance)"""
+    from app.models.db_models import TimelineEvent
+    from datetime import datetime, timedelta
+
+    # Create events with different types and importance levels
+    now = datetime.utcnow()
+    events_data = [
+        {"event_type": "session", "importance": "normal", "days_ago": 10, "title": "Session 1"},
+        {"event_type": "milestone", "importance": "milestone", "days_ago": 7, "title": "Milestone 1"},
+        {"event_type": "note", "importance": "low", "days_ago": 5, "title": "Note 1"},
+        {"event_type": "session", "importance": "normal", "days_ago": 3, "title": "Session 2"},
+        {"event_type": "milestone", "importance": "milestone", "days_ago": 1, "title": "Milestone 2"},
+    ]
+
+    for event_data in events_data:
+        days_ago = event_data.pop("days_ago")
+        event = TimelineEvent(
+            patient_id=patient_user.id,
+            therapist_id=therapist_user.id,
+            event_date=now - timedelta(days=days_ago),
+            **event_data
+        )
+        test_db.add(event)
+    test_db.commit()
+
+    # Test filtering by event type
+    response = async_db_client.get(
+        f"/api/sessions/patients/{patient_user.id}/timeline?event_types=session",
+        headers=therapist_auth_headers
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["events"]) == 2
+    assert all(e["event_type"] == "session" for e in data["events"])
+
+    # Test filtering by importance
+    response = async_db_client.get(
+        f"/api/sessions/patients/{patient_user.id}/timeline?importance=milestone",
+        headers=therapist_auth_headers
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["events"]) == 2
+    assert all(e["importance"] == "milestone" for e in data["events"])
+
+    # Test filtering by date range
+    start_date = (now - timedelta(days=6)).isoformat()
+    end_date = now.isoformat()
+    response = async_db_client.get(
+        f"/api/sessions/patients/{patient_user.id}/timeline?start_date={start_date}&end_date={end_date}",
+        headers=therapist_auth_headers
+    )
+    assert response.status_code == 200
+    data = response.json()
+    # Should return events from last 6 days (4 events: milestone at day 7 excluded)
+    assert len(data["events"]) == 4
+
+
+@pytest.mark.asyncio
+async def test_get_timeline_pagination(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test cursor-based pagination for timeline"""
+    from app.models.db_models import TimelineEvent
+    from datetime import datetime, timedelta
+
+    # Create 25 timeline events
+    now = datetime.utcnow()
+    for i in range(25):
+        event = TimelineEvent(
+            patient_id=patient_user.id,
+            therapist_id=therapist_user.id,
+            event_type="session",
+            event_date=now - timedelta(days=i),
+            title=f"Session #{i+1}",
+            description=f"Session description {i+1}",
+            importance="normal"
+        )
+        test_db.add(event)
+    test_db.commit()
+
+    # Get first page (default limit is 20)
+    response = async_db_client.get(
+        f"/api/sessions/patients/{patient_user.id}/timeline",
+        headers=therapist_auth_headers
+    )
+    assert response.status_code == 200
+    data = response.json()
+
+    assert len(data["events"]) == 20
+    assert data["has_more"] is True
+    assert data["total_count"] == 25
+    assert data["next_cursor"] is not None
+
+    # Get second page using cursor
+    cursor = data["next_cursor"]
+    response = async_db_client.get(
+        f"/api/sessions/patients/{patient_user.id}/timeline?cursor={cursor}",
+        headers=therapist_auth_headers
+    )
+    assert response.status_code == 200
+    data = response.json()
+
+    assert len(data["events"]) == 5
+    assert data["has_more"] is False
+    assert data["total_count"] == 25
+
+    # Test custom limit
+    response = async_db_client.get(
+        f"/api/sessions/patients/{patient_user.id}/timeline?limit=10",
+        headers=therapist_auth_headers
+    )
+    assert response.status_code == 200
+    data = response.json()
+
+    assert len(data["events"]) == 10
+    assert data["has_more"] is True
+
+
+@pytest.mark.asyncio
+async def test_get_timeline_summary_success(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test GET /patients/{patient_id}/timeline/summary"""
+    from app.models.db_models import TimelineEvent, Session as TherapySession
+    from datetime import datetime, timedelta
+
+    now = datetime.utcnow()
+
+    # Create therapy sessions
+    for i in range(5):
+        session = TherapySession(
+            patient_id=patient_user.id,
+            therapist_id=therapist_user.id,
+            session_date=now - timedelta(days=i*7),
+            status=SessionStatus.processed.value,
+            duration_seconds=3600
+        )
+        test_db.add(session)
+
+    # Create timeline events with different types
+    events_data = [
+        {"event_type": "session", "importance": "normal", "title": "Session 1"},
+        {"event_type": "session", "importance": "normal", "title": "Session 2"},
+        {"event_type": "milestone", "importance": "milestone", "title": "10th session"},
+        {"event_type": "milestone", "importance": "milestone", "title": "First breakthrough"},
+        {"event_type": "note", "importance": "normal", "title": "Clinical note"},
+        {"event_type": "goal", "importance": "high", "title": "New goal set"},
+    ]
+
+    for i, event_data in enumerate(events_data):
+        event = TimelineEvent(
+            patient_id=patient_user.id,
+            therapist_id=therapist_user.id,
+            event_date=now - timedelta(days=i),
+            description=f"Description for {event_data['title']}",
+            **event_data
+        )
+        test_db.add(event)
+    test_db.commit()
+
+    # Get timeline summary
+    response = async_db_client.get(
+        f"/api/sessions/patients/{patient_user.id}/timeline/summary",
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify summary structure
+    assert "patient_id" in data
+    assert "total_sessions" in data
+    assert "total_events" in data
+    assert "events_by_type" in data
+    assert "milestones_achieved" in data
+    assert "recent_highlights" in data
+
+    # Verify counts
+    assert data["total_sessions"] == 5
+    assert data["total_events"] == 6
+    assert data["milestones_achieved"] == 2
+    assert data["events_by_type"]["session"] == 2
+    assert data["events_by_type"]["milestone"] == 2
+    assert data["events_by_type"]["note"] == 1
+    assert data["events_by_type"]["goal"] == 1
+
+    # Verify recent highlights (last 3 milestones)
+    assert len(data["recent_highlights"]) == 2  # Only 2 milestones total
+
+
+@pytest.mark.asyncio
+async def test_create_timeline_event_success(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test POST /patients/{patient_id}/timeline"""
+    from datetime import datetime, timedelta
+
+    event_data = {
+        "event_type": "milestone",
+        "event_subtype": "treatment_progress",
+        "event_date": (datetime.utcnow() - timedelta(days=1)).isoformat(),
+        "title": "Major breakthrough in therapy",
+        "description": "Patient demonstrated significant progress in managing anxiety",
+        "importance": "milestone",
+        "is_private": False,
+        "metadata": {
+            "achievement": "First panic-free week",
+            "techniques_used": ["CBT", "breathing exercises"]
+        }
+    }
+
+    response = async_db_client.post(
+        f"/api/sessions/patients/{patient_user.id}/timeline",
+        json=event_data,
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 201
+    data = response.json()
+
+    # Verify response structure
+    assert "id" in data
+    assert data["patient_id"] == str(patient_user.id)
+    assert data["therapist_id"] == str(therapist_user.id)
+    assert data["event_type"] == "milestone"
+    assert data["title"] == "Major breakthrough in therapy"
+    assert data["importance"] == "milestone"
+    assert "created_at" in data
+
+    # Verify event was saved to database
+    from app.models.db_models import TimelineEvent
+    db_event = test_db.query(TimelineEvent).filter_by(id=UUID(data["id"])).first()
+    assert db_event is not None
+    assert db_event.title == "Major breakthrough in therapy"
+
+
+@pytest.mark.asyncio
+async def test_create_timeline_event_unauthorized(async_db_client, test_db, patient_user, patient_auth_headers):
+    """Test that patients cannot create timeline events"""
+    from datetime import datetime, timedelta
+
+    event_data = {
+        "event_type": "note",
+        "event_date": (datetime.utcnow() - timedelta(days=1)).isoformat(),
+        "title": "Patient note",
+        "description": "This should not be allowed",
+        "importance": "normal",
+        "is_private": False
+    }
+
+    response = async_db_client.post(
+        f"/api/sessions/patients/{patient_user.id}/timeline",
+        json=event_data,
+        headers=patient_auth_headers
+    )
+
+    assert response.status_code == 403
+    assert "only therapists" in response.json()["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_get_chart_data_success(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test GET /patients/{patient_id}/timeline/chart-data"""
+    from app.models.db_models import TimelineEvent, Session as TherapySession
+    from app.models.analytics_models import SessionMetrics
+    from datetime import datetime, timedelta
+
+    now = datetime.utcnow()
+
+    # Create sessions with metrics for mood trend
+    for i in range(6):
+        session = TherapySession(
+            patient_id=patient_user.id,
+            therapist_id=therapist_user.id,
+            session_date=now - timedelta(days=i*30),  # Monthly sessions
+            status=SessionStatus.processed.value,
+            duration_seconds=3600
+        )
+        test_db.add(session)
+        test_db.flush()
+
+        # Add session metrics with mood data
+        metrics = SessionMetrics(
+            session_id=session.id,
+            patient_id=patient_user.id,
+            therapist_id=therapist_user.id,
+            session_date=session.session_date,
+            mood_pre=5.0 - i*0.5,  # Declining mood
+            mood_post=6.0 + i*0.5  # Improving mood
+        )
+        test_db.add(metrics)
+
+    # Create milestone events for chart
+    milestone_events = [
+        {"title": "First session", "days_ago": 150},
+        {"title": "10th session", "days_ago": 100},
+        {"title": "Breakthrough", "days_ago": 50},
+    ]
+
+    for milestone in milestone_events:
+        event = TimelineEvent(
+            patient_id=patient_user.id,
+            therapist_id=therapist_user.id,
+            event_type="milestone",
+            event_date=now - timedelta(days=milestone["days_ago"]),
+            title=milestone["title"],
+            description=f"Milestone: {milestone['title']}",
+            importance="milestone"
+        )
+        test_db.add(event)
+
+    test_db.commit()
+
+    # Get chart data
+    response = async_db_client.get(
+        f"/api/sessions/patients/{patient_user.id}/timeline/chart-data",
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify chart data structure
+    assert "mood_trend" in data
+    assert "session_frequency" in data
+    assert "milestones" in data
+
+    # Verify mood trend data
+    assert len(data["mood_trend"]) > 0
+    for mood_point in data["mood_trend"]:
+        assert "month" in mood_point
+        assert "avg_mood" in mood_point
+
+    # Verify session frequency data
+    assert len(data["session_frequency"]) > 0
+    for freq_point in data["session_frequency"]:
+        assert "month" in freq_point
+        assert "count" in freq_point
+
+    # Verify milestones data
+    assert len(data["milestones"]) == 3
+    for milestone in data["milestones"]:
+        assert "date" in milestone
+        assert "title" in milestone
+        assert "description" in milestone
+        assert "event_type" in milestone

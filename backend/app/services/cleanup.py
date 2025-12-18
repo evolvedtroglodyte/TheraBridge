@@ -20,6 +20,7 @@ from sqlalchemy import select, and_
 import logging
 
 from app.models.db_models import Session
+from app.models.export_models import ExportJob
 from app.database import AsyncSessionLocal
 
 # Configure logger
@@ -372,6 +373,114 @@ class AudioCleanupService:
                 files.add(file_path.name)
 
         return files
+
+
+async def cleanup_expired_exports(dry_run: bool = False) -> CleanupResult:
+    """
+    Clean up expired export files.
+
+    Deletes export files where expires_at < now and updates database records.
+
+    Strategy:
+    1. Query ExportJob table for expired exports (status='completed', expires_at < now, file_path IS NOT NULL)
+    2. For each expired job:
+       - Check if file exists on disk
+       - Delete file if not dry_run
+       - Update job record (set file_path=None, file_size_bytes=None)
+       - Log deletion with job_id and file_size context
+    3. Return CleanupResult with files deleted and bytes freed
+
+    Args:
+        dry_run: If True, only log what would be deleted without actually deleting
+
+    Returns:
+        CleanupResult with details of cleanup operation
+    """
+    result = CleanupResult()
+    result.dry_run = dry_run
+
+    logger.info(f"Starting expired export cleanup (dry_run={dry_run})")
+
+    async with AsyncSessionLocal() as db:
+        try:
+            now = datetime.now()
+
+            # Find expired jobs with files
+            query = select(ExportJob).where(
+                and_(
+                    ExportJob.status == 'completed',
+                    ExportJob.expires_at < now,
+                    ExportJob.file_path.isnot(None)
+                )
+            )
+            result_db = await db.execute(query)
+            expired_jobs = result_db.scalars().all()
+
+            logger.info(f"Found {len(expired_jobs)} expired export jobs with files")
+
+            for job in expired_jobs:
+                if not job.file_path:
+                    continue
+
+                file_path = Path(job.file_path)
+
+                # Check if file exists
+                if not file_path.exists():
+                    logger.warning(
+                        f"Export file not found for job {job.id}: {job.file_path}"
+                    )
+                    # Update database even if file doesn't exist
+                    if not dry_run:
+                        job.file_path = None
+                        job.file_size_bytes = None
+                        await db.commit()
+                    continue
+
+                # Get file size before deletion
+                file_size = file_path.stat().st_size
+                file_size_mb = file_size / (1024 * 1024)
+
+                if dry_run:
+                    logger.info(
+                        f"[DRY RUN] Would delete expired export for job {job.id}: "
+                        f"{file_path.name} ({file_size_mb:.2f} MB)"
+                    )
+                else:
+                    try:
+                        # Delete file
+                        file_path.unlink()
+
+                        # Update job record
+                        job.file_path = None
+                        job.file_size_bytes = None
+                        await db.commit()
+
+                        logger.info(
+                            f"Deleted expired export for job {job.id}: "
+                            f"{file_path.name} ({file_size_mb:.2f} MB)"
+                        )
+                    except Exception as e:
+                        error_msg = f"Failed to delete export file for job {job.id}: {str(e)}"
+                        logger.error(error_msg)
+                        result.errors.append(error_msg)
+                        await db.rollback()
+                        continue
+
+                # Track in result (use orphaned_files_deleted for now, could add export-specific field later)
+                result.orphaned_files_deleted.append(str(job.id))
+                result.total_space_freed_mb += file_size_mb
+
+        except Exception as e:
+            error_msg = f"Error during expired export cleanup: {str(e)}"
+            logger.error(error_msg, exc_info=True)
+            result.errors.append(error_msg)
+
+    logger.info(
+        f"Expired export cleanup complete: {len(result.orphaned_files_deleted)} files deleted, "
+        f"{result.total_space_freed_mb:.2f} MB freed"
+    )
+
+    return result
 
 
 # Standalone function for scheduled cleanup

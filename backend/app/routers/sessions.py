@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 from uuid import UUID
 from typing import List, Optional
+from datetime import datetime
 import os
 import shutil
 from pathlib import Path
@@ -14,9 +15,12 @@ import hashlib
 import logging
 
 from app.database import get_db
+from app.auth.dependencies import get_current_user
 from app.models.schemas import (
     SessionCreate, SessionResponse, SessionStatus,
-    ExtractedNotes, ExtractNotesResponse
+    ExtractedNotes, ExtractNotesResponse, SessionTimelineResponse,
+    TimelineEventCreate, TimelineEventResponse, TimelineSummaryResponse,
+    TimelineChartDataResponse, UserRole
 )
 from app.models import db_models
 from app.services.note_extraction import get_extraction_service, NoteExtractionService
@@ -562,6 +566,121 @@ async def list_sessions(
     return [SessionResponse.model_validate(s) for s in sessions]
 
 
+@router.get("/patients/{patient_id}/timeline", response_model=SessionTimelineResponse)
+async def get_patient_timeline_endpoint(
+    patient_id: UUID,
+    event_types: Optional[str] = None,
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None,
+    importance: Optional[str] = None,
+    search: Optional[str] = None,
+    limit: int = 20,
+    cursor: Optional[UUID] = None,
+    db: AsyncSession = Depends(get_db),
+    current_user: db_models.User = Depends(get_current_user)
+):
+    """
+    Get patient timeline with pagination and filtering.
+
+    Retrieves timeline events for a specific patient with optional filtering
+    by event types, date range, importance level, and text search. Uses
+    cursor-based pagination for efficient browsing of large timelines.
+
+    Authorization:
+        - Patients: Can only access their own timeline
+        - Therapists: Can only access timelines of assigned patients
+        - Admins: Can access any patient's timeline
+
+    Query Params:
+        - event_types: Comma-separated event types (e.g., "session,milestone,clinical")
+        - start_date: Filter from date (ISO 8601 format)
+        - end_date: Filter to date (ISO 8601 format)
+        - importance: Filter by importance level (low, normal, high, milestone)
+        - search: Search in title/description (case-insensitive)
+        - limit: Number of events per page (default 20, max 100)
+        - cursor: Pagination cursor (last event ID from previous page)
+
+    Returns:
+        SessionTimelineResponse: Paginated timeline events with cursor for next page
+
+    Raises:
+        HTTPException 403: If user not authorized to access this patient's timeline
+        HTTPException 404: If patient not found
+    """
+    # Import datetime for nested use
+    from datetime import datetime as dt
+    from sqlalchemy import and_
+
+    # Authorization: Check if user has access to this patient's timeline
+    if current_user.role == UserRole.patient:
+        # Patients can only access their own timeline
+        if current_user.id != patient_id:
+            raise HTTPException(
+                status_code=403,
+                detail="Not authorized to access this patient's timeline"
+            )
+    elif current_user.role == UserRole.therapist:
+        # Therapists can only access assigned patients' timelines
+        # Query the therapist_patients junction table
+        therapist_patient_query = select(db_models.TherapistPatient).where(
+            and_(
+                db_models.TherapistPatient.therapist_id == current_user.id,
+                db_models.TherapistPatient.patient_id == patient_id,
+                db_models.TherapistPatient.is_active == True
+            )
+        )
+        result = await db.execute(therapist_patient_query)
+        assignment = result.scalar_one_or_none()
+
+        if not assignment:
+            raise HTTPException(
+                status_code=403,
+                detail="Not authorized to access this patient's timeline"
+            )
+    elif current_user.role == UserRole.admin:
+        # Admins can access any patient's timeline
+        pass
+    else:
+        raise HTTPException(
+            status_code=403,
+            detail="Invalid user role"
+        )
+
+    # Validate that patient exists
+    patient_query = select(db_models.User).where(
+        and_(db_models.User.id == patient_id, db_models.User.role == UserRole.patient.value)
+    )
+    patient_result = await db.execute(patient_query)
+    patient = patient_result.scalar_one_or_none()
+
+    if not patient:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Patient {patient_id} not found"
+        )
+
+    # Parse event_types from comma-separated string to list
+    event_types_list = None
+    if event_types:
+        event_types_list = [t.strip() for t in event_types.split(',') if t.strip()]
+
+    # Import timeline service
+    from app.services.timeline import get_patient_timeline
+
+    # Call timeline service with parsed parameters
+    return await get_patient_timeline(
+        patient_id=patient_id,
+        db=db,
+        event_types=event_types_list,
+        start_date=start_date,
+        end_date=end_date,
+        importance=importance,
+        search=search,
+        limit=limit,
+        cursor=cursor
+    )
+
+
 @router.post("/{session_id}/extract-notes", response_model=ExtractNotesResponse)
 @limiter.limit("20/hour")
 async def manually_extract_notes(
@@ -633,3 +752,162 @@ async def manually_extract_notes(
         extracted_notes=notes,
         processing_time=processing_time
     )
+
+
+@router.post("/patients/{patient_id}/timeline", response_model=TimelineEventResponse, status_code=201)
+async def create_timeline_event(
+    patient_id: UUID,
+    event_data: TimelineEventCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: db_models.User = Depends(get_current_user)
+):
+    """
+    Create a manual timeline event for a patient.
+
+    Allows therapists to add custom events like:
+    - Milestones
+    - Clinical observations
+    - Significant moments
+    - Administrative notes
+
+    Request body: TimelineEventCreate schema
+
+    Authorization: Only therapists assigned to the patient.
+    """
+    # Authorization: Only therapists can create manual events
+    if current_user.role != UserRole.therapist:
+        raise HTTPException(
+            status_code=403,
+            detail="Only therapists can create timeline events"
+        )
+
+    # Check therapist is assigned to patient
+    from sqlalchemy import and_
+    from app.models.db_models import TherapistPatient
+
+    assignment_query = select(TherapistPatient).where(
+        and_(
+            TherapistPatient.therapist_id == current_user.id,
+            TherapistPatient.patient_id == patient_id,
+            TherapistPatient.is_active == True
+        )
+    )
+    result = await db.execute(assignment_query)
+    assignment = result.scalar_one_or_none()
+
+    if not assignment:
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorized to create events for this patient"
+        )
+
+    # Call timeline service
+    from app.services.timeline import create_timeline_event as create_event
+
+    return await create_event(
+        patient_id=patient_id,
+        event_data=event_data,
+        therapist_id=current_user.id,
+        db=db
+    )
+
+
+@router.get("/patients/{patient_id}/timeline/summary", response_model=TimelineSummaryResponse)
+async def get_timeline_summary(
+    patient_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: db_models.User = Depends(get_current_user)
+):
+    """
+    Get timeline summary statistics for a patient.
+
+    Returns summary including:
+    - First/last session dates
+    - Total sessions and events
+    - Events grouped by type
+    - Milestones achieved
+    - Recent highlights
+
+    Authorization: Therapist assigned to patient or patient themselves.
+    """
+    # Authorization check: patient can view own data, therapist must be assigned
+    if current_user.role == UserRole.patient:
+        if current_user.id != patient_id:
+            raise HTTPException(
+                status_code=403,
+                detail="Patients can only view their own timeline"
+            )
+    elif current_user.role == UserRole.therapist:
+        # Check therapist is assigned to patient
+        from sqlalchemy import and_
+        from app.models.db_models import TherapistPatient
+
+        assignment_query = select(TherapistPatient).where(
+            and_(
+                TherapistPatient.therapist_id == current_user.id,
+                TherapistPatient.patient_id == patient_id,
+                TherapistPatient.is_active == True
+            )
+        )
+        result = await db.execute(assignment_query)
+        assignment = result.scalar_one_or_none()
+
+        if not assignment:
+            raise HTTPException(
+                status_code=403,
+                detail="Not authorized to view this patient's timeline"
+            )
+    else:
+        raise HTTPException(
+            status_code=403,
+            detail="Invalid role for timeline access"
+        )
+
+    # Call timeline service
+    from app.services.timeline import get_timeline_summary as fetch_summary
+
+    return await fetch_summary(patient_id=patient_id, db=db)
+
+
+@router.get("/patients/{patient_id}/timeline/chart-data", response_model=TimelineChartDataResponse)
+async def get_timeline_chart_data(
+    patient_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: db_models.User = Depends(get_current_user)
+):
+    """
+    Get chart visualization data for patient timeline.
+
+    Returns data for:
+    - Mood trend over time (monthly averages)
+    - Session frequency per month
+    - Milestone markers with dates and descriptions
+
+    Authorization: Therapist assigned to patient or patient themselves.
+    """
+    # Authorization check
+    if current_user.role == UserRole.patient:
+        if current_user.id != patient_id:
+            raise HTTPException(status_code=403, detail="Not authorized")
+    elif current_user.role == UserRole.therapist:
+        # Check therapist assignment
+        from sqlalchemy import select, and_
+        from app.models.db_models import TherapistPatient
+
+        assignment_query = select(TherapistPatient).where(
+            and_(
+                TherapistPatient.therapist_id == current_user.id,
+                TherapistPatient.patient_id == patient_id,
+                TherapistPatient.is_active == True
+            )
+        )
+        result = await db.execute(assignment_query)
+        if not result.scalar_one_or_none():
+            raise HTTPException(status_code=403, detail="Not authorized")
+    else:
+        raise HTTPException(status_code=403, detail="Invalid role")
+
+    # Call timeline service
+    from app.services.timeline import get_timeline_chart_data
+
+    return await get_timeline_chart_data(patient_id=patient_id, db=db)

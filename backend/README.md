@@ -52,7 +52,8 @@ backend/
 │   ├── routers/
 │   │   ├── sessions.py         # Session upload & management (324 lines)
 │   │   ├── patients.py         # Patient endpoints (71 lines)
-│   │   └── cleanup.py          # Cleanup endpoints (248 lines)
+│   │   ├── cleanup.py          # Cleanup endpoints (248 lines)
+│   │   └── analytics.py        # Analytics endpoints (200+ lines)
 │   ├── auth/
 │   │   ├── router.py           # Authentication routes (signup, login, logout)
 │   │   ├── utils.py            # Auth utilities (JWT, password hashing)
@@ -61,10 +62,12 @@ backend/
 │   │   ├── dependencies.py     # Auth dependencies (get_current_user)
 │   │   └── config.py           # Auth configuration
 │   ├── services/
-│   │   ├── transcription.py    # Whisper/Pipeline wrapper (27 lines)
-│   │   ├── note_extraction.py  # GPT-4o extraction service (187 lines)
-│   │   ├── cleanup.py          # Audio cleanup service (574 lines)
-│   │   └── __init__.py         # Service initialization
+│   │   ├── transcription.py         # Whisper/Pipeline wrapper (27 lines)
+│   │   ├── note_extraction.py       # GPT-4o extraction service (187 lines)
+│   │   ├── cleanup.py               # Audio cleanup service (574 lines)
+│   │   ├── analytics_service.py     # Analytics computation service
+│   │   ├── analytics_scheduler.py   # Background job scheduler (APScheduler)
+│   │   └── __init__.py              # Service initialization
 │   ├── middleware/
 │   │   ├── rate_limit.py       # Rate limiting middleware
 │   │   └── __init__.py         # Middleware initialization
@@ -77,6 +80,8 @@ backend/
 │   ├── test_e2e_auth_flow.py         # End-to-end authentication flow tests
 │   ├── test_auth_integration.py      # Integration tests for auth endpoints
 │   ├── test_auth_rbac.py             # Role-based access control tests
+│   ├── test_analytics_endpoints.py   # Analytics API endpoint tests
+│   ├── test_analytics_scheduler.py   # Background scheduler tests
 │   ├── conftest.py                   # Pytest configuration & fixtures
 │   ├── fixtures/
 │   │   ├── sample_transcripts.py      # Sample transcript data for tests
@@ -120,6 +125,25 @@ backend/
 - `POST /api/auth/logout` - Revoke refresh token
 - `GET /api/auth/me` - Get current user info
 
+### Analytics - Therapist Insights
+- `GET /api/v1/analytics/overview` - Practice overview (total/active patients, sessions, completion rate)
+- `GET /api/v1/analytics/patients/{patient_id}/progress` - Patient progress metrics (sessions, trends, topics)
+- `GET /api/v1/analytics/session-trends` - Session activity over time (daily/weekly aggregates)
+- `GET /api/v1/analytics/common-topics` - Most discussed topics across patients
+
+**Security:** All analytics endpoints require therapist role and authentication.
+
+### Export & Reporting - Documentation Export
+- `POST /api/v1/export/session-notes` - Export session notes (PDF/DOCX)
+- `POST /api/v1/export/progress-report` - Export progress report for patient (PDF/DOCX)
+- `GET /api/v1/export/jobs` - List export jobs with status
+- `GET /api/v1/export/jobs/{job_id}` - Get export job status
+- `GET /api/v1/export/download/{job_id}` - Download completed export
+- `DELETE /api/v1/export/jobs/{job_id}` - Delete export job
+
+**Features:** Background processing, HIPAA audit logging, rate limiting (20/hour), 7-day file expiration
+**Security:** All export endpoints require therapist role. Downloads logged with IP/user agent.
+
 ### Health & Status
 - `GET /` - Simple health check
 - `GET /health` - Detailed health status (database, services)
@@ -134,6 +158,266 @@ Sessions are processed asynchronously through these stages:
 4. **Complete** - All data saved to database, ready for review
 
 **Status Progression:** `uploading` → `transcribing` → `transcribed` → `extracting_notes` → `processed`
+
+## Analytics Dashboard
+
+Feature 2 provides therapists with insights into patient progress, session patterns, and treatment effectiveness through pre-computed analytics and background aggregation.
+
+### API Endpoints
+
+#### GET /api/v1/analytics/overview
+
+Returns practice overview for the authenticated therapist.
+
+**Authentication:** Required (Therapist role)
+
+**Response:**
+```json
+{
+  "total_patients": 24,
+  "active_patients": 18,
+  "sessions_this_week": 12,
+  "sessions_this_month": 48,
+  "upcoming_sessions": 5,
+  "completion_rate": 0.92
+}
+```
+
+**Example:**
+```bash
+curl "http://localhost:8000/api/v1/analytics/overview" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+#### GET /api/v1/analytics/patients/{patient_id}/progress
+
+Returns detailed progress metrics for a specific patient.
+
+**Authentication:** Required (Therapist role, patient must be assigned to therapist)
+
+**Query Parameters:**
+- `weeks` (optional, default: 12) - Number of weeks of historical data
+
+**Response:**
+```json
+{
+  "patient_id": "uuid",
+  "patient_name": "Jane Smith",
+  "total_sessions": 24,
+  "recent_sessions": [
+    {
+      "date": "2025-12-15",
+      "mood": "positive",
+      "key_topics": ["anxiety", "work stress"],
+      "progress_notes": "Improved coping skills"
+    }
+  ],
+  "mood_trend": {
+    "current": "positive",
+    "trajectory": "improving",
+    "change_percent": 15
+  },
+  "common_topics": [
+    {"topic": "anxiety", "frequency": 18},
+    {"topic": "work stress", "frequency": 12}
+  ],
+  "attendance_rate": 0.96
+}
+```
+
+**Example:**
+```bash
+curl "http://localhost:8000/api/v1/analytics/patients/PATIENT_UUID/progress?weeks=8" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+#### GET /api/v1/analytics/session-trends
+
+Returns session activity trends over time (daily/weekly aggregates).
+
+**Authentication:** Required (Therapist role)
+
+**Query Parameters:**
+- `period` (optional, default: "30d") - Time period: "7d", "30d", "90d", "1y"
+- `granularity` (optional, default: "day") - Aggregation level: "day", "week", "month"
+
+**Response:**
+```json
+{
+  "period": "30d",
+  "granularity": "day",
+  "data_points": [
+    {
+      "date": "2025-12-01",
+      "sessions_completed": 5,
+      "sessions_cancelled": 1,
+      "avg_session_duration_min": 52,
+      "completion_rate": 0.83
+    }
+  ],
+  "summary": {
+    "total_sessions": 48,
+    "avg_per_day": 1.6,
+    "peak_day": "2025-12-10",
+    "completion_rate": 0.92
+  }
+}
+```
+
+**Example:**
+```bash
+curl "http://localhost:8000/api/v1/analytics/session-trends?period=30d&granularity=week" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+#### GET /api/v1/analytics/common-topics
+
+Returns most frequently discussed topics across all patients.
+
+**Authentication:** Required (Therapist role)
+
+**Query Parameters:**
+- `limit` (optional, default: 20) - Maximum topics to return
+- `weeks` (optional, default: 12) - Number of weeks to analyze
+
+**Response:**
+```json
+{
+  "time_period_weeks": 12,
+  "topics": [
+    {
+      "topic": "anxiety",
+      "frequency": 42,
+      "patients_affected": 15,
+      "trend": "increasing"
+    },
+    {
+      "topic": "work stress",
+      "frequency": 35,
+      "patients_affected": 12,
+      "trend": "stable"
+    }
+  ]
+}
+```
+
+**Example:**
+```bash
+curl "http://localhost:8000/api/v1/analytics/common-topics?limit=10&weeks=8" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+### Background Jobs & Scheduler
+
+Analytics uses **APScheduler** to pre-compute daily statistics and reduce query load. The scheduler runs automatically when the server starts (if enabled).
+
+**Scheduled Jobs:**
+
+1. **Daily Stats Aggregation** - Runs daily at midnight UTC (configurable)
+   - Aggregates session metrics per therapist
+   - Computes completion rates, patient counts, session trends
+   - Stores results in `daily_stats` table for fast retrieval
+
+2. **Weekly Progress Snapshot** - Runs Sundays at 1:00 AM UTC
+   - Creates patient progress snapshots (mood trends, topic frequencies)
+   - Enables historical comparison without recalculating
+   - Stores results in `patient_progress` table
+
+**Configuration (`.env`):**
+```bash
+# Enable background scheduler (default: true)
+ENABLE_ANALYTICS_SCHEDULER=true
+
+# Hour to run daily aggregation (0-23, default: 0 = midnight UTC)
+DAILY_AGGREGATION_HOUR=0
+
+# Timezone for scheduler (default: UTC)
+SCHEDULER_TIMEZONE=UTC
+```
+
+**Disable Scheduler:**
+```bash
+# In .env
+ENABLE_ANALYTICS_SCHEDULER=false
+```
+
+**Manual Trigger:**
+```bash
+# Run aggregation manually via Python REPL
+cd backend
+source venv/bin/activate
+python -c "
+from app.services.analytics_scheduler import run_daily_aggregation
+import asyncio
+asyncio.run(run_daily_aggregation())
+"
+```
+
+**Scheduler Logs:**
+```
+INFO:     Scheduler started: Daily stats at 00:00 UTC
+INFO:     Running daily analytics aggregation...
+INFO:     Daily stats computed for 3 therapists
+INFO:     Next run: 2025-12-18 00:00:00 UTC
+```
+
+### Database Tables
+
+Analytics data is stored in three dedicated tables:
+
+**session_metrics** - Per-session analytics metrics
+- `id` (UUID) - Primary key
+- `session_id` (UUID) - Foreign key to sessions
+- `therapist_id` (UUID) - Foreign key to users
+- `patient_id` (UUID) - Foreign key to patients
+- `session_date` (DATE) - Session date
+- `duration_minutes` (INTEGER) - Session length
+- `mood_score` (INTEGER) - Numeric mood (1-5)
+- `mood_label` (VARCHAR) - Mood label (very_low, low, neutral, positive, very_positive)
+- `topic_count` (INTEGER) - Number of topics discussed
+- `topics` (JSONB) - Array of key topics
+- `strategies_count` (INTEGER) - Number of coping strategies identified
+- `action_items_count` (INTEGER) - Number of action items assigned
+- `has_risk_flags` (BOOLEAN) - Whether session contains risk flags
+- `created_at` (TIMESTAMP)
+
+**daily_stats** - Aggregated daily statistics per therapist
+- `id` (UUID) - Primary key
+- `therapist_id` (UUID) - Foreign key to users
+- `stat_date` (DATE) - Date of aggregation (unique per therapist)
+- `total_sessions` (INTEGER) - Sessions on this date
+- `completed_sessions` (INTEGER) - Completed sessions
+- `cancelled_sessions` (INTEGER) - Cancelled sessions
+- `active_patients` (INTEGER) - Patients with sessions this day
+- `avg_duration_minutes` (FLOAT) - Average session duration
+- `completion_rate` (FLOAT) - Percentage of completed sessions
+- `created_at`, `updated_at` (TIMESTAMP)
+
+**patient_progress** - Weekly patient progress snapshots
+- `id` (UUID) - Primary key
+- `patient_id` (UUID) - Foreign key to patients
+- `therapist_id` (UUID) - Foreign key to users
+- `week_start_date` (DATE) - Start of week (Monday)
+- `sessions_count` (INTEGER) - Sessions this week
+- `avg_mood_score` (FLOAT) - Average mood score (1-5)
+- `mood_trajectory` (VARCHAR) - improving, declining, stable, fluctuating
+- `common_topics` (JSONB) - Array of {topic, frequency}
+- `attendance_rate` (FLOAT) - Percentage of scheduled sessions attended
+- `created_at` (TIMESTAMP)
+
+**Indexes:**
+- `session_metrics`: (therapist_id, session_date), (patient_id, session_date)
+- `daily_stats`: (therapist_id, stat_date) - UNIQUE
+- `patient_progress`: (patient_id, week_start_date), (therapist_id, week_start_date)
+
+### Migration
+
+Apply analytics database schema:
+```bash
+cd backend
+source venv/bin/activate
+alembic upgrade head
+```
 
 ## Testing
 
@@ -189,6 +473,8 @@ pytest tests/test_extraction_service.py -v      # Note extraction tests
 pytest tests/test_e2e_auth_flow.py -v           # End-to-end auth flow
 pytest tests/test_auth_integration.py -v        # Auth endpoint integration
 pytest tests/test_auth_rbac.py -v               # Role-based access control
+pytest tests/test_analytics_endpoints.py -v     # Analytics API tests
+pytest tests/test_analytics_scheduler.py -v     # Background job tests
 
 # Run specific test
 pytest tests/test_extraction_service.py::test_extract_notes_basic -v
@@ -196,6 +482,11 @@ pytest tests/test_extraction_service.py::test_extract_notes_basic -v
 # With coverage report
 pytest tests/ --cov=app --cov-report=html
 ```
+
+**Analytics Test Fixtures:**
+- `analytics_patient` - Patient with historical session data
+- `sample_sessions` - 10+ sessions with varying moods and topics
+- `mock_scheduler` - APScheduler mock for testing background jobs
 
 ### Interactive API Testing
 
@@ -275,6 +566,24 @@ curl -X POST http://localhost:8000/api/auth/refresh \
   -d '{"refresh_token": "YOUR_REFRESH_TOKEN"}'
 ```
 
+### Get Practice Analytics Overview
+
+```bash
+curl "http://localhost:8000/api/v1/analytics/overview" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+Response includes total patients, active patients, sessions this week/month, and completion rate.
+
+### Get Patient Progress Report
+
+```bash
+curl "http://localhost:8000/api/v1/analytics/patients/PATIENT_UUID/progress?weeks=12" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+Response includes session history, mood trends, common topics, and attendance rate for the past 12 weeks.
+
 ## Authentication
 
 TherapyBridge uses JWT-based authentication with refresh token rotation.
@@ -339,6 +648,35 @@ TherapyBridge uses JWT-based authentication with refresh token rotation.
 - `transcript_text` (TEXT) - Full transcript
 - `extracted_notes` (JSONB) - AI-extracted data
 - `created_at`, `updated_at` (TIMESTAMP)
+
+**session_metrics** - Analytics metrics per session (Feature 2)
+- `id` (UUID) - Primary key
+- `session_id` (UUID) - Foreign key to sessions
+- `therapist_id` (UUID) - Foreign key to users
+- `patient_id` (UUID) - Foreign key to patients
+- `session_date` (DATE) - Session date
+- `mood_score` (INTEGER) - Numeric mood (1-5)
+- `topics` (JSONB) - Array of key topics
+- `has_risk_flags` (BOOLEAN) - Risk flag indicator
+- `created_at` (TIMESTAMP)
+
+**daily_stats** - Aggregated daily statistics (Feature 2)
+- `id` (UUID) - Primary key
+- `therapist_id` (UUID) - Foreign key to users
+- `stat_date` (DATE) - Date of aggregation
+- `total_sessions` (INTEGER) - Sessions count
+- `completion_rate` (FLOAT) - Success rate
+- `active_patients` (INTEGER) - Patient count
+- `created_at`, `updated_at` (TIMESTAMP)
+
+**patient_progress** - Weekly progress snapshots (Feature 2)
+- `id` (UUID) - Primary key
+- `patient_id` (UUID) - Foreign key to patients
+- `week_start_date` (DATE) - Start of week
+- `avg_mood_score` (FLOAT) - Average mood
+- `mood_trajectory` (VARCHAR) - Trend direction
+- `common_topics` (JSONB) - Topic frequencies
+- `created_at` (TIMESTAMP)
 
 ### Migrations
 
@@ -614,6 +952,12 @@ echo $OPENAI_API_KEY
 - `test_auth_integration.py` - 25 tests (happy paths, error cases, token rotation)
 - `test_e2e_auth_flow.py` - 7 tests (complete user journeys, multi-device sessions)
 - `test_auth_rbac.py` - 30 tests (role-based access control)
+
+**Analytics Tests: 20+ total (Feature 2)**
+- `test_analytics_endpoints.py` - API endpoint tests (overview, progress, trends, topics)
+- `test_analytics_scheduler.py` - Background job tests (daily aggregation, weekly snapshots)
+
+**Service Tests:**
 - `test_extraction_service.py` - Note extraction service tests
 
 **Key Test Scenarios:**
@@ -623,6 +967,9 @@ echo $OPENAI_API_KEY
 - Rate limiting enforcement
 - Role-based access control (therapist, patient, admin)
 - Password security (hashing, validation)
+- Analytics data aggregation and trend calculation
+- Background scheduler job execution
+- Patient progress tracking over time
 
 ### Dependency Status
 
@@ -636,8 +983,10 @@ echo $OPENAI_API_KEY
 
 ## Next Steps
 
-1. **Deploy Backend** - Move from local to cloud (AWS Lambda, Railway, Render)
-2. **Add Production Authentication** - Implement Auth.js on frontend
-3. **Performance Testing** - Load test with concurrent sessions
-4. **Monitoring** - Add error tracking (Sentry), metrics (DataDog)
-5. **Compliance** - HIPAA compliance review for healthcare data
+1. **Test Analytics Integration** - Verify analytics endpoints with frontend dashboard
+2. **Monitor Scheduler Performance** - Ensure background jobs complete successfully
+3. **Deploy Backend** - Move from local to cloud (AWS Lambda, Railway, Render)
+4. **Add Production Authentication** - Implement Auth.js on frontend
+5. **Performance Testing** - Load test with concurrent sessions
+6. **Monitoring** - Add error tracking (Sentry), metrics (DataDog)
+7. **Compliance** - HIPAA compliance review for healthcare data

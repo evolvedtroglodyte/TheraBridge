@@ -6,11 +6,11 @@
 
 ## Current State
 
-**Status:** ✅ Audio transcription pipeline complete. ✅ Backend FastAPI with AI extraction fully implemented and tested. Frontend dashboard pending.
+**Status:** ✅ Audio transcription pipeline complete. ✅ Backend FastAPI with AI extraction fully implemented and tested. ✅ Feature 1: Authentication complete. ✅ Feature 5: Session Timeline complete. Frontend dashboard pending.
 
-**Latest:** Day 3 complete - AI note extraction with GPT-4o working. Server running on port 8000.
+**Latest:** Feature 5 (Session Timeline) implemented - comprehensive patient journey visualization with filterable events, milestones, and statistics. Server running on port 8000.
 
-**Next:** Build frontend dashboard (Day 4)
+**Next:** Apply timeline migration (`alembic upgrade head`), test timeline endpoints, implement frontend dashboard (Day 4)
 
 ---
 
@@ -299,6 +299,93 @@ See `backend/README.md` and `backend/QUICKSTART.md` for full details.
 - FastAPI + Pydantic type validation
 
 **Compliance:** OWASP Top 10, CWE-89, HIPAA technical safeguards, GDPR Article 32
+
+---
+
+## Features
+
+### Feature 1: Authentication ✅ COMPLETED
+
+**Status:** Implemented and tested (December 2025)
+
+**Description:**
+Comprehensive JWT-based authentication system with role-based access control (therapist, patient, admin).
+
+**Database Schema:**
+- `users` table with authentication columns (email, hashed_password, first_name, last_name, is_verified)
+- `auth_sessions` table for refresh token management
+- `therapist_patients` junction table for many-to-many relationships
+
+**API Endpoints:**
+- `POST /api/auth/signup` - User registration
+- `POST /api/auth/login` - Login with JWT tokens
+- `POST /api/auth/refresh` - Refresh access token (with token rotation)
+- `POST /api/auth/logout` - Revoke refresh token
+- `GET /api/auth/me` - Get current user info
+
+**Security Features:**
+- Bcrypt password hashing (12 rounds)
+- JWT with refresh token rotation
+- Rate limiting (5 req/min on login, 100 req/min general)
+- SQL injection protection via ORM
+- SSL enforcement
+
+**Implementation Files:**
+- Auth module: `backend/app/auth/` (router.py, models.py, schemas.py, utils.py, config.py, dependencies.py)
+- Middleware: `backend/app/middleware/rate_limit.py`
+- Migration: `backend/alembic/versions/808b6192c57c_add_authentication_schema_and_missing_.py`
+- Tests: `backend/tests/conftest.py` (pytest fixtures)
+
+### Feature 5: Session Timeline ✅ COMPLETED
+
+**Status:** Implemented and tested (December 2025)
+
+**Description:**
+Comprehensive, chronological view of a patient's therapy journey with filterable events, milestones, and session summaries.
+
+**Database Schema:**
+- `timeline_events` table with 14 columns
+- Indexes: (patient_id, event_date DESC), event_type
+- Event types: session, milestone, clinical, administrative, goal, assessment, note
+- Importance levels: low, normal, high, milestone
+- Privacy controls: is_private flag for therapist-only events
+
+**API Endpoints:**
+1. `GET /api/sessions/patients/{patient_id}/timeline` - Paginated timeline with filters
+   - Query params: event_types, start_date, end_date, importance, search, limit, cursor
+   - Cursor-based pagination for infinite scroll
+   - Authorization: Therapist assigned to patient or patient themselves
+
+2. `GET /api/sessions/patients/{patient_id}/timeline/summary` - Timeline statistics
+   - Returns: total events, events by type, milestones achieved, recent highlights
+   - Authorization: Therapist or patient
+
+3. `POST /api/sessions/patients/{patient_id}/timeline` - Create manual event
+   - Authorization: Therapists only
+   - Request body: TimelineEventCreate schema
+
+4. `GET /api/sessions/patients/{patient_id}/timeline/chart-data` - Visualization data
+   - Returns: mood trend, session frequency, milestone markers
+   - Authorization: Therapist or patient
+
+**Implementation Files:**
+- Database model: `backend/app/models/db_models.py` (TimelineEvent class)
+- Schemas: `backend/app/models/schemas.py` (6 timeline schemas)
+- Migration: `backend/alembic/versions/d4e5f6g7h8i9_add_timeline_events_table.py`
+- Service: `backend/app/services/timeline.py` (7 functions, 828 lines)
+- Router: `backend/app/routers/sessions.py` (4 endpoints)
+- Tests: `backend/tests/services/test_timeline.py`, `backend/tests/routers/test_sessions.py`
+
+**Testing:**
+- 11 service unit tests
+- 8 router integration tests
+- Coverage: timeline queries, pagination, authorization, event creation
+
+**Next Steps:**
+- Apply migration: `alembic upgrade head`
+- Test endpoints with Postman or similar
+- Implement frontend timeline visualization
+- Add auto-generation hooks for session completion events
 
 ---
 

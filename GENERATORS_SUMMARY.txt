@@ -1,0 +1,299 @@
+================================================================================
+PDF/DOCX GENERATORS AND AUTO-GENERATION HOOKS - QUICK REFERENCE
+================================================================================
+
+FULL ANALYSIS: /GENERATORS_AND_HOOKS_ANALYSIS.md (1621 lines)
+
+================================================================================
+1. PDF GENERATOR SERVICE
+================================================================================
+File: /backend/app/services/pdf_generator.py
+Library: WeasyPrint 60.1 + Jinja2 3.1.2
+
+Key Methods:
+  - render_template(template_name, context) -> str
+    Converts Jinja2 template to HTML
+  
+  - generate_pdf(html_content, custom_css?) -> bytes
+    Converts HTML to PDF using WeasyPrint
+  
+  - generate_from_template(template_name, context, custom_css?) -> bytes
+    One-shot: template → HTML → PDF
+
+Templates Available:
+  - progress_report.html     (clinical progress summary)
+  - session_notes.html       (exported transcripts + AI notes)
+  - treatment_summary.html   (treatment overview)
+  - full_record.html         (complete patient record)
+  - base.html                (base template for others)
+
+Data Context Structure:
+  {
+    "patient": {"full_name", "email", "dob"},
+    "therapist": {"full_name"},
+    "start_date": datetime,
+    "end_date": datetime,
+    "goals": [{description, baseline, current, progress_percentage}],
+    "session_count": int,
+    "avg_duration_minutes": float,
+    "key_topics": [str],
+    "include_sections": {bool_flags}
+  }
+
+================================================================================
+2. DOCX GENERATOR SERVICE
+================================================================================
+File: /backend/app/services/docx_generator.py
+Library: python-docx 1.1.0
+
+Key Methods:
+  - generate_progress_report(patient, therapist, goals, sessions, 
+                             date_range, include_sections) -> bytes
+    Creates formatted Word document with progress data
+  
+  - generate_treatment_summary(...) -> bytes
+    [STUB] Treatment summary DOCX
+
+Data Input Structure:
+  patient: {full_name, email, dob, phone}
+  therapist: {full_name, email, license}
+  goals: [{description, baseline, current, progress_percentage}]
+  sessions: [{session_date, duration_minutes, transcript_text, status}]
+  date_range: {start_date, end_date}
+  include_sections: {patient_info, treatment_goals, session_summary, ...}
+
+================================================================================
+3. EXPORT SERVICE
+================================================================================
+File: /backend/app/services/export_service.py
+
+Key Methods:
+  - gather_session_notes_data(session_ids, db) -> Dict
+    Fetches session data with joinedload (avoid N+1 queries)
+  
+  - gather_progress_report_data(patient_id, start_date, end_date, db) -> Dict
+    ✓ Filters for sessions WHERE status='processed'
+    ✓ Extracts goals from extracted_notes JSONB
+    ✓ Calculates metrics (session count, avg duration, topics)
+  
+  - generate_export(export_type, format, context, template_id?, db?) -> bytes
+    Routes to appropriate generator:
+    - format='pdf' → PDFGeneratorService.generate_from_template()
+    - format='docx' → DOCXGeneratorService.generate_progress_report()
+    - format='json' → json.dumps(context)
+    - format='csv' → NOT IMPLEMENTED
+
+Format Support:
+  Export Type              PDF    DOCX   JSON   CSV
+  session_notes             ✓      ✗      ✓      ✗
+  progress_report           ✓      ✓      ✓      ✗
+  treatment_summary         ✗      ✗      ✗      ✗  [Phase 4]
+  full_record               ✗      ✗      ✗      ✗  [Phase 4]
+
+================================================================================
+4. AUTO-GENERATION HOOKS - KEY PATTERNS
+================================================================================
+
+HOOK #1: Audio Upload → Session Processing
+───────────────────────────────────────────
+Location: /backend/app/routers/sessions.py - process_audio_pipeline()
+
+Trigger: POST /sessions/upload
+Flow:
+  1. Session created with status="uploading"
+  2. background_tasks.add_task(process_audio_pipeline, ...) ← HOOK FIRED
+  3. Status transitions:
+     - uploading → transcribing
+     - transcribing → transcribed (saves transcript)
+     - transcribed → extracting_notes
+     - extracting_notes → PROCESSED ← FINAL
+     - [on error] → failed
+
+Key: Only PROCESSED sessions can be exported!
+
+HOOK #2: Export Request → Document Generation
+──────────────────────────────────────────────
+Location: /backend/app/routers/export.py - POST /export/progress-report
+
+Trigger: Explicit user request
+Flow:
+  1. ExportJob created with status="pending"
+  2. background_tasks.add_task(process_export_job, ...) ← HOOK FIRED
+  3. Status transitions:
+     - pending → processing
+     - processing → [generate document]
+     - [on success] → completed (file saved, audit logged)
+     - [on error] → failed
+
+Database Query:
+  SELECT TherapySession 
+  WHERE patient_id=? AND session_date BETWEEN ? AND ? 
+    AND status='processed' ← FILTERS FOR PROCESSED!
+
+================================================================================
+5. STATUS TRANSITION CHAIN (CRITICAL)
+================================================================================
+
+Session Status Values:
+  uploading        → transcribing      → transcribed        → extracting_notes
+       ↓                  ↓                  ↓                      ↓
+    [Audio file]  [Transcribe API]  [Save transcript]  [Extract with GPT-4o]
+                                                              ↓
+                                                         PROCESSED ← ✓ Ready for export
+                                                              ↓
+                                                     [Export queries use this]
+
+Export Job Status Values:
+  pending → processing → completed
+                           ↓
+                      [File saved to disk]
+                      [Audit log created]
+                      [7-day expiration set]
+
+Status-Based Filtering (THE HOOK MECHANISM):
+  ✓ Only sessions with status='processed' are included in exports
+  ✓ This ensures AI extraction completed successfully
+  ✓ This ensures all required data fields are populated
+
+================================================================================
+6. DATABASE MODELS
+================================================================================
+
+File: /backend/app/models/export_models.py
+
+ExportJob:
+  - id, user_id, patient_id, template_id
+  - export_type ('session_notes', 'progress_report', etc.)
+  - format ('pdf', 'docx', 'json', 'csv')
+  - status ('pending', 'processing', 'completed', 'failed')
+  - parameters (JSONB - export options/filters)
+  - file_path, file_size_bytes, error_message
+  - started_at, completed_at, expires_at (7 days)
+
+ExportAuditLog:
+  - export_job_id, user_id, patient_id
+  - action ('created', 'downloaded', 'deleted', 'shared')
+  - ip_address, user_agent (HIPAA compliance)
+  - action_metadata (JSONB)
+
+================================================================================
+7. TEMPLATE AUTO-FILL SERVICE
+================================================================================
+
+File: /backend/app/services/template_autofill.py
+
+Purpose: Map AI-extracted notes to clinical note templates with confidence scoring
+
+Templates Supported:
+  - SOAP (Subjective, Objective, Assessment, Plan)
+  - DAP (Data, Assessment, Plan)
+  - BIRP (Behavior, Intervention, Response, Plan)
+  - Progress Note (narrative style)
+
+fill_template(notes, template_type) Returns:
+  {
+    "sections": {section_name: {field: value}},
+    "confidence_scores": {section_name: 0.0-1.0},
+    "missing_fields": {section_name: [field_names]},
+    "metadata": {template_type, overall_confidence, mapped_fields_count}
+  }
+
+Confidence Scoring:
+  - Empty field: 0.0
+  - Short text (< 20 chars): 0.5
+  - Medium text (< 100 chars): 0.8
+  - Comprehensive text: 1.0
+  - Empty list: 0.3
+  - Short list (< 3): 0.7
+  - Good list (3+ items): 1.0
+
+================================================================================
+8. END-TO-END FLOW EXAMPLE
+================================================================================
+
+User Action: "Upload audio and export progress report"
+
+1. POST /sessions/upload
+   → Creates Session (status="uploading")
+   → Saves audio file
+   → Queues process_audio_pipeline() ← HOOK 1
+
+2. process_audio_pipeline() [background task]
+   → Transcribe audio (Whisper API)
+   → Update status → "transcribed"
+   → Extract notes (GPT-4o)
+   → Update status → "processed" ← KEY MOMENT
+   → Delete audio file
+
+3. POST /export/progress-report
+   → Creates ExportJob (status="pending")
+   → Queues process_export_job() ← HOOK 2
+
+4. process_export_job() [background task]
+   → Query: SELECT sessions WHERE status='processed' ← USES HOOK
+   → Gather data (patient, therapist, goals, metrics)
+   → Call generate_export()
+     - PDFGeneratorService.generate_from_template('progress_report.html', context)
+     - WeasyPrint converts to PDF
+   → Save file to exports/output/{job_id}.pdf
+   → Create ExportAuditLog
+   → Update status → "completed"
+
+5. GET /export/jobs/{job_id}
+   → Status="completed", download_url available
+
+6. GET /export/download/{job_id}
+   → Create audit log (downloaded)
+   → Return FileResponse with PDF
+
+================================================================================
+9. KEY INSIGHTS
+================================================================================
+
+✓ TWO AUTO-GENERATION HOOKS:
+  1. Audio processing → status transitions → "processed"
+  2. Export requests → document generation → file saved
+
+✓ STATUS ACTS AS FILTER:
+  Only PROCESSED sessions included in exports
+  This ensures data completeness before generation
+
+✓ FORMAT NEGOTIATION:
+  Single export endpoint supports multiple formats (PDF, DOCX, JSON)
+  Routed at generation time based on request
+
+✓ HIPAA COMPLIANCE:
+  Every download logged with IP + user agent
+  7-day file expiration automatic
+  Audit trail preserved
+
+✓ ASYNC PATTERN:
+  Both hooks use FastAPI BackgroundTasks
+  Returns immediately to client
+  Long-running operations don't block request
+
+================================================================================
+10. FILES TO REVIEW
+================================================================================
+
+Core Implementation:
+  - /backend/app/services/pdf_generator.py
+  - /backend/app/services/docx_generator.py
+  - /backend/app/services/export_service.py
+  - /backend/app/services/template_autofill.py
+  - /backend/app/routers/sessions.py (process_audio_pipeline)
+  - /backend/app/routers/export.py (process_export_job)
+
+Data Models:
+  - /backend/app/models/export_models.py
+  - /backend/app/models/db_models.py (Session/TherapySession)
+
+Templates:
+  - /backend/app/templates/exports/progress_report.html
+  - /backend/app/templates/exports/session_notes.html
+
+Tests:
+  - /backend/tests/services/test_export_service.py
+  - /backend/tests/routers/test_export.py
+
+================================================================================

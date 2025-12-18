@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Session Notes - {{ patients.values()|first.full_name if patients else 'Multiple Patients' }}{% endblock %}
+
+{% block header %}
+<h1>Session Notes Export</h1>
+<p><strong>Therapist:</strong> {{ therapist.full_name }}</p>
+<p><strong>Number of Sessions:</strong> {{ session_count }}</p>
+<p><strong>Date Range:</strong> {{ sessions|first.session_date.strftime('%B %d, %Y') if sessions else 'N/A' }} - {{ sessions|last.session_date.strftime('%B %d, %Y') if sessions else 'N/A' }}</p>
+{% endblock %}
+
+{% block content %}
+{% for session in sessions %}
+<div class="section">
+    <div class="section-title">Session {{ loop.index }} - {{ session.session_date.strftime('%B %d, %Y') }}</div>
+
+    <p><strong>Patient:</strong> {{ patients[session.patient_id].full_name if session.patient_id in patients else 'Unknown' }}</p>
+    <p><strong>Duration:</strong> {{ session.duration_minutes|round(1) if session.duration_minutes else 'N/A' }} minutes</p>
+    <p><strong>Status:</strong> {{ session.status }}</p>
+
+    {% if options.include_ai_notes and session.extracted_notes %}
+    <div style="margin-top: 15px;">
+        <strong>AI-Extracted Notes:</strong>
+
+        {% if session.extracted_notes.key_topics %}
+        <p><strong>Key Topics:</strong> {{ session.extracted_notes.key_topics|join(', ') }}</p>
+        {% endif %}
+
+        {% if session.extracted_notes.treatment_goals %}
+        <p><strong>Treatment Goals:</strong></p>
+        <ul>
+        {% for goal in session.extracted_notes.treatment_goals %}
+            <li>{{ goal }}</li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if session.extracted_notes.interventions %}
+        <p><strong>Interventions:</strong></p>
+        <ul>
+        {% for intervention in session.extracted_notes.interventions %}
+            <li>{{ intervention }}</li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if session.extracted_notes.client_mood %}
+        <p><strong>Client Mood:</strong> {{ session.extracted_notes.client_mood }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if options.include_action_items and session.extracted_notes and session.extracted_notes.action_items %}
+    <div style="margin-top: 15px;">
+        <strong>Action Items:</strong>
+        <ul>
+        {% for item in session.extracted_notes.action_items %}
+            <li>{{ item }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if options.include_transcript and session.transcript_text %}
+    <div style="margin-top: 15px; page-break-before: auto;">
+        <strong>Session Transcript:</strong>
+        <div style="white-space: pre-wrap; font-family: monospace; font-size: 10pt; background-color: #f9f9f9; padding: 10px; border: 1px solid #ddd; margin-top: 5px;">{{ session.transcript_text }}</div>
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+
+{% if not sessions %}
+<div class="section">
+    <p>No sessions found for this export.</p>
+</div>
+{% endif %}
+{% endblock %}

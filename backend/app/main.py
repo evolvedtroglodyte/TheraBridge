@@ -13,18 +13,28 @@ from dotenv import load_dotenv
 from sqlalchemy import text
 from openai import AsyncOpenAI
 
-from app.database import init_db, close_db, engine
-from app.routers import sessions, patients, cleanup, analytics
+from app.database import init_db, close_db, engine, AsyncSessionLocal
+from app.routers import sessions, patients, cleanup, analytics, export, goal_tracking, assessments, self_report, progress_reports, templates, notes, mfa
+# Temporarily commented out - incomplete features
+# from app.routers import treatment_plans, goals, interventions
 from app.auth.router import router as auth_router
 from app.middleware.rate_limit import limiter, custom_rate_limit_handler
 from app.middleware.error_handler import register_exception_handlers
 from app.middleware.correlation_id import CorrelationIdMiddleware
 from app.logging_config import setup_logging
 from app.services.cleanup import run_startup_cleanup
+from app.services.template_seeder import seed_on_startup
 
-# Analytics scheduler imports (to be implemented by DevOps Engineer and Backend Dev #5)
-# from app.scheduler import start_scheduler, shutdown_scheduler
-# from app.tasks.aggregation import register_analytics_jobs
+# Feature 8: HIPAA Compliance Security Middleware
+from app.middleware.audit import AuditMiddleware
+from app.middleware.security_headers import SecurityHeadersMiddleware
+
+# Feature 8: HIPAA Compliance Routers
+from app.routers import session_security, audit, access_requests, emergency, consent
+
+# Analytics scheduler imports
+from app.scheduler import start_scheduler, shutdown_scheduler
+from app.tasks.aggregation import register_analytics_jobs
 
 load_dotenv()
 
@@ -47,15 +57,18 @@ async def lifespan(app: FastAPI):
     await init_db()
     logger.info("✅ Database initialized")
 
+    # Seed system templates
+    async with AsyncSessionLocal() as db:
+        await seed_on_startup(db)
+
     # Run cleanup on startup if enabled
     await run_startup_cleanup()
 
     # Start analytics scheduler and register background jobs
-    # TODO: Uncomment when scheduler files are implemented by DevOps Engineer
-    # logger.info("Starting analytics scheduler...")
-    # start_scheduler()
-    # register_analytics_jobs()
-    # logger.info("✅ Analytics scheduler started and jobs registered")
+    logger.info("Starting analytics scheduler...")
+    start_scheduler()
+    register_analytics_jobs()
+    logger.info("✅ Analytics scheduler started and jobs registered")
 
     yield
 
@@ -63,10 +76,9 @@ async def lifespan(app: FastAPI):
     logger.info("Shutting down TherapyBridge API")
 
     # Stop analytics scheduler
-    # TODO: Uncomment when scheduler files are implemented by DevOps Engineer
-    # logger.info("Stopping analytics scheduler...")
-    # shutdown_scheduler()
-    # logger.info("✅ Analytics scheduler stopped")
+    logger.info("Stopping analytics scheduler...")
+    shutdown_scheduler()
+    logger.info("✅ Analytics scheduler stopped")
 
     await close_db()
     logger.info("Database connections closed")
@@ -93,7 +105,21 @@ app.add_exception_handler(RateLimitExceeded, custom_rate_limit_handler)
 # Register global exception handlers
 register_exception_handlers(app)
 
-# Correlation ID middleware (MUST be first to ensure request ID available everywhere)
+# Middleware order is critical (outermost to innermost):
+# 1. SecurityHeaders - Add security headers to all responses (HIPAA compliance)
+# 2. AuditMiddleware - Log all requests for HIPAA compliance
+# 3. CorrelationId - Add X-Request-ID for tracing
+# 4. CORS - Handle cross-origin requests
+# 5. Rate limiting - Applied via decorators
+# 6. Exception handlers - Catch all errors
+
+# Feature 8: Security headers (first)
+app.add_middleware(SecurityHeadersMiddleware)
+
+# Feature 8: Audit logging (after security headers, before CORS)
+app.add_middleware(AuditMiddleware)
+
+# Correlation ID middleware (ensure request ID available everywhere)
 # This middleware:
 # - Accepts X-Request-ID header from clients/proxies
 # - Generates UUID if no ID provided
@@ -113,10 +139,53 @@ app.add_middleware(
 
 # Include routers
 app.include_router(auth_router, prefix="/api/v1", tags=["authentication"])
+
+# Feature 8: HIPAA Compliance & Security
+app.include_router(mfa.router, prefix="/api/v1/mfa", tags=["Multi-Factor Authentication"])
+app.include_router(session_security.router, prefix="/api/v1/auth", tags=["Session Management"])
+app.include_router(audit.router, prefix="/api/v1/audit", tags=["Audit Logs"])
+app.include_router(access_requests.router, prefix="/api/v1/access-requests", tags=["Access Requests"])
+app.include_router(emergency.router, prefix="/api/v1/emergency-access", tags=["Emergency Access"])
+app.include_router(consent.router, prefix="/api/v1/consent", tags=["Consent Management"])
+
+# Core application routers
 app.include_router(sessions.router, prefix="/api/sessions", tags=["Sessions"])
 app.include_router(patients.router, prefix="/api/patients", tags=["Patients"])
 app.include_router(cleanup.router, prefix="/api/admin", tags=["Cleanup"])
 app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["Analytics"])
+app.include_router(export.router, prefix="/api/v1")
+
+# Goal tracking and progress endpoints (Feature 6)
+app.include_router(
+    goal_tracking.router,
+    prefix="/api/v1",
+    tags=["goal-tracking"]
+)
+app.include_router(
+    assessments.router,
+    prefix="/api/v1",
+    tags=["assessments"]
+)
+app.include_router(
+    self_report.router,
+    prefix="/api/v1/self-report",
+    tags=["self-report"]
+)
+app.include_router(
+    progress_reports.router,
+    prefix="/api/v1/progress-reports",
+    tags=["progress-reports"]
+)
+
+# Template and note management endpoints (Feature 3)
+app.include_router(templates.router, prefix="/api/v1/templates", tags=["Templates"])
+app.include_router(notes.router, prefix="/api/v1", tags=["Session Notes"])
+
+# Treatment plans and goals endpoints (Feature 4)
+# Temporarily commented out - incomplete features
+# app.include_router(treatment_plans.router, prefix="/api/v1", tags=["Treatment Plans"])
+# app.include_router(goals.router, prefix="/api/v1", tags=["Goals"])
+# app.include_router(interventions.router, prefix="/api/v1", tags=["Interventions"])
 
 
 @app.get("/")

@@ -517,11 +517,11 @@ async def calculate_patient_progress(
         - No sessions: Returns N/A dates and zero metrics
         - Single session: Weekly average set to 1.0, trend "stable"
         - No mood data: Returns empty mood_trend with "stable" trend
-        - No action items: Returns zero goal counts
+        - No goals: Returns zero goal counts
 
-    JSONB Queries:
+    Data Sources:
         - Mood: extracted_notes->>'session_mood' (very_low/low/neutral/positive/very_positive)
-        - Goals: extracted_notes->'action_items' (JSONB array of action items)
+        - Goals: treatment_goals table (queried by patient_id)
 
     Example:
         >>> async with AsyncSession(engine) as db:
@@ -595,8 +595,8 @@ async def calculate_patient_progress(
     # 5. Calculate mood trend
     mood_trend = await _calculate_mood_trend(sessions, db, patient_id)
 
-    # 6. Calculate goals/action items
-    goals = await _calculate_goals(sessions)
+    # 6. Calculate goals from treatment_goals table
+    goals = await _calculate_goals(patient_id, db)
 
     logger.info(
         f"Patient progress calculated for patient {patient_id}: "
@@ -799,78 +799,46 @@ async def _calculate_mood_trend(
     )
 
 
-async def _calculate_goals(sessions: List[TherapySession]) -> GoalStatus:
+async def _calculate_goals(patient_id: UUID, db: AsyncSession) -> GoalStatus:
     """
-    Calculate goal status from action_items in extracted_notes JSONB.
+    Calculate goal status from treatment_goals table.
 
-    Extracts action items from all sessions and counts them. Currently treats
-    all action items as "not_started" since the ExtractedNotes schema doesn't
-    track status changes across sessions.
+    Queries the treatment_goals table for all goals assigned to a patient
+    and counts them by status (assigned, in_progress, completed, abandoned).
 
     Args:
-        sessions: List of all sessions for the patient
+        patient_id: UUID of the patient to calculate goal status for
+        db: Async database session
 
     Returns:
         GoalStatus: Counts of goals by status
 
-    JSONB Structure:
-        extracted_notes: {
-            "action_items": [
-                {
-                    "task": "Practice deep breathing",
-                    "category": "homework",
-                    "details": "..."
-                },
-                ...
-            ]
-        }
+    Status Mapping:
+        - not_started: Goals with status 'assigned'
+        - in_progress: Goals with status 'in_progress'
+        - completed: Goals with status 'completed' or 'abandoned'
 
-    Future Enhancement:
-        To track completed/in_progress status, would need to:
-        1. Add status field to ActionItem schema
-        2. Track action item IDs across sessions
-        3. Update status based on follow-up discussion in later sessions
-
-    Current Implementation:
-        - total: Count of all action items across all sessions
-        - completed: 0 (not tracked yet)
-        - in_progress: 0 (not tracked yet)
-        - not_started: total (all items counted as not started)
+    Note: Previously extracted from action_items in therapy_sessions.extracted_notes JSONB.
+    Now uses dedicated treatment_goals table for proper relational tracking.
     """
-    total = 0
-    completed = 0
-    in_progress = 0
-    not_started = 0
+    from app.models.goal_models import TreatmentGoal
 
-    for session in sessions:
-        if not session.extracted_notes:
-            continue
+    # Query all goals for patient
+    query = select(TreatmentGoal).where(
+        TreatmentGoal.patient_id == patient_id
+    )
+    result = await db.execute(query)
+    goals = result.scalars().all()
 
-        # Extract action_items from JSONB
-        action_items = session.extracted_notes.get('action_items', [])
-
-        if not isinstance(action_items, list):
-            continue
-
-        for item in action_items:
-            if not isinstance(item, dict):
-                continue
-
-            total += 1
-
-            # Note: The current ExtractedNotes schema doesn't track status on ActionItem
-            # We'll count all as "not_started" for now
-            # In a real implementation, we'd need to:
-            # 1. Add status tracking to ActionItem schema
-            # 2. Match action items across sessions to update status
-            # 3. Detect completion based on therapist notes in follow-up sessions
-
-            # For MVP: count all as "not_started"
-            not_started += 1
+    # Count by status
+    total = len(goals)
+    completed = len([g for g in goals if g.status == 'completed'])
+    in_progress = len([g for g in goals if g.status == 'in_progress'])
+    not_started = len([g for g in goals if g.status == 'assigned'])
 
     logger.debug(
-        f"Goal status calculated: total={total}, completed={completed}, "
-        f"in_progress={in_progress}, not_started={not_started}"
+        f"Goal status calculated for patient {patient_id}: total={total}, "
+        f"completed={completed}, in_progress={in_progress}, not_started={not_started}"
     )
 
     return GoalStatus(

@@ -23,6 +23,19 @@ from app.auth.models import User, AuthSession
 # Import therapy session models
 from app.models.db_models import Session as DBSession
 
+# Import analytics models for Feature 2
+from app.models.analytics_models import SessionMetrics, DailyStats, PatientProgress
+
+# Import goal tracking models for Feature 6
+from app.models.goal_models import TreatmentGoal
+from app.models.tracking_models import (
+    GoalTrackingConfig,
+    ProgressEntry,
+    AssessmentScore,
+    ProgressMilestone,
+    GoalReminder
+)
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

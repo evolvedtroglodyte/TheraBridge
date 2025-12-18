@@ -66,7 +66,7 @@ def therapist_with_patients_and_sessions(test_db, therapist_user):
             duration_seconds=3600,
             audio_filename=f"session_p1_{i}.mp3",
             transcript_text="Therapist: How are you? Client: Good.",
-            status=SessionStatus.completed.value,
+            status=SessionStatus.processed.value,
             extracted_notes={
                 "key_topics": ["Anxiety", "Work stress"],
                 "session_mood": "neutral",
@@ -85,7 +85,7 @@ def therapist_with_patients_and_sessions(test_db, therapist_user):
             duration_seconds=3000,
             audio_filename=f"session_p2_{i}.mp3",
             transcript_text="Therapist: Let's talk. Client: Okay.",
-            status=SessionStatus.completed.value,
+            status=SessionStatus.processed.value,
             extracted_notes={
                 "key_topics": ["Depression", "Family issues"],
                 "session_mood": "positive",
@@ -103,7 +103,7 @@ def therapist_with_patients_and_sessions(test_db, therapist_user):
             duration_seconds=4200,
             audio_filename=f"session_p3_{i}.mp3",
             transcript_text="Therapist: Welcome. Client: Thanks.",
-            status=SessionStatus.completed.value,
+            status=SessionStatus.processed.value,
             extracted_notes={
                 "key_topics": ["Relationships", "Self-esteem"],
                 "session_mood": "neutral"

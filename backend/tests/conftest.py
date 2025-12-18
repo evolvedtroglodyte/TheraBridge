@@ -8,8 +8,16 @@ This module provides test fixtures for:
 - Sample data (patients, sessions)
 - Mock OpenAI client
 """
+import os
 import pytest
 import pytest_asyncio
+
+
+@pytest.fixture(scope="session", autouse=True)
+def set_test_secret_key():
+    """Set consistent SECRET_KEY for all test JWT operations"""
+    os.environ["SECRET_KEY"] = "test-secret-key-must-be-32-characters-long-for-hs256-algorithm-security"
+    yield
 from datetime import datetime, timedelta
 from typing import AsyncGenerator, Generator
 from unittest.mock import AsyncMock, MagicMock
@@ -21,6 +29,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.postgresql import JSONB
 from app.database import Base, get_db
 from app.auth.dependencies import get_db as get_sync_db
+import app.models  # Import models package to register all tables with Base.metadata
 from app.main import app
 from app.models.db_models import User, Patient, Session
 from app.auth.models import AuthSession
@@ -40,9 +49,18 @@ engine = create_engine(
     connect_args={
         "check_same_thread": False,
     },
-    isolation_level="READ UNCOMMITTED"  # Allow reading uncommitted data
+    echo=False,
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Enable WAL mode for sync SQLite connections
+@event.listens_for(engine, "connect")
+def set_sqlite_pragma_sync(dbapi_conn, connection_record):
+    """Enable WAL mode for SQLite to support concurrent reads/writes"""
+    cursor = dbapi_conn.cursor()
+    cursor.execute("PRAGMA journal_mode=WAL")
+    cursor.execute("PRAGMA synchronous=NORMAL")
+    cursor.close()
 
 # Async engine for async tests
 async_engine = create_async_engine(
@@ -50,7 +68,8 @@ async_engine = create_async_engine(
     connect_args={
         "check_same_thread": False,
     },
-    isolation_level="READ UNCOMMITTED"  # Allow reading uncommitted data
+    echo=False,
+    future=True,
 )
 AsyncTestingSessionLocal = async_sessionmaker(
     async_engine,
@@ -59,22 +78,30 @@ AsyncTestingSessionLocal = async_sessionmaker(
 )
 
 
+# Enable WAL mode for async SQLite connections to allow concurrent reads/writes
+@event.listens_for(async_engine.sync_engine, "connect")
+def set_sqlite_pragma(dbapi_conn, connection_record):
+    """Enable WAL mode for SQLite to support async writes"""
+    cursor = dbapi_conn.cursor()
+    cursor.execute("PRAGMA journal_mode=WAL")
+    cursor.execute("PRAGMA synchronous=NORMAL")
+    cursor.close()
+
+
 # Convert JSONB to JSON for SQLite compatibility
 @event.listens_for(Base.metadata, "before_create")
 def _set_json_columns(target, connection, **kw):
     """
     Convert JSONB columns to JSON for SQLite.
-
     SQLite doesn't support JSONB (PostgreSQL-specific type),
     so we replace it with JSON for tests.
     """
-    from app.models.db_models import Session
-
     # Only convert if using SQLite
     if connection.dialect.name == "sqlite":
-        for col in Session.__table__.columns:
-            if isinstance(col.type, JSONB):
-                col.type = JSON()
+        for table in Base.metadata.tables.values():
+            for col in table.columns:
+                if isinstance(col.type, JSONB):
+                    col.type = JSON()
 
 
 @pytest.fixture(scope="function")
@@ -127,11 +154,14 @@ async def async_test_db() -> AsyncGenerator[AsyncSession, None]:
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    # Create session with transaction for rollback
+    # Create session and commit fixture data
     async with AsyncTestingSessionLocal() as session:
-        async with session.begin():
+        try:
             yield session
-            await session.rollback()
+            await session.commit()  # Commit fixture data
+        except Exception:
+            await session.rollback()  # Only rollback on error
+            raise
 
     # Drop all tables to ensure clean state
     async with async_engine.begin() as conn:
@@ -1288,6 +1318,389 @@ def mock_analytics_date_range():
         "end_date": now,
         "middle_date": now - timedelta(days=15),
     }
+
+
+# ============================================================================
+# Goal Tracking Test Fixtures (Feature 6)
+# ============================================================================
+
+@pytest.fixture(scope="function")
+def sample_goal(test_db, sample_patient, therapist_user, sample_session):
+    """
+    Create a basic TreatmentGoal for testing.
+
+    Args:
+        test_db: Test database session
+        sample_patient: Patient who owns this goal
+        therapist_user: Therapist who created this goal
+        sample_session: Session where goal was assigned
+
+    Returns:
+        TreatmentGoal object with basic goal data
+    """
+    from app.models.goal_models import TreatmentGoal
+    from datetime import date
+
+    goal = TreatmentGoal(
+        patient_id=sample_patient.id,
+        therapist_id=therapist_user.id,
+        session_id=sample_session.id,
+        description="Practice deep breathing exercises daily",
+        category="anxiety_management",
+        status="assigned",
+        baseline_value=2.0,
+        target_value=7.0,
+        target_date=date.today() + timedelta(days=30),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    )
+    test_db.add(goal)
+    test_db.commit()
+    test_db.refresh(goal)
+    return goal
+
+
+@pytest.fixture(scope="function")
+def sample_goal_with_tracking(test_db, sample_patient, therapist_user, sample_session):
+    """
+    Create a TreatmentGoal with associated GoalTrackingConfig.
+
+    Args:
+        test_db: Test database session
+        sample_patient: Patient who owns this goal
+        therapist_user: Therapist who created this goal
+        sample_session: Session where goal was assigned
+
+    Returns:
+        Tuple of (TreatmentGoal, GoalTrackingConfig)
+    """
+    from app.models.goal_models import TreatmentGoal
+    from app.models.tracking_models import GoalTrackingConfig
+    from datetime import date
+
+    # Create goal
+    goal = TreatmentGoal(
+        patient_id=sample_patient.id,
+        therapist_id=therapist_user.id,
+        session_id=sample_session.id,
+        description="Rate anxiety level on scale of 1-10",
+        category="anxiety_tracking",
+        status="in_progress",
+        baseline_value=8.0,
+        target_value=4.0,
+        target_date=date.today() + timedelta(days=60),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    )
+    test_db.add(goal)
+    test_db.commit()
+    test_db.refresh(goal)
+
+    # Create tracking config
+    tracking_config = GoalTrackingConfig(
+        goal_id=goal.id,
+        tracking_method="scale",
+        tracking_frequency="daily",
+        scale_min=1,
+        scale_max=10,
+        scale_labels={"1": "No anxiety", "5": "Moderate", "10": "Severe"},
+        target_direction="decrease",
+        reminder_enabled=True,
+        created_at=datetime.utcnow()
+    )
+    test_db.add(tracking_config)
+    test_db.commit()
+    test_db.refresh(tracking_config)
+
+    return (goal, tracking_config)
+
+
+@pytest.fixture(scope="function")
+def sample_progress_entries(test_db, sample_goal_with_tracking):
+    """
+    Create a list of ProgressEntry objects for testing.
+
+    Args:
+        test_db: Test database session
+        sample_goal_with_tracking: Tuple of (goal, tracking_config)
+
+    Returns:
+        List of 5 ProgressEntry objects spanning 5 days
+    """
+    from app.models.tracking_models import ProgressEntry
+    from datetime import date, time
+
+    goal, tracking_config = sample_goal_with_tracking
+
+    entries = []
+    base_date = date.today() - timedelta(days=5)
+    values = [8.0, 7.5, 7.0, 6.5, 6.0]  # Improving trend
+
+    for i, value in enumerate(values):
+        entry = ProgressEntry(
+            goal_id=goal.id,
+            tracking_config_id=tracking_config.id,
+            entry_date=base_date + timedelta(days=i),
+            entry_time=time(hour=20, minute=0),
+            value=value,
+            value_label=f"Anxiety level: {value}",
+            notes=f"Daily check-in day {i+1}",
+            context="self_report",
+            recorded_at=datetime.utcnow()
+        )
+        test_db.add(entry)
+        entries.append(entry)
+
+    test_db.commit()
+
+    # Refresh all entries
+    for entry in entries:
+        test_db.refresh(entry)
+
+    return entries
+
+
+@pytest.fixture(scope="function")
+def sample_assessment(test_db, sample_patient, therapist_user, sample_goal):
+    """
+    Create an AssessmentScore fixture for testing.
+
+    Args:
+        test_db: Test database session
+        sample_patient: Patient who took the assessment
+        therapist_user: Therapist who administered the assessment
+        sample_goal: Related treatment goal
+
+    Returns:
+        AssessmentScore object (e.g., GAD-7 assessment)
+    """
+    from app.models.tracking_models import AssessmentScore
+    from datetime import date
+
+    assessment = AssessmentScore(
+        patient_id=sample_patient.id,
+        goal_id=sample_goal.id,
+        administered_by=therapist_user.id,
+        assessment_type="GAD-7",
+        score=14,
+        severity="moderate",
+        subscores={
+            "feeling_nervous": 2,
+            "not_stop_worrying": 2,
+            "worrying_too_much": 2,
+            "trouble_relaxing": 2,
+            "restless": 2,
+            "easily_annoyed": 2,
+            "feeling_afraid": 2
+        },
+        administered_date=date.today() - timedelta(days=7),
+        notes="Baseline assessment - moderate anxiety symptoms present",
+        created_at=datetime.utcnow()
+    )
+    test_db.add(assessment)
+    test_db.commit()
+    test_db.refresh(assessment)
+    return assessment
+
+
+@pytest.fixture(scope="function")
+def sample_milestone(test_db, sample_goal):
+    """
+    Create a ProgressMilestone fixture for testing.
+
+    Args:
+        test_db: Test database session
+        sample_goal: Goal associated with this milestone
+
+    Returns:
+        ProgressMilestone object
+    """
+    from app.models.tracking_models import ProgressMilestone
+
+    milestone = ProgressMilestone(
+        goal_id=sample_goal.id,
+        milestone_type="percentage",
+        title="50% Progress Achieved",
+        description="Halfway to target value",
+        target_value=4.5,  # Midpoint between baseline (2.0) and target (7.0)
+        achieved_at=None,  # Not yet achieved
+        created_at=datetime.utcnow()
+    )
+    test_db.add(milestone)
+    test_db.commit()
+    test_db.refresh(milestone)
+    return milestone
+
+
+@pytest.fixture(scope="function")
+def goal_with_progress_history(test_db, sample_patient, therapist_user, sample_session):
+    """
+    Create a goal with 10+ progress entries for testing trend analysis.
+
+    This fixture provides a complete goal tracking history suitable for:
+    - Trend calculation tests
+    - Progress statistics tests
+    - Dashboard visualization tests
+
+    Args:
+        test_db: Test database session
+        sample_patient: Patient who owns this goal
+        therapist_user: Therapist who created this goal
+        sample_session: Session where goal was assigned
+
+    Returns:
+        Tuple of (TreatmentGoal, GoalTrackingConfig, List[ProgressEntry])
+    """
+    from app.models.goal_models import TreatmentGoal
+    from app.models.tracking_models import GoalTrackingConfig, ProgressEntry
+    from datetime import date, time
+
+    # Create goal
+    goal = TreatmentGoal(
+        patient_id=sample_patient.id,
+        therapist_id=therapist_user.id,
+        session_id=sample_session.id,
+        description="Exercise for 30 minutes, 5 times per week",
+        category="physical_activity",
+        status="in_progress",
+        baseline_value=1.0,  # 1 time per week
+        target_value=5.0,    # 5 times per week
+        target_date=date.today() + timedelta(days=90),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    )
+    test_db.add(goal)
+    test_db.commit()
+    test_db.refresh(goal)
+
+    # Create tracking config
+    tracking_config = GoalTrackingConfig(
+        goal_id=goal.id,
+        tracking_method="frequency",
+        tracking_frequency="weekly",
+        frequency_unit="times_per_week",
+        target_direction="increase",
+        reminder_enabled=True,
+        created_at=datetime.utcnow()
+    )
+    test_db.add(tracking_config)
+    test_db.commit()
+    test_db.refresh(tracking_config)
+
+    # Create 12 weeks of progress entries showing improvement
+    entries = []
+    base_date = date.today() - timedelta(weeks=12)
+
+    # Realistic improvement pattern: slow start, then steady progress
+    weekly_values = [1.0, 1.5, 2.0, 2.0, 2.5, 3.0, 3.5, 3.5, 4.0, 4.5, 4.5, 5.0]
+
+    for week_num, value in enumerate(weekly_values):
+        entry = ProgressEntry(
+            goal_id=goal.id,
+            tracking_config_id=tracking_config.id,
+            entry_date=base_date + timedelta(weeks=week_num),
+            entry_time=time(hour=9, minute=0),
+            value=value,
+            value_label=f"{int(value)} times this week",
+            notes=f"Week {week_num + 1} summary",
+            context="self_report",
+            recorded_at=datetime.utcnow()
+        )
+        test_db.add(entry)
+        entries.append(entry)
+
+    test_db.commit()
+
+    # Refresh all entries
+    for entry in entries:
+        test_db.refresh(entry)
+
+    return (goal, tracking_config, entries)
+
+
+@pytest.fixture(scope="function")
+def multiple_goals_for_patient(test_db, sample_patient, therapist_user, sample_session):
+    """
+    Create multiple treatment goals for comprehensive testing.
+
+    Creates 3 goals with different:
+    - Categories (anxiety, depression, behavioral)
+    - Statuses (assigned, in_progress, completed)
+    - Target dates
+
+    Args:
+        test_db: Test database session
+        sample_patient: Patient who owns these goals
+        therapist_user: Therapist who created these goals
+        sample_session: Session where goals were assigned
+
+    Returns:
+        List of 3 TreatmentGoal objects
+    """
+    from app.models.goal_models import TreatmentGoal
+    from datetime import date
+
+    goals = []
+
+    # Goal 1: Active anxiety goal
+    goal1 = TreatmentGoal(
+        patient_id=sample_patient.id,
+        therapist_id=therapist_user.id,
+        session_id=sample_session.id,
+        description="Reduce anxiety symptoms to mild level",
+        category="anxiety_management",
+        status="in_progress",
+        baseline_value=15.0,
+        target_value=7.0,
+        target_date=date.today() + timedelta(days=60),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    )
+    test_db.add(goal1)
+    goals.append(goal1)
+
+    # Goal 2: Completed behavioral goal
+    goal2 = TreatmentGoal(
+        patient_id=sample_patient.id,
+        therapist_id=therapist_user.id,
+        session_id=sample_session.id,
+        description="Establish consistent sleep schedule",
+        category="behavioral",
+        status="completed",
+        baseline_value=5.0,  # 5 hours average
+        target_value=8.0,    # 8 hours average
+        target_date=date.today() - timedelta(days=10),
+        created_at=datetime.utcnow() - timedelta(days=60),
+        updated_at=datetime.utcnow() - timedelta(days=10),
+        completed_at=datetime.utcnow() - timedelta(days=10)
+    )
+    test_db.add(goal2)
+    goals.append(goal2)
+
+    # Goal 3: Newly assigned depression goal
+    goal3 = TreatmentGoal(
+        patient_id=sample_patient.id,
+        therapist_id=therapist_user.id,
+        session_id=sample_session.id,
+        description="Engage in at least one social activity per week",
+        category="depression_management",
+        status="assigned",
+        baseline_value=0.0,
+        target_value=1.0,
+        target_date=date.today() + timedelta(days=30),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    )
+    test_db.add(goal3)
+    goals.append(goal3)
+
+    test_db.commit()
+
+    # Refresh all goals
+    for goal in goals:
+        test_db.refresh(goal)
+
+    return goals
 
 
 # ============================================================================

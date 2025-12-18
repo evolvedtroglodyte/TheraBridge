@@ -269,6 +269,43 @@ SCALING DECISION:
 └─ Decision: USING [N] AGENTS [reason]
 ```
 
+### Step 1.5: Git Backup (REQUIRED)
+
+**🚨 CRITICAL: Before ANY execution, create a git backup commit per CLAUDE.md rules.**
+
+After Wave 0 research completes and BEFORE showing wave structure, execute:
+
+```
+🔒 GIT BACKUP (Required by CLAUDE.md):
+
+Checking git status...
+Creating safety backup before orchestration...
+```
+
+**Use Bash tool to execute:**
+```xml
+<invoke name="Bash">
+<parameter name="command">cd [absolute_project_root] && git add -A && git commit -m "Backup before orchestration: [task]" && git log -1 --oneline</parameter>
+<parameter name="description">Create git backup commit</parameter>
+</invoke>
+```
+
+**Then output result:**
+```
+✅ Backup commit created: [commit hash]
+
+This ensures all work (tracked and untracked) is preserved before changes.
+```
+
+**Why this is mandatory:**
+- Per .claude/CLAUDE.md: "BEFORE MAKING ANY CHANGES (deletions, modifications, cleanup)"
+- Orchestration WILL modify/create/delete files
+- Untracked files CANNOT be recovered without a commit
+- Creates safety net for ALL files
+- Better to have an extra commit than lose work
+
+---
+
 ### Step 2: Wave Structure (REQUIRED)
 
 **🚨 CRITICAL: Show POOL SIZE (maximum across waves), not total agent slots.**

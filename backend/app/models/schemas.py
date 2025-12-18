@@ -4,7 +4,7 @@ Pydantic schemas for API requests/responses and AI extraction
 from datetime import datetime, date
 from typing import List, Optional, Dict, Any
 from enum import Enum
-from pydantic import BaseModel, Field, ConfigDict, field_validator
+from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator
 from uuid import UUID
 
 
@@ -390,3 +390,215 @@ class TimelineChartDataResponse(BaseModel):
         default_factory=list,
         description="Milestone events with dates and details"
     )
+
+
+# ============================================================================
+# Template and Note Schemas (Feature 3)
+# ============================================================================
+
+class NoteStatus(str, Enum):
+    """Session note status"""
+    draft = "draft"
+    completed = "completed"
+    signed = "signed"
+
+
+class TemplateFieldType(str, Enum):
+    """Types of fields in a template"""
+    text = "text"
+    textarea = "textarea"
+    select = "select"
+    multiselect = "multiselect"
+    checkbox = "checkbox"
+    number = "number"
+    date = "date"
+    scale = "scale"
+
+
+class TemplateType(str, Enum):
+    """Template types"""
+    soap = "soap"
+    dap = "dap"
+    birp = "birp"
+    progress = "progress"
+    custom = "custom"
+
+
+class TemplateField(BaseModel):
+    """A single field within a template section"""
+    id: str = Field(..., description="Unique field identifier within the section")
+    label: str = Field(..., description="Display label for the field")
+    type: TemplateFieldType = Field(..., description="Field input type")
+    required: bool = Field(default=False, description="Whether field is required")
+    options: Optional[List[str]] = Field(None, description="Options for select/multiselect types")
+    ai_mapping: Optional[str] = Field(None, description="Maps to ExtractedNotes field for auto-fill")
+    placeholder: Optional[str] = Field(None, description="Placeholder text")
+    help_text: Optional[str] = Field(None, description="Help text for users")
+
+    @model_validator(mode='after')
+    def validate_options_for_select_types(self):
+        """Ensure select/multiselect fields have options"""
+        if self.type in [TemplateFieldType.select, TemplateFieldType.multiselect]:
+            if not self.options or len(self.options) == 0:
+                raise ValueError(f'Field type {self.type} requires at least one option')
+        return self
+
+
+class TemplateSection(BaseModel):
+    """A section within a template (e.g., Subjective in SOAP)"""
+    id: str = Field(..., description="Unique section identifier within the template")
+    name: str = Field(..., description="Display name of the section")
+    description: Optional[str] = Field(None, description="Section description or instructions")
+    fields: List[TemplateField] = Field(..., description="Fields in this section")
+
+    @field_validator('fields')
+    @classmethod
+    def validate_fields_not_empty(cls, v: List[TemplateField]) -> List[TemplateField]:
+        """Ensure each section has at least one field"""
+        if not v or len(v) == 0:
+            raise ValueError('Each section must have at least one field')
+        return v
+
+
+class TemplateStructure(BaseModel):
+    """Complete template structure"""
+    sections: List[TemplateSection] = Field(..., description="All sections in the template")
+
+    @field_validator('sections')
+    @classmethod
+    def validate_sections_not_empty(cls, v: List[TemplateSection]) -> List[TemplateSection]:
+        """Ensure template has at least one section"""
+        if not v or len(v) == 0:
+            raise ValueError('Template must have at least one section')
+        return v
+
+    @field_validator('sections')
+    @classmethod
+    def validate_unique_section_ids(cls, v: List[TemplateSection]) -> List[TemplateSection]:
+        """Ensure all section IDs are unique"""
+        section_ids = [section.id for section in v]
+        if len(section_ids) != len(set(section_ids)):
+            raise ValueError('All section IDs must be unique')
+        return v
+
+
+class TemplateBase(BaseModel):
+    """Base template fields"""
+    name: str = Field(..., min_length=1, max_length=200, description="Template name")
+    description: Optional[str] = Field(None, description="Template description")
+    template_type: TemplateType = Field(..., description="Template type (soap, dap, birp, etc.)")
+    is_shared: bool = Field(default=False, description="Whether template is shared with other therapists")
+
+
+class TemplateCreate(TemplateBase):
+    """Request to create a template"""
+    structure: TemplateStructure = Field(..., description="Complete template structure with sections and fields")
+
+
+class TemplateUpdate(BaseModel):
+    """Request to update a template (partial updates allowed)"""
+    name: Optional[str] = Field(None, min_length=1, max_length=200, description="Updated template name")
+    description: Optional[str] = Field(None, description="Updated template description")
+    is_shared: Optional[bool] = Field(None, description="Updated sharing status")
+    structure: Optional[TemplateStructure] = Field(None, description="Updated template structure")
+
+
+class TemplateResponse(TemplateBase):
+    """Template data returned by API"""
+    id: UUID = Field(..., description="Unique template identifier")
+    is_system: bool = Field(..., description="Whether this is a system-provided template")
+    created_by: Optional[UUID] = Field(None, description="User ID of template creator (null for system templates)")
+    structure: TemplateStructure = Field(..., description="Complete template structure")
+    created_at: datetime = Field(..., description="Template creation timestamp")
+    updated_at: datetime = Field(..., description="Template last update timestamp")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TemplateListItem(BaseModel):
+    """Minimal template data for list views"""
+    id: UUID = Field(..., description="Unique template identifier")
+    name: str = Field(..., description="Template name")
+    description: Optional[str] = Field(None, description="Template description")
+    template_type: TemplateType = Field(..., description="Template type")
+    is_system: bool = Field(..., description="Whether this is a system template")
+    is_shared: bool = Field(..., description="Whether template is shared")
+    section_count: int = Field(..., description="Number of sections in template (computed from structure)")
+    created_at: datetime = Field(..., description="Template creation timestamp")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class NoteCreate(BaseModel):
+    """Request to create a session note"""
+    template_id: UUID = Field(..., description="Template used for this note")
+    content: Dict[str, Any] = Field(..., description="Filled template data (JSONB structure)")
+
+    @field_validator('content')
+    @classmethod
+    def validate_content_not_empty(cls, v: Dict[str, Any]) -> Dict[str, Any]:
+        """Ensure content has at least one entry"""
+        if not v or len(v) == 0:
+            raise ValueError('Note content cannot be empty')
+        return v
+
+
+class NoteUpdate(BaseModel):
+    """Request to update a session note"""
+    content: Optional[Dict[str, Any]] = Field(None, description="Updated note content")
+    status: Optional[NoteStatus] = Field(None, description="Updated note status")
+
+    @field_validator('content')
+    @classmethod
+    def validate_content_not_empty_if_provided(cls, v: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+        """If content is provided, ensure it's not empty"""
+        if v is not None and len(v) == 0:
+            raise ValueError('Note content cannot be empty if provided')
+        return v
+
+
+class NoteResponse(BaseModel):
+    """Session note data returned by API"""
+    id: UUID = Field(..., description="Unique note identifier")
+    session_id: UUID = Field(..., description="Associated therapy session ID")
+    template_id: Optional[UUID] = Field(None, description="Template used for this note (null for legacy notes)")
+    content: Dict[str, Any] = Field(..., description="Filled template data (JSONB structure)")
+    status: NoteStatus = Field(..., description="Note status (draft, completed, signed)")
+    signed_at: Optional[datetime] = Field(None, description="When note was signed (null if not signed)")
+    signed_by: Optional[UUID] = Field(None, description="User ID who signed the note (null if not signed)")
+    created_at: datetime = Field(..., description="Note creation timestamp")
+    updated_at: datetime = Field(..., description="Note last update timestamp")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class AutoFillRequest(BaseModel):
+    """Request to auto-fill a template from extracted notes"""
+    template_type: TemplateType = Field(..., description="Type of template to auto-fill (soap, dap, birp, progress)")
+
+
+class AutoFillResponse(BaseModel):
+    """Auto-filled template data response"""
+    template_type: TemplateType = Field(..., description="Type of template that was auto-filled")
+    auto_filled_content: Dict[str, Any] = Field(..., description="Filled template sections with extracted data")
+    confidence_scores: Dict[str, float] = Field(
+        ...,
+        description="Per-section confidence scores (0.0-1.0) indicating data quality"
+    )
+    missing_fields: Dict[str, List[str]] = Field(
+        ...,
+        description="Sections with missing or low-confidence data that need manual review"
+    )
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional metadata (e.g., extraction_time, ai_model, etc.)"
+    )
+
+    @field_validator('confidence_scores')
+    @classmethod
+    def validate_confidence_range(cls, v: Dict[str, float]) -> Dict[str, float]:
+        """Ensure all confidence scores are between 0.0 and 1.0"""
+        for section, score in v.items():
+            if not 0.0 <= score <= 1.0:
+                raise ValueError(f'Confidence score for section "{section}" must be between 0.0 and 1.0')
+        return v
