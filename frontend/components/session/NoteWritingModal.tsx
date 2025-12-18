@@ -7,7 +7,7 @@ import { TemplateSelector } from '@/components/templates/TemplateSelector';
 import { TemplateEditor } from '@/components/templates/TemplateEditor';
 import type { Template, AutofillResponse } from '@/lib/types';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface NoteWritingModalProps {
   isOpen: boolean;
@@ -32,7 +32,6 @@ export function NoteWritingModal({
   const [isSaving, setIsSaving] = React.useState(false);
   const [isAutoFilling, setIsAutoFilling] = React.useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState(false);
-  const { toast } = useToast();
 
   // Reset state when modal closes
   React.useEffect(() => {
@@ -97,16 +96,13 @@ export function NoteWritingModal({
         ...prev, // Keep user's manual edits
       }));
 
-      toast({
-        title: 'Auto-fill complete',
+      toast.success('Auto-fill complete', {
         description: 'Template has been filled with AI-extracted data',
       });
     } catch (error) {
       console.error('Auto-fill error:', error);
-      toast({
-        title: 'Auto-fill failed',
+      toast.error('Auto-fill failed', {
         description: 'Could not auto-fill template. Please fill manually.',
-        variant: 'destructive',
       });
     } finally {
       setIsAutoFilling(false);
@@ -136,8 +132,7 @@ export function NoteWritingModal({
         throw new Error('Failed to save note');
       }
 
-      toast({
-        title: 'Note saved',
+      toast.success('Note saved', {
         description: 'Your session note has been saved successfully',
       });
 
@@ -146,10 +141,8 @@ export function NoteWritingModal({
       onClose();
     } catch (error) {
       console.error('Save error:', error);
-      toast({
-        title: 'Save failed',
+      toast.error('Save failed', {
         description: 'Could not save note. Please try again.',
-        variant: 'destructive',
       });
     } finally {
       setIsSaving(false);

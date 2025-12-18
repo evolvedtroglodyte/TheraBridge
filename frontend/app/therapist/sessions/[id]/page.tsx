@@ -1,8 +1,10 @@
 'use client';
 
-import { use } from 'react';
+import { use, useState } from 'react';
 import { useSession } from '@/hooks/useSession';
 import { usePatient } from '@/hooks/usePatients';
+import { useSessionNotes } from '@/hooks/useSessionNotes';
+import { useTemplates } from '@/hooks/useTemplates';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +15,8 @@ import { TriggerCard } from '@/components/TriggerCard';
 import { ActionItemCard } from '@/components/ActionItemCard';
 import { TranscriptViewer } from '@/components/TranscriptViewer';
 import { SessionDetailSkeleton } from '@/components/skeletons';
+import { NoteWritingModal } from '@/components/session/NoteWritingModal';
+import { SessionNoteCard } from '@/components/session/SessionNoteCard';
 import {
   ArrowLeft,
   Clock,
@@ -23,6 +27,8 @@ import {
   AlertCircle,
   CheckCircle,
   Loader2,
+  FileText,
+  PenSquare,
 } from 'lucide-react';
 import Link from 'next/link';
 import { formatDateTime, formatDuration } from '@/lib/utils';
@@ -35,9 +41,22 @@ export default function SessionDetailPage({ params }: PageProps) {
   const { id } = use(params);
   const { session, isLoading, isError, isProcessing } = useSession(id);
   const { patient } = usePatient(session?.patient_id || null);
+  const { notes, refresh: refreshNotes } = useSessionNotes(id);
+  const { templates } = useTemplates();
+  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
 
   // Note: useSession hook automatically handles polling at 5s intervals while processing
   // No manual polling needed here - the hook's dynamic refreshInterval handles it
+
+  const handleNoteSaved = () => {
+    refreshNotes();
+  };
+
+  // Find template for each note
+  const getTemplateForNote = (templateId: string | null | undefined) => {
+    if (!templateId || !templates) return null;
+    return templates.find((t) => t.id === templateId) || null;
+  };
 
   if (isLoading) {
     return <SessionDetailSkeleton />;
@@ -75,7 +94,7 @@ export default function SessionDetailPage({ params }: PageProps) {
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between">
-            <div className="space-y-2">
+            <div className="space-y-2 flex-1">
               <div className="flex items-center gap-4">
                 <CardTitle className="text-2xl">
                   {patient ? `${patient.name}'s Session` : 'Session Details'}
@@ -95,9 +114,17 @@ export default function SessionDetailPage({ params }: PageProps) {
                 )}
               </div>
             </div>
-            {notes?.session_mood && (
-              <MoodIndicator mood={notes.session_mood} trajectory={notes.mood_trajectory} />
-            )}
+            <div className="flex items-center gap-3">
+              {notes?.session_mood && (
+                <MoodIndicator mood={notes.session_mood} trajectory={notes.mood_trajectory} />
+              )}
+              {session.status === 'processed' && (
+                <Button onClick={() => setIsNoteModalOpen(true)}>
+                  <PenSquare className="w-4 h-4 mr-2" />
+                  Write Note
+                </Button>
+              )}
+            </div>
           </div>
         </CardHeader>
 
@@ -317,6 +344,25 @@ export default function SessionDetailPage({ params }: PageProps) {
         </>
       )}
 
+      {/* Session Notes */}
+      {notes && notes.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <FileText className="w-5 h-5" />
+            <h3 className="text-lg font-semibold">Session Notes ({notes.length})</h3>
+          </div>
+          <div className="space-y-3">
+            {notes.map((note) => (
+              <SessionNoteCard
+                key={note.id}
+                note={note}
+                template={getTemplateForNote(note.template_id)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Transcript */}
       {(session.transcript_segments || session.transcript_text) && (
         <TranscriptViewer
@@ -324,6 +370,14 @@ export default function SessionDetailPage({ params }: PageProps) {
           transcriptText={session.transcript_text}
         />
       )}
+
+      {/* Note Writing Modal */}
+      <NoteWritingModal
+        isOpen={isNoteModalOpen}
+        onClose={() => setIsNoteModalOpen(false)}
+        sessionId={id}
+        onNoteSaved={handleNoteSaved}
+      />
     </div>
   );
 }
