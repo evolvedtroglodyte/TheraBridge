@@ -1,22 +1,50 @@
 # Python
+venv/
+.venv/
+env/
 __pycache__/
+*.pyc
 *.py[cod]
 *$py.class
 *.so
 .Python
-venv/
-env/
+.pytest_cache/
+*.egg-info/
+*.egg
+*.pyo
+*.pyd
+
+# Test coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+coverage.json
+*.cover
+
+# Environment
+.env
+.env.local
+.env.*.local
+# Note: .env.example IS committed (do not ignore)
 
 # Project-specific
 data/
 logs/
-.env
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
 
 # IDE
 .vscode/
 .idea/
 *.swp
-
-# OS
-.DS_Store
-Thumbs.db
+*.swo
+*.sublime-project
+*.sublime-workspace

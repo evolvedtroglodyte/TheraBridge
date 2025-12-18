@@ -31,12 +31,12 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 }
 
 // Patients API
-export const getPatients = (): Promise<Patient[]> => fetchApi<Patient[]>('/api/patients/');
+export const getPatients = (): Promise<Patient[]> => fetchApi<Patient[]>('/api/v1/patients/');
 
-export const getPatient = (id: string): Promise<Patient> => fetchApi<Patient>(`/api/patients/${id}`);
+export const getPatient = (id: string): Promise<Patient> => fetchApi<Patient>(`/api/v1/patients/${id}`);
 
 export const createPatient = (data: { name: string; email: string; phone?: string; therapist_id: string }): Promise<Patient> =>
-  fetchApi<Patient>('/api/patients/', {
+  fetchApi<Patient>('/api/v1/patients/', {
     method: 'POST',
     body: JSON.stringify(data),
   });
@@ -47,20 +47,20 @@ export const getSessions = (patientId?: string, status?: SessionStatus): Promise
   if (patientId) params.set('patient_id', patientId);
   if (status) params.set('status', status);
   const queryString = params.toString();
-  return fetchApi<Session[]>(`/api/sessions/${queryString ? `?${queryString}` : ''}`);
+  return fetchApi<Session[]>(`/api/v1/sessions/${queryString ? `?${queryString}` : ''}`);
 };
 
-export const getSession = (id: string): Promise<Session> => fetchApi<Session>(`/api/sessions/${id}`);
+export const getSession = (id: string): Promise<Session> => fetchApi<Session>(`/api/v1/sessions/${id}`);
 
 export const getSessionNotes = (id: string): Promise<ExtractedNotes> =>
-  fetchApi<ExtractedNotes>(`/api/sessions/${id}/notes`);
+  fetchApi<ExtractedNotes>(`/api/v1/sessions/${id}/notes`);
 
 export const uploadSession = async (patientId: string, file: File): Promise<Session> => {
   const formData = new FormData();
   formData.append('file', file);
 
   const response = await fetch(
-    `${API_BASE_URL}/api/sessions/upload?patient_id=${patientId}`,
+    `${API_BASE_URL}/api/v1/sessions/upload?patient_id=${patientId}`,
     {
       method: 'POST',
       body: formData,
@@ -81,11 +81,11 @@ export const getTemplates = (templateType?: string, includeShared?: boolean): Pr
   if (templateType) params.set('template_type', templateType);
   if (includeShared !== undefined) params.set('include_shared', String(includeShared));
   const queryString = params.toString();
-  return fetchApi<Template[]>(`/api/templates/${queryString ? `?${queryString}` : ''}`);
+  return fetchApi<Template[]>(`/api/v1/templates/${queryString ? `?${queryString}` : ''}`);
 };
 
 export const getTemplate = (id: string): Promise<Template> =>
-  fetchApi<Template>(`/api/templates/${id}`);
+  fetchApi<Template>(`/api/v1/templates/${id}`);
 
 // Fetcher for SWR - typed for use with SWR hooks
 export const fetcher = async <T,>(url: string): Promise<T> => {

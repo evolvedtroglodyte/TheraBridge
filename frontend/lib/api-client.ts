@@ -17,7 +17,7 @@ import {
   isValidationError,
 } from './api-types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 /**
  * Custom error class for API errors with full response details
@@ -40,7 +40,7 @@ export class ApiClientError extends Error {
  *
  * @example
  * ```ts
- * const result = await apiClient.get<Patient>('/api/patients/123');
+ * const result = await apiClient.get<Patient>('/api/v1/patients/123');
  * if (result.success) {
  *   console.log(result.data.name);
  * } else {
@@ -55,7 +55,7 @@ class ApiClient {
    * Returns discriminated union type for exhaustive error handling.
    *
    * @template T - The expected response data type
-   * @param endpoint - API endpoint (e.g., '/api/patients/123')
+   * @param endpoint - API endpoint (e.g., '/api/v1/patients/123')
    * @param options - Request options including custom timeout, retry logic, etc.
    * @returns ApiResult<T> - Success or failure result with full type information
    */
@@ -371,7 +371,7 @@ class ApiClient {
     data: { template_id: string; content: Record<string, unknown> },
     options?: ApiRequestOptions
   ): Promise<ApiResult<T>> {
-    return this.post<T>(`/sessions/${sessionId}/notes`, data, options);
+    return this.post<T>(`/api/v1/sessions/${sessionId}/notes`, data, options);
   }
 
   /**
@@ -385,7 +385,7 @@ class ApiClient {
     data: { content?: Record<string, unknown>; status?: string },
     options?: ApiRequestOptions
   ): Promise<ApiResult<T>> {
-    return this.patch<T>(`/notes/${noteId}`, data, options);
+    return this.patch<T>(`/api/v1/notes/${noteId}`, data, options);
   }
 
   /**
@@ -399,7 +399,7 @@ class ApiClient {
     templateType: string,
     options?: ApiRequestOptions
   ): Promise<ApiResult<T>> {
-    return this.post<T>(`/sessions/${sessionId}/autofill`, { template_type: templateType }, options);
+    return this.post<T>(`/api/v1/sessions/${sessionId}/autofill`, { template_type: templateType }, options);
   }
 }
 

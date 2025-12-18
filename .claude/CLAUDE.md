@@ -59,7 +59,7 @@ Before creating any new file, ask:
 
 ## Repository Structure
 
-**Monorepo with 2 independent projects:**
+**Monorepo with 4 independent projects:**
 
 ```
 peerbridge proj/
@@ -94,26 +94,103 @@ peerbridge proj/
 │   ├── requirements.txt
 │   └── README.md
 │
-└── backend/                   # STANDALONE PROJECT
-    ├── app/
-    │   ├── main.py
-    │   ├── database.py
-    │   ├── routers/
+├── backend/                   # STANDALONE PROJECT (TherapyBridge API)
+│   ├── app/
+│   │   ├── main.py
+│   │   ├── database.py
+│   │   ├── routers/
+│   │   ├── models/
+│   │   └── services/
+│   ├── tests/
+│   ├── migrations/
+│   ├── uploads/audio/         # Runtime only
+│   ├── venv/                  # Independent venv
+│   ├── .env                   # Backend-specific env
+│   ├── .env.example
+│   ├── .gitignore             # Backend-specific
+│   ├── .python-version
+│   ├── requirements.txt
+│   └── README.md
+│
+├── frontend/                  # STANDALONE PROJECT (TherapyBridge UI)
+│   ├── app/                   # Next.js 16 app directory
+│   ├── components/
+│   ├── lib/
+│   │   ├── api-client.ts      # Backend API integration
+│   │   └── auth-context.tsx
+│   ├── hooks/
+│   ├── public/
+│   ├── node_modules/
+│   ├── .next/                 # Build output
+│   ├── .env.local             # Frontend-specific env
+│   ├── .env.local.example
+│   ├── .gitignore
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── tailwind.config.ts
+│
+└── Scrapping/                 # STANDALONE PROJECT (Web scraping utility)
+    ├── src/scraper/
+    │   ├── config.py          # Pydantic settings
+    │   ├── scrapers/
+    │   │   ├── base.py
+    │   │   └── upheal_scraper.py  # Competitive analysis
     │   ├── models/
-    │   └── services/
+    │   │   └── schemas.py     # Data validation
+    │   └── utils/
+    │       ├── http_client.py
+    │       ├── rate_limiter.py
+    │       └── logger.py
     ├── tests/
-    ├── migrations/
-    ├── uploads/audio/         # Runtime only
+    ├── data/                  # Scraped data (gitignored)
     ├── venv/                  # Independent venv
-    ├── .env                   # Backend-specific env
+    ├── .env                   # Scraper-specific env
     ├── .env.example
-    ├── .gitignore             # Backend-specific
-    ├── .python-version
+    ├── .gitignore
+    ├── .python-version        # Python 3.11 (legacy)
     ├── requirements.txt
     └── README.md
 ```
 
 **Key principle:** Each subproject is self-contained and can be deployed independently.
+
+---
+
+## Environment Configuration
+
+**Python Version Standardization:**
+- ✅ Root: Python 3.13.9 (`.python-version`)
+- ✅ Backend: Python 3.13.9 (`.python-version`)
+- ✅ Audio Pipeline: Python 3.13.9 (`.python-version`)
+- ⚠️ Scrapping: Python 3.11 (legacy, not yet upgraded)
+
+**Environment Files Status:**
+
+**backend/.env** - Complete production configuration
+- All required fields populated (DATABASE_URL, JWT_SECRET, OPENAI_API_KEY, etc.)
+- Email service config (SMTP, SendGrid)
+- AWS S3 credentials
+- Security: Consider moving to environment variables or secrets manager
+
+**audio-transcription-pipeline/.env** - Documented via .env.example
+- OpenAI API key for Whisper API
+- HuggingFace token for pyannote diarization
+- All fields documented in .env.example
+
+**frontend/.env.local** - Validated
+- NEXT_PUBLIC_API_URL configured
+- NEXT_PUBLIC_USE_REAL_API feature flag
+- Template available in .env.local.example
+
+**Scrapping/.env** - Independent project
+- Separate configuration for web scraping utilities
+- Template available in .env.example
+
+**Security Note:**
+- .env files are currently tracked in git (not in .gitignore)
+- Contains sensitive credentials (API keys, database URLs, secrets)
+- Production deployments should use environment variables or secrets management
+- Consider adding .env to .gitignore and using .env.example as templates
 
 ---
 
@@ -141,6 +218,15 @@ peerbridge proj/
 - ✅ Upload modal with processing indicator
 - ⏳ Backend API integration (toggle via env flag)
 
+**Scrapping (Web Scraping Utility):**
+- ✅ Modular architecture (scrapers, models, utils)
+- ✅ Pydantic configuration and validation
+- ✅ HTTPX async client with retry logic
+- ✅ Token bucket rate limiter (0.5 req/sec)
+- ✅ Upheal competitive analysis scraper
+- ✅ Compliance-focused (robots.txt, rate limits)
+- ⚠️ Python 3.11 (legacy dependencies, not upgraded to 3.13)
+
 ---
 
 ## Quick Commands
@@ -159,6 +245,19 @@ source venv/bin/activate
 uvicorn app.main:app --reload
 ```
 
+**Run frontend dev server:**
+```bash
+cd frontend
+npm run dev
+```
+
+**Run web scraper:**
+```bash
+cd Scrapping
+source venv/bin/activate
+python -m pytest  # Run tests
+```
+
 ---
 
 ## Next Steps
@@ -173,6 +272,43 @@ uvicorn app.main:app --reload
 ---
 
 ## Session Log
+
+### 2025-12-18 - Wave 2 Environment Configuration Audit ✅
+**Standardized environment configuration across all projects:**
+
+1. **Python version standardization** - Upgraded to 3.13.9 (except Scrapping legacy project)
+   - Root: 3.13.9
+   - Backend: 3.13.9
+   - Audio Pipeline: 3.13.9
+   - Scrapping: 3.11 (not upgraded)
+
+2. **Backend .env completion** - All required fields populated:
+   - Database connection (Neon PostgreSQL)
+   - JWT authentication secrets
+   - OpenAI API configuration
+   - Email service (SMTP + SendGrid)
+   - AWS S3 credentials
+   - CORS and security settings
+
+3. **Environment file validation** - All projects have complete .env setup:
+   - backend/.env + .env.example
+   - audio-transcription-pipeline/.env + .env.example
+   - frontend/.env.local + .env.local.example
+   - Scrapping/.env + .env.example
+
+4. **Security considerations documented**:
+   - .env files currently tracked in git (security risk)
+   - Recommendation: Use environment variables or secrets manager for production
+   - .env.example templates available for all projects
+
+5. **Documentation updated**:
+   - Added "Environment Configuration" section to CLAUDE.md
+   - Documented Python versions across projects
+   - Documented all .env file status and contents
+   - Added security notes about credential management
+
+**Files updated:**
+- `.claude/CLAUDE.md` (added Environment Configuration section)
 
 ### 2025-12-17 - Feature 1 Authentication Completion (100%) ✅
 **Successfully completed all Feature 1 gaps and applied schema changes to production database:**

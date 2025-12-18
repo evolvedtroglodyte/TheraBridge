@@ -1,1 +1,7 @@
 3.11
+# KEEP Python 3.11: Requires dependency upgrades for 3.13 compatibility
+# - pydantic 2.6.3 → 2.8.0+ (breaking: pydantic-core PyO3 limit)
+# - pandas 2.2.1 → 2.2.3+ (incompatible with 3.13)
+# - lxml 5.1.0 → 5.3.0+ (no 3.13 wheels)
+# - playwright 1.42.0 → 1.48.0+ (greenlet compatibility)
+# Python 3.11 EOL: October 2027 (security updates guaranteed)

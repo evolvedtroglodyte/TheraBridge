@@ -15,7 +15,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
-  fullNameRules,
+  firstNameRules,
+  lastNameRules,
   emailRules,
   passwordStrongRules,
   validateFields,
@@ -26,12 +27,14 @@ import { formatAuthError } from '@/lib/error-formatter';
 import type { FailureResult } from '@/lib/api-types';
 
 export default function SignupPage() {
-  const [fullName, setFullName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'therapist' | 'patient'>('patient');
   const [fieldValidation, setFieldValidation] = useState({
-    fullName: { isValid: true, errors: [], isDirty: false },
+    firstName: { isValid: true, errors: [], isDirty: false },
+    lastName: { isValid: true, errors: [], isDirty: false },
     email: { isValid: true, errors: [], isDirty: false },
     password: { isValid: true, errors: [], isDirty: false },
   });
@@ -44,15 +47,16 @@ export default function SignupPage() {
   // Validate form on input change
   useEffect(() => {
     const validation = validateFields(
-      { fullName, email, password },
+      { firstName, lastName, email, password },
       {
-        fullName: fullNameRules,
+        firstName: firstNameRules,
+        lastName: lastNameRules,
         email: emailRules,
         password: passwordStrongRules,
       }
     );
     setFieldValidation(validation);
-  }, [fullName, email, password]);
+  }, [firstName, lastName, email, password]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,9 +64,10 @@ export default function SignupPage() {
 
     // Validate all fields
     const validation = validateFields(
-      { fullName, email, password },
+      { firstName, lastName, email, password },
       {
-        fullName: fullNameRules,
+        firstName: firstNameRules,
+        lastName: lastNameRules,
         email: emailRules,
         password: passwordStrongRules,
       }
@@ -77,7 +82,7 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      await signup(email, password, fullName, role);
+      await signup(email, password, firstName, lastName, role);
 
       // Redirect based on role
       if (role === 'therapist') {
@@ -160,15 +165,31 @@ export default function SignupPage() {
             />
           )}
 
-          {/* Full Name Field */}
+          {/* First Name Field */}
           <FormField
-            name="fullName"
-            label="Full Name"
+            name="firstName"
+            label="First Name"
             type="text"
-            value={fullName}
-            onChange={setFullName}
-            rules={fullNameRules}
-            placeholder="John Doe"
+            value={firstName}
+            onChange={setFirstName}
+            rules={firstNameRules}
+            placeholder="John"
+            required
+            validateOnChange
+            validateOnBlur
+            showErrors
+            showValidationIcon
+          />
+
+          {/* Last Name Field */}
+          <FormField
+            name="lastName"
+            label="Last Name"
+            type="text"
+            value={lastName}
+            onChange={setLastName}
+            rules={lastNameRules}
+            placeholder="Doe"
             required
             validateOnChange
             validateOnBlur

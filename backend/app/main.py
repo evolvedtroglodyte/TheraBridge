@@ -14,7 +14,7 @@ from sqlalchemy import text
 from openai import AsyncOpenAI
 
 from app.database import init_db, close_db, engine, AsyncSessionLocal
-from app.routers import sessions, patients, cleanup, analytics, export, goal_tracking, assessments, self_report, progress_reports, templates, notes, mfa, treatment_plans, goals, interventions
+from app.routers import sessions, patients, cleanup, analytics, export, goal_tracking, assessments, self_report, progress_reports, templates, notes, mfa, treatment_plans, goals, interventions, email_verification
 from app.auth.router import router as auth_router
 from app.middleware.rate_limit import limiter, custom_rate_limit_handler
 from app.middleware.error_handler import register_exception_handlers
@@ -150,6 +150,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(auth_router, prefix="/api/v1", tags=["authentication"])
+app.include_router(email_verification.router, prefix="/api/v1", tags=["Email Verification"])
 
 # Feature 8: HIPAA Compliance & Security
 app.include_router(mfa.router, prefix="/api/v1/mfa", tags=["Multi-Factor Authentication"])

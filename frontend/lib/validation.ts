@@ -100,6 +100,42 @@ export const fullNameRules: ValidationRule[] = [
 ];
 
 /**
+ * Validation rules for first name field
+ */
+export const firstNameRules: ValidationRule[] = [
+  {
+    validate: (value) => value.trim().length > 0,
+    message: 'First name is required',
+  },
+  {
+    validate: (value) => value.trim().length >= 2,
+    message: 'First name must be at least 2 characters long',
+  },
+  {
+    validate: (value) => /^[a-zA-Z\s'-]+$/.test(value.trim()),
+    message: 'First name can only contain letters, spaces, hyphens, and apostrophes',
+  },
+];
+
+/**
+ * Validation rules for last name field
+ */
+export const lastNameRules: ValidationRule[] = [
+  {
+    validate: (value) => value.trim().length > 0,
+    message: 'Last name is required',
+  },
+  {
+    validate: (value) => value.trim().length >= 2,
+    message: 'Last name must be at least 2 characters long',
+  },
+  {
+    validate: (value) => /^[a-zA-Z\s'-]+$/.test(value.trim()),
+    message: 'Last name can only contain letters, spaces, hyphens, and apostrophes',
+  },
+];
+
+/**
  * Validate a field against a set of rules
  * @param value - The field value to validate
  * @param rules - Array of validation rules to check

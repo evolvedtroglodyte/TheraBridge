@@ -24,6 +24,10 @@
 .env
 .env.local
 .env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+# Note: .env.example and .env.local.example ARE committed
 
 # debug
 npm-debug.log*

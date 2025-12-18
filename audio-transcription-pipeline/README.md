@@ -192,6 +192,41 @@ The pipeline generates JSON output with the following structure:
 }
 ```
 
+## Environment Variables
+
+Create a `.env` file in the project root with the following variables:
+
+### Required Variables
+
+**OPENAI_API_KEY** (CPU/API version only)
+- Get from: https://platform.openai.com/api-keys
+- Required for: Whisper API transcription in CPU mode
+- Example: `OPENAI_API_KEY=sk-your-key-here`
+
+**HF_TOKEN** (All versions)
+- Get from: https://hf.co/settings/tokens (free account required)
+- Required for: Pyannote speaker diarization model access
+- Setup: Accept terms at https://huggingface.co/pyannote/speaker-diarization-3.1
+- Example: `HF_TOKEN=hf_your-token-here`
+
+### Optional Variables
+
+**VAST_API_KEY** (GPU version only)
+- Get from: https://cloud.vast.ai/account/ (Account → API Key)
+- Required for: Automated Vast.ai GPU instance management
+- Used by: `run_gpu_vast.py`, `batch_youtube_vast.py`, parallel processing scripts
+- Example: `VAST_API_KEY=your-vast-api-key`
+- Note: Not needed if manually connecting to GPU instances
+
+**Quick setup:**
+```bash
+# Copy example file
+cp .env.example .env
+
+# Edit with your keys
+nano .env
+```
+
 ## Dependencies
 
 ### CPU/API Version (`requirements.txt`)

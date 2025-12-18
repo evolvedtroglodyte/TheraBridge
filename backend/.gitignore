@@ -3,22 +3,35 @@ venv/
 .venv/
 __pycache__/
 *.pyc
+*.py[cod]
+*$py.class
 .pytest_cache/
 *.egg-info/
+*.egg
 *.pyo
 *.pyd
 .Python
+
+# Test coverage
 htmlcov/
 .coverage
+.coverage.*
+coverage.xml
+coverage.json
+*.cover
 
 # Environment
 .env
 .env.local
+.env.*.local
 # Note: .env.example IS committed (do not ignore)
 
 # Database
 *.db
+*.db-shm
+*.db-wal
 *.sqlite
+*.sqlite3
 
 # Uploads (runtime files)
 uploads/audio/*

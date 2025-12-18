@@ -53,7 +53,8 @@ backend/
 │   │   ├── sessions.py         # Session upload & management (324 lines)
 │   │   ├── patients.py         # Patient endpoints (71 lines)
 │   │   ├── cleanup.py          # Cleanup endpoints (248 lines)
-│   │   └── analytics.py        # Analytics endpoints (200+ lines)
+│   │   ├── analytics.py        # Analytics endpoints (200+ lines)
+│   │   └── email_verification.py # Email verification endpoints
 │   ├── auth/
 │   │   ├── router.py           # Authentication routes (signup, login, logout)
 │   │   ├── utils.py            # Auth utilities (JWT, password hashing)
@@ -67,7 +68,12 @@ backend/
 │   │   ├── cleanup.py               # Audio cleanup service (574 lines)
 │   │   ├── analytics_service.py     # Analytics computation service
 │   │   ├── analytics_scheduler.py   # Background job scheduler (APScheduler)
+│   │   ├── email_service.py         # Email sending service (SMTP/SendGrid/SES)
 │   │   └── __init__.py              # Service initialization
+│   ├── templates/
+│   │   └── emails/              # Email templates (Jinja2 HTML)
+│   │       ├── verification.html     # Email verification template
+│   │       └── password_reset.html   # Password reset template (ready)
 │   ├── middleware/
 │   │   ├── rate_limit.py       # Rate limiting middleware
 │   │   └── __init__.py         # Middleware initialization
@@ -124,6 +130,9 @@ backend/
 - `POST /api/auth/refresh` - Get new access token using refresh token
 - `POST /api/auth/logout` - Revoke refresh token
 - `GET /api/auth/me` - Get current user info
+- `POST /api/auth/verify-email` - Verify email address using token
+- `POST /api/auth/resend-verification` - Resend verification email
+- `GET /api/auth/verify-status` - Check email verification status
 
 ### Analytics - Therapist Insights
 - `GET /api/v1/analytics/overview` - Practice overview (total/active patients, sessions, completion rate)
@@ -539,11 +548,14 @@ curl -X POST http://localhost:8000/api/auth/signup \
   -H "Content-Type: application/json" \
   -d '{
     "email": "therapist@example.com",
-    "password": "securepass123",
-    "full_name": "Dr. Jane Smith",
+    "password": "SecurePass123!",
+    "first_name": "Jane",
+    "last_name": "Smith",
     "role": "therapist"
   }'
 ```
+
+**Note:** Password must be 12+ characters with uppercase, lowercase, number, and special character.
 
 Response: `{"access_token": "...", "refresh_token": "...", "expires_in": 1800}`
 
@@ -566,6 +578,28 @@ curl -X POST http://localhost:8000/api/auth/refresh \
   -d '{"refresh_token": "YOUR_REFRESH_TOKEN"}'
 ```
 
+### Verify Email Address
+
+```bash
+# User receives verification email after signup
+# Email contains a link like: http://localhost:3000/auth/verify?token=VERIFICATION_TOKEN
+
+# Frontend calls backend with token:
+curl -X POST http://localhost:8000/api/auth/verify-email \
+  -H "Content-Type: application/json" \
+  -d '{"token": "VERIFICATION_TOKEN"}'
+```
+
+Response: `{"message": "Email verified successfully", "email": "user@example.com", "is_verified": true}`
+
+### Resend Verification Email
+
+```bash
+curl -X POST http://localhost:8000/api/auth/resend-verification \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com"}'
+```
+
 ### Get Practice Analytics Overview
 
 ```bash
@@ -586,12 +620,54 @@ Response includes session history, mood trends, common topics, and attendance ra
 
 ## Authentication
 
-TherapyBridge uses JWT-based authentication with refresh token rotation.
+TherapyBridge uses JWT-based authentication with refresh token rotation and email verification.
+
+### User Registration Flow
+
+1. User signs up with `first_name`, `last_name`, `email`, `password`, and `role`
+2. Account created with `is_verified=false`
+3. Verification email sent automatically (if email service configured)
+4. User clicks link in email to verify account
+5. Account status updated to `is_verified=true`
+
+### Email Verification
+
+Email verification is fully functional with support for multiple providers:
+
+**Supported Providers:**
+- **SMTP** (default) - Standard SMTP server
+- **SendGrid** - API-based email delivery
+- **AWS SES** - Amazon Simple Email Service
+
+**Configuration** (in `.env`):
+```bash
+# Email provider: smtp, sendgrid, ses
+EMAIL_PROVIDER=smtp
+EMAIL_FROM=noreply@therapybridge.com
+
+# SMTP Configuration
+SMTP_HOST=localhost
+SMTP_PORT=587
+SMTP_USER=your_username
+SMTP_PASSWORD=your_password
+
+# SendGrid/SES (if using)
+EMAIL_API_KEY=your_api_key
+
+# Frontend URL for verification links
+FRONTEND_URL=http://localhost:3000
+```
+
+**Email Templates:**
+- HTML templates in `app/templates/emails/`
+- Verification email: `verification.html`
+- Password reset email: `password_reset.html` (template ready)
 
 ### Token Details
 
 - **Access Token**: 30 minutes validity (use for API requests)
 - **Refresh Token**: 7 days validity (single-use, rotated on each refresh)
+- **Verification Token**: 24 hours validity (single-use)
 - **Signing**: HS256 with 32-byte secret key
 - **Password**: Bcrypt hashing with 12 rounds
 
@@ -599,10 +675,11 @@ TherapyBridge uses JWT-based authentication with refresh token rotation.
 
 - Automatic token rotation (old refresh token revoked when new one issued)
 - Rate limiting: 5 login attempts per minute per IP
-- Password minimum: 8 characters
+- Password requirements: 12+ characters with uppercase, lowercase, number, special character
 - SQL injection protection via SQLAlchemy ORM
 - CORS configured for frontend origin only
 - Refresh tokens stored in database for revocation support
+- Email verification prevents unauthorized account creation
 
 ### Rate Limits
 
@@ -619,9 +696,12 @@ TherapyBridge uses JWT-based authentication with refresh token rotation.
 - `id` (UUID) - Primary key
 - `email` (VARCHAR) - Unique email
 - `hashed_password` (TEXT) - Bcrypt hash
-- `full_name` (VARCHAR) - User's name
+- `first_name` (VARCHAR) - User's first name
+- `last_name` (VARCHAR) - User's last name
+- `full_name` (VARCHAR) - Computed full name (backward compatibility)
 - `role` (ENUM) - therapist, patient, or admin
 - `is_active` (BOOLEAN) - Account status
+- `is_verified` (BOOLEAN) - Email verification status
 - `created_at`, `updated_at` (TIMESTAMP)
 
 **auth_sessions** - Refresh token management

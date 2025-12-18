@@ -15,6 +15,7 @@ __pycache__/
 # Environment
 .env
 .env.local
+.env.*.local
 # Note: .env.example IS committed (do not ignore)
 
 # Node.js
@@ -44,6 +45,25 @@ Thumbs.db
 # Sync tools
 .stfolder/
 .sync-*
+
+# Analysis and temporary documentation files
+*_ANALYSIS.md
+*_REPORT.md
+*_INDEX.md
+*_MAP.txt
+*_REFERENCE.txt
+*_SUMMARY.txt
+*_EXPLORATION*.md
+ORCHESTRATION_*.md
+# Note: Keep permanent documentation in Project MDs/
+
+# Test coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+coverage.json
+*.cover
 
 # Note: Each subproject (audio-transcription-pipeline/, backend/)
 # has its own .gitignore for project-specific patterns
