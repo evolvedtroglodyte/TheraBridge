@@ -9,6 +9,7 @@ Provides dashboard data aggregation including:
 """
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_, or_, desc
+from sqlalchemy.orm import selectinload
 from uuid import UUID
 from datetime import date as date_type, datetime, timedelta
 from typing import List, Optional
@@ -320,6 +321,7 @@ async def get_goal_dashboard_items(
     logger.info(f"Getting goal dashboard items for patient {patient_id}")
 
     # Get all active goals with tracking configs
+    # Eager load progress_entries to avoid N+1 queries (loads all entries in single query)
     goals_query = select(TreatmentGoal, GoalTrackingConfig).outerjoin(
         GoalTrackingConfig,
         TreatmentGoal.id == GoalTrackingConfig.goal_id
@@ -328,6 +330,8 @@ async def get_goal_dashboard_items(
             TreatmentGoal.patient_id == patient_id,
             TreatmentGoal.status.in_(['assigned', 'in_progress', 'completed'])
         )
+    ).options(
+        selectinload(TreatmentGoal.progress_entries)
     ).order_by(TreatmentGoal.created_at)
 
     goals_result = await db.execute(goals_query)
@@ -336,13 +340,11 @@ async def get_goal_dashboard_items(
     dashboard_items = []
 
     for goal, config in goals_with_configs:
-        # Get latest progress entry
-        latest_entry_query = select(ProgressEntry).where(
-            ProgressEntry.goal_id == goal.id
-        ).order_by(desc(ProgressEntry.entry_date)).limit(1)
-
-        latest_entry_result = await db.execute(latest_entry_query)
-        latest_entry = latest_entry_result.scalar_one_or_none()
+        # Use pre-loaded progress_entries to get latest entry (avoids N+1 query)
+        # Filter and sort in Python since entries are already loaded
+        latest_entry = None
+        if goal.progress_entries:
+            latest_entry = max(goal.progress_entries, key=lambda e: e.entry_date)
 
         current_value = float(latest_entry.value) if latest_entry else None
 
@@ -359,16 +361,14 @@ async def get_goal_dashboard_items(
                 progress_percentage = max(0.0, min(100.0, progress))
 
         # Get trend data (last 30 days)
+        # Use pre-loaded progress_entries and filter by date in Python (avoids N+1 query)
         thirty_days_ago = date_type.today() - timedelta(days=30)
-        trend_entries_query = select(ProgressEntry).where(
-            and_(
-                ProgressEntry.goal_id == goal.id,
-                ProgressEntry.entry_date >= thirty_days_ago
-            )
-        ).order_by(ProgressEntry.entry_date)
-
-        trend_entries_result = await db.execute(trend_entries_query)
-        trend_entries = trend_entries_result.scalars().all()
+        trend_entries = [
+            entry for entry in goal.progress_entries
+            if entry.entry_date >= thirty_days_ago
+        ]
+        # Sort by entry_date in Python (already optimized since entries are in memory)
+        trend_entries = sorted(trend_entries, key=lambda e: e.entry_date)
 
         # Build trend data points
         trend_data = [

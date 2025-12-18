@@ -22,12 +22,12 @@ from datetime import date, datetime, timedelta
 from app.models.db_models import User
 from app.models.treatment_models import (
     TreatmentPlan,
-    TreatmentGoal,
     GoalProgress,
     Intervention,
     GoalIntervention,
     PlanReview
 )
+from app.models.goal_models import TreatmentGoal
 from app.models.schemas import UserRole
 from app.models.treatment_schemas import PlanStatus, GoalStatus, GoalType, EvidenceLevel
 

@@ -338,29 +338,57 @@ async def calculate_session_trends(
     limit = config["limit"]
     label_format = config["label_format"]
 
+    # Detect database dialect for cross-database compatibility
+    dialect_name = db.bind.dialect.name
+
     # Build base query with different label generation based on period
     if label_format == "week":
         # Week: "Week 42 2024"
-        label_expr = func.concat(
-            'Week ',
-            func.extract('week', TherapySession.session_date),
-            ' ',
-            func.extract('year', TherapySession.session_date)
-        ).label('label')
+        if dialect_name == 'postgresql':
+            label_expr = func.concat(
+                'Week ',
+                func.extract('week', TherapySession.session_date),
+                ' ',
+                func.extract('year', TherapySession.session_date)
+            ).label('label')
+        else:  # sqlite
+            # SQLite: Use strftime for week and year
+            label_expr = (
+                'Week ' +
+                cast(func.strftime('%W', TherapySession.session_date), String) +
+                ' ' +
+                cast(func.strftime('%Y', TherapySession.session_date), String)
+            ).label('label')
     elif label_format == "month":
         # Month: "Jan", "Feb", "Mar"
-        label_expr = func.to_char(TherapySession.session_date, 'Mon').label('label')
+        if dialect_name == 'postgresql':
+            label_expr = func.to_char(TherapySession.session_date, 'Mon').label('label')
+        else:  # sqlite
+            # SQLite: Use strftime with %m and map to month names
+            label_expr = func.strftime('%m', TherapySession.session_date).label('label')
     elif label_format == "quarter":
         # Quarter: "Q1 2024", "Q2 2024"
-        label_expr = func.concat(
-            'Q',
-            func.extract('quarter', TherapySession.session_date),
-            ' ',
-            func.extract('year', TherapySession.session_date)
-        ).label('label')
+        if dialect_name == 'postgresql':
+            label_expr = func.concat(
+                'Q',
+                func.extract('quarter', TherapySession.session_date),
+                ' ',
+                func.extract('year', TherapySession.session_date)
+            ).label('label')
+        else:  # sqlite
+            # SQLite: Calculate quarter from month
+            label_expr = (
+                'Q' +
+                cast((cast(func.strftime('%m', TherapySession.session_date), Integer) - 1) / 3 + 1, String) +
+                ' ' +
+                cast(func.strftime('%Y', TherapySession.session_date), String)
+            ).label('label')
     else:  # year
         # Year: "2024", "2023"
-        label_expr = func.to_char(TherapySession.session_date, 'YYYY').label('label')
+        if dialect_name == 'postgresql':
+            label_expr = func.to_char(TherapySession.session_date, 'YYYY').label('label')
+        else:  # sqlite
+            label_expr = func.strftime('%Y', TherapySession.session_date).label('label')
 
     # Build query
     query = select(
@@ -463,70 +491,151 @@ async def calculate_topic_frequencies(
     logger.info(f"Calculating topic frequencies for therapist {therapist_id}")
 
     try:
-        # Step 1: Extract all topics from all sessions using JSONB array expansion
-        # func.jsonb_array_elements_text expands JSONB array to individual text rows
-        # func.lower normalizes casing for consistent counting
-        topic_query = (
-            select(
-                func.lower(
-                    func.jsonb_array_elements_text(
-                        TherapySession.extracted_notes['key_topics']
+        # Detect database dialect for cross-database compatibility
+        dialect_name = db.bind.dialect.name
+
+        if dialect_name == 'postgresql':
+            # PostgreSQL - Use SQL-based aggregation with GROUP BY and COUNT
+            # This optimizes the query by doing counting at the database level
+            # instead of fetching all topics and counting in Python
+
+            # Build optimized query with GROUP BY, COUNT, filtering, ordering, and limiting
+            # Use CTE (Common Table Expression) to expand topics once, then filter and count
+            from sqlalchemy import literal_column
+
+            topic_expr = func.lower(
+                func.jsonb_array_elements_text(
+                    TherapySession.extracted_notes['key_topics']
+                )
+            )
+
+            topic_query = (
+                select(
+                    topic_expr.label('topic'),
+                    func.count().label('count')
+                )
+                .where(
+                    and_(
+                        TherapySession.therapist_id == therapist_id,
+                        TherapySession.extracted_notes.isnot(None)
                     )
-                ).label('topic')
+                )
+                .group_by(topic_expr)
+                .having(
+                    and_(
+                        topic_expr != '',
+                        topic_expr.isnot(None),
+                        func.length(func.trim(topic_expr)) > 0
+                    )
+                )
+                .order_by(func.count().desc())
+                .limit(50)
             )
-            .where(TherapySession.therapist_id == therapist_id)
-            .where(TherapySession.extracted_notes.isnot(None))
-        )
 
-        # Execute query and collect all topics
-        result = await db.execute(topic_query)
-        all_topics = [row.topic for row in result.fetchall()]
+            # Execute optimized query
+            result = await db.execute(topic_query)
+            topic_rows = result.fetchall()
 
-        # Handle edge case: no topics found
-        if not all_topics:
-            logger.info(f"No topics found for therapist {therapist_id}")
-            return TopicsResponse(topics=[])
+            # Calculate total topics for percentages
+            total_topics = sum(row.count for row in topic_rows)
 
-        # Step 2: Count frequencies
-        topic_counts = {}
-        for topic in all_topics:
-            # Skip empty, None, or whitespace-only topics
-            if not topic or not topic.strip():
-                continue
+            # Handle edge case: no topics found
+            if total_topics == 0:
+                logger.info(f"No topics found for therapist {therapist_id}")
+                return TopicsResponse(topics=[])
 
-            topic_normalized = topic.strip()
-            topic_counts[topic_normalized] = topic_counts.get(topic_normalized, 0) + 1
+            # Convert to TopicFrequency objects
+            topic_frequencies = [
+                TopicFrequency(
+                    name=row.topic.strip(),
+                    count=row.count,
+                    percentage=round(row.count / total_topics, 4)
+                )
+                for row in topic_rows
+                if row.topic and row.topic.strip()  # Skip empty/whitespace topics
+            ]
 
-        # Handle edge case: all topics were empty/whitespace
-        if not topic_counts:
-            logger.info(f"All topics were empty for therapist {therapist_id}")
-            return TopicsResponse(topics=[])
+            # Take top 20 (already ordered by count desc in SQL)
+            top_topics = topic_frequencies[:20]
 
-        # Step 3: Calculate total for percentage calculations
-        total_topics = sum(topic_counts.values())
-
-        # Step 4: Convert to TopicFrequency objects with percentages
-        topic_frequencies = [
-            TopicFrequency(
-                name=topic,
-                count=count,
-                percentage=round(count / total_topics, 4)  # Round to 4 decimal places (0.XXXX)
+            logger.info(
+                f"Topic frequency analysis complete for therapist {therapist_id}: "
+                f"analyzed {total_topics} total topics, "
+                f"found {len(topic_frequencies)} unique topics, "
+                f"returning top {len(top_topics)} topics"
             )
-            for topic, count in topic_counts.items()
-        ]
 
-        # Step 5: Sort by count (descending) and take top 20
-        topic_frequencies.sort(key=lambda x: x.count, reverse=True)
-        top_topics = topic_frequencies[:20]
+            return TopicsResponse(topics=top_topics)
 
-        logger.info(
-            f"Topic frequency analysis complete for therapist {therapist_id}: "
-            f"analyzed {total_topics} total topics, "
-            f"found {len(topic_counts)} unique topics, "
-            f"returning top {len(top_topics)} topics"
-        )
+        else:  # sqlite
+            # SQLite - Parse JSON in Python since SQLite lacks jsonb_array_elements_text
+            # First fetch all sessions with extracted_notes
+            sessions_query = (
+                select(TherapySession.extracted_notes)
+                .where(TherapySession.therapist_id == therapist_id)
+                .where(TherapySession.extracted_notes.isnot(None))
+            )
+            result = await db.execute(sessions_query)
+            all_notes = result.scalars().all()
 
-        return TopicsResponse(topics=top_topics)
+            # Parse JSON and extract key_topics arrays
+            all_topics = []
+            for notes in all_notes:
+                if notes and 'key_topics' in notes:
+                    topics = notes['key_topics']
+                    if isinstance(topics, list):
+                        # Normalize to lowercase and filter empty
+                        all_topics.extend([
+                            topic.lower().strip()
+                            for topic in topics
+                            if isinstance(topic, str) and topic.strip()
+                        ])
+                    elif isinstance(topics, str):
+                        # Handle case where it's stored as JSON string
+                        try:
+                            topics_list = json.loads(topics)
+                            if isinstance(topics_list, list):
+                                all_topics.extend([
+                                    topic.lower().strip()
+                                    for topic in topics_list
+                                    if isinstance(topic, str) and topic.strip()
+                                ])
+                        except json.JSONDecodeError:
+                            pass
+
+            # Handle edge case: no topics found
+            if not all_topics:
+                logger.info(f"No topics found for therapist {therapist_id}")
+                return TopicsResponse(topics=[])
+
+            # Count frequencies using Python Counter for SQLite
+            from collections import Counter
+            topic_counts = Counter(all_topics)
+
+            # Calculate total for percentage calculations
+            total_topics = sum(topic_counts.values())
+
+            # Convert to TopicFrequency objects with percentages
+            topic_frequencies = [
+                TopicFrequency(
+                    name=topic,
+                    count=count,
+                    percentage=round(count / total_topics, 4)
+                )
+                for topic, count in topic_counts.most_common(50)  # Get top 50
+            ]
+
+            # Take top 20
+            top_topics = topic_frequencies[:20]
+
+            logger.info(
+                f"Topic frequency analysis complete for therapist {therapist_id}: "
+                f"analyzed {total_topics} total topics, "
+                f"found {len(topic_counts)} unique topics, "
+                f"returning top {len(top_topics)} topics"
+            )
+
+            return TopicsResponse(topics=top_topics)
 
     except Exception as e:
         logger.error(
@@ -793,10 +902,18 @@ async def _calculate_mood_trend(
         Uses extracted_notes->>'session_mood' to extract mood as text,
         then maps to numeric score using CASE statement.
     """
+    # Detect database dialect for cross-database compatibility
+    dialect_name = db.bind.dialect.name
+
     # Query sessions grouped by month with mood data
     # Extract session_mood from extracted_notes JSONB and convert to numeric score
+    if dialect_name == 'postgresql':
+        month_expr = func.to_char(TherapySession.session_date, 'YYYY-MM').label('month')
+    else:  # sqlite
+        month_expr = func.strftime('%Y-%m', TherapySession.session_date).label('month')
+
     mood_query = select(
-        func.to_char(TherapySession.session_date, 'YYYY-MM').label('month'),
+        month_expr,
         func.avg(
             func.cast(
                 func.case(

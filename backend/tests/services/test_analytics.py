@@ -562,16 +562,17 @@ class TestCalculatePatientProgress:
     ):
         """Test patient progress calculation with valid data"""
         therapist = therapist_with_patients_and_sessions["therapist"]
-        patient_user = therapist_with_patients_and_sessions["patient_users"][0]
+        patients = therapist_with_patients_and_sessions["patients"]
+        patient1 = patients[0]  # Get Patient object from legacy table
 
         result = await calculate_patient_progress(
-            patient_user.id,
+            patient1.id,  # Use Patient ID, not User ID
             therapist.id,
             async_test_db
         )
 
         assert isinstance(result, PatientProgressResponse)
-        assert result.patient_id == patient_user.id
+        assert result.patient_id == patient1.id
         assert result.total_sessions > 0
         assert isinstance(result.first_session_date, str)
         assert isinstance(result.last_session_date, str)
@@ -602,12 +603,13 @@ class TestCalculatePatientProgress:
         async_test_db.add(unauthorized_therapist)
         await async_test_db.flush()
 
-        patient_user = therapist_with_patients_and_sessions["patient_users"][0]
+        patients = therapist_with_patients_and_sessions["patients"]
+        patient1 = patients[0]  # Get Patient object from legacy table
 
         # Should raise 403 HTTPException
         with pytest.raises(HTTPException) as exc_info:
             await calculate_patient_progress(
-                patient_user.id,
+                patient1.id,  # Use Patient ID, not User ID
                 unauthorized_therapist.id,
                 async_test_db
             )
@@ -644,6 +646,15 @@ class TestCalculatePatientProgress:
         async_test_db.add(patient_user)
         await async_test_db.flush()
 
+        # Create Patient record (legacy table)
+        patient = Patient(
+            name="Test Patient",
+            email="progress.patient@test.com",
+            therapist_id=therapist.id
+        )
+        async_test_db.add(patient)
+        await async_test_db.flush()
+
         # Create active relationship
         rel = TherapistPatient(
             therapist_id=therapist.id,
@@ -654,7 +665,7 @@ class TestCalculatePatientProgress:
         await async_test_db.flush()
 
         result = await calculate_patient_progress(
-            patient_user.id,
+            patient.id,  # Use Patient ID from legacy table, not User ID
             therapist.id,
             async_test_db
         )
@@ -676,10 +687,11 @@ class TestCalculatePatientProgress:
     ):
         """Test mood trend calculation from session data"""
         therapist = therapist_with_patients_and_sessions["therapist"]
-        patient_user = therapist_with_patients_and_sessions["patient_users"][0]
+        patients = therapist_with_patients_and_sessions["patients"]
+        patient1 = patients[0]  # Get Patient object from legacy table
 
         result = await calculate_patient_progress(
-            patient_user.id,
+            patient1.id,  # Use Patient ID, not User ID
             therapist.id,
             async_test_db
         )
@@ -703,10 +715,11 @@ class TestCalculatePatientProgress:
     ):
         """Test session frequency calculation and trend detection"""
         therapist = therapist_with_patients_and_sessions["therapist"]
-        patient_user = therapist_with_patients_and_sessions["patient_users"][0]
+        patients = therapist_with_patients_and_sessions["patients"]
+        patient1 = patients[0]  # Get Patient object from legacy table
 
         result = await calculate_patient_progress(
-            patient_user.id,
+            patient1.id,  # Use Patient ID, not User ID
             therapist.id,
             async_test_db
         )
