@@ -81,15 +81,17 @@ async def get_patient_timeline(
         - search: Case-insensitive search in title and description
 
     Example:
-        >>> # Get first page of timeline
-        >>> timeline = await get_patient_timeline(patient_uuid, db, limit=20)
+        >>> # Get first page of timeline (therapist can see all events)
+        >>> timeline = await get_patient_timeline(
+        ...     patient_uuid, db, current_user=therapist, limit=20
+        ... )
         >>> # Get next page using cursor
         >>> next_page = await get_patient_timeline(
-        ...     patient_uuid, db, limit=20, cursor=timeline.next_cursor
+        ...     patient_uuid, db, current_user=therapist, limit=20, cursor=timeline.next_cursor
         ... )
-        >>> # Filter by event types and date range
+        >>> # Filter by event types and date range (patient sees only non-private events)
         >>> filtered = await get_patient_timeline(
-        ...     patient_uuid, db,
+        ...     patient_uuid, db, current_user=patient,
         ...     event_types=['session', 'milestone'],
         ...     start_date=datetime(2024, 1, 1),
         ...     end_date=datetime(2024, 12, 31)

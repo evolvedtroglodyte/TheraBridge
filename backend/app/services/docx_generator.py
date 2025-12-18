@@ -136,6 +136,170 @@ class DOCXGeneratorService:
         # ... implementation ...
         pass
 
+    async def generate_timeline_export(
+        self,
+        patient: Dict[str, Any],
+        therapist: Dict[str, Any],
+        events: List[Dict[str, Any]],
+        summary: Dict[str, Any],
+        date_range: Dict[str, Any]
+    ) -> bytes:
+        """
+        Generate patient timeline DOCX export.
+
+        Args:
+            patient: Patient data
+            therapist: Therapist data
+            events: Timeline events list
+            summary: Timeline summary data
+            date_range: {start_date, end_date} or None values
+
+        Returns:
+            DOCX file as bytes
+        """
+        try:
+            logger.info("Starting DOCX timeline export generation")
+
+            doc = Document()
+
+            # Add confidentiality notice
+            heading = doc.add_paragraph("CONFIDENTIAL - PROTECTED HEALTH INFORMATION")
+            heading.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            heading.runs[0].font.color.rgb = RGBColor(211, 47, 47)
+            heading.runs[0].font.bold = True
+
+            # Add title
+            title = doc.add_heading('Patient Timeline Export', 0)
+
+            # Add header information
+            doc.add_paragraph(f"Patient: {patient['full_name']}")
+
+            if date_range.get('start_date') and date_range.get('end_date'):
+                doc.add_paragraph(
+                    f"Period: {date_range['start_date'].strftime('%B %d, %Y')} - "
+                    f"{date_range['end_date'].strftime('%B %d, %Y')}"
+                )
+            else:
+                doc.add_paragraph("Period: All Time")
+
+            doc.add_paragraph(f"Prepared by: {therapist['full_name']}")
+            doc.add_paragraph(f"Export Date: {datetime.now().strftime('%B %d, %Y')}")
+            doc.add_paragraph("")  # Blank line
+
+            # Summary section
+            doc.add_heading('Timeline Summary', 1)
+            doc.add_paragraph(f"Total Events: {len(events)}")
+            doc.add_paragraph(f"Total Sessions: {summary.get('total_sessions', 0)}")
+            doc.add_paragraph(f"Milestones Achieved: {summary.get('milestones_achieved', 0)}")
+
+            if summary.get('first_session'):
+                doc.add_paragraph(f"First Session: {summary['first_session']}")
+            if summary.get('last_session'):
+                doc.add_paragraph(f"Last Session: {summary['last_session']}")
+
+            doc.add_paragraph("")
+
+            # Events by type breakdown
+            if summary.get('events_by_type'):
+                doc.add_heading('Events by Type', 2)
+                for event_type, count in summary['events_by_type'].items():
+                    doc.add_paragraph(f"{event_type.capitalize()}: {count}", style='List Bullet')
+                doc.add_paragraph("")
+
+            # Timeline events section
+            doc.add_heading('Timeline Events', 1)
+
+            if not events:
+                doc.add_paragraph("No events found for the specified criteria.")
+            else:
+                # Group events by importance for better organization
+                milestone_events = [e for e in events if e['importance'] == 'milestone']
+                high_events = [e for e in events if e['importance'] == 'high']
+                normal_events = [e for e in events if e['importance'] == 'normal']
+                low_events = [e for e in events if e['importance'] == 'low']
+
+                # Display milestones first
+                if milestone_events:
+                    doc.add_heading('Milestones', 2)
+                    for event in milestone_events:
+                        self._add_event_to_doc(doc, event)
+                    doc.add_paragraph("")
+
+                # Display high importance events
+                if high_events:
+                    doc.add_heading('High Importance Events', 2)
+                    for event in high_events:
+                        self._add_event_to_doc(doc, event)
+                    doc.add_paragraph("")
+
+                # Display normal events
+                if normal_events:
+                    doc.add_heading('Standard Events', 2)
+                    for event in normal_events:
+                        self._add_event_to_doc(doc, event)
+                    doc.add_paragraph("")
+
+                # Display low importance events
+                if low_events:
+                    doc.add_heading('Additional Events', 2)
+                    for event in low_events:
+                        self._add_event_to_doc(doc, event)
+
+            # Save to bytes
+            buffer = BytesIO()
+            doc.save(buffer)
+            buffer.seek(0)
+            docx_bytes = buffer.read()
+
+            logger.info(
+                f"Timeline DOCX generated successfully",
+                extra={"size_kb": len(docx_bytes) / 1024, "event_count": len(events)}
+            )
+
+            return docx_bytes
+
+        except Exception as e:
+            logger.error(f"Timeline DOCX generation failed: {e}", exc_info=True)
+            raise ValueError(f"Failed to generate timeline DOCX: {str(e)}")
+
+    def _add_event_to_doc(self, doc: Document, event: Dict[str, Any]) -> None:
+        """
+        Add a single event to the document.
+
+        Args:
+            doc: Document instance
+            event: Event data dictionary
+        """
+        # Event title with date
+        event_date = event['event_date']
+        if isinstance(event_date, str):
+            date_str = event_date
+        else:
+            date_str = event_date.strftime('%B %d, %Y')
+
+        event_para = doc.add_paragraph()
+        event_para.add_run(f"{event['title']}").bold = True
+        event_para.add_run(f" - {date_str}")
+
+        # Event type badge
+        type_para = doc.add_paragraph(f"Type: {event['event_type'].capitalize()}", style='List Bullet')
+
+        # Description if available
+        if event.get('description'):
+            doc.add_paragraph(event['description'])
+
+        # Metadata if available
+        if event.get('metadata'):
+            metadata = event['metadata']
+            if isinstance(metadata, dict):
+                if metadata.get('topics'):
+                    topics_str = ", ".join(metadata['topics'])
+                    doc.add_paragraph(f"Topics: {topics_str}", style='List Bullet 2')
+                if metadata.get('mood'):
+                    doc.add_paragraph(f"Mood: {metadata['mood']}", style='List Bullet 2')
+
+        doc.add_paragraph("")  # Blank line after event
+
 
 def get_docx_generator() -> DOCXGeneratorService:
     """FastAPI dependency to provide DOCX generator service"""

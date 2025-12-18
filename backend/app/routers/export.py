@@ -54,7 +54,7 @@ async def process_export_job(
 
     Args:
         job_id: UUID of the export job to process
-        export_type: Type of export (session_notes, progress_report, etc.)
+        export_type: Type of export (session_notes, progress_report, timeline, etc.)
         request_data: Dictionary containing export parameters
         db: Database session
 
@@ -88,6 +88,15 @@ async def process_export_job(
                 request_data['patient_id'],
                 request_data['start_date'],
                 request_data['end_date'],
+                db
+            )
+        elif export_type == 'timeline':
+            context = await export_service.gather_timeline_data(
+                request_data['patient_id'],
+                request_data.get('start_date'),
+                request_data.get('end_date'),
+                request_data.get('event_types'),
+                request_data.get('include_private', True),
                 db
             )
         # Future export types will be added here

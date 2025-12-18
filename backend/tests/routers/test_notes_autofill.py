@@ -36,7 +36,6 @@ def sample_session_rich_notes(therapist_user, sample_patient, active_relationshi
     - Complete mood trajectory data
 
     Args:
-        test_db: Test database session
         therapist_user: Therapist conducting the session
         sample_patient: Patient for this session
         active_relationship: Active therapist-patient relationship
@@ -44,14 +43,18 @@ def sample_session_rich_notes(therapist_user, sample_patient, active_relationshi
     Returns:
         Session object with rich extracted_notes (high confidence scores)
     """
-    session = Session(
-        patient_id=sample_patient.id,
-        therapist_id=therapist_user.id,
-        session_date=datetime.utcnow(),
-        duration_seconds=3600,
-        audio_filename="comprehensive_session.mp3",
-        transcript_text="Detailed transcript of a comprehensive therapy session discussing work anxiety, family dynamics, and coping strategies.",
-        status=SessionStatus.processed.value,
+    from tests.routers.conftest import TestingSyncSessionLocal
+
+    db = TestingSyncSessionLocal()
+    try:
+        session = Session(
+            patient_id=sample_patient.id,
+            therapist_id=therapist_user.id,
+            session_date=datetime.utcnow(),
+            duration_seconds=3600,
+            audio_filename="comprehensive_session.mp3",
+            transcript_text="Detailed transcript of a comprehensive therapy session discussing work anxiety, family dynamics, and coping strategies.",
+            status=SessionStatus.processed.value,
         extracted_notes={
             "key_topics": [
                 "Work-related stress and deadline pressure",
@@ -144,15 +147,17 @@ def sample_session_rich_notes(therapist_user, sample_patient, active_relationshi
             "therapist_notes": "Patient continues to demonstrate strong engagement and insight. Notable progress in identifying anxiety triggers and applying cognitive restructuring techniques. Sleep disturbances remain a concern but patient is motivated to address through behavioral interventions. Family dynamics appear to be a secondary stressor that warrants continued attention. Overall trajectory is positive with good prognosis for continued improvement.",
             "patient_summary": "You're making excellent progress in understanding your anxiety triggers, especially around work deadlines. This week, we practiced relaxation techniques and discussed ways to improve your sleep. Your homework includes daily relaxation practice and tracking anxious thoughts. You're developing good skills for managing stress and anxiety."
         }
-    )
-    test_db.add(session)
-    test_db.commit()
-    test_db.refresh(session)
-    return session
+        )
+        db.add(session)
+        db.commit()
+        db.refresh(session)
+        return session
+    finally:
+        db.close()
 
 
 @pytest.fixture(scope="function")
-def sample_session_sparse_notes(test_db, therapist_user, sample_patient, active_relationship):
+def sample_session_sparse_notes(therapist_user, sample_patient, active_relationship):
     """
     Create a session with minimal extracted_notes for low-confidence autofill testing.
 
@@ -162,7 +167,6 @@ def sample_session_sparse_notes(test_db, therapist_user, sample_patient, active_
     - Handling of incomplete data
 
     Args:
-        test_db: Test database session
         therapist_user: Therapist conducting the session
         sample_patient: Patient for this session
         active_relationship: Active therapist-patient relationship
@@ -170,7 +174,11 @@ def sample_session_sparse_notes(test_db, therapist_user, sample_patient, active_
     Returns:
         Session object with sparse extracted_notes (low confidence scores)
     """
-    session = Session(
+    from tests.routers.conftest import TestingSyncSessionLocal
+
+    db = TestingSyncSessionLocal()
+    try:
+        session = Session(
         patient_id=sample_patient.id,
         therapist_id=therapist_user.id,
         session_date=datetime.utcnow(),
@@ -194,15 +202,17 @@ def sample_session_sparse_notes(test_db, therapist_user, sample_patient, active_
             "therapist_notes": "Short session.",
             "patient_summary": "Brief update."
         }
-    )
-    test_db.add(session)
-    test_db.commit()
-    test_db.refresh(session)
-    return session
+        )
+        db.add(session)
+        db.commit()
+        db.refresh(session)
+        return session
+    finally:
+        db.close()
 
 
 @pytest.fixture(scope="function")
-def sample_session_no_notes(test_db, therapist_user, sample_patient, active_relationship):
+def sample_session_no_notes(therapist_user, sample_patient, active_relationship):
     """
     Create a session without extracted_notes for error testing.
 
@@ -210,7 +220,6 @@ def sample_session_no_notes(test_db, therapist_user, sample_patient, active_rela
     so autofill should fail with a 400 error.
 
     Args:
-        test_db: Test database session
         therapist_user: Therapist conducting the session
         sample_patient: Patient for this session
         active_relationship: Active therapist-patient relationship
@@ -218,7 +227,11 @@ def sample_session_no_notes(test_db, therapist_user, sample_patient, active_rela
     Returns:
         Session object with no extracted_notes (status=transcribed)
     """
-    session = Session(
+    from tests.routers.conftest import TestingSyncSessionLocal
+
+    db = TestingSyncSessionLocal()
+    try:
+        session = Session(
         patient_id=sample_patient.id,
         therapist_id=therapist_user.id,
         session_date=datetime.utcnow(),
@@ -227,15 +240,17 @@ def sample_session_no_notes(test_db, therapist_user, sample_patient, active_rela
         transcript_text="This session has not been processed by AI extraction yet.",
         status=SessionStatus.transcribed.value,
         extracted_notes=None  # Not yet processed
-    )
-    test_db.add(session)
-    test_db.commit()
-    test_db.refresh(session)
-    return session
+        )
+        db.add(session)
+        db.commit()
+        db.refresh(session)
+        return session
+    finally:
+        db.close()
 
 
 @pytest.fixture(scope="function")
-def active_relationship(test_db, therapist_user, sample_patient):
+def active_relationship(therapist_user, sample_patient):
     """
     Create an active therapist-patient relationship.
 
@@ -243,28 +258,33 @@ def active_relationship(test_db, therapist_user, sample_patient):
     via the therapist_patients junction table.
 
     Args:
-        test_db: Test database session
         therapist_user: Therapist user
         sample_patient: Patient
 
     Returns:
         TherapistPatient relationship object
     """
-    relationship = TherapistPatient(
+    from tests.routers.conftest import TestingSyncSessionLocal
+
+    db = TestingSyncSessionLocal()
+    try:
+        relationship = TherapistPatient(
         therapist_id=therapist_user.id,
         patient_id=sample_patient.id,
         relationship_type="primary",
         is_active=True,
         started_at=datetime.utcnow()
-    )
-    test_db.add(relationship)
-    test_db.commit()
-    test_db.refresh(relationship)
-    return relationship
+        )
+        db.add(relationship)
+        db.commit()
+        db.refresh(relationship)
+        return relationship
+    finally:
+        db.close()
 
 
 @pytest.fixture(scope="function")
-def second_therapist_user(test_db):
+def second_therapist_user():
     """
     Create a second therapist user for authorization testing.
 
@@ -275,8 +295,11 @@ def second_therapist_user(test_db):
         User object with therapist role (no patient access)
     """
     from app.auth.utils import get_password_hash
+    from tests.routers.conftest import TestingSyncSessionLocal
 
-    user = User(
+    db = TestingSyncSessionLocal()
+    try:
+        user = User(
         email="therapist2@test.com",
         hashed_password=get_password_hash("testpass123456"),
         first_name="Second",
@@ -285,11 +308,13 @@ def second_therapist_user(test_db):
         role=UserRole.therapist,
         is_active=True,
         is_verified=False
-    )
-    test_db.add(user)
-    test_db.commit()
-    test_db.refresh(user)
-    return user
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        return user
+    finally:
+        db.close()
 
 
 @pytest.fixture(scope="function")
@@ -942,13 +967,15 @@ class TestAutofillEdgeCases:
         self,
         client,
         therapist_auth_headers,
-        test_db,
         therapist_user,
         sample_patient,
         active_relationship
     ):
         """Test autofill handles sessions with some fields missing from extracted_notes"""
+        from tests.routers.conftest import TestingSyncSessionLocal
+
         # Create session with only required fields, optional fields missing
+        db = TestingSyncSessionLocal()
         session = Session(
             patient_id=sample_patient.id,
             therapist_id=therapist_user.id,
@@ -971,9 +998,10 @@ class TestAutofillEdgeCases:
                 "patient_summary": "Brief summary."
             }
         )
-        test_db.add(session)
-        test_db.commit()
-        test_db.refresh(session)
+        db.add(session)
+        db.commit()
+        db.refresh(session)
+        db.close()
 
         request_data = {
             "template_type": "soap"

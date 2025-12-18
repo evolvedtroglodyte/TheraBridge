@@ -8,7 +8,7 @@ Provides calculation functions for analytics endpoints including:
 - Topic analysis and insights
 """
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_, distinct
+from sqlalchemy import select, func, and_, distinct, case, cast, Integer
 from uuid import UUID
 from datetime import datetime, timedelta
 from typing import Optional, List
@@ -31,6 +31,63 @@ from app.models.db_models import TherapySession, User, TherapistPatient
 
 # Configure logger
 logger = logging.getLogger(__name__)
+
+
+def dialect_aware_date_trunc(period: str, column, db_session: AsyncSession):
+    """
+    Create a database-agnostic date truncation expression.
+
+    PostgreSQL uses func.date_trunc(), SQLite uses func.strftime().
+    This helper function returns the appropriate SQL expression based on the dialect.
+
+    Args:
+        period: Time period to truncate to ("week", "month", "quarter", "year")
+        column: SQLAlchemy column to truncate (e.g., TherapySession.session_date)
+        db_session: AsyncSession used to detect database dialect
+
+    Returns:
+        SQLAlchemy expression appropriate for the database dialect
+
+    SQLite Format Strings:
+        - week: '%Y-%W' (Year-WeekNumber)
+        - month: '%Y-%m' (Year-Month)
+        - quarter: Calculated using month division
+        - year: '%Y' (Year)
+    """
+    # Detect dialect from session's bind
+    dialect_name = db_session.bind.dialect.name
+
+    if dialect_name == 'postgresql':
+        # PostgreSQL: Use native date_trunc
+        return func.date_trunc(period, column)
+
+    elif dialect_name == 'sqlite':
+        # SQLite: Use strftime with format strings
+        if period == 'week':
+            # ISO week format: YYYY-WW
+            return func.strftime('%Y-%W', column)
+        elif period == 'month':
+            # Month format: YYYY-MM
+            return func.strftime('%Y-%m', column)
+        elif period == 'quarter':
+            # Quarter calculation: YYYY-Q
+            # Formula: (month - 1) / 3 + 1 = quarter number
+            return func.strftime('%Y-', column) + cast(
+                (cast(func.strftime('%m', column), Integer) - 1) / 3 + 1,
+                Integer
+            )
+        elif period == 'year':
+            # Year format: YYYY
+            return func.strftime('%Y', column)
+        else:
+            # Default to month for unknown periods
+            logger.warning(f"Unknown period '{period}' for SQLite, defaulting to month")
+            return func.strftime('%Y-%m', column)
+
+    else:
+        # Fallback for other databases (MySQL, etc.) - use PostgreSQL syntax
+        logger.warning(f"Unknown dialect '{dialect_name}', using PostgreSQL date_trunc syntax")
+        return func.date_trunc(period, column)
 
 
 async def calculate_overview_analytics(
@@ -317,11 +374,12 @@ async def calculate_session_trends(
     if patient_id is not None:
         query = query.where(TherapySession.patient_id == patient_id)
 
-    # Group by truncated date
+    # Group by truncated date using dialect-aware function
+    date_trunc_expr = dialect_aware_date_trunc(trunc_arg, TherapySession.session_date, db)
     query = query.group_by(
-        func.date_trunc(trunc_arg, TherapySession.session_date)
+        date_trunc_expr
     ).order_by(
-        func.date_trunc(trunc_arg, TherapySession.session_date).desc()
+        date_trunc_expr.desc()
     ).limit(limit)
 
     # Execute query

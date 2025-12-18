@@ -1,12 +1,12 @@
 """
 Session management endpoints
 """
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, BackgroundTasks, Request
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, BackgroundTasks, Request, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 from uuid import UUID
-from typing import List, Optional
-from datetime import datetime
+from typing import List, Optional, Literal
+from datetime import datetime, date
 import os
 import shutil
 from pathlib import Path
@@ -935,6 +935,250 @@ async def get_timeline_chart_data(
     from app.services.timeline import get_timeline_chart_data
 
     return await get_timeline_chart_data(patient_id=patient_id, db=db)
+
+
+@router.patch("/patients/{patient_id}/timeline/{event_id}", response_model=TimelineEventResponse)
+@limiter.limit("50/hour")
+async def update_timeline_event(
+    request: Request,
+    patient_id: UUID,
+    event_id: UUID,
+    event_update: TimelineEventUpdate,
+    current_user: db_models.User = Depends(require_role(["therapist"])),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Update a timeline event (partial updates allowed).
+
+    Only therapists with active relationship to patient can update events.
+    All fields are optional - only provided fields will be updated.
+
+    Authorization:
+        - Requires therapist role
+        - Therapist must have active relationship with the patient
+
+    Rate Limit:
+        - 50 updates per hour per IP address
+
+    Path Parameters:
+        - patient_id: UUID of the patient who owns the timeline
+        - event_id: UUID of the timeline event to update
+
+    Request Body:
+        - TimelineEventUpdate: Schema with optional fields to update
+
+    Returns:
+        TimelineEventResponse: Updated timeline event
+
+    Raises:
+        HTTPException 403: If user is not a therapist
+        HTTPException 403: If therapist does not have active relationship with patient
+        HTTPException 404: If timeline event not found for this patient
+        HTTPException 400: If no update data provided or validation fails
+        HTTPException 429: Rate limit exceeded
+        HTTPException 500: Database error
+
+    Example:
+        PATCH /patients/123e4567-e89b-12d3-a456-426614174000/timeline/987e6543-e89b-12d3-a456-426614174999
+        Body: {"title": "Updated title", "importance": "high"}
+    """
+    # Verify therapist has access to patient and event
+    event = await verify_timeline_event_access(event_id, current_user.id, db)
+
+    # Verify event belongs to this patient (double-check)
+    if event.patient_id != patient_id:
+        raise HTTPException(status_code=404, detail="Timeline event not found for this patient")
+
+    # Apply partial updates using exclude_unset=True
+    update_data = event_update.model_dump(exclude_unset=True)
+
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No update data provided")
+
+    # Apply updates to event
+    for field, value in update_data.items():
+        setattr(event, field, value)
+
+    # Commit changes
+    await db.commit()
+    await db.refresh(event)
+
+    # Log update with structured metadata
+    logger.info(
+        "Timeline event updated",
+        extra={
+            "event_id": str(event_id),
+            "patient_id": str(patient_id),
+            "therapist_id": str(current_user.id),
+            "updated_fields": list(update_data.keys())
+        }
+    )
+
+    return TimelineEventResponse.model_validate(event)
+
+
+@router.get("/patients/{patient_id}/timeline/export")
+@limiter.limit("10/hour")
+async def export_patient_timeline(
+    request: Request,
+    patient_id: UUID,
+    background_tasks: BackgroundTasks,
+    format: Literal["pdf", "docx", "json"] = Query(..., description="Export format"),
+    start_date: Optional[date] = Query(None, description="Filter timeline events from this date"),
+    end_date: Optional[date] = Query(None, description="Filter timeline events until this date"),
+    current_user: db_models.User = Depends(require_role(["therapist"])),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Export patient timeline in specified format.
+
+    Creates an export job that runs in the background. Returns immediately
+    with job ID that can be used to check status and download the file.
+
+    **Formats:**
+    - PDF: Formatted timeline report with visual elements
+    - DOCX: Editable Word document with timeline data
+    - JSON: Machine-readable timeline data structure
+
+    **Date Filtering:**
+    - start_date: Optional - include only events from this date forward
+    - end_date: Optional - include only events up to this date
+
+    **Privacy:**
+    - Excludes is_private=true events for patient exports
+    - Therapists can export all events including private ones
+
+    **Rate Limit:** 10 exports per hour per user
+
+    **Authorization:**
+    - Requires therapist role
+    - Therapist must have active relationship with patient
+
+    **Example Request:**
+    ```
+    GET /patients/550e8400-e29b-41d4-a716-446655440000/timeline/export?format=pdf&start_date=2025-01-01
+    ```
+
+    Returns:
+        ExportJobResponse with job ID and status
+    """
+    # Verify therapist has access to patient
+    from sqlalchemy import and_
+    from app.models.db_models import TherapistPatient
+
+    assignment_query = select(TherapistPatient).where(
+        and_(
+            TherapistPatient.therapist_id == current_user.id,
+            TherapistPatient.patient_id == patient_id,
+            TherapistPatient.is_active == True
+        )
+    )
+    result = await db.execute(assignment_query)
+    assignment = result.scalar_one_or_none()
+
+    if not assignment:
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorized to export this patient's timeline"
+        )
+
+    # Validate date range if both provided
+    if start_date and end_date and end_date < start_date:
+        raise HTTPException(
+            status_code=400,
+            detail="end_date must be after start_date"
+        )
+
+    # Log export request
+    logger.info(
+        "Timeline export requested",
+        extra={
+            "user_id": str(current_user.id),
+            "patient_id": str(patient_id),
+            "format": format,
+            "start_date": str(start_date) if start_date else None,
+            "end_date": str(end_date) if end_date else None
+        }
+    )
+
+    # Create export job record
+    from app.models.export_models import ExportJob
+
+    job = ExportJob(
+        user_id=current_user.id,
+        patient_id=patient_id,
+        template_id=None,
+        export_type='timeline',
+        format=format,
+        status='pending',
+        parameters={
+            "patient_id": str(patient_id),
+            "start_date": start_date.isoformat() if start_date else None,
+            "end_date": end_date.isoformat() if end_date else None,
+            "include_private": True  # Therapists see all events
+        }
+    )
+    db.add(job)
+    await db.commit()
+    await db.refresh(job)
+
+    # Queue background processing
+    background_tasks.add_task(
+        process_timeline_export,
+        job.id,
+        patient_id,
+        format,
+        start_date,
+        end_date,
+        db
+    )
+
+    # Return job response
+    from app.schemas.export_schemas import ExportJobResponse
+
+    return ExportJobResponse(
+        id=job.id,
+        export_type=job.export_type,
+        format=job.format,
+        status=job.status,
+        patient_name=None,  # Will be populated when job completes
+        created_at=job.created_at,
+        completed_at=None,
+        file_size_bytes=None,
+        expires_at=None,
+        download_url=None,
+        error_message=None
+    )
+
+
+async def process_timeline_export(
+    job_id: UUID,
+    patient_id: UUID,
+    format: str,
+    start_date: Optional[date],
+    end_date: Optional[date],
+    db: AsyncSession
+):
+    """
+    Background task to process timeline export job.
+
+    This is a placeholder that will be implemented by Backend Dev #3 (I7).
+    The actual implementation will:
+    1. Fetch timeline events from database
+    2. Generate export file in requested format (PDF, DOCX, or JSON)
+    3. Update job status and file_path
+    4. Set expiration timestamp
+    """
+    # TODO: Backend Dev #3 (I7) will implement this
+    logger.info(
+        "Timeline export task queued (pending implementation)",
+        extra={
+            "job_id": str(job_id),
+            "patient_id": str(patient_id),
+            "format": format
+        }
+    )
+    pass
 
 
 @router.delete("/patients/{patient_id}/timeline/{event_id}")

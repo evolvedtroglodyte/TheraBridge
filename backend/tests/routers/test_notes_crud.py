@@ -255,15 +255,10 @@ def test_create_note_with_valid_template_succeeds(
     }
 
     response = async_db_client.post(
-        f"/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
+        f"/api/v1/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
         json=note_data,
         headers=therapist_auth_headers
     )
-
-    print(f"\n=== DEBUG ===")
-    print(f"Response status: {response.status_code}")
-    print(f"Response body: {response.json()}")
-    print(f"=============\n")
 
     assert response.status_code == 201
     data = response.json()
@@ -290,7 +285,7 @@ def test_create_note_links_to_session_and_template(
     }
 
     response = async_db_client.post(
-        f"/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
+        f"/api/v1/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
         json=note_data,
         headers=therapist_auth_headers
     )
@@ -319,7 +314,7 @@ def test_create_note_defaults_to_draft_status(
     }
 
     response = async_db_client.post(
-        f"/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
+        f"/api/v1/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
         json=note_data,
         headers=therapist_auth_headers
     )
@@ -341,7 +336,7 @@ def test_create_note_requires_therapist_role(
     }
 
     response = async_db_client.post(
-        f"/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
+        f"/api/v1/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
         json=note_data,
         headers=patient_auth_headers
     )
@@ -409,7 +404,7 @@ def test_create_note_with_invalid_template_returns_400(
     }
 
     response = async_db_client.post(
-        f"/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
+        f"/api/v1/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
         json=note_data,
         headers=therapist_auth_headers
     )
@@ -432,7 +427,7 @@ def test_create_note_with_empty_content_returns_400(
     }
 
     response = async_db_client.post(
-        f"/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
+        f"/api/v1/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
         json=note_data,
         headers=therapist_auth_headers
     )
@@ -473,7 +468,7 @@ def test_list_notes_returns_all_notes_for_session(
     test_db.commit()
 
     response = async_db_client.get(
-        f"/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
+        f"/api/v1/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
         headers=therapist_auth_headers
     )
 
@@ -520,7 +515,7 @@ def test_list_notes_ordered_by_created_at_desc(
     test_db.commit()
 
     response = async_db_client.get(
-        f"/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
+        f"/api/v1/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
         headers=therapist_auth_headers
     )
 
@@ -589,7 +584,7 @@ def test_update_note_allows_partial_content_update(
     }
 
     response = async_db_client.patch(
-        f"/api/v1/notes/{sample_note.id}",
+        f"/api/v1/api/v1/notes/{sample_note.id}",
         json=update_data,
         headers=therapist_auth_headers
     )
@@ -613,7 +608,7 @@ def test_update_note_can_change_status_draft_to_completed(
     update_data = {"status": "completed"}
 
     response = async_db_client.patch(
-        f"/api/v1/notes/{sample_note.id}",
+        f"/api/v1/api/v1/notes/{sample_note.id}",
         json=update_data,
         headers=therapist_auth_headers
     )
@@ -642,7 +637,7 @@ def test_update_note_can_change_status_completed_to_signed(
     update_data = {"status": "signed"}
 
     response = async_db_client.patch(
-        f"/api/v1/notes/{sample_note.id}",
+        f"/api/v1/api/v1/notes/{sample_note.id}",
         json=update_data,
         headers=therapist_auth_headers
     )
@@ -692,7 +687,7 @@ def test_update_note_requires_session_access(
     update_data = {"status": "completed"}
 
     response = async_db_client.patch(
-        f"/api/v1/notes/{other_note.id}",
+        f"/api/v1/api/v1/notes/{other_note.id}",
         json=update_data,
         headers=therapist_auth_headers
     )
@@ -711,7 +706,7 @@ def test_update_note_with_empty_content_returns_400(
     update_data = {"content": {}}  # Empty content
 
     response = async_db_client.patch(
-        f"/api/v1/notes/{sample_note.id}",
+        f"/api/v1/api/v1/notes/{sample_note.id}",
         json=update_data,
         headers=therapist_auth_headers
     )
@@ -728,7 +723,7 @@ def test_update_note_with_nonexistent_note_id_returns_404(
     update_data = {"status": "completed"}
 
     response = async_db_client.patch(
-        f"/api/v1/notes/{uuid4()}",
+        f"/api/v1/api/v1/notes/{uuid4()}",
         json=update_data,
         headers=therapist_auth_headers
     )
@@ -753,7 +748,7 @@ def test_create_note_without_auth_returns_401(
     }
 
     response = async_db_client.post(
-        f"/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
+        f"/api/v1/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes",
         json=note_data
     )
 
@@ -766,7 +761,7 @@ def test_list_notes_without_auth_returns_401(
 ):
     """Test listing notes without authentication returns 401"""
     response = async_db_client.get(
-        f"/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes"
+        f"/api/v1/api/v1/sessions/{sample_session_with_extracted_notes.id}/notes"
     )
 
     assert response.status_code == 401
@@ -780,7 +775,7 @@ def test_update_note_without_auth_returns_401(
     update_data = {"status": "completed"}
 
     response = async_db_client.patch(
-        f"/api/v1/notes/{sample_note.id}",
+        f"/api/v1/api/v1/notes/{sample_note.id}",
         json=update_data
     )
 

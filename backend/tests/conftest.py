@@ -31,7 +31,7 @@ from app.database import Base, get_db
 from app.auth.dependencies import get_db as get_sync_db
 import app.models  # Import models package to register all tables with Base.metadata
 from app.main import app
-from app.models.db_models import User, Patient, Session
+from app.models.db_models import User, Patient, Session, TherapistPatient
 from app.auth.models import AuthSession
 from app.auth.utils import get_password_hash
 from app.models.schemas import UserRole, SessionStatus, ExtractedNotes, MoodLevel
@@ -1185,12 +1185,14 @@ def completed_sessions(test_db, therapist_user):
 @pytest.fixture(scope="function")
 def therapist_with_patients_and_sessions(test_db):
     """
-    Create a therapist with 3 patients and 6-9 sessions for comprehensive testing.
+    Create a therapist with 3 patients and 8 sessions for comprehensive testing.
 
     Creates:
-    - 1 therapist
-    - 3 patients assigned to the therapist
-    - 2-3 sessions per patient (total 6-9 sessions)
+    - 1 therapist (User with role=therapist)
+    - 3 patient User objects (with role=patient) for authorization/analytics
+    - 3 TherapistPatient junction records (linking therapist to patient users)
+    - 3 Patient records (legacy table for session compatibility)
+    - 8 sessions total: Patient A (3), Patient B (3), Patient C (2)
     - All sessions have analytics-ready data
 
     Args:
@@ -1199,8 +1201,9 @@ def therapist_with_patients_and_sessions(test_db):
     Returns:
         Dict with:
         - therapist: User object (therapist)
-        - patients: List of 3 Patient objects
-        - sessions: List of 6-9 Session objects
+        - patients: List of 3 Patient objects (legacy table)
+        - patient_users: List of 3 User objects with role=patient
+        - sessions: List of 8 Session objects
     """
     # Create therapist
     therapist = User(
@@ -1217,7 +1220,39 @@ def therapist_with_patients_and_sessions(test_db):
     test_db.commit()
     test_db.refresh(therapist)
 
-    # Create 3 patients
+    # Create 3 patient User objects (for therapist_patients junction table)
+    patient_users = []
+    for i in range(3):
+        patient_user = User(
+            email=f"patient{chr(97+i)}@example.com",
+            hashed_password=get_password_hash("testpass123"),
+            first_name=f"Patient{chr(65+i)}",
+            last_name="TestUser",
+            full_name=f"Patient {chr(65+i)} TestUser",
+            role=UserRole.patient,
+            is_active=True,
+            is_verified=False
+        )
+        test_db.add(patient_user)
+        patient_users.append(patient_user)
+    test_db.commit()
+
+    # Refresh patient users
+    for patient_user in patient_users:
+        test_db.refresh(patient_user)
+
+    # Create TherapistPatient junction records (for authorization/analytics)
+    for patient_user in patient_users:
+        therapist_patient = TherapistPatient(
+            therapist_id=therapist.id,
+            patient_id=patient_user.id,
+            relationship_type="primary",
+            is_active=True
+        )
+        test_db.add(therapist_patient)
+    test_db.commit()
+
+    # Create 3 Patient records (for session compatibility - sessions reference patients table)
     patients = []
     for i in range(3):
         patient = Patient(
@@ -1291,6 +1326,7 @@ def therapist_with_patients_and_sessions(test_db):
     return {
         "therapist": therapist,
         "patients": patients,
+        "patient_users": patient_users,  # User objects with role=patient (for analytics/authorization)
         "sessions": sessions
     }
 

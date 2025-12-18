@@ -126,6 +126,10 @@ class TherapySession(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     processed_at = Column(DateTime)
 
+    # Relationships for export service eager loading
+    patient = relationship("Patient", foreign_keys=[patient_id])
+    therapist = relationship("User", foreign_keys=[therapist_id])
+
 
 # Backwards compatibility alias - allows existing code to use 'Session' name
 Session = TherapySession

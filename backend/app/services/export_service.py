@@ -177,6 +177,109 @@ class ExportService:
             "key_topics": key_topics
         }
 
+    async def gather_timeline_data(
+        self,
+        patient_id: UUID,
+        start_date: Optional[datetime],
+        end_date: Optional[datetime],
+        event_types: Optional[List[str]],
+        include_private: bool,
+        db: AsyncSession
+    ) -> Dict[str, Any]:
+        """
+        Gather data for timeline export.
+
+        Args:
+            patient_id: Patient UUID
+            start_date: Optional start date filter
+            end_date: Optional end date filter
+            event_types: Optional event type filter
+            include_private: Whether to include private events
+            db: Database session
+
+        Returns:
+            Context dict with patient, therapist, timeline events, summary
+
+        Raises:
+            ValueError: If patient not found
+        """
+        from app.services.timeline import get_patient_timeline, get_timeline_summary
+
+        # Query patient
+        patient_result = await db.execute(
+            select(User).where(User.id == patient_id)
+        )
+        patient = patient_result.scalar_one_or_none()
+
+        if not patient:
+            raise ValueError(f"Patient {patient_id} not found")
+
+        # Query therapist relationship
+        therapist_rel = await db.execute(
+            select(TherapistPatient)
+            .where(
+                and_(
+                    TherapistPatient.patient_id == patient_id,
+                    TherapistPatient.is_active == True,
+                    TherapistPatient.relationship_type == 'primary'
+                )
+            )
+            .options(joinedload(TherapistPatient.therapist))
+        )
+        relationship = therapist_rel.scalar_one_or_none()
+        therapist = relationship.therapist if relationship else None
+
+        # Fetch timeline data using timeline service
+        timeline_response = await get_patient_timeline(
+            patient_id=patient_id,
+            db=db,
+            event_types=event_types,
+            start_date=start_date,
+            end_date=end_date,
+            limit=10000  # Large limit for full export
+        )
+
+        # Apply privacy filter if needed
+        events = timeline_response.events
+        if not include_private:
+            events = [e for e in events if not e.is_private]
+
+        # Get timeline summary for additional context
+        summary = await get_timeline_summary(patient_id=patient_id, db=db)
+
+        # Serialize events to dict format
+        events_serialized = [
+            {
+                "id": str(event.id),
+                "event_type": event.event_type,
+                "event_subtype": event.event_subtype,
+                "event_date": event.event_date,
+                "title": event.title,
+                "description": event.description,
+                "importance": event.importance,
+                "metadata": event.metadata,
+                "is_private": event.is_private
+            }
+            for event in events
+        ]
+
+        return {
+            "patient": self._serialize_user(patient),
+            "therapist": self._serialize_user(therapist) if therapist else None,
+            "start_date": start_date,
+            "end_date": end_date,
+            "event_types_filter": event_types,
+            "events": events_serialized,
+            "total_events": len(events_serialized),
+            "summary": {
+                "total_sessions": summary.total_sessions,
+                "first_session": summary.first_session,
+                "last_session": summary.last_session,
+                "milestones_achieved": summary.milestones_achieved,
+                "events_by_type": summary.events_by_type
+            }
+        }
+
     async def generate_export(
         self,
         export_type: str,
@@ -234,6 +337,17 @@ class ExportService:
                     therapist=context['therapist'],
                     treatment_data=context,
                     include_sections=context.get('include_sections', {})
+                )
+            elif export_type == 'timeline':
+                return await self.docx_generator.generate_timeline_export(
+                    patient=context['patient'],
+                    therapist=context['therapist'],
+                    events=context['events'],
+                    summary=context['summary'],
+                    date_range={
+                        'start_date': context.get('start_date'),
+                        'end_date': context.get('end_date')
+                    }
                 )
             else:
                 # Fallback for unsupported DOCX export types
