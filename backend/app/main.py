@@ -14,9 +14,7 @@ from sqlalchemy import text
 from openai import AsyncOpenAI
 
 from app.database import init_db, close_db, engine, AsyncSessionLocal
-from app.routers import sessions, patients, cleanup, analytics, export, goal_tracking, assessments, self_report, progress_reports, templates, notes, mfa
-# Temporarily commented out - incomplete features
-# from app.routers import treatment_plans, goals, interventions
+from app.routers import sessions, patients, cleanup, analytics, export, goal_tracking, assessments, self_report, progress_reports, templates, notes, mfa, treatment_plans, goals, interventions
 from app.auth.router import router as auth_router
 from app.middleware.rate_limit import limiter, custom_rate_limit_handler
 from app.middleware.error_handler import register_exception_handlers
@@ -182,10 +180,9 @@ app.include_router(templates.router, prefix="/api/v1/templates", tags=["Template
 app.include_router(notes.router, prefix="/api/v1", tags=["Session Notes"])
 
 # Treatment plans and goals endpoints (Feature 4)
-# Temporarily commented out - incomplete features
-# app.include_router(treatment_plans.router, prefix="/api/v1", tags=["Treatment Plans"])
-# app.include_router(goals.router, prefix="/api/v1", tags=["Goals"])
-# app.include_router(interventions.router, prefix="/api/v1", tags=["Interventions"])
+app.include_router(treatment_plans.router, prefix="/api/v1", tags=["Treatment Plans"])
+app.include_router(goals.router, prefix="/api/v1", tags=["Goals"])
+app.include_router(interventions.router, prefix="/api/v1", tags=["Interventions"])
 
 
 @app.get("/")

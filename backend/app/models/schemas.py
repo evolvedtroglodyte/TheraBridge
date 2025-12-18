@@ -340,6 +340,29 @@ class TimelineEventCreate(TimelineEventBase):
         return v.strip()
 
 
+class TimelineEventUpdate(BaseModel):
+    """Schema for updating timeline events (partial updates allowed)"""
+    title: Optional[str] = Field(None, max_length=200, description="Event title")
+    description: Optional[str] = Field(None, description="Detailed description")
+    event_type: Optional[str] = Field(None, description="Type of event")
+    event_subtype: Optional[str] = Field(None, max_length=100, description="Event subtype")
+    importance: Optional[TimelineImportance] = Field(None, description="Event importance level")
+    is_private: Optional[bool] = Field(None, description="Whether event is private to therapist")
+    metadata: Optional[Dict[str, Any]] = Field(None, description="Additional structured data")
+
+    @field_validator('title')
+    @classmethod
+    def validate_title_if_present(cls, v: Optional[str]) -> Optional[str]:
+        """Validate title if provided"""
+        if v is not None:
+            if len(v.strip()) == 0:
+                raise ValueError('Title cannot be empty')
+            if len(v) > 200:
+                raise ValueError('Title cannot exceed 200 characters')
+            return v.strip()
+        return v
+
+
 class TimelineEventResponse(TimelineEventBase):
     """Schema for timeline event responses from API"""
     id: UUID = Field(..., description="Unique event identifier")

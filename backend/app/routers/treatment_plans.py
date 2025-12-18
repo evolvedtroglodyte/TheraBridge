@@ -11,7 +11,8 @@ from datetime import date, timedelta
 
 from app.database import get_db
 from app.auth.dependencies import require_role, verify_treatment_plan_access
-from app.models.db_models import User, TherapistPatient, TreatmentPlan, TreatmentGoal, PlanReview
+from app.models.db_models import User, TherapistPatient
+from app.models.treatment_models import TreatmentPlan, TreatmentPlanGoal, PlanReview
 from app.models.treatment_schemas import (
     TreatmentPlanCreate,
     TreatmentPlanUpdate,
@@ -61,12 +62,12 @@ async def verify_therapist_patient_access(
         )
 
 
-def calculate_progress_summary(goals: List[TreatmentGoal]) -> ProgressSummary:
+def calculate_progress_summary(goals: List[TreatmentPlanGoal]) -> ProgressSummary:
     """
     Calculate progress summary from list of goals.
 
     Args:
-        goals: List of TreatmentGoal objects
+        goals: List of TreatmentPlanGoal objects
 
     Returns:
         ProgressSummary: Calculated progress metrics
@@ -282,8 +283,8 @@ async def get_treatment_plan(
     query = select(TreatmentPlan).where(
         TreatmentPlan.id == plan_id
     ).options(
-        selectinload(TreatmentPlan.goals).selectinload(TreatmentGoal.interventions),
-        selectinload(TreatmentPlan.goals).selectinload(TreatmentGoal.sub_goals)
+        selectinload(TreatmentPlan.goals).selectinload(TreatmentPlanGoal.interventions),
+        selectinload(TreatmentPlan.goals).selectinload(TreatmentPlanGoal.sub_goals)
     )
 
     result = await db.execute(query)

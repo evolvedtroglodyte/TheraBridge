@@ -157,6 +157,40 @@ class ExportTemplateCreate(BaseModel):
         return v
 
 
+class TimelineExportRequest(BaseModel):
+    """Request to export patient timeline"""
+    patient_id: UUID = Field(..., description="Patient ID for the timeline export")
+    format: Literal["pdf", "docx", "json"] = Field(..., description="Export format")
+    start_date: Optional[date] = Field(None, description="Optional start date filter (inclusive)")
+    end_date: Optional[date] = Field(None, description="Optional end date filter (inclusive)")
+    event_types: Optional[List[str]] = Field(
+        None,
+        description="Optional event type filter (e.g., ['session', 'milestone', 'goal'])"
+    )
+    include_private: bool = Field(
+        True,
+        description="Include private events (therapist-only). Therapists see all, patients see only non-private."
+    )
+
+    @field_validator('end_date')
+    @classmethod
+    def validate_date_range(cls, v: Optional[date], info) -> Optional[date]:
+        """Ensure end_date is after start_date if both provided"""
+        if v is not None:
+            start_date = info.data.get('start_date')
+            if start_date and v < start_date:
+                raise ValueError('end_date must be after start_date')
+        return v
+
+    @field_validator('start_date', 'end_date')
+    @classmethod
+    def validate_date_not_future(cls, v: Optional[date]) -> Optional[date]:
+        """Ensure dates are not in the future"""
+        if v is not None and v > date.today():
+            raise ValueError('Date cannot be in the future')
+        return v
+
+
 class ScheduledReportCreate(BaseModel):
     """Create scheduled report"""
     template_id: UUID = Field(..., description="Template to use for the report")

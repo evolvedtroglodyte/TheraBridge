@@ -266,11 +266,11 @@ def shared_template(test_db, therapist_user):
 class TestListTemplates:
     """Test GET /api/v1/templates"""
 
-    def test_list_templates_returns_system_templates_for_unauthenticated(
-        self, async_db_client, test_db, system_soap_template, system_dap_template
+    def test_list_templates_returns_system_templates_for_any_user(
+        self, async_db_client, test_db, system_soap_template, system_dap_template, therapist_auth_headers
     ):
-        """List templates returns all system templates for any user"""
-        response = async_db_client.get("/api/v1/templates")
+        """List templates returns all system templates for any authenticated user"""
+        response = async_db_client.get("/api/v1/templates", headers=therapist_auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -293,10 +293,10 @@ class TestListTemplates:
             assert "created_at" in template
 
     def test_list_templates_includes_user_custom_templates(
-        self, async_db_client, test_db, therapist_user, therapist_custom_template, system_soap_template
+        self, async_db_client, test_db, therapist_user, therapist_custom_template, system_soap_template, therapist_auth_headers
     ):
         """List templates includes user's custom templates"""
-        response = async_db_client.get("/api/v1/templates")
+        response = async_db_client.get("/api/v1/templates", headers=therapist_auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -310,10 +310,10 @@ class TestListTemplates:
         assert custom_template["template_type"] == "custom"
 
     def test_list_templates_includes_shared_templates_by_default(
-        self, async_db_client, test_db, shared_template, system_soap_template
+        self, async_db_client, test_db, shared_template, system_soap_template, therapist_auth_headers
     ):
         """List templates includes shared templates from other users by default"""
-        response = async_db_client.get("/api/v1/templates")
+        response = async_db_client.get("/api/v1/templates", headers=therapist_auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -327,10 +327,10 @@ class TestListTemplates:
         assert shared["is_system"] is False
 
     def test_list_templates_excludes_shared_when_requested(
-        self, async_db_client, test_db, shared_template, system_soap_template, therapist_custom_template
+        self, async_db_client, test_db, shared_template, system_soap_template, therapist_custom_template, therapist_auth_headers
     ):
         """List templates excludes shared templates when include_shared=false"""
-        response = async_db_client.get("/api/v1/templates?include_shared=false")
+        response = async_db_client.get("/api/v1/templates?include_shared=false", headers=therapist_auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -343,10 +343,10 @@ class TestListTemplates:
         assert "My Custom SOAP" in template_names
 
     def test_list_templates_filter_by_type(
-        self, async_db_client, test_db, system_soap_template, system_dap_template, therapist_custom_template
+        self, async_db_client, test_db, system_soap_template, system_dap_template, therapist_custom_template, therapist_auth_headers
     ):
         """List templates with template_type filter"""
-        response = async_db_client.get(f"/api/v1/templates?template_type={TemplateType.soap.value}")
+        response = async_db_client.get(f"/api/v1/templates?template_type={TemplateType.soap.value}", headers=therapist_auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -358,10 +358,10 @@ class TestListTemplates:
         assert "DAP Note (System)" not in template_names
 
     def test_list_templates_sorted_system_first_then_recent(
-        self, async_db_client, test_db, system_soap_template, therapist_custom_template
+        self, async_db_client, test_db, system_soap_template, therapist_custom_template, therapist_auth_headers
     ):
         """Templates are sorted with system templates first, then by creation date"""
-        response = async_db_client.get("/api/v1/templates")
+        response = async_db_client.get("/api/v1/templates", headers=therapist_auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -375,10 +375,10 @@ class TestListTemplates:
                 "System templates should appear before custom templates"
 
     def test_list_templates_section_count_calculated_correctly(
-        self, async_db_client, test_db, system_soap_template
+        self, async_db_client, test_db, system_soap_template, therapist_auth_headers
     ):
         """section_count is correctly calculated from structure"""
-        response = async_db_client.get("/api/v1/templates")
+        response = async_db_client.get("/api/v1/templates", headers=therapist_auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -396,10 +396,10 @@ class TestGetTemplate:
     """Test GET /api/v1/templates/{template_id}"""
 
     def test_get_system_template_succeeds_for_any_user(
-        self, async_db_client, test_db, system_soap_template
+        self, async_db_client, test_db, system_soap_template, therapist_auth_headers
     ):
         """Any user can access system templates"""
-        response = async_db_client.get(f"/api/v1/templates/{system_soap_template.id}")
+        response = async_db_client.get(f"/api/v1/templates/{system_soap_template.id}", headers=therapist_auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -412,10 +412,10 @@ class TestGetTemplate:
         assert len(data["structure"]["sections"]) == 4
 
     def test_get_user_own_template_succeeds(
-        self, async_db_client, test_db, therapist_user, therapist_custom_template
+        self, async_db_client, test_db, therapist_user, therapist_custom_template, therapist_auth_headers
     ):
         """User can access their own custom templates"""
-        response = async_db_client.get(f"/api/v1/templates/{therapist_custom_template.id}")
+        response = async_db_client.get(f"/api/v1/templates/{therapist_custom_template.id}", headers=therapist_auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -426,10 +426,10 @@ class TestGetTemplate:
         assert data["created_by"] == str(therapist_user.id)
 
     def test_get_shared_template_succeeds(
-        self, async_db_client, test_db, shared_template
+        self, async_db_client, test_db, shared_template, therapist_auth_headers
     ):
         """User can access shared templates from other users"""
-        response = async_db_client.get(f"/api/v1/templates/{shared_template.id}")
+        response = async_db_client.get(f"/api/v1/templates/{shared_template.id}", headers=therapist_auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -437,19 +437,19 @@ class TestGetTemplate:
         assert data["id"] == str(shared_template.id)
         assert data["is_shared"] is True
 
-    def test_get_template_not_found(self, async_db_client, test_db):
+    def test_get_template_not_found(self, async_db_client, test_db, therapist_auth_headers):
         """Getting non-existent template returns 404"""
         fake_template_id = uuid4()
-        response = async_db_client.get(f"/api/v1/templates/{fake_template_id}")
+        response = async_db_client.get(f"/api/v1/templates/{fake_template_id}", headers=therapist_auth_headers)
 
         assert response.status_code == 404
         assert "not found" in response.json()["detail"].lower()
 
     def test_get_template_includes_complete_structure(
-        self, async_db_client, test_db, system_soap_template
+        self, async_db_client, test_db, system_soap_template, therapist_auth_headers
     ):
         """Template response includes complete structure with all fields"""
-        response = async_db_client.get(f"/api/v1/templates/{system_soap_template.id}")
+        response = async_db_client.get(f"/api/v1/templates/{system_soap_template.id}", headers=therapist_auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -470,9 +470,9 @@ class TestGetTemplate:
                 assert "type" in field
                 assert "required" in field
 
-    def test_get_template_invalid_uuid(self, async_db_client, test_db):
+    def test_get_template_invalid_uuid(self, async_db_client, test_db, therapist_auth_headers):
         """Getting template with invalid UUID format returns 422"""
-        response = async_db_client.get("/api/v1/templates/not-a-uuid")
+        response = async_db_client.get("/api/v1/templates/not-a-uuid", headers=therapist_auth_headers)
 
         assert response.status_code == 422
 
@@ -1141,11 +1141,12 @@ class TestTemplateEdgeCases:
         assert fields[1]["ai_mapping"] == "session_mood"
 
     def test_list_templates_with_multiple_filters(
-        self, async_db_client, test_db, system_soap_template, system_dap_template, shared_template
+        self, async_db_client, test_db, system_soap_template, system_dap_template, shared_template, therapist_auth_headers
     ):
         """List templates with combined filters"""
         response = async_db_client.get(
-            f"/api/v1/templates?template_type={TemplateType.soap.value}&include_shared=false"
+            f"/api/v1/templates?template_type={TemplateType.soap.value}&include_shared=false",
+            headers=therapist_auth_headers
         )
 
         assert response.status_code == 200

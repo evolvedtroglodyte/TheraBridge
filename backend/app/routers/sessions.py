@@ -15,11 +15,11 @@ import hashlib
 import logging
 
 from app.database import get_db
-from app.auth.dependencies import get_current_user
+from app.auth.dependencies import get_current_user, require_role, verify_timeline_event_access
 from app.models.schemas import (
     SessionCreate, SessionResponse, SessionStatus,
     ExtractedNotes, ExtractNotesResponse, SessionTimelineResponse,
-    TimelineEventCreate, TimelineEventResponse, TimelineSummaryResponse,
+    TimelineEventCreate, TimelineEventUpdate, TimelineEventResponse, TimelineSummaryResponse,
     TimelineChartDataResponse, UserRole
 )
 from app.models import db_models
@@ -186,6 +186,29 @@ async def process_audio_pipeline(
             )
         )
         await db.commit()
+
+        # Auto-generate timeline event for completed session
+        try:
+            # Load the session object (required by auto_generate_session_event)
+            session_query = select(db_models.TherapySession).where(
+                db_models.TherapySession.id == session_id
+            )
+            session_result = await db.execute(session_query)
+            session = session_result.scalar_one_or_none()
+
+            if session:
+                from app.services.timeline import auto_generate_session_event
+                await auto_generate_session_event(session=session, db=db)
+                logger.info(f"Timeline event auto-generated for session {session_id}")
+            else:
+                logger.warning(f"Session {session_id} not found for timeline event generation")
+
+        except Exception as timeline_error:
+            # Log but don't fail the entire pipeline if timeline generation fails
+            logger.error(
+                f"Failed to auto-generate timeline event for session {session_id}: {str(timeline_error)}",
+                exc_info=True
+            )
 
         logger.info("Session processing completed", extra={"session_id": str(session_id)})
 
@@ -671,6 +694,7 @@ async def get_patient_timeline_endpoint(
     return await get_patient_timeline(
         patient_id=patient_id,
         db=db,
+        current_user=current_user,
         event_types=event_types_list,
         start_date=start_date,
         end_date=end_date,
@@ -911,3 +935,68 @@ async def get_timeline_chart_data(
     from app.services.timeline import get_timeline_chart_data
 
     return await get_timeline_chart_data(patient_id=patient_id, db=db)
+
+
+@router.delete("/patients/{patient_id}/timeline/{event_id}")
+@limiter.limit("20/hour")
+async def delete_timeline_event(
+    request: Request,
+    patient_id: UUID,
+    event_id: UUID,
+    current_user: db_models.User = Depends(require_role(["therapist"])),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Delete a timeline event.
+
+    Only therapists with active relationship to patient can delete events.
+    Deletion is permanent and creates an audit log entry.
+
+    Authorization:
+        - Requires therapist role
+        - Therapist must have active relationship with the patient
+
+    Rate Limit:
+        - 20 deletions per hour per IP address
+
+    Path Parameters:
+        - patient_id: UUID of the patient who owns the timeline
+        - event_id: UUID of the timeline event to delete
+
+    Returns:
+        dict: Success message {"message": "Timeline event deleted successfully"}
+
+    Raises:
+        HTTPException 403: If user is not a therapist
+        HTTPException 403: If therapist does not have active relationship with patient
+        HTTPException 404: If timeline event not found for this patient
+        HTTPException 429: Rate limit exceeded
+        HTTPException 500: Database error
+
+    Example:
+        DELETE /patients/123e4567-e89b-12d3-a456-426614174000/timeline/987e6543-e89b-12d3-a456-426614174999
+    """
+    # Verify therapist has access to patient and event
+    event = await verify_timeline_event_access(event_id, current_user.id, db)
+
+    # Verify event belongs to this patient (double-check)
+    if event.patient_id != patient_id:
+        raise HTTPException(status_code=404, detail="Timeline event not found for this patient")
+
+    # Delete event
+    await db.delete(event)
+    await db.commit()
+
+    # Log deletion with structured metadata
+    logger.info(
+        "Timeline event deleted",
+        extra={
+            "event_id": str(event_id),
+            "patient_id": str(patient_id),
+            "therapist_id": str(current_user.id),
+            "event_type": event.event_type,
+            "title": event.title
+        }
+    )
+
+    return {"message": "Timeline event deleted successfully"}

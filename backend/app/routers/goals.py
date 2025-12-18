@@ -11,7 +11,8 @@ from typing import List
 
 from app.database import get_db
 from app.auth.dependencies import require_role
-from app.models.db_models import User, TreatmentPlan, TreatmentGoal, GoalProgress, GoalIntervention, Intervention
+from app.models.db_models import User
+from app.models.treatment_models import TreatmentPlan, TreatmentPlanGoal, GoalProgress, GoalIntervention, Intervention
 from app.models.treatment_schemas import (
     GoalCreate,
     GoalUpdate,
@@ -60,7 +61,7 @@ async def verify_plan_ownership(plan_id: UUID, therapist_id: UUID, db: AsyncSess
     return plan
 
 
-async def verify_goal_ownership(goal_id: UUID, therapist_id: UUID, db: AsyncSession) -> TreatmentGoal:
+async def verify_goal_ownership(goal_id: UUID, therapist_id: UUID, db: AsyncSession) -> TreatmentPlanGoal:
     """
     Verify that a therapist owns a goal via plan ownership.
 
@@ -70,7 +71,7 @@ async def verify_goal_ownership(goal_id: UUID, therapist_id: UUID, db: AsyncSess
         db: Database session
 
     Returns:
-        TreatmentGoal if ownership verified
+        TreatmentPlanGoal if ownership verified
 
     Raises:
         HTTPException 404: Goal not found
@@ -78,9 +79,9 @@ async def verify_goal_ownership(goal_id: UUID, therapist_id: UUID, db: AsyncSess
     """
     # Load goal with plan relationship
     result = await db.execute(
-        select(TreatmentGoal)
-        .options(joinedload(TreatmentGoal.plan))
-        .where(TreatmentGoal.id == goal_id)
+        select(TreatmentPlanGoal)
+        .options(joinedload(TreatmentPlanGoal.plan))
+        .where(TreatmentPlanGoal.id == goal_id)
     )
     goal = result.scalar_one_or_none()
 
@@ -134,9 +135,9 @@ async def add_goal_to_plan(
     # Validate parent_goal_id if provided (must exist in same plan)
     if goal_data.parent_goal_id:
         parent_result = await db.execute(
-            select(TreatmentGoal).where(
-                TreatmentGoal.id == goal_data.parent_goal_id,
-                TreatmentGoal.plan_id == plan_id
+            select(TreatmentPlanGoal).where(
+                TreatmentPlanGoal.id == goal_data.parent_goal_id,
+                TreatmentPlanGoal.plan_id == plan_id
             )
         )
         parent_goal = parent_result.scalar_one_or_none()
@@ -147,8 +148,8 @@ async def add_goal_to_plan(
                 detail=f"Parent goal {goal_data.parent_goal_id} not found in plan {plan_id}"
             )
 
-    # Create TreatmentGoal
-    new_goal = TreatmentGoal(
+    # Create TreatmentPlanGoal
+    new_goal = TreatmentPlanGoal(
         plan_id=plan_id,
         parent_goal_id=goal_data.parent_goal_id,
         goal_type=goal_data.goal_type.value,
@@ -262,9 +263,9 @@ async def recalculate_parent_progress(parent_goal_id: UUID, db: AsyncSession):
     """
     # Load parent goal with all sub-goals
     result = await db.execute(
-        select(TreatmentGoal)
-        .options(selectinload(TreatmentGoal.sub_goals))
-        .where(TreatmentGoal.id == parent_goal_id)
+        select(TreatmentPlanGoal)
+        .options(selectinload(TreatmentPlanGoal.sub_goals))
+        .where(TreatmentPlanGoal.id == parent_goal_id)
     )
     parent_goal = result.scalar_one_or_none()
 

@@ -25,7 +25,7 @@ from app.models.schemas import UserRole, NoteStatus, TemplateType
 # Fixtures
 # ============================================================================
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def test_patient(test_db, therapist_user):
     """Create a test patient in the database"""
     patient = Patient(
@@ -41,7 +41,7 @@ def test_patient(test_db, therapist_user):
     return patient
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def patient_user_for_relationship(test_db):
     """Create a patient user for therapist-patient relationship testing"""
     from app.auth.utils import get_password_hash
@@ -62,13 +62,29 @@ def patient_user_for_relationship(test_db):
     return patient_user
 
 
-@pytest.fixture
-def active_therapist_patient_relationship(test_db, therapist_user, patient_user_for_relationship):
+@pytest.fixture(scope="function")
+def test_patient_linked_to_user(test_db, therapist_user, patient_user_for_relationship):
+    """Create a Patient record linked to the patient user (for sessions)"""
+    patient = Patient(
+        id=patient_user_for_relationship.id,  # Use same ID as user
+        name="Patient User",
+        email="patientuser@test.com",
+        phone="+1234567890",
+        therapist_id=therapist_user.id
+    )
+    test_db.add(patient)
+    test_db.commit()
+    test_db.refresh(patient)
+    return patient
+
+
+@pytest.fixture(scope="function")
+def active_therapist_patient_relationship(test_db, therapist_user, patient_user_for_relationship, test_patient_linked_to_user):
     """Create an active therapist-patient relationship"""
     relationship = TherapistPatient(
         id=uuid4(),
         therapist_id=therapist_user.id,
-        patient_id=patient_user_for_relationship.id,
+        patient_id=patient_user_for_relationship.id,  # This must match session.patient_id
         relationship_type="primary",
         is_active=True,
         started_at=datetime.utcnow()
@@ -79,7 +95,7 @@ def active_therapist_patient_relationship(test_db, therapist_user, patient_user_
     return relationship
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def sample_note_template(test_db, therapist_user):
     """Create a sample SOAP note template for testing"""
     template = NoteTemplate(
@@ -132,12 +148,12 @@ def sample_note_template(test_db, therapist_user):
     return template
 
 
-@pytest.fixture
-def sample_session_with_extracted_notes(test_db, test_patient, therapist_user):
+@pytest.fixture(scope="function")
+def sample_session_with_extracted_notes(test_db, test_patient_linked_to_user, therapist_user):
     """Create a test session with AI-extracted notes (JSONB)"""
     session = TherapySession(
         id=uuid4(),
-        patient_id=test_patient.id,
+        patient_id=test_patient_linked_to_user.id,  # Links to Patient with same ID as User
         therapist_id=therapist_user.id,
         session_date=datetime.utcnow(),
         status="processed",
@@ -184,7 +200,7 @@ def sample_session_with_extracted_notes(test_db, test_patient, therapist_user):
     return session
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def sample_note(test_db, sample_session_with_extracted_notes, sample_note_template):
     """Create a pre-existing note for update/get tests"""
     note = SessionNote(
@@ -243,6 +259,11 @@ def test_create_note_with_valid_template_succeeds(
         json=note_data,
         headers=therapist_auth_headers
     )
+
+    print(f"\n=== DEBUG ===")
+    print(f"Response status: {response.status_code}")
+    print(f"Response body: {response.json()}")
+    print(f"=============\n")
 
     assert response.status_code == 201
     data = response.json()

@@ -24,7 +24,7 @@ from app.models.schemas import UserRole, SessionStatus, TemplateType, MoodLevel
 # ============================================================================
 
 @pytest.fixture(scope="function")
-def sample_session_rich_notes(test_db, therapist_user, sample_patient, active_relationship):
+def sample_session_rich_notes(therapist_user, sample_patient, active_relationship):
     """
     Create a session with comprehensive extracted_notes for high-confidence autofill.
 
@@ -330,7 +330,7 @@ class TestAutofillSOAP:
 
     def test_autofill_soap_success(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         sample_session_rich_notes
     ):
@@ -339,7 +339,7 @@ class TestAutofillSOAP:
             "template_type": "soap"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_rich_notes.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -378,7 +378,7 @@ class TestAutofillSOAP:
 
     def test_autofill_soap_confidence_scores(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         sample_session_rich_notes
     ):
@@ -387,7 +387,7 @@ class TestAutofillSOAP:
             "template_type": "soap"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_rich_notes.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -425,7 +425,7 @@ class TestAutofillDAP:
 
     def test_autofill_dap_success(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         sample_session_rich_notes
     ):
@@ -434,7 +434,7 @@ class TestAutofillDAP:
             "template_type": "dap"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_rich_notes.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -463,7 +463,7 @@ class TestAutofillDAP:
 
     def test_autofill_dap_confidence_scores(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         sample_session_rich_notes
     ):
@@ -472,7 +472,7 @@ class TestAutofillDAP:
             "template_type": "dap"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_rich_notes.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -502,7 +502,7 @@ class TestAutofillBIRP:
 
     def test_autofill_birp_success(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         sample_session_rich_notes
     ):
@@ -511,7 +511,7 @@ class TestAutofillBIRP:
             "template_type": "birp"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_rich_notes.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -543,7 +543,7 @@ class TestAutofillBIRP:
 
     def test_autofill_birp_confidence_scores(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         sample_session_rich_notes
     ):
@@ -552,7 +552,7 @@ class TestAutofillBIRP:
             "template_type": "birp"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_rich_notes.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -583,7 +583,7 @@ class TestAutofillProgress:
 
     def test_autofill_progress_success(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         sample_session_rich_notes
     ):
@@ -592,7 +592,7 @@ class TestAutofillProgress:
             "template_type": "progress"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_rich_notes.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -625,7 +625,7 @@ class TestAutofillProgress:
 
     def test_autofill_progress_confidence_scores(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         sample_session_rich_notes
     ):
@@ -634,7 +634,7 @@ class TestAutofillProgress:
             "template_type": "progress"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_rich_notes.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -666,7 +666,7 @@ class TestConfidenceScoring:
 
     def test_sparse_notes_lower_confidence(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         sample_session_sparse_notes
     ):
@@ -675,7 +675,7 @@ class TestConfidenceScoring:
             "template_type": "soap"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_sparse_notes.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -693,7 +693,7 @@ class TestConfidenceScoring:
 
     def test_missing_fields_identified(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         sample_session_sparse_notes
     ):
@@ -702,7 +702,7 @@ class TestConfidenceScoring:
             "template_type": "soap"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_sparse_notes.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -723,7 +723,7 @@ class TestConfidenceScoring:
 
     def test_metadata_includes_overall_confidence(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         sample_session_rich_notes
     ):
@@ -732,7 +732,7 @@ class TestConfidenceScoring:
             "template_type": "soap"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_rich_notes.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -755,7 +755,7 @@ class TestConfidenceScoring:
 
     def test_rich_notes_high_confidence(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         sample_session_rich_notes
     ):
@@ -764,7 +764,7 @@ class TestConfidenceScoring:
             "template_type": "soap"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_rich_notes.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -787,7 +787,7 @@ class TestAutofillAuthorization:
 
     def test_autofill_requires_therapist_role(
         self,
-        async_db_client,
+        client,
         patient_auth_headers,
         sample_session_rich_notes
     ):
@@ -796,7 +796,7 @@ class TestAutofillAuthorization:
             "template_type": "soap"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_rich_notes.id}/notes/autofill",
             headers=patient_auth_headers,
             json=request_data
@@ -807,7 +807,7 @@ class TestAutofillAuthorization:
 
     def test_autofill_requires_active_relationship(
         self,
-        async_db_client,
+        client,
         second_therapist_auth_headers,
         sample_session_rich_notes
     ):
@@ -817,7 +817,7 @@ class TestAutofillAuthorization:
             "template_type": "soap"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_rich_notes.id}/notes/autofill",
             headers=second_therapist_auth_headers,
             json=request_data
@@ -828,7 +828,7 @@ class TestAutofillAuthorization:
 
     def test_autofill_requires_authentication(
         self,
-        async_db_client,
+        client,
         sample_session_rich_notes
     ):
         """Test that autofill requires authentication"""
@@ -836,7 +836,7 @@ class TestAutofillAuthorization:
             "template_type": "soap"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_rich_notes.id}/notes/autofill",
             json=request_data
         )
@@ -853,7 +853,7 @@ class TestAutofillErrors:
 
     def test_autofill_fails_without_extracted_notes(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         sample_session_no_notes
     ):
@@ -862,7 +862,7 @@ class TestAutofillErrors:
             "template_type": "soap"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_no_notes.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -874,7 +874,7 @@ class TestAutofillErrors:
 
     def test_autofill_invalid_template_type(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         sample_session_rich_notes
     ):
@@ -883,7 +883,7 @@ class TestAutofillErrors:
             "template_type": "invalid_type"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{sample_session_rich_notes.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -894,7 +894,7 @@ class TestAutofillErrors:
 
     def test_autofill_nonexistent_session(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers
     ):
         """Test autofill returns 404 for non-existent session"""
@@ -904,7 +904,7 @@ class TestAutofillErrors:
             "template_type": "soap"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{nonexistent_id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -914,7 +914,7 @@ class TestAutofillErrors:
 
     def test_autofill_malformed_session_id(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers
     ):
         """Test autofill returns 422 for malformed session UUID"""
@@ -922,7 +922,7 @@ class TestAutofillErrors:
             "template_type": "soap"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/not-a-uuid/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -940,7 +940,7 @@ class TestAutofillEdgeCases:
 
     def test_autofill_handles_partial_extracted_notes(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         test_db,
         therapist_user,
@@ -979,7 +979,7 @@ class TestAutofillEdgeCases:
             "template_type": "soap"
         }
 
-        response = async_db_client.post(
+        response = client.post(
             f"/api/v1/sessions/{session.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -999,7 +999,7 @@ class TestAutofillEdgeCases:
 
     def test_autofill_all_template_types_same_session(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         sample_session_rich_notes
     ):
@@ -1011,7 +1011,7 @@ class TestAutofillEdgeCases:
                 "template_type": template_type
             }
 
-            response = async_db_client.post(
+            response = client.post(
                 f"/api/v1/sessions/{sample_session_rich_notes.id}/notes/autofill",
                 headers=therapist_auth_headers,
                 json=request_data
@@ -1031,7 +1031,7 @@ class TestAutofillEdgeCases:
 
     def test_autofill_confidence_reflects_data_quality(
         self,
-        async_db_client,
+        client,
         therapist_auth_headers,
         sample_session_rich_notes,
         sample_session_sparse_notes
@@ -1042,7 +1042,7 @@ class TestAutofillEdgeCases:
         }
 
         # Get confidence for rich notes
-        rich_response = async_db_client.post(
+        rich_response = client.post(
             f"/api/v1/sessions/{sample_session_rich_notes.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data
@@ -1050,7 +1050,7 @@ class TestAutofillEdgeCases:
         rich_confidence = rich_response.json()["metadata"]["overall_confidence"]
 
         # Get confidence for sparse notes
-        sparse_response = async_db_client.post(
+        sparse_response = client.post(
             f"/api/v1/sessions/{sample_session_sparse_notes.id}/notes/autofill",
             headers=therapist_auth_headers,
             json=request_data

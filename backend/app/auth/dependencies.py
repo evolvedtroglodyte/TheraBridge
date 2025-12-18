@@ -193,3 +193,89 @@ async def verify_treatment_plan_access(
         )
 
     return plan
+
+
+async def verify_timeline_event_access(
+    event_id: UUID,
+    therapist_id: UUID,
+    db: AsyncSession
+):
+    """
+    Verify therapist has access to timeline event via active patient relationship.
+
+    This helper ensures that the therapist attempting to access a timeline event
+    has an active relationship with the patient who owns the event. It loads the
+    event with its patient relationship and verifies ownership through the
+    therapist_patients junction table.
+
+    Args:
+        event_id: UUID of the timeline event to verify access for
+        therapist_id: UUID of the therapist requesting access
+        db: AsyncSession database connection
+
+    Returns:
+        TimelineEvent: The timeline event object if access is authorized
+
+    Raises:
+        HTTPException 404: If timeline event not found
+        HTTPException 403: If therapist does not have active relationship with patient
+
+    Usage:
+        @router.patch("/timeline-events/{event_id}")
+        async def update_event(
+            event_id: UUID,
+            event_data: TimelineEventUpdate,
+            current_user: User = Depends(require_role(["therapist"])),
+            db: AsyncSession = Depends(get_db)
+        ):
+            # Verify access and get event in one operation
+            event = await verify_timeline_event_access(event_id, current_user.id, db)
+            # Proceed with update...
+            return updated_event
+
+    Example:
+        # In a router endpoint
+        event = await verify_timeline_event_access(
+            event_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+            therapist_id=current_user.id,
+            db=db
+        )
+        # If we get here, access is authorized and event is loaded
+    """
+    # Import here to avoid circular dependency
+    from app.models.db_models import TimelineEvent
+
+    # Load timeline event
+    result = await db.execute(
+        select(TimelineEvent).where(TimelineEvent.id == event_id)
+    )
+    event = result.scalar_one_or_none()
+
+    if not event:
+        logger.warning(f"Timeline event {event_id} not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Timeline event not found"
+        )
+
+    # Verify therapist has active relationship with patient
+    access_query = select(TherapistPatient).where(
+        TherapistPatient.therapist_id == therapist_id,
+        TherapistPatient.patient_id == event.patient_id,
+        TherapistPatient.is_active == True
+    )
+
+    access_result = await db.execute(access_query)
+    relationship = access_result.scalar_one_or_none()
+
+    if not relationship:
+        logger.warning(
+            f"Access denied: Therapist {therapist_id} does not have active "
+            f"relationship with patient {event.patient_id} for event {event_id}"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: Event not assigned to this therapist's patients"
+        )
+
+    return event

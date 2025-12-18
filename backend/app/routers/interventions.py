@@ -10,7 +10,8 @@ from typing import List, Optional
 
 from app.database import get_db
 from app.auth.dependencies import get_current_user
-from app.models import db_models
+from app.models.db_models import User
+from app.models.treatment_models import Intervention
 from app.models.treatment_schemas import (
     InterventionCreate,
     InterventionResponse,
@@ -30,7 +31,7 @@ async def list_interventions(
     include_system: bool = True,
     include_custom: bool = True,
     db: AsyncSession = Depends(get_db),
-    current_user: db_models.User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """
     List available interventions from the system library and user's custom interventions.
@@ -69,7 +70,7 @@ async def list_interventions(
         )
 
     # Build base query
-    query = select(db_models.Intervention)
+    query = select(Intervention)
 
     # Filter by system vs custom interventions
     if not include_system and not include_custom:
@@ -79,46 +80,46 @@ async def list_interventions(
     if not include_system:
         # Only custom interventions by current user
         query = query.where(
-            db_models.Intervention.is_system == False,
-            db_models.Intervention.created_by == current_user.id
+            Intervention.is_system == False,
+            Intervention.created_by == current_user.id
         )
     elif not include_custom:
         # Only system interventions
-        query = query.where(db_models.Intervention.is_system == True)
+        query = query.where(Intervention.is_system == True)
     else:
         # Both system and custom: system interventions OR custom by current user
         query = query.where(
             or_(
-                db_models.Intervention.is_system == True,
-                db_models.Intervention.created_by == current_user.id
+                Intervention.is_system == True,
+                Intervention.created_by == current_user.id
             )
         )
 
     # Filter by modality (case-insensitive partial match)
     if modality:
         query = query.where(
-            db_models.Intervention.modality.ilike(f"%{modality}%")
+            Intervention.modality.ilike(f"%{modality}%")
         )
 
     # Filter by search term (name or description, case-insensitive)
     if search:
         query = query.where(
             or_(
-                db_models.Intervention.name.ilike(f"%{search}%"),
-                db_models.Intervention.description.ilike(f"%{search}%")
+                Intervention.name.ilike(f"%{search}%"),
+                Intervention.description.ilike(f"%{search}%")
             )
         )
 
     # Filter by evidence level (exact match)
     if evidence_level:
         query = query.where(
-            db_models.Intervention.evidence_level == evidence_level.value
+            Intervention.evidence_level == evidence_level.value
         )
 
     # Order by: system interventions first, then alphabetically by name
     query = query.order_by(
-        db_models.Intervention.is_system.desc(),
-        db_models.Intervention.name.asc()
+        Intervention.is_system.desc(),
+        Intervention.name.asc()
     )
 
     # Execute query
@@ -133,7 +134,7 @@ async def list_interventions(
 async def create_custom_intervention(
     intervention_data: InterventionCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: db_models.User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Create a custom intervention for the current therapist.
@@ -177,7 +178,7 @@ async def create_custom_intervention(
         )
 
     # Create new intervention
-    new_intervention = db_models.Intervention(
+    new_intervention = Intervention(
         name=intervention_data.name.strip(),
         description=intervention_data.description.strip() if intervention_data.description else None,
         modality=intervention_data.modality.strip() if intervention_data.modality else None,
@@ -197,7 +198,7 @@ async def create_custom_intervention(
 async def get_intervention_details(
     intervention_id: UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: db_models.User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Get full details for a specific intervention.
@@ -231,8 +232,8 @@ async def get_intervention_details(
 
     # Load intervention by ID
     result = await db.execute(
-        select(db_models.Intervention).where(
-            db_models.Intervention.id == intervention_id
+        select(Intervention).where(
+            Intervention.id == intervention_id
         )
     )
     intervention = result.scalar_one_or_none()

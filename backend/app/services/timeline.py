@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 async def get_patient_timeline(
     patient_id: UUID,
     db: AsyncSession,
+    current_user: User,
     event_types: Optional[List[str]] = None,
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
@@ -44,9 +45,13 @@ async def get_patient_timeline(
     by event types, date range, importance level, and text search. Uses
     cursor-based pagination for efficient browsing of large timelines.
 
+    Privacy filtering: Patients can only see non-private events (is_private=False).
+    Therapists and admins can see all events including private ones.
+
     Args:
         patient_id: UUID of the patient whose timeline to fetch
         db: Async database session
+        current_user: User object containing role and permissions for privacy filtering
         event_types: Optional list of event types to filter by (e.g., ['session', 'milestone'])
         start_date: Optional start date for date range filter (inclusive)
         end_date: Optional end date for date range filter (inclusive)
@@ -119,6 +124,11 @@ async def get_patient_timeline(
     if importance:
         query = query.where(TimelineEvent.importance == importance.value)
 
+    # Apply privacy filtering: patients can only see non-private events
+    # Therapists and admins can see all events including private ones
+    if current_user and current_user.role == 'patient':
+        query = query.where(TimelineEvent.is_private == False)
+
     if search:
         search_pattern = f"%{search}%"
         query = query.where(
@@ -182,6 +192,9 @@ async def get_patient_timeline(
         count_query = count_query.where(TimelineEvent.event_date <= end_date)
     if importance:
         count_query = count_query.where(TimelineEvent.importance == importance.value)
+    # Apply privacy filtering to count query as well
+    if current_user and current_user.role == 'patient':
+        count_query = count_query.where(TimelineEvent.is_private == False)
     if search:
         search_pattern = f"%{search}%"
         count_query = count_query.where(
