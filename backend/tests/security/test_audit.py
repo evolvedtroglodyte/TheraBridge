@@ -58,6 +58,12 @@ def audit_logs_sample(test_db, therapist_user, patient_user, admin_user):
     Returns:
         List of 15 AuditLog objects
     """
+    # Extract IDs immediately - don't refresh as users were created in separate sessions
+    # Each user fixture already committed and the IDs are accessible
+    therapist_id = therapist_user.id
+    patient_id = patient_user.id
+    admin_id = admin_user.id
+
     now = datetime.utcnow()
     logs = []
 
@@ -65,7 +71,7 @@ def audit_logs_sample(test_db, therapist_user, patient_user, admin_user):
     log_configs = [
         # Normal risk - read-only operations
         {
-            "user_id": therapist_user.id,
+            "user_id": therapist_id,
             "patient_id": None,
             "action": "view_session",
             "resource_type": "session",
@@ -75,8 +81,8 @@ def audit_logs_sample(test_db, therapist_user, patient_user, admin_user):
             "ip": "192.168.1.100",
         },
         {
-            "user_id": patient_user.id,
-            "patient_id": patient_user.id,
+            "user_id": patient_id,
+            "patient_id": patient_id,
             "action": "view_patient",
             "resource_type": "patient",
             "risk_level": "normal",
@@ -85,7 +91,7 @@ def audit_logs_sample(test_db, therapist_user, patient_user, admin_user):
             "ip": "192.168.1.101",
         },
         {
-            "user_id": therapist_user.id,
+            "user_id": therapist_id,
             "patient_id": None,
             "action": "view_note",
             "resource_type": "note",
@@ -97,8 +103,8 @@ def audit_logs_sample(test_db, therapist_user, patient_user, admin_user):
 
         # Elevated risk - PHI access
         {
-            "user_id": therapist_user.id,
-            "patient_id": patient_user.id,
+            "user_id": therapist_id,
+            "patient_id": patient_id,
             "action": "view_session",
             "resource_type": "session",
             "risk_level": "elevated",
@@ -107,8 +113,8 @@ def audit_logs_sample(test_db, therapist_user, patient_user, admin_user):
             "ip": "192.168.1.100",
         },
         {
-            "user_id": therapist_user.id,
-            "patient_id": patient_user.id,
+            "user_id": therapist_id,
+            "patient_id": patient_id,
             "action": "create_note",
             "resource_type": "note",
             "risk_level": "elevated",
@@ -117,8 +123,8 @@ def audit_logs_sample(test_db, therapist_user, patient_user, admin_user):
             "ip": "192.168.1.100",
         },
         {
-            "user_id": therapist_user.id,
-            "patient_id": patient_user.id,
+            "user_id": therapist_id,
+            "patient_id": patient_id,
             "action": "update_transcript",
             "resource_type": "transcript",
             "risk_level": "elevated",
@@ -127,8 +133,8 @@ def audit_logs_sample(test_db, therapist_user, patient_user, admin_user):
             "ip": "192.168.1.100",
         },
         {
-            "user_id": admin_user.id,
-            "patient_id": patient_user.id,
+            "user_id": admin_id,
+            "patient_id": patient_id,
             "action": "view_patient",
             "resource_type": "patient",
             "risk_level": "elevated",
@@ -161,7 +167,7 @@ def audit_logs_sample(test_db, therapist_user, patient_user, admin_user):
 
         # High risk - bulk export
         {
-            "user_id": admin_user.id,
+            "user_id": admin_id,
             "patient_id": None,
             "action": "export_data",
             "resource_type": "session",
@@ -173,7 +179,7 @@ def audit_logs_sample(test_db, therapist_user, patient_user, admin_user):
 
         # High risk - admin user modifications
         {
-            "user_id": admin_user.id,
+            "user_id": admin_id,
             "patient_id": None,
             "action": "create_user",
             "resource_type": "user",
@@ -183,7 +189,7 @@ def audit_logs_sample(test_db, therapist_user, patient_user, admin_user):
             "ip": "192.168.1.200",
         },
         {
-            "user_id": admin_user.id,
+            "user_id": admin_id,
             "patient_id": None,
             "action": "update_user",
             "resource_type": "user",
@@ -195,7 +201,7 @@ def audit_logs_sample(test_db, therapist_user, patient_user, admin_user):
 
         # More normal risk
         {
-            "user_id": therapist_user.id,
+            "user_id": therapist_id,
             "patient_id": None,
             "action": "view_resource",
             "resource_type": "unknown",
@@ -205,8 +211,8 @@ def audit_logs_sample(test_db, therapist_user, patient_user, admin_user):
             "ip": "192.168.1.100",
         },
         {
-            "user_id": patient_user.id,
-            "patient_id": patient_user.id,
+            "user_id": patient_id,
+            "patient_id": patient_id,
             "action": "view_session",
             "resource_type": "session",
             "risk_level": "normal",
@@ -215,7 +221,7 @@ def audit_logs_sample(test_db, therapist_user, patient_user, admin_user):
             "ip": "192.168.1.101",
         },
         {
-            "user_id": therapist_user.id,
+            "user_id": therapist_id,
             "patient_id": None,
             "action": "user_logout",
             "resource_type": "auth",
@@ -386,7 +392,11 @@ class TestAuditLogsQuery:
         )
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        assert "admin" in response.json()["detail"].lower()
+        # Error handler middleware returns {"error": {"code": "...", "message": "..."}}
+        data = response.json()
+        assert "error" in data
+        # The internal message should mention required roles, but user message is generic
+        assert data["error"]["code"] == "HTTP_403"
 
     def test_get_audit_logs_filters_by_user(self, client, admin_auth_headers, therapist_user, audit_logs_sample):
         """Test filtering audit logs by user_id"""
@@ -650,15 +660,24 @@ class TestRiskLevelClassification:
             assert log.risk_level == "high"
 
     def test_risk_level_elevated_phi_access(self, audit_logs_sample, patient_user):
-        """Test that PHI access is classified as elevated risk"""
+        """Test that PHI access by others (not patient themselves) is classified as elevated risk"""
+        # Get patient ID (patient_user was already created and committed by fixture)
+        patient_id = patient_user.id
+
+        # Filter for PHI access by others (not patient accessing their own data)
+        # Patient viewing their own data should be normal risk
         phi_access_logs = [
             log for log in audit_logs_sample
-            if log.patient_id == patient_user.id and log.response_status == 200
+            if log.patient_id == patient_id
+            and log.response_status == 200
+            and log.user_id != patient_id  # Exclude patient accessing their own data
         ]
 
-        # Verify PHI access logs are elevated risk
+        # Verify PHI access by others is elevated risk
         for log in phi_access_logs:
-            assert log.risk_level == "elevated"
+            assert log.risk_level == "elevated", \
+                f"Expected elevated risk for PHI access, got {log.risk_level} " \
+                f"(action: {log.action}, user: {log.user_id}, patient: {log.patient_id})"
 
     def test_risk_level_normal_read_only(self, audit_logs_sample):
         """Test that read-only operations without PHI are normal risk"""

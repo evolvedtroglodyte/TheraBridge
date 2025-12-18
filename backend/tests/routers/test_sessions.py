@@ -1305,3 +1305,776 @@ async def test_get_chart_data_success(async_db_client, test_db, therapist_user, 
         assert "title" in milestone
         assert "description" in milestone
         assert "event_type" in milestone
+
+
+# ============================================================================
+# Timeline Event Update Tests (PATCH /patients/{patient_id}/timeline/{event_id})
+# ============================================================================
+
+@pytest.mark.asyncio
+async def test_update_timeline_event_success(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test successful timeline event update with partial fields"""
+    from app.models.db_models import TimelineEvent, TherapistPatient
+    from datetime import datetime, timedelta
+
+    # Create active therapist-patient relationship
+    relationship = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient_user.id,
+        relationship_type="primary",
+        is_active=True
+    )
+    test_db.add(relationship)
+    test_db.commit()
+
+    # Create a timeline event
+    event = TimelineEvent(
+        patient_id=patient_user.id,
+        therapist_id=therapist_user.id,
+        event_type="session",
+        event_date=datetime.utcnow() - timedelta(days=1),
+        title="Original Title",
+        description="Original description",
+        importance="normal"
+    )
+    test_db.add(event)
+    test_db.commit()
+    test_db.refresh(event)
+
+    # Update title and importance
+    update_data = {
+        "title": "Updated Title",
+        "importance": "milestone"
+    }
+
+    response = async_db_client.patch(
+        f"/api/sessions/patients/{patient_user.id}/timeline/{event.id}",
+        json=update_data,
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify response contains updated fields
+    assert data["title"] == "Updated Title"
+    assert data["importance"] == "milestone"
+    assert data["description"] == "Original description"  # Unchanged
+    assert data["id"] == str(event.id)
+    assert data["patient_id"] == str(patient_user.id)
+
+    # Verify database was updated
+    test_db.refresh(event)
+    assert event.title == "Updated Title"
+    assert event.importance == "milestone"
+    assert event.description == "Original description"
+
+
+@pytest.mark.asyncio
+async def test_update_timeline_event_partial_update(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test that partial updates only modify specified fields"""
+    from app.models.db_models import TimelineEvent, TherapistPatient
+    from datetime import datetime, timedelta
+
+    # Create active therapist-patient relationship
+    relationship = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient_user.id,
+        relationship_type="primary",
+        is_active=True
+    )
+    test_db.add(relationship)
+    test_db.commit()
+
+    # Create event with multiple fields
+    event = TimelineEvent(
+        patient_id=patient_user.id,
+        therapist_id=therapist_user.id,
+        event_type="milestone",
+        event_subtype="treatment_progress",
+        event_date=datetime.utcnow() - timedelta(days=2),
+        title="Original Title",
+        description="Original description",
+        importance="high",
+        is_private=False,
+        metadata={"key": "original_value"}
+    )
+    test_db.add(event)
+    test_db.commit()
+    test_db.refresh(event)
+
+    # Update only title - all other fields should remain unchanged
+    update_data = {"title": "New Title"}
+
+    response = async_db_client.patch(
+        f"/api/sessions/patients/{patient_user.id}/timeline/{event.id}",
+        json=update_data,
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify only title changed
+    assert data["title"] == "New Title"
+    assert data["description"] == "Original description"
+    assert data["importance"] == "high"
+    assert data["is_private"] is False
+    assert data["event_type"] == "milestone"
+    assert data["event_subtype"] == "treatment_progress"
+    assert data["metadata"]["key"] == "original_value"
+
+    # Verify database reflects partial update
+    test_db.refresh(event)
+    assert event.title == "New Title"
+    assert event.description == "Original description"
+
+
+@pytest.mark.asyncio
+async def test_update_timeline_event_inactive_relationship(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test update fails when therapist-patient relationship is inactive"""
+    from app.models.db_models import TimelineEvent, TherapistPatient
+    from datetime import datetime, timedelta
+
+    # Create inactive relationship
+    relationship = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient_user.id,
+        relationship_type="primary",
+        is_active=False  # Inactive relationship
+    )
+    test_db.add(relationship)
+    test_db.commit()
+
+    # Create timeline event for patient
+    event = TimelineEvent(
+        patient_id=patient_user.id,
+        therapist_id=therapist_user.id,
+        event_type="note",
+        event_date=datetime.utcnow() - timedelta(days=1),
+        title="Clinical Note",
+        description="Some clinical observations",
+        importance="normal"
+    )
+    test_db.add(event)
+    test_db.commit()
+    test_db.refresh(event)
+
+    # Attempt to update event
+    update_data = {"title": "Updated Note"}
+
+    response = async_db_client.patch(
+        f"/api/sessions/patients/{patient_user.id}/timeline/{event.id}",
+        json=update_data,
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 403
+    assert "access denied" in response.json()["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_update_timeline_event_empty_body(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test update fails with empty request body"""
+    from app.models.db_models import TimelineEvent, TherapistPatient
+    from datetime import datetime, timedelta
+
+    # Create active therapist-patient relationship
+    relationship = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient_user.id,
+        relationship_type="primary",
+        is_active=True
+    )
+    test_db.add(relationship)
+    test_db.commit()
+
+    # Create timeline event
+    event = TimelineEvent(
+        patient_id=patient_user.id,
+        therapist_id=therapist_user.id,
+        event_type="goal",
+        event_date=datetime.utcnow() - timedelta(days=1),
+        title="Treatment Goal",
+        description="Goal description",
+        importance="high"
+    )
+    test_db.add(event)
+    test_db.commit()
+    test_db.refresh(event)
+
+    # Attempt update with empty body
+    update_data = {}
+
+    response = async_db_client.patch(
+        f"/api/sessions/patients/{patient_user.id}/timeline/{event.id}",
+        json=update_data,
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 400
+    assert "no update data provided" in response.json()["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_update_timeline_event_patient_id_mismatch(async_db_client, test_db, therapist_user, therapist_auth_headers):
+    """Test update fails when event belongs to different patient than path parameter"""
+    from app.models.db_models import TimelineEvent, User, TherapistPatient
+    from datetime import datetime, timedelta
+    from app.models.schemas import UserRole
+    from app.auth.utils import get_password_hash
+
+    # Create two patients
+    patient1 = User(
+        email="patient1@test.com",
+        hashed_password=get_password_hash("testpass123"),
+        first_name="Patient",
+        last_name="One",
+        full_name="Patient One",
+        role=UserRole.patient,
+        is_active=True,
+        is_verified=False
+    )
+    patient2 = User(
+        email="patient2@test.com",
+        hashed_password=get_password_hash("testpass123"),
+        first_name="Patient",
+        last_name="Two",
+        full_name="Patient Two",
+        role=UserRole.patient,
+        is_active=True,
+        is_verified=False
+    )
+    test_db.add(patient1)
+    test_db.add(patient2)
+    test_db.commit()
+    test_db.refresh(patient1)
+    test_db.refresh(patient2)
+
+    # Create active relationships for both patients
+    rel1 = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient1.id,
+        relationship_type="primary",
+        is_active=True
+    )
+    rel2 = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient2.id,
+        relationship_type="primary",
+        is_active=True
+    )
+    test_db.add(rel1)
+    test_db.add(rel2)
+    test_db.commit()
+
+    # Create event for patient1
+    event = TimelineEvent(
+        patient_id=patient1.id,
+        therapist_id=therapist_user.id,
+        event_type="assessment",
+        event_date=datetime.utcnow() - timedelta(days=1),
+        title="Initial Assessment",
+        description="Assessment notes",
+        importance="high"
+    )
+    test_db.add(event)
+    test_db.commit()
+    test_db.refresh(event)
+
+    # Attempt to update with patient2's ID in path (wrong patient)
+    update_data = {"title": "Updated Assessment"}
+
+    response = async_db_client.patch(
+        f"/api/sessions/patients/{patient2.id}/timeline/{event.id}",
+        json=update_data,
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 404
+    assert "not found for this patient" in response.json()["detail"].lower()
+
+
+# ============================================================================
+# Delete Timeline Event Tests (Sub-feature 6: DELETE endpoint)
+# ============================================================================
+
+@pytest.mark.asyncio
+async def test_delete_timeline_event_success(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test successful deletion of a timeline event"""
+    from app.models.db_models import TimelineEvent, TherapistPatient
+    from datetime import datetime, timedelta
+
+    # Create active therapist-patient relationship
+    relationship = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient_user.id,
+        relationship_type="primary",
+        is_active=True
+    )
+    test_db.add(relationship)
+    test_db.commit()
+
+    # Create timeline event
+    event = TimelineEvent(
+        patient_id=patient_user.id,
+        therapist_id=therapist_user.id,
+        event_type="note",
+        event_date=datetime.utcnow() - timedelta(days=1),
+        title="Clinical note to delete",
+        description="This event should be deleted",
+        importance="normal"
+    )
+    test_db.add(event)
+    test_db.commit()
+    test_db.refresh(event)
+    event_id = event.id
+
+    # Verify event exists before deletion
+    db_event = test_db.query(TimelineEvent).filter_by(id=event_id).first()
+    assert db_event is not None
+    assert db_event.title == "Clinical note to delete"
+
+    # Delete event
+    response = async_db_client.delete(
+        f"/api/sessions/patients/{patient_user.id}/timeline/{event_id}",
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert "message" in data
+    assert "deleted successfully" in data["message"].lower()
+
+    # Verify event no longer exists in database (hard delete)
+    db_event = test_db.query(TimelineEvent).filter_by(id=event_id).first()
+    assert db_event is None
+
+
+@pytest.mark.asyncio
+async def test_delete_timeline_event_not_found(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test deletion fails with non-existent event ID"""
+    from app.models.db_models import TherapistPatient
+
+    # Create active therapist-patient relationship
+    relationship = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient_user.id,
+        relationship_type="primary",
+        is_active=True
+    )
+    test_db.add(relationship)
+    test_db.commit()
+
+    # Try to delete non-existent event
+    fake_event_id = uuid4()
+    response = async_db_client.delete(
+        f"/api/sessions/patients/{patient_user.id}/timeline/{fake_event_id}",
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 404
+    data = response.json()
+    assert "detail" in data
+    assert "not found" in data["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_delete_timeline_event_inactive_relationship(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test deletion fails when therapist-patient relationship is inactive"""
+    from app.models.db_models import TimelineEvent, TherapistPatient
+    from datetime import datetime, timedelta
+
+    # Create timeline event
+    event = TimelineEvent(
+        patient_id=patient_user.id,
+        therapist_id=therapist_user.id,
+        event_type="milestone",
+        event_date=datetime.utcnow() - timedelta(days=2),
+        title="Milestone event",
+        description="Event that cannot be deleted with inactive relationship",
+        importance="milestone"
+    )
+    test_db.add(event)
+    test_db.commit()
+    test_db.refresh(event)
+
+    # Create INACTIVE therapist-patient relationship
+    relationship = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient_user.id,
+        relationship_type="primary",
+        is_active=False  # Inactive relationship
+    )
+    test_db.add(relationship)
+    test_db.commit()
+
+    # Try to delete event with inactive relationship
+    response = async_db_client.delete(
+        f"/api/sessions/patients/{patient_user.id}/timeline/{event.id}",
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 403
+    data = response.json()
+    assert "detail" in data
+    assert "access denied" in data["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_delete_timeline_event_patient_id_mismatch(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test deletion fails when patient_id in URL doesn't match event's patient"""
+    from app.models.db_models import TimelineEvent, TherapistPatient, User
+    from datetime import datetime, timedelta
+    from app.auth.utils import get_password_hash
+
+    # Create second patient
+    patient_user_2 = User(
+        email="patient2@test.com",
+        hashed_password=get_password_hash("testpass123"),
+        first_name="Test",
+        last_name="Patient 2",
+        full_name="Test Patient 2",
+        role=UserRole.patient,
+        is_active=True,
+        is_verified=False
+    )
+    test_db.add(patient_user_2)
+    test_db.commit()
+    test_db.refresh(patient_user_2)
+
+    # Create active relationship for both patients
+    relationship1 = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient_user.id,
+        relationship_type="primary",
+        is_active=True
+    )
+    relationship2 = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient_user_2.id,
+        relationship_type="primary",
+        is_active=True
+    )
+    test_db.add(relationship1)
+    test_db.add(relationship2)
+    test_db.commit()
+
+    # Create event for patient_user
+    event = TimelineEvent(
+        patient_id=patient_user.id,
+        therapist_id=therapist_user.id,
+        event_type="session",
+        event_date=datetime.utcnow() - timedelta(days=3),
+        title="Session event for patient 1",
+        description="This event belongs to patient 1",
+        importance="normal"
+    )
+    test_db.add(event)
+    test_db.commit()
+    test_db.refresh(event)
+
+    # Try to delete event using wrong patient_id in URL
+    response = async_db_client.delete(
+        f"/api/sessions/patients/{patient_user_2.id}/timeline/{event.id}",  # Wrong patient_id
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 404
+    data = response.json()
+    assert "detail" in data
+    assert "not found for this patient" in data["detail"].lower()
+
+    # Verify event still exists (was not deleted)
+    db_event = test_db.query(TimelineEvent).filter_by(id=event.id).first()
+    assert db_event is not None
+
+# ============================================================================
+# Feature 7 - Sub-feature 3: Export Timeline Tests
+# ============================================================================
+
+@pytest.mark.asyncio
+async def test_export_timeline_pdf_success(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test successful PDF export job creation"""
+    from app.models.db_models import TimelineEvent, TherapistPatient
+    from app.models.export_models import ExportJob
+    from datetime import datetime, timedelta
+
+    # Create active therapist-patient relationship
+    relationship = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient_user.id,
+        relationship_type="primary",
+        is_active=True
+    )
+    test_db.add(relationship)
+    test_db.commit()
+
+    # Create 5 timeline events
+    now = datetime.utcnow()
+    for i in range(5):
+        event = TimelineEvent(
+            patient_id=patient_user.id,
+            therapist_id=therapist_user.id,
+            event_type="session",
+            event_date=now - timedelta(days=i*2),
+            title=f"Session #{i+1}",
+            description=f"Session notes for event {i+1}",
+            importance="normal"
+        )
+        test_db.add(event)
+    test_db.commit()
+
+    # Request PDF export
+    response = async_db_client.get(
+        f"/api/sessions/patients/{patient_user.id}/timeline/export?format=pdf",
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify response structure
+    assert "id" in data
+    assert data["status"] == "pending"
+    assert data["export_type"] == "timeline"
+    assert data["format"] == "pdf"
+    assert "created_at" in data
+
+    # Verify ExportJob created in database
+    job = test_db.query(ExportJob).filter(ExportJob.id == data["id"]).first()
+    assert job is not None
+    assert job.user_id == therapist_user.id
+    assert job.patient_id == patient_user.id
+    assert job.export_type == "timeline"
+    assert job.format == "pdf"
+    assert job.status == "pending"
+    assert job.parameters["patient_id"] == str(patient_user.id)
+
+
+@pytest.mark.asyncio
+async def test_export_timeline_docx_success(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test successful DOCX export job creation"""
+    from app.models.db_models import TimelineEvent, TherapistPatient
+    from app.models.export_models import ExportJob
+    from datetime import datetime, timedelta
+
+    # Create active therapist-patient relationship
+    relationship = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient_user.id,
+        relationship_type="primary",
+        is_active=True
+    )
+    test_db.add(relationship)
+    test_db.commit()
+
+    # Create 5 timeline events
+    now = datetime.utcnow()
+    for i in range(5):
+        event = TimelineEvent(
+            patient_id=patient_user.id,
+            therapist_id=therapist_user.id,
+            event_type="note",
+            event_date=now - timedelta(days=i*3),
+            title=f"Clinical note #{i+1}",
+            description=f"Note content {i+1}",
+            importance="normal"
+        )
+        test_db.add(event)
+    test_db.commit()
+
+    # Request DOCX export
+    response = async_db_client.get(
+        f"/api/sessions/patients/{patient_user.id}/timeline/export?format=docx",
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify response structure
+    assert "id" in data
+    assert data["status"] == "pending"
+    assert data["format"] == "docx"
+
+    # Verify ExportJob created in database
+    job = test_db.query(ExportJob).filter(ExportJob.id == data["id"]).first()
+    assert job is not None
+    assert job.format == "docx"
+    assert job.status == "pending"
+
+
+@pytest.mark.asyncio
+async def test_export_timeline_json_success(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test successful JSON export job creation"""
+    from app.models.db_models import TimelineEvent, TherapistPatient
+    from app.models.export_models import ExportJob
+    from datetime import datetime, timedelta
+
+    # Create active therapist-patient relationship
+    relationship = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient_user.id,
+        relationship_type="primary",
+        is_active=True
+    )
+    test_db.add(relationship)
+    test_db.commit()
+
+    # Create 5 timeline events
+    now = datetime.utcnow()
+    for i in range(5):
+        event = TimelineEvent(
+            patient_id=patient_user.id,
+            therapist_id=therapist_user.id,
+            event_type="milestone",
+            event_date=now - timedelta(days=i*5),
+            title=f"Milestone #{i+1}",
+            description=f"Progress milestone {i+1}",
+            importance="milestone"
+        )
+        test_db.add(event)
+    test_db.commit()
+
+    # Request JSON export
+    response = async_db_client.get(
+        f"/api/sessions/patients/{patient_user.id}/timeline/export?format=json",
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify response structure
+    assert "id" in data
+    assert data["status"] == "pending"
+    assert data["format"] == "json"
+
+    # Verify ExportJob created in database
+    job = test_db.query(ExportJob).filter(ExportJob.id == data["id"]).first()
+    assert job is not None
+    assert job.format == "json"
+    assert job.status == "pending"
+
+
+@pytest.mark.asyncio
+async def test_export_timeline_with_date_filtering(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test export with date range filtering"""
+    from app.models.db_models import TimelineEvent, TherapistPatient
+    from app.models.export_models import ExportJob
+    from datetime import datetime, timedelta
+
+    # Create active therapist-patient relationship
+    relationship = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient_user.id,
+        relationship_type="primary",
+        is_active=True
+    )
+    test_db.add(relationship)
+    test_db.commit()
+
+    # Create events spanning 30 days
+    base_date = datetime(2024, 1, 1)
+    for i in range(30):
+        event = TimelineEvent(
+            patient_id=patient_user.id,
+            therapist_id=therapist_user.id,
+            event_type="session",
+            event_date=base_date + timedelta(days=i),
+            title=f"Session day {i+1}",
+            description=f"Daily session {i+1}",
+            importance="normal"
+        )
+        test_db.add(event)
+    test_db.commit()
+
+    # Request export with date filtering
+    response = async_db_client.get(
+        f"/api/sessions/patients/{patient_user.id}/timeline/export?format=pdf&start_date=2024-01-10&end_date=2024-01-20",
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Verify job created
+    assert "id" in data
+    assert data["status"] == "pending"
+
+    # Verify date parameters stored in job
+    job = test_db.query(ExportJob).filter(ExportJob.id == data["id"]).first()
+    assert job is not None
+    assert job.parameters["start_date"] == "2024-01-10"
+    assert job.parameters["end_date"] == "2024-01-20"
+
+
+@pytest.mark.asyncio
+async def test_export_timeline_invalid_date_range(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test export with invalid date range (end before start)"""
+    from app.models.db_models import TherapistPatient
+
+    # Create active therapist-patient relationship
+    relationship = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient_user.id,
+        relationship_type="primary",
+        is_active=True
+    )
+    test_db.add(relationship)
+    test_db.commit()
+
+    # Request export with invalid date range (end before start)
+    response = async_db_client.get(
+        f"/api/sessions/patients/{patient_user.id}/timeline/export?format=pdf&start_date=2024-01-20&end_date=2024-01-10",
+        headers=therapist_auth_headers
+    )
+
+    assert response.status_code == 400
+    data = response.json()
+    assert "detail" in data
+    assert "end_date must be after start_date" in data["detail"]
+
+
+@pytest.mark.asyncio
+async def test_export_timeline_unauthorized_therapist(async_db_client, test_db, therapist_user, patient_user, therapist_auth_headers):
+    """Test export authorization - therapist without patient relationship"""
+    from app.models.db_models import User, TherapistPatient
+    from uuid import uuid4
+
+    # Create a second therapist (not related to patient_user)
+    therapist2 = User(
+        id=uuid4(),
+        email="therapist2@test.com",
+        hashed_password="hashed_password_here_12345",
+        first_name="Second",
+        last_name="Therapist",
+        role="therapist",
+        is_active=True,
+        is_verified=True
+    )
+    test_db.add(therapist2)
+    test_db.commit()
+    test_db.refresh(therapist2)
+
+    # Create relationship between therapist2 and patient (NOT therapist_user)
+    relationship = TherapistPatient(
+        therapist_id=therapist2.id,
+        patient_id=patient_user.id,
+        relationship_type="primary",
+        is_active=True
+    )
+    test_db.add(relationship)
+    test_db.commit()
+
+    # Try to export as therapist_user (who has NO relationship with patient)
+    response = async_db_client.get(
+        f"/api/sessions/patients/{patient_user.id}/timeline/export?format=pdf",
+        headers=therapist_auth_headers  # This is for therapist_user, not therapist2
+    )
+
+    assert response.status_code == 403
+    data = response.json()
+    assert "detail" in data
+    assert "Not authorized" in data["detail"] or "not assigned" in data["detail"].lower()

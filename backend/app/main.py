@@ -50,36 +50,49 @@ async def lifespan(app: FastAPI):
     Lifespan context manager for startup/shutdown events.
     Runs database checks, initializes services, and starts scheduler on startup.
     """
-    # Startup
-    logger.info("🚀 Starting TherapyBridge API")
-    await init_db()
-    logger.info("✅ Database initialized")
+    import sys
 
-    # Seed system templates
-    async with AsyncSessionLocal() as db:
-        await seed_on_startup(db)
+    # Detect if running under pytest - skip database initialization during tests
+    is_pytest = (
+        'pytest' in sys.modules or
+        'PYTEST_CURRENT_TEST' in os.environ or
+        'pytest' in sys.argv[0]
+    )
 
-    # Run cleanup on startup if enabled
-    await run_startup_cleanup()
+    if not is_pytest:
+        # Startup
+        logger.info("🚀 Starting TherapyBridge API")
+        await init_db()
+        logger.info("✅ Database initialized")
 
-    # Start analytics scheduler and register background jobs
-    logger.info("Starting analytics scheduler...")
-    start_scheduler()
-    register_analytics_jobs()
-    logger.info("✅ Analytics scheduler started and jobs registered")
+        # Seed system templates
+        async with AsyncSessionLocal() as db:
+            await seed_on_startup(db)
+
+        # Run cleanup on startup if enabled
+        await run_startup_cleanup()
+
+        # Start analytics scheduler and register background jobs
+        logger.info("Starting analytics scheduler...")
+        start_scheduler()
+        register_analytics_jobs()
+        logger.info("✅ Analytics scheduler started and jobs registered")
+    else:
+        logger.info("🧪 Running under pytest - skipping production startup tasks")
 
     yield
 
-    # Shutdown
-    logger.info("Shutting down TherapyBridge API")
+    if not is_pytest:
+        # Shutdown
+        logger.info("Shutting down TherapyBridge API")
 
-    # Stop analytics scheduler
-    logger.info("Stopping analytics scheduler...")
-    shutdown_scheduler()
-    logger.info("✅ Analytics scheduler stopped")
+        # Stop analytics scheduler
+        logger.info("Stopping analytics scheduler...")
+        shutdown_scheduler()
+        logger.info("✅ Analytics scheduler stopped")
 
-    await close_db()
-    logger.info("Database connections closed")
+        await close_db()
+        logger.info("Database connections closed")
 
 
 # Security: Get debug mode from environment (defaults to False to prevent PHI exposure)

@@ -168,7 +168,7 @@ class TestMFASetup:
 
     def test_mfa_setup_success(
         self,
-        async_db_async_db_client,
+        async_db_client,
         test_db,
         therapist_auth_headers,
         therapist_user,
@@ -203,7 +203,7 @@ class TestMFASetup:
 
     def test_mfa_setup_creates_db_record(
         self,
-        async_db_async_db_client,
+        async_db_client,
         test_db,
         therapist_auth_headers,
         therapist_user,
@@ -235,7 +235,7 @@ class TestMFASetup:
 
     def test_mfa_setup_already_enabled(
         self,
-        async_db_async_db_client,
+        async_db_client,
         test_db,
         patient_auth_headers,
         mfa_enabled_user,
@@ -262,7 +262,7 @@ class TestMFASetup:
 
     def test_mfa_setup_updates_pending_config(
         self,
-        async_db_async_db_client,
+        async_db_client,
         test_db,
         therapist_auth_headers,
         mfa_user,

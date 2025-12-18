@@ -471,6 +471,43 @@ def admin_token(admin_user):
 
 
 @pytest.fixture(scope="function")
+def therapist_with_patient(test_db, therapist_user, patient_user):
+    """
+    Create active therapist-patient relationship in junction table.
+
+    This fixture establishes the many-to-many relationship between a therapist
+    and patient user via the therapist_patients junction table. Required for
+    authorization tests that check therapist access to patient data.
+
+    Args:
+        test_db: Test database session
+        therapist_user: Therapist user fixture
+        patient_user: Patient user fixture
+
+    Returns:
+        Dict with:
+        - therapist: User object (therapist)
+        - patient: User object (patient)
+        - relationship: TherapistPatient junction table entry
+    """
+    relationship = TherapistPatient(
+        therapist_id=therapist_user.id,
+        patient_id=patient_user.id,
+        relationship_type="primary",
+        is_active=True
+    )
+    test_db.add(relationship)
+    test_db.commit()
+    test_db.refresh(relationship)
+
+    return {
+        "therapist": therapist_user,
+        "patient": patient_user,
+        "relationship": relationship
+    }
+
+
+@pytest.fixture(scope="function")
 def therapist_auth_headers(therapist_token):
     """
     Generate authorization headers for therapist user.

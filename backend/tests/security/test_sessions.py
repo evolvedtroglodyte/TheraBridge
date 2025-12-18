@@ -67,7 +67,7 @@ def mobile_request():
 
 
 @pytest.fixture
-async def user_with_sessions(test_db, test_user, session_manager, mock_request):
+async def user_with_sessions(async_test_db, test_user, session_manager, mock_request):
     """
     Create a user with 3 active sessions for testing.
 
@@ -87,10 +87,10 @@ async def user_with_sessions(test_db, test_user, session_manager, mock_request):
         session, token = await session_manager.create_session(
             user_id=test_user.id,
             request=mock_request,
-            db=test_db
+            db=async_test_db
         )
-        await test_db.commit()
-        await test_db.refresh(session)
+        await async_test_db.commit()
+        await async_test_db.refresh(session)
 
         sessions.append(session)
         tokens.append(token)
@@ -103,7 +103,7 @@ async def user_with_sessions(test_db, test_user, session_manager, mock_request):
 
 
 @pytest.fixture
-async def expired_session(test_db, test_user, session_manager, mock_request):
+async def expired_session(async_test_db, test_user, session_manager, mock_request):
     """
     Create a session that has exceeded absolute expiration (8 hours).
 
@@ -114,10 +114,10 @@ async def expired_session(test_db, test_user, session_manager, mock_request):
         session, token = await session_manager.create_session(
             user_id=test_user.id,
             request=mock_request,
-            db=test_db
+            db=async_test_db
         )
-        await test_db.commit()
-        await test_db.refresh(session)
+        await async_test_db.commit()
+        await async_test_db.refresh(session)
 
     # Move time forward 9 hours (past 8-hour expiration)
     with freeze_time("2025-01-01 09:00:00"):
@@ -125,7 +125,7 @@ async def expired_session(test_db, test_user, session_manager, mock_request):
 
 
 @pytest.fixture
-async def idle_session(test_db, test_user, session_manager, mock_request):
+async def idle_session(async_test_db, test_user, session_manager, mock_request):
     """
     Create a session that has exceeded idle timeout (30 minutes).
 
@@ -136,10 +136,10 @@ async def idle_session(test_db, test_user, session_manager, mock_request):
         session, token = await session_manager.create_session(
             user_id=test_user.id,
             request=mock_request,
-            db=test_db
+            db=async_test_db
         )
-        await test_db.commit()
-        await test_db.refresh(session)
+        await async_test_db.commit()
+        await async_test_db.refresh(session)
 
     # Move time forward 35 minutes (past 30-minute idle timeout)
     with freeze_time("2025-01-01 12:35:00"):
@@ -151,15 +151,15 @@ async def idle_session(test_db, test_user, session_manager, mock_request):
 # ============================================================================
 
 @pytest.mark.asyncio
-async def test_create_session_success(test_db, test_user, session_manager, mock_request):
+async def test_create_session_success(async_test_db, test_user, session_manager, mock_request):
     """Test SessionManager creates session with secure token and device info."""
     session, raw_token = await session_manager.create_session(
         user_id=test_user.id,
         request=mock_request,
-        db=test_db
+        db=async_test_db
     )
-    await test_db.commit()
-    await test_db.refresh(session)
+    await async_test_db.commit()
+    await async_test_db.refresh(session)
 
     # Verify session created
     assert session.id is not None
@@ -185,7 +185,7 @@ async def test_create_session_success(test_db, test_user, session_manager, mock_
 
 
 @pytest.mark.asyncio
-async def test_create_session_enforces_limit(test_db, test_user, session_manager, mock_request):
+async def test_create_session_enforces_limit(async_test_db, test_user, session_manager, mock_request):
     """Test max 5 sessions enforced - oldest session revoked when limit exceeded."""
     # Create 5 sessions (at the limit)
     sessions = []
@@ -194,14 +194,14 @@ async def test_create_session_enforces_limit(test_db, test_user, session_manager
         session, token = await session_manager.create_session(
             user_id=test_user.id,
             request=mock_request,
-            db=test_db
+            db=async_test_db
         )
-        await test_db.commit()
-        await test_db.refresh(session)
+        await async_test_db.commit()
+        await async_test_db.refresh(session)
         sessions.append(session)
 
     # Verify all 5 are active
-    result = await test_db.execute(
+    result = await async_test_db.execute(
         select(UserSession).where(
             UserSession.user_id == test_user.id,
             UserSession.is_active == True
@@ -215,12 +215,12 @@ async def test_create_session_enforces_limit(test_db, test_user, session_manager
     new_session, new_token = await session_manager.create_session(
         user_id=test_user.id,
         request=mock_request,
-        db=test_db
+        db=async_test_db
     )
-    await test_db.commit()
+    await async_test_db.commit()
 
     # Verify still only 5 active sessions
-    result = await test_db.execute(
+    result = await async_test_db.execute(
         select(UserSession).where(
             UserSession.user_id == test_user.id,
             UserSession.is_active == True
@@ -230,13 +230,13 @@ async def test_create_session_enforces_limit(test_db, test_user, session_manager
     assert len(active_sessions) == 5
 
     # Verify oldest session was revoked
-    await test_db.refresh(sessions[0])
+    await async_test_db.refresh(sessions[0])
     assert sessions[0].is_active is False
     assert sessions[0].revoke_reason == "session_limit_exceeded"
 
 
 @pytest.mark.asyncio
-async def test_create_session_revokes_oldest(test_db, test_user, session_manager, mock_request):
+async def test_create_session_revokes_oldest(async_test_db, test_user, session_manager, mock_request):
     """Test that when limit is exceeded, the OLDEST session is revoked (not random)."""
     # Create sessions with different timestamps
     oldest_session = None
@@ -247,21 +247,21 @@ async def test_create_session_revokes_oldest(test_db, test_user, session_manager
             session, token = await session_manager.create_session(
                 user_id=test_user.id,
                 request=mock_request,
-                db=test_db
+                db=async_test_db
             )
-            await test_db.commit()
-            await test_db.refresh(session)
+            await async_test_db.commit()
+            await async_test_db.refresh(session)
 
             if i == 0:
                 oldest_session = session
 
     # Verify oldest session (from 10:00) was revoked
-    await test_db.refresh(oldest_session)
+    await async_test_db.refresh(oldest_session)
     assert oldest_session.is_active is False
     assert oldest_session.revoke_reason == "session_limit_exceeded"
 
     # Verify newest 5 sessions are still active
-    result = await test_db.execute(
+    result = await async_test_db.execute(
         select(UserSession).where(
             UserSession.user_id == test_user.id,
             UserSession.is_active == True
@@ -272,16 +272,16 @@ async def test_create_session_revokes_oldest(test_db, test_user, session_manager
 
 
 @pytest.mark.asyncio
-async def test_create_session_extracts_device_info(test_db, test_user, session_manager, mock_request, mobile_request):
+async def test_create_session_extracts_device_info(async_test_db, test_user, session_manager, mock_request, mobile_request):
     """Test device fingerprinting extracts device_type, OS, browser, is_mobile."""
     # Test desktop session
     desktop_session, _ = await session_manager.create_session(
         user_id=test_user.id,
         request=mock_request,
-        db=test_db
+        db=async_test_db
     )
-    await test_db.commit()
-    await test_db.refresh(desktop_session)
+    await async_test_db.commit()
+    await async_test_db.refresh(desktop_session)
 
     assert desktop_session.device_info is not None
     assert desktop_session.device_info["device_type"] == "desktop"
@@ -293,10 +293,10 @@ async def test_create_session_extracts_device_info(test_db, test_user, session_m
     mobile_session, _ = await session_manager.create_session(
         user_id=test_user.id,
         request=mobile_request,
-        db=test_db
+        db=async_test_db
     )
-    await test_db.commit()
-    await test_db.refresh(mobile_session)
+    await async_test_db.commit()
+    await async_test_db.refresh(mobile_session)
 
     assert mobile_session.device_info is not None
     assert mobile_session.device_info["device_type"] == "mobile"
@@ -310,33 +310,33 @@ async def test_create_session_extracts_device_info(test_db, test_user, session_m
 # ============================================================================
 
 @pytest.mark.asyncio
-async def test_validate_session_success(test_db, test_user, session_manager, mock_request):
+async def test_validate_session_success(async_test_db, test_user, session_manager, mock_request):
     """Test valid session passes validation and updates last_activity_at."""
     # Create session
     session, token = await session_manager.create_session(
         user_id=test_user.id,
         request=mock_request,
-        db=test_db
+        db=async_test_db
     )
-    await test_db.commit()
+    await async_test_db.commit()
     original_activity = session.last_activity_at
 
     # Wait 1 second and validate
     with freeze_time(datetime.utcnow() + timedelta(seconds=1)):
-        validated_session = await session_manager.validate_session(token, test_db)
-        await test_db.commit()
+        validated_session = await session_manager.validate_session(token, async_test_db)
+        await async_test_db.commit()
 
     assert validated_session is not None
     assert validated_session.id == session.id
     assert validated_session.is_active is True
 
     # Verify last_activity_at was updated
-    await test_db.refresh(session)
+    await async_test_db.refresh(session)
     assert session.last_activity_at > original_activity
 
 
 @pytest.mark.asyncio
-async def test_validate_session_expired(test_db, test_user, session_manager):
+async def test_validate_session_expired(async_test_db, test_user, session_manager):
     """Test expired session fails validation (8 hours)."""
     # Create session at T=0
     with freeze_time("2025-01-01 00:00:00"):
@@ -349,20 +349,20 @@ async def test_validate_session_expired(test_db, test_user, session_manager):
         session, token = await session_manager.create_session(
             user_id=test_user.id,
             request=mock_request,
-            db=test_db
+            db=async_test_db
         )
-        await test_db.commit()
+        await async_test_db.commit()
         session_id = session.id
 
     # Validate at T=9 hours (past 8-hour expiration)
     with freeze_time("2025-01-01 09:00:00"):
-        validated_session = await session_manager.validate_session(token, test_db)
-        await test_db.commit()
+        validated_session = await session_manager.validate_session(token, async_test_db)
+        await async_test_db.commit()
 
     assert validated_session is None
 
     # Verify session was revoked
-    result = await test_db.execute(
+    result = await async_test_db.execute(
         select(UserSession).where(UserSession.id == session_id)
     )
     revoked_session = result.scalar_one()
@@ -371,7 +371,7 @@ async def test_validate_session_expired(test_db, test_user, session_manager):
 
 
 @pytest.mark.asyncio
-async def test_validate_session_idle_timeout(test_db, test_user, session_manager):
+async def test_validate_session_idle_timeout(async_test_db, test_user, session_manager):
     """Test idle timeout enforced (30 minutes)."""
     # Create session at T=0
     with freeze_time("2025-01-01 12:00:00"):
@@ -384,20 +384,20 @@ async def test_validate_session_idle_timeout(test_db, test_user, session_manager
         session, token = await session_manager.create_session(
             user_id=test_user.id,
             request=mock_request,
-            db=test_db
+            db=async_test_db
         )
-        await test_db.commit()
+        await async_test_db.commit()
         session_id = session.id
 
     # Validate at T=35 minutes (past 30-minute idle timeout)
     with freeze_time("2025-01-01 12:35:00"):
-        validated_session = await session_manager.validate_session(token, test_db)
-        await test_db.commit()
+        validated_session = await session_manager.validate_session(token, async_test_db)
+        await async_test_db.commit()
 
     assert validated_session is None
 
     # Verify session was revoked
-    result = await test_db.execute(
+    result = await async_test_db.execute(
         select(UserSession).where(UserSession.id == session_id)
     )
     revoked_session = result.scalar_one()
@@ -406,58 +406,58 @@ async def test_validate_session_idle_timeout(test_db, test_user, session_manager
 
 
 @pytest.mark.asyncio
-async def test_validate_session_updates_activity(test_db, test_user, session_manager, mock_request):
+async def test_validate_session_updates_activity(async_test_db, test_user, session_manager, mock_request):
     """Test that validation updates last_activity_at timestamp."""
     # Create session
     with freeze_time("2025-01-01 10:00:00"):
         session, token = await session_manager.create_session(
             user_id=test_user.id,
             request=mock_request,
-            db=test_db
+            db=async_test_db
         )
-        await test_db.commit()
-        await test_db.refresh(session)
+        await async_test_db.commit()
+        await async_test_db.refresh(session)
         initial_activity = session.last_activity_at
 
     # Validate 10 minutes later
     with freeze_time("2025-01-01 10:10:00"):
-        validated_session = await session_manager.validate_session(token, test_db)
-        await test_db.commit()
+        validated_session = await session_manager.validate_session(token, async_test_db)
+        await async_test_db.commit()
 
     assert validated_session is not None
     assert validated_session.last_activity_at > initial_activity
 
     # Verify timestamp in database
-    await test_db.refresh(session)
+    await async_test_db.refresh(session)
     expected_time = datetime(2025, 1, 1, 10, 10, 0)
     assert abs((session.last_activity_at - expected_time).total_seconds()) < 5
 
 
 @pytest.mark.asyncio
-async def test_validate_session_invalid_token(test_db, session_manager):
+async def test_validate_session_invalid_token(async_test_db, session_manager):
     """Test validation fails with non-existent token."""
     invalid_token = "invalid-token-12345678901234567890"
-    validated_session = await session_manager.validate_session(invalid_token, test_db)
+    validated_session = await session_manager.validate_session(invalid_token, async_test_db)
 
     assert validated_session is None
 
 
 @pytest.mark.asyncio
-async def test_validate_session_revoked(test_db, test_user, session_manager, mock_request):
+async def test_validate_session_revoked(async_test_db, test_user, session_manager, mock_request):
     """Test validation fails for revoked sessions."""
     # Create and revoke session
     session, token = await session_manager.create_session(
         user_id=test_user.id,
         request=mock_request,
-        db=test_db
+        db=async_test_db
     )
-    await test_db.commit()
+    await async_test_db.commit()
 
-    await session_manager.revoke_session(session.id, "test_revocation", test_db)
-    await test_db.commit()
+    await session_manager.revoke_session(session.id, "test_revocation", async_test_db)
+    await async_test_db.commit()
 
     # Attempt validation
-    validated_session = await session_manager.validate_session(token, test_db)
+    validated_session = await session_manager.validate_session(token, async_test_db)
 
     assert validated_session is None
 
@@ -467,29 +467,29 @@ async def test_validate_session_revoked(test_db, test_user, session_manager, moc
 # ============================================================================
 
 @pytest.mark.asyncio
-async def test_revoke_session_success(test_db, test_user, session_manager, mock_request):
+async def test_revoke_session_success(async_test_db, test_user, session_manager, mock_request):
     """Test single session revoked successfully."""
     # Create session
     session, token = await session_manager.create_session(
         user_id=test_user.id,
         request=mock_request,
-        db=test_db
+        db=async_test_db
     )
-    await test_db.commit()
+    await async_test_db.commit()
 
     # Revoke session
-    await session_manager.revoke_session(session.id, "user_logout", test_db)
-    await test_db.commit()
+    await session_manager.revoke_session(session.id, "user_logout", async_test_db)
+    await async_test_db.commit()
 
     # Verify revocation
-    await test_db.refresh(session)
+    await async_test_db.refresh(session)
     assert session.is_active is False
     assert session.revoked_at is not None
     assert session.revoke_reason == "user_logout"
 
 
 @pytest.mark.asyncio
-async def test_revoke_all_sessions_except_current(test_db, user_with_sessions, session_manager):
+async def test_revoke_all_sessions_except_current(async_test_db, user_with_sessions, session_manager):
     """Test revokes all but current session."""
     sessions = user_with_sessions["sessions"]
     tokens = user_with_sessions["tokens"]
@@ -499,20 +499,20 @@ async def test_revoke_all_sessions_except_current(test_db, user_with_sessions, s
     count = await session_manager.revoke_all_sessions(
         user_id=user_with_sessions["user"].id,
         except_token=current_token,
-        db=test_db
+        db=async_test_db
     )
-    await test_db.commit()
+    await async_test_db.commit()
 
     # Verify 2 sessions revoked (out of 3 total)
     assert count == 2
 
     # Verify current session still active
-    await test_db.refresh(sessions[0])
+    await async_test_db.refresh(sessions[0])
     assert sessions[0].is_active is True
 
     # Verify others revoked
-    await test_db.refresh(sessions[1])
-    await test_db.refresh(sessions[2])
+    await async_test_db.refresh(sessions[1])
+    await async_test_db.refresh(sessions[2])
     assert sessions[1].is_active is False
     assert sessions[2].is_active is False
     assert sessions[1].revoke_reason == "revoke_all_sessions"
@@ -520,13 +520,13 @@ async def test_revoke_all_sessions_except_current(test_db, user_with_sessions, s
 
 
 @pytest.mark.asyncio
-async def test_revoke_session_not_found(test_db, session_manager):
+async def test_revoke_session_not_found(async_test_db, session_manager):
     """Test revoking non-existent session doesn't crash."""
     fake_session_id = uuid4()
 
     # Should not raise exception
-    await session_manager.revoke_session(fake_session_id, "test", test_db)
-    await test_db.commit()
+    await session_manager.revoke_session(fake_session_id, "test", async_test_db)
+    await async_test_db.commit()
 
 
 # ============================================================================
@@ -534,11 +534,11 @@ async def test_revoke_session_not_found(test_db, session_manager):
 # ============================================================================
 
 @pytest.mark.asyncio
-async def test_get_active_sessions(test_db, user_with_sessions, session_manager):
+async def test_get_active_sessions(async_test_db, user_with_sessions, session_manager):
     """Test retrieves all active sessions ordered by last activity."""
     sessions = await session_manager.get_active_sessions(
         user_id=user_with_sessions["user"].id,
-        db=test_db
+        db=async_test_db
     )
 
     # Verify all 3 sessions returned
@@ -550,11 +550,11 @@ async def test_get_active_sessions(test_db, user_with_sessions, session_manager)
 
 
 @pytest.mark.asyncio
-async def test_get_active_sessions_shows_device_info(test_db, user_with_sessions, session_manager):
+async def test_get_active_sessions_shows_device_info(async_test_db, user_with_sessions, session_manager):
     """Test session list includes device info."""
     sessions = await session_manager.get_active_sessions(
         user_id=user_with_sessions["user"].id,
-        db=test_db
+        db=async_test_db
     )
 
     # Verify each session has device info
@@ -567,28 +567,28 @@ async def test_get_active_sessions_shows_device_info(test_db, user_with_sessions
 
 
 @pytest.mark.asyncio
-async def test_get_active_sessions_empty(test_db, test_user, session_manager):
+async def test_get_active_sessions_empty(async_test_db, test_user, session_manager):
     """Test returns empty list for user with no sessions."""
     sessions = await session_manager.get_active_sessions(
         user_id=test_user.id,
-        db=test_db
+        db=async_test_db
     )
 
     assert sessions == []
 
 
 @pytest.mark.asyncio
-async def test_get_active_sessions_excludes_revoked(test_db, user_with_sessions, session_manager):
+async def test_get_active_sessions_excludes_revoked(async_test_db, user_with_sessions, session_manager):
     """Test only returns active sessions, excludes revoked."""
     user = user_with_sessions["user"]
     sessions = user_with_sessions["sessions"]
 
     # Revoke one session
-    await session_manager.revoke_session(sessions[0].id, "test", test_db)
-    await test_db.commit()
+    await session_manager.revoke_session(sessions[0].id, "test", async_test_db)
+    await async_test_db.commit()
 
     # Get active sessions
-    active_sessions = await session_manager.get_active_sessions(user.id, test_db)
+    active_sessions = await session_manager.get_active_sessions(user.id, async_test_db)
 
     # Verify only 2 active sessions
     assert len(active_sessions) == 2
@@ -600,7 +600,7 @@ async def test_get_active_sessions_excludes_revoked(test_db, user_with_sessions,
 # ============================================================================
 
 @pytest.mark.asyncio
-async def test_cleanup_expired_sessions(test_db, test_user, session_manager):
+async def test_cleanup_expired_sessions(async_test_db, test_user, session_manager):
     """Test cleanup removes expired sessions."""
     # Create 2 sessions: 1 expired, 1 valid
     with freeze_time("2025-01-01 00:00:00"):
@@ -613,30 +613,30 @@ async def test_cleanup_expired_sessions(test_db, test_user, session_manager):
         expired_sess, _ = await session_manager.create_session(
             user_id=test_user.id,
             request=mock_request,
-            db=test_db
+            db=async_test_db
         )
-        await test_db.commit()
+        await async_test_db.commit()
         expired_id = expired_sess.id
 
     with freeze_time("2025-01-01 05:00:00"):
         valid_sess, _ = await session_manager.create_session(
             user_id=test_user.id,
             request=mock_request,
-            db=test_db
+            db=async_test_db
         )
-        await test_db.commit()
+        await async_test_db.commit()
         valid_id = valid_sess.id
 
     # Run cleanup at T=9 hours (expired session is 9 hours old, valid is 4 hours old)
     with freeze_time("2025-01-01 09:00:00"):
-        count = await session_manager.cleanup_expired_sessions(test_db)
-        await test_db.commit()
+        count = await session_manager.cleanup_expired_sessions(async_test_db)
+        await async_test_db.commit()
 
     # Verify 1 session cleaned up
     assert count == 1
 
     # Verify expired session revoked
-    result = await test_db.execute(
+    result = await async_test_db.execute(
         select(UserSession).where(UserSession.id == expired_id)
     )
     expired_session = result.scalar_one()
@@ -644,7 +644,7 @@ async def test_cleanup_expired_sessions(test_db, test_user, session_manager):
     assert expired_session.revoke_reason == "expired"
 
     # Verify valid session still active
-    result = await test_db.execute(
+    result = await async_test_db.execute(
         select(UserSession).where(UserSession.id == valid_id)
     )
     valid_session = result.scalar_one()
@@ -652,7 +652,7 @@ async def test_cleanup_expired_sessions(test_db, test_user, session_manager):
 
 
 @pytest.mark.asyncio
-async def test_cleanup_idle_sessions(test_db, test_user, session_manager):
+async def test_cleanup_idle_sessions(async_test_db, test_user, session_manager):
     """Test cleanup removes idle sessions."""
     # Create 2 sessions: 1 idle, 1 active
     with freeze_time("2025-01-01 10:00:00"):
@@ -665,30 +665,30 @@ async def test_cleanup_idle_sessions(test_db, test_user, session_manager):
         idle_sess, _ = await session_manager.create_session(
             user_id=test_user.id,
             request=mock_request,
-            db=test_db
+            db=async_test_db
         )
-        await test_db.commit()
+        await async_test_db.commit()
         idle_id = idle_sess.id
 
     with freeze_time("2025-01-01 10:20:00"):
         active_sess, _ = await session_manager.create_session(
             user_id=test_user.id,
             request=mock_request,
-            db=test_db
+            db=async_test_db
         )
-        await test_db.commit()
+        await async_test_db.commit()
         active_id = active_sess.id
 
     # Run cleanup at T=10:35 (idle session is 35 min old, active is 15 min old)
     with freeze_time("2025-01-01 10:35:00"):
-        count = await session_manager.cleanup_expired_sessions(test_db)
-        await test_db.commit()
+        count = await session_manager.cleanup_expired_sessions(async_test_db)
+        await async_test_db.commit()
 
     # Verify 1 session cleaned up
     assert count == 1
 
     # Verify idle session revoked
-    result = await test_db.execute(
+    result = await async_test_db.execute(
         select(UserSession).where(UserSession.id == idle_id)
     )
     idle_session = result.scalar_one()
@@ -696,7 +696,7 @@ async def test_cleanup_idle_sessions(test_db, test_user, session_manager):
     assert idle_session.revoke_reason == "idle_timeout"
 
     # Verify active session still active
-    result = await test_db.execute(
+    result = await async_test_db.execute(
         select(UserSession).where(UserSession.id == active_id)
     )
     active_session = result.scalar_one()
@@ -704,24 +704,24 @@ async def test_cleanup_idle_sessions(test_db, test_user, session_manager):
 
 
 @pytest.mark.asyncio
-async def test_cleanup_sessions_no_cleanup_needed(test_db, test_user, session_manager, mock_request):
+async def test_cleanup_sessions_no_cleanup_needed(async_test_db, test_user, session_manager, mock_request):
     """Test cleanup returns 0 when no sessions need cleanup."""
     # Create fresh session
     session, _ = await session_manager.create_session(
         user_id=test_user.id,
         request=mock_request,
-        db=test_db
+        db=async_test_db
     )
-    await test_db.commit()
+    await async_test_db.commit()
 
     # Run cleanup immediately
-    count = await session_manager.cleanup_expired_sessions(test_db)
-    await test_db.commit()
+    count = await session_manager.cleanup_expired_sessions(async_test_db)
+    await async_test_db.commit()
 
     assert count == 0
 
     # Verify session still active
-    await test_db.refresh(session)
+    await async_test_db.refresh(session)
     assert session.is_active is True
 
 
@@ -744,17 +744,17 @@ def test_get_session_manager_dependency():
 # ============================================================================
 
 @pytest.mark.asyncio
-async def test_session_token_is_hashed(test_db, test_user, session_manager, mock_request):
+async def test_session_token_is_hashed(async_test_db, test_user, session_manager, mock_request):
     """Test raw token is never stored in database (only hash)."""
     session, raw_token = await session_manager.create_session(
         user_id=test_user.id,
         request=mock_request,
-        db=test_db
+        db=async_test_db
     )
-    await test_db.commit()
+    await async_test_db.commit()
 
     # Verify raw token not in database
-    result = await test_db.execute(
+    result = await async_test_db.execute(
         select(UserSession).where(UserSession.session_token_hash.contains(raw_token))
     )
     assert result.scalar_one_or_none() is None
@@ -765,25 +765,25 @@ async def test_session_token_is_hashed(test_db, test_user, session_manager, mock
 
 
 @pytest.mark.asyncio
-async def test_different_users_sessions_isolated(test_db, test_user, test_patient_user, session_manager, mock_request):
+async def test_different_users_sessions_isolated(async_test_db, test_user, test_patient_user, session_manager, mock_request):
     """Test users can't access or affect other users' sessions."""
     # Create sessions for both users
     user1_session, user1_token = await session_manager.create_session(
         user_id=test_user.id,
         request=mock_request,
-        db=test_db
+        db=async_test_db
     )
-    await test_db.commit()
+    await async_test_db.commit()
 
     user2_session, user2_token = await session_manager.create_session(
         user_id=test_patient_user.id,
         request=mock_request,
-        db=test_db
+        db=async_test_db
     )
-    await test_db.commit()
+    await async_test_db.commit()
 
     # Get user1's active sessions
-    user1_sessions = await session_manager.get_active_sessions(test_user.id, test_db)
+    user1_sessions = await session_manager.get_active_sessions(test_user.id, async_test_db)
 
     # Verify only user1's session returned
     assert len(user1_sessions) == 1
@@ -792,7 +792,7 @@ async def test_different_users_sessions_isolated(test_db, test_user, test_patien
 
 
 @pytest.mark.asyncio
-async def test_concurrent_session_creation_enforces_limit(test_db, test_user, session_manager, mock_request):
+async def test_concurrent_session_creation_enforces_limit(async_test_db, test_user, session_manager, mock_request):
     """Test session limit enforcement works with concurrent session creation."""
     # Create 10 sessions rapidly (simulating concurrent logins)
     for i in range(10):
@@ -800,17 +800,17 @@ async def test_concurrent_session_creation_enforces_limit(test_db, test_user, se
         await session_manager.create_session(
             user_id=test_user.id,
             request=mock_request,
-            db=test_db
+            db=async_test_db
         )
-        await test_db.commit()
+        await async_test_db.commit()
 
     # Verify only 5 active sessions remain
-    active_sessions = await session_manager.get_active_sessions(test_user.id, test_db)
+    active_sessions = await session_manager.get_active_sessions(test_user.id, async_test_db)
     assert len(active_sessions) == 5
 
 
 @pytest.mark.asyncio
-async def test_session_without_user_agent(test_db, test_user, session_manager):
+async def test_session_without_user_agent(async_test_db, test_user, session_manager):
     """Test session creation handles missing user-agent gracefully."""
     request = MagicMock(spec=Request)
     request.client = MagicMock()
@@ -820,9 +820,9 @@ async def test_session_without_user_agent(test_db, test_user, session_manager):
     session, token = await session_manager.create_session(
         user_id=test_user.id,
         request=request,
-        db=test_db
+        db=async_test_db
     )
-    await test_db.commit()
+    await async_test_db.commit()
 
     # Verify session created with unknown device info
     assert session.device_info is not None

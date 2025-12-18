@@ -112,20 +112,30 @@ async def get_goal_dashboard(
     ]
 
     # Get assessments due (placeholder logic - assessments due every 4 weeks)
-    # Get last assessment for each type
-    assessments_due = []
+    # OPTIMIZATION: Single query to fetch latest assessments for all types (replaces N+1 loop)
+    # Fetch all assessments for this patient, filter to latest per type in Python
     assessment_types = ["GAD-7", "PHQ-9"]  # Common assessment types
 
-    for assessment_type in assessment_types:
-        last_assessment_query = select(AssessmentScore).where(
-            and_(
-                AssessmentScore.patient_id == patient_id,
-                AssessmentScore.assessment_type == assessment_type
-            )
-        ).order_by(desc(AssessmentScore.administered_date)).limit(1)
+    all_assessments_query = select(AssessmentScore).where(
+        and_(
+            AssessmentScore.patient_id == patient_id,
+            AssessmentScore.assessment_type.in_(assessment_types)
+        )
+    ).order_by(AssessmentScore.assessment_type, desc(AssessmentScore.administered_date))
 
-        last_assessment_result = await db.execute(last_assessment_query)
-        last_assessment = last_assessment_result.scalar_one_or_none()
+    all_assessments_result = await db.execute(all_assessments_query)
+    all_assessments = all_assessments_result.scalars().all()
+
+    # Group by assessment_type and get latest for each
+    latest_by_type = {}
+    for assessment in all_assessments:
+        if assessment.assessment_type not in latest_by_type:
+            latest_by_type[assessment.assessment_type] = assessment
+
+    # Build assessments_due list
+    assessments_due = []
+    for assessment_type in assessment_types:
+        last_assessment = latest_by_type.get(assessment_type)
 
         if last_assessment:
             # Check if due (4 weeks = 28 days since last administration)

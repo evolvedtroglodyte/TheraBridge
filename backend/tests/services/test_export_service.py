@@ -759,3 +759,307 @@ def test_get_export_service_creates_instance(
     assert isinstance(service, ExportService)
     assert service.pdf_generator == mock_pdf_generator
     assert service.docx_generator == mock_docx_generator
+
+
+# ============================================================================
+# Timeline Data Gathering Tests (Sub-feature 4: Export Processor)
+# ============================================================================
+
+@pytest.mark.asyncio
+async def test_gather_timeline_data_success(
+    export_service: ExportService,
+    async_test_db: AsyncSession,
+    therapist_with_sessions
+):
+    """Test successful gathering of timeline data with 5 events."""
+    from app.models.schemas import TimelineEventResponse, SessionTimelineResponse, TimelineSummaryResponse
+    from unittest.mock import patch, MagicMock
+
+    patient = therapist_with_sessions["patient"]
+    therapist = therapist_with_sessions["therapist"]
+
+    # Create 5 mock timeline events
+    now = datetime.utcnow()
+    mock_events = []
+    for i in range(5):
+        event = MagicMock(spec=TimelineEventResponse)
+        event.id = uuid4()
+        event.event_type = "milestone" if i % 2 == 0 else "note"
+        event.event_subtype = None
+        event.event_date = now - timedelta(days=i)
+        event.title = f"Event {i+1}"
+        event.description = f"Description for event {i+1}"
+        event.importance = "milestone" if i == 0 else "normal"
+        event.is_private = (i == 4)  # Make last event private
+        event.metadata = {}
+        mock_events.append(event)
+
+    # Mock timeline service response
+    mock_timeline_response = MagicMock(spec=SessionTimelineResponse)
+    mock_timeline_response.events = mock_events
+
+    # Mock summary response
+    mock_summary = MagicMock(spec=TimelineSummaryResponse)
+    mock_summary.total_sessions = 3
+    mock_summary.first_session = now.date()
+    mock_summary.last_session = now.date()
+    mock_summary.milestones_achieved = 1
+    mock_summary.events_by_type = {"milestone": 3, "note": 2}
+
+    # Patch timeline service functions
+    with patch('app.services.export_service.get_patient_timeline', new=AsyncMock(return_value=mock_timeline_response)):
+        with patch('app.services.export_service.get_timeline_summary', new=AsyncMock(return_value=mock_summary)):
+            # Gather timeline data
+            result = await export_service.gather_timeline_data(
+                patient_id=patient.id,
+                start_date=None,
+                end_date=None,
+                event_types=None,
+                include_private=True,
+                db=async_test_db
+            )
+
+    # Assert: Returns dict with required keys
+    assert "patient" in result
+    assert "therapist" in result
+    assert "events" in result
+    assert "total_events" in result
+    assert "summary" in result
+
+    # Assert: events list contains 5 items
+    assert len(result["events"]) == 5
+    assert result["total_events"] == 5
+
+    # Assert: Each event has required fields
+    for event_data in result["events"]:
+        assert "id" in event_data
+        assert "event_type" in event_data
+        assert "title" in event_data
+        assert "description" in event_data
+        assert "is_private" in event_data
+        assert "event_date" in event_data
+        assert "importance" in event_data
+
+    # Verify patient and therapist data
+    assert result["patient"]["email"] == "export.patient@test.com"
+    assert result["therapist"]["email"] == "export.therapist@test.com"
+
+    # Verify summary structure
+    assert "total_sessions" in result["summary"]
+    assert "first_session" in result["summary"]
+    assert "last_session" in result["summary"]
+    assert "milestones_achieved" in result["summary"]
+    assert "events_by_type" in result["summary"]
+
+
+@pytest.mark.asyncio
+async def test_gather_timeline_data_with_date_filtering(
+    export_service: ExportService,
+    async_test_db: AsyncSession,
+    therapist_with_sessions
+):
+    """Test timeline data gathering with date range filtering."""
+    from app.models.schemas import TimelineEventResponse, SessionTimelineResponse, TimelineSummaryResponse
+    from unittest.mock import patch, MagicMock
+
+    patient = therapist_with_sessions["patient"]
+
+    # Set date range: day 10 to day 20
+    base_date = datetime.utcnow()
+    start_date = base_date - timedelta(days=20)
+    end_date = base_date - timedelta(days=10)
+
+    # Create 3 mock events within date range (days 12, 15, 18)
+    mock_events = []
+    for day_offset in [12, 15, 18]:
+        event = MagicMock(spec=TimelineEventResponse)
+        event.id = uuid4()
+        event.event_type = "note"
+        event.event_date = base_date - timedelta(days=day_offset)
+        event.title = f"Event day {day_offset}"
+        event.description = f"Event at day {day_offset}"
+        event.importance = "normal"
+        event.is_private = False
+        event.event_subtype = None
+        event.metadata = {}
+        mock_events.append(event)
+
+    # Mock timeline service response
+    mock_timeline_response = MagicMock(spec=SessionTimelineResponse)
+    mock_timeline_response.events = mock_events
+
+    # Mock summary response
+    mock_summary = MagicMock(spec=TimelineSummaryResponse)
+    mock_summary.total_sessions = 0
+    mock_summary.first_session = None
+    mock_summary.last_session = None
+    mock_summary.milestones_achieved = 0
+    mock_summary.events_by_type = {"note": 3}
+
+    # Patch timeline service functions
+    with patch('app.services.export_service.get_patient_timeline', new=AsyncMock(return_value=mock_timeline_response)):
+        with patch('app.services.export_service.get_timeline_summary', new=AsyncMock(return_value=mock_summary)):
+            # Gather timeline data with date filtering
+            result = await export_service.gather_timeline_data(
+                patient_id=patient.id,
+                start_date=start_date,
+                end_date=end_date,
+                event_types=None,
+                include_private=True,
+                db=async_test_db
+            )
+
+    # Assert: Returns only events within date range
+    assert result["total_events"] == 3
+
+    # Verify all returned events are within date range
+    for event_data in result["events"]:
+        event_date = event_data["event_date"]
+        assert event_date >= start_date
+        assert event_date <= end_date
+
+    # Verify date filters are stored in result
+    assert result["start_date"] == start_date
+    assert result["end_date"] == end_date
+
+
+@pytest.mark.asyncio
+async def test_gather_timeline_data_include_private_false(
+    export_service: ExportService,
+    async_test_db: AsyncSession,
+    therapist_with_sessions
+):
+    """Test timeline data gathering excludes private events when include_private=False."""
+    from app.models.schemas import TimelineEventResponse, SessionTimelineResponse, TimelineSummaryResponse
+    from unittest.mock import patch, MagicMock
+
+    patient = therapist_with_sessions["patient"]
+
+    # Create 5 mock events: 3 non-private, 2 private
+    now = datetime.utcnow()
+    mock_events = []
+    for i in range(5):
+        is_private = (i in [1, 3])  # Events at index 1 and 3 are private
+        event = MagicMock(spec=TimelineEventResponse)
+        event.id = uuid4()
+        event.event_type = "note"
+        event.event_date = now - timedelta(days=i)
+        event.title = f"Event {i+1}"
+        event.description = f"Description {i+1}"
+        event.importance = "normal"
+        event.is_private = is_private
+        event.event_subtype = None
+        event.metadata = {}
+        mock_events.append(event)
+
+    # Mock timeline service response (returns all 5 events)
+    mock_timeline_response = MagicMock(spec=SessionTimelineResponse)
+    mock_timeline_response.events = mock_events
+
+    # Mock summary response
+    mock_summary = MagicMock(spec=TimelineSummaryResponse)
+    mock_summary.total_sessions = 0
+    mock_summary.first_session = None
+    mock_summary.last_session = None
+    mock_summary.milestones_achieved = 0
+    mock_summary.events_by_type = {"note": 5}
+
+    # Patch timeline service functions
+    with patch('app.services.export_service.get_patient_timeline', new=AsyncMock(return_value=mock_timeline_response)):
+        with patch('app.services.export_service.get_timeline_summary', new=AsyncMock(return_value=mock_summary)):
+            # Gather timeline data with include_private=False
+            result = await export_service.gather_timeline_data(
+                patient_id=patient.id,
+                start_date=None,
+                end_date=None,
+                event_types=None,
+                include_private=False,
+                db=async_test_db
+            )
+
+    # Assert: Returns only 3 events (non-private ones)
+    assert result["total_events"] == 3
+    assert len(result["events"]) == 3
+
+    # Assert: All returned events have is_private=False
+    for event_data in result["events"]:
+        assert event_data["is_private"] == False
+
+    # Verify event titles (should be events 1, 3, 5 - indices 0, 2, 4)
+    titles = {event["title"] for event in result["events"]}
+    assert "Event 1" in titles
+    assert "Event 3" in titles
+    assert "Event 5" in titles
+
+    # Private events should not be present (Event 2 and Event 4)
+    assert "Event 2" not in titles
+    assert "Event 4" not in titles
+
+
+@pytest.mark.asyncio
+async def test_gather_timeline_data_patient_not_found(
+    export_service: ExportService,
+    async_test_db: AsyncSession
+):
+    """Test that ValueError is raised when patient not found."""
+    fake_patient_id = uuid4()
+
+    # Attempt to gather timeline data for non-existent patient
+    with pytest.raises(ValueError, match="Patient .* not found"):
+        await export_service.gather_timeline_data(
+            patient_id=fake_patient_id,
+            start_date=None,
+            end_date=None,
+            event_types=None,
+            include_private=True,
+            db=async_test_db
+        )
+
+
+@pytest.mark.asyncio
+async def test_gather_timeline_data_empty_result(
+    export_service: ExportService,
+    async_test_db: AsyncSession,
+    therapist_with_sessions
+):
+    """Test gathering timeline data when patient has zero events."""
+    from app.models.schemas import SessionTimelineResponse, TimelineSummaryResponse
+    from unittest.mock import patch, MagicMock
+
+    patient = therapist_with_sessions["patient"]
+
+    # Mock timeline service response with empty events list
+    mock_timeline_response = MagicMock(spec=SessionTimelineResponse)
+    mock_timeline_response.events = []  # No events
+
+    # Mock summary response with zeros
+    mock_summary = MagicMock(spec=TimelineSummaryResponse)
+    mock_summary.total_sessions = 0
+    mock_summary.first_session = None
+    mock_summary.last_session = None
+    mock_summary.milestones_achieved = 0
+    mock_summary.events_by_type = {}
+
+    # Patch timeline service functions
+    with patch('app.services.export_service.get_patient_timeline', new=AsyncMock(return_value=mock_timeline_response)):
+        with patch('app.services.export_service.get_timeline_summary', new=AsyncMock(return_value=mock_summary)):
+            # Gather timeline data
+            result = await export_service.gather_timeline_data(
+                patient_id=patient.id,
+                start_date=None,
+                end_date=None,
+                event_types=None,
+                include_private=True,
+                db=async_test_db
+            )
+
+    # Assert: Returns empty events list (not error)
+    assert result["events"] == []
+    assert result["total_events"] == 0
+
+    # Assert: summary contains zeros for all counts
+    assert result["summary"]["milestones_achieved"] == 0
+
+    # Patient and therapist data should still be present
+    assert result["patient"]["email"] == "export.patient@test.com"
+    assert result["therapist"]["email"] == "export.therapist@test.com"

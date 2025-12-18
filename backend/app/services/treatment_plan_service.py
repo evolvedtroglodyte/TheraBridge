@@ -40,7 +40,7 @@ async def calculate_goal_progress(goal: TreatmentGoal, db: AsyncSession) -> int:
     3. Otherwise: return current progress_percentage
 
     Args:
-        goal: TreatmentGoal object with loaded sub_goals and progress_entries relationships
+        goal: TreatmentGoal object (relationships will be loaded if needed)
         db: Async database session
 
     Returns:
@@ -62,6 +62,9 @@ async def calculate_goal_progress(goal: TreatmentGoal, db: AsyncSession) -> int:
         >>> print(progress)  # 67
     """
     logger.debug(f"Calculating progress for goal {goal.id} (type={goal.goal_type})")
+
+    # Load sub_goals relationship if not already loaded
+    await db.refresh(goal, ['sub_goals'])
 
     # Strategy 1: Calculate from sub-goals using weighted average
     if goal.sub_goals and len(goal.sub_goals) > 0:
@@ -94,6 +97,9 @@ async def calculate_goal_progress(goal: TreatmentGoal, db: AsyncSession) -> int:
         else:
             logger.warning(f"Goal {goal.id} has sub-goals but total weight is 0, returning 0")
             return 0
+
+    # Load progress_entries relationship if not already loaded
+    await db.refresh(goal, ['progress_entries'])
 
     # Strategy 2: Calculate from latest progress entry rating
     if goal.progress_entries and len(goal.progress_entries) > 0:
