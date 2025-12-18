@@ -806,9 +806,9 @@ async def test_gather_timeline_data_success(
     mock_summary.milestones_achieved = 1
     mock_summary.events_by_type = {"milestone": 3, "note": 2}
 
-    # Patch timeline service functions
-    with patch('app.services.export_service.get_patient_timeline', new=AsyncMock(return_value=mock_timeline_response)):
-        with patch('app.services.export_service.get_timeline_summary', new=AsyncMock(return_value=mock_summary)):
+    # Patch timeline service functions at their import location
+    with patch('app.services.timeline.get_patient_timeline', new=AsyncMock(return_value=mock_timeline_response)):
+        with patch('app.services.timeline.get_timeline_summary', new=AsyncMock(return_value=mock_summary)):
             # Gather timeline data
             result = await export_service.gather_timeline_data(
                 patient_id=patient.id,
@@ -896,9 +896,9 @@ async def test_gather_timeline_data_with_date_filtering(
     mock_summary.milestones_achieved = 0
     mock_summary.events_by_type = {"note": 3}
 
-    # Patch timeline service functions
-    with patch('app.services.export_service.get_patient_timeline', new=AsyncMock(return_value=mock_timeline_response)):
-        with patch('app.services.export_service.get_timeline_summary', new=AsyncMock(return_value=mock_summary)):
+    # Patch timeline service functions at their import location
+    with patch('app.services.timeline.get_patient_timeline', new=AsyncMock(return_value=mock_timeline_response)):
+        with patch('app.services.timeline.get_timeline_summary', new=AsyncMock(return_value=mock_summary)):
             # Gather timeline data with date filtering
             result = await export_service.gather_timeline_data(
                 patient_id=patient.id,
@@ -964,9 +964,9 @@ async def test_gather_timeline_data_include_private_false(
     mock_summary.milestones_achieved = 0
     mock_summary.events_by_type = {"note": 5}
 
-    # Patch timeline service functions
-    with patch('app.services.export_service.get_patient_timeline', new=AsyncMock(return_value=mock_timeline_response)):
-        with patch('app.services.export_service.get_timeline_summary', new=AsyncMock(return_value=mock_summary)):
+    # Patch timeline service functions at their import location
+    with patch('app.services.timeline.get_patient_timeline', new=AsyncMock(return_value=mock_timeline_response)):
+        with patch('app.services.timeline.get_timeline_summary', new=AsyncMock(return_value=mock_summary)):
             # Gather timeline data with include_private=False
             result = await export_service.gather_timeline_data(
                 patient_id=patient.id,
@@ -1040,9 +1040,9 @@ async def test_gather_timeline_data_empty_result(
     mock_summary.milestones_achieved = 0
     mock_summary.events_by_type = {}
 
-    # Patch timeline service functions
-    with patch('app.services.export_service.get_patient_timeline', new=AsyncMock(return_value=mock_timeline_response)):
-        with patch('app.services.export_service.get_timeline_summary', new=AsyncMock(return_value=mock_summary)):
+    # Patch timeline service functions at their import location
+    with patch('app.services.timeline.get_patient_timeline', new=AsyncMock(return_value=mock_timeline_response)):
+        with patch('app.services.timeline.get_timeline_summary', new=AsyncMock(return_value=mock_summary)):
             # Gather timeline data
             result = await export_service.gather_timeline_data(
                 patient_id=patient.id,

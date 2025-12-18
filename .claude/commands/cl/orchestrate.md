@@ -660,6 +660,43 @@ Success criteria: Repository cleaner, better organized, follows CLAUDE.md rules<
 [Cleanup summary from agent will appear here]
 
 ---
+```
+
+### Step 4c: Push to Remote Repository (REQUIRED)
+
+**🚨 CRITICAL: After cleanup completes, automatically push all commits to the remote repository.**
+
+After cleanup summary is shown, immediately push to remote:
+
+```
+📤 PUSHING TO REMOTE REPOSITORY...
+
+Syncing local commits to GitHub...
+```
+
+**Execute git push using Bash tool:**
+
+```xml
+<invoke name="Bash">
+<parameter name="command">cd [project_root] && git push origin main</parameter>
+<parameter name="description">Push all commits to remote repository</parameter>
+</invoke>
+```
+
+**Then show push results:**
+
+```
+✅ PUSH COMPLETE
+
+Pushed to: origin (https://github.com/[username]/[repo].git)
+Branch: main
+Commits pushed: [N] commits
+Remote status: Up to date
+
+All changes are now synced to GitHub and visible at:
+https://github.com/[username]/[repo]
+
+---
 
 💡 FOLLOW-UP ORCHESTRATION PROMPT:
 
@@ -678,24 +715,46 @@ Current project state:
 - [Brief summary of what was just accomplished]
 - [Cleanup results summary]
 - [Any known gaps or future work identified]
+- ✅ All changes pushed to GitHub
 
 Ready to continue with another orchestration? (Copy the command above and describe your task)
 ```
 
+**Error Handling:**
+
+If push fails (e.g., network issue, merge conflicts, authentication):
+
+```
+❌ PUSH FAILED
+
+Error: [error message]
+
+Common issues:
+- Network connectivity problems → Retry: git push origin main
+- Authentication required → Set up GitHub credentials
+- Remote has diverged → Run: git pull --rebase origin main
+- Merge conflicts → Resolve conflicts and retry
+
+Manual push command:
+cd [project_root] && git push origin main
+
+⚠️ Your work is safely committed locally but NOT yet on GitHub.
+```
+
 **Why this is required:**
-- Automatically cleans up after orchestration execution
-- Maintains repository organization per CLAUDE.md rules
-- Provides detailed metrics on what changed during cleanup
-- Shows before/after comparisons for transparency
-- Ensures orchestration doesn't leave temporary artifacts
-- No manual cleanup needed from user
+- Automatically syncs all work to GitHub after each orchestration
+- Ensures remote repository stays current with local changes
+- Provides immediate backup to cloud
+- Makes work visible to team/collaborators instantly
+- Eliminates manual "git push" step
+- User can see changes on GitHub immediately
 
 **Benefits:**
-1. **Automatic maintenance** - Repository stays organized without user intervention
-2. **Full transparency** - Detailed metrics show exactly what changed
-3. **CLAUDE.md compliance** - Cleanup follows repository organization rules
-4. **Seamless workflow** - User can immediately continue with next task
-5. **Prevents clutter** - No temporary files or artifacts left behind
+1. **Automatic synchronization** - GitHub always reflects current state
+2. **Immediate backup** - Work protected in cloud storage
+3. **Team visibility** - Collaborators see changes instantly
+4. **No manual steps** - Push happens automatically
+5. **Error reporting** - Clear feedback if push fails
 
 ---
 

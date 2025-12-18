@@ -8,16 +8,13 @@ This module provides test fixtures for:
 - Sample data (patients, sessions)
 - Mock OpenAI client
 """
+# CRITICAL: Set SECRET_KEY BEFORE any imports that load auth_config
+# This ensures all JWT operations use the same key during tests
 import os
+os.environ["SECRET_KEY"] = "test-secret-key-must-be-32-characters-long-for-hs256-algorithm-security"
+
 import pytest
 import pytest_asyncio
-
-
-@pytest.fixture(scope="session", autouse=True)
-def set_test_secret_key():
-    """Set consistent SECRET_KEY for all test JWT operations"""
-    os.environ["SECRET_KEY"] = "test-secret-key-must-be-32-characters-long-for-hs256-algorithm-security"
-    yield
 from datetime import datetime, timedelta
 from typing import AsyncGenerator, Generator
 from unittest.mock import AsyncMock, MagicMock

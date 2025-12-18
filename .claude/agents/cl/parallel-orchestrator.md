@@ -1869,18 +1869,109 @@ Success criteria: Repository cleaner, better organized, follows CLAUDE.md rules,
 [Detailed cleanup summary from agent appears here]
 
 ---
+```
+
+### Step 4c: Push to Remote Repository (REQUIRED)
+
+**🚨 CRITICAL: After cleanup completes, automatically push all commits to the remote repository.**
+
+After showing cleanup summary, immediately push to remote:
+
+```
+📤 PUSHING TO REMOTE REPOSITORY...
+
+Syncing local commits to GitHub...
+```
+
+**Execute git push using Bash tool:**
+
+```xml
+<invoke name="Bash">
+<parameter name="command">cd [absolute_project_root] && git push origin main</parameter>
+<parameter name="description">Push all commits to remote repository</parameter>
+</invoke>
+```
+
+**Parse push output and show results:**
+
+```
+✅ PUSH COMPLETE
+
+Pushed to: origin (https://github.com/[username]/[repo].git)
+Branch: main
+Commits pushed: [N] commits
+Remote status: Up to date
+
+All changes are now synced to GitHub and visible at:
+https://github.com/[username]/[repo]
+
+---
 
 🎉 ORCHESTRATION FULLY COMPLETE
 
-The task has been executed and the repository has been automatically cleaned and organized.
+The task has been executed, repository cleaned, and all changes pushed to GitHub.
 
 Final state:
 - ✅ All planned waves executed successfully
 - ✅ Repository cleaned and organized
+- ✅ All commits pushed to GitHub
 - ✅ Ready for next orchestration
+
+GitHub repository: https://github.com/[username]/[repo]
 
 Use the continuation prompt above to start another orchestration task.
 ```
+
+**Error Handling:**
+
+If push fails:
+
+```
+❌ PUSH FAILED
+
+Error: [error message from git]
+
+Common issues and solutions:
+- **Network connectivity** → Retry: git push origin main
+- **Authentication required** → Set up GitHub credentials or SSH keys
+- **Remote diverged** → Run: git pull --rebase origin main
+- **Merge conflicts** → Resolve conflicts manually and retry
+- **Protected branch** → May require pull request workflow
+
+Manual push command:
+cd [project_root] && git push origin main
+
+⚠️ IMPORTANT: Your work is safely committed locally but NOT yet on GitHub.
+All changes are preserved in local git history.
+
+You can push manually when ready, or the next orchestration will attempt to push again.
+```
+
+**Why this is required:**
+- Automatically syncs all work to GitHub after every orchestration
+- Ensures remote repository always reflects latest state
+- Provides immediate cloud backup of all changes
+- Makes work visible to team/collaborators instantly
+- Eliminates manual "git push" step from workflow
+- User can immediately view changes on GitHub
+
+**Critical Rules:**
+1. Push ALWAYS runs after cleanup completes (if cleanup succeeded)
+2. Push must show commits count and remote URL
+3. Push must handle errors gracefully with clear guidance
+4. Push must confirm sync status clearly
+5. Push failure should NOT block continuation prompt
+
+**Benefits:**
+1. **Automatic synchronization** - GitHub always current
+2. **Immediate backup** - Work protected in cloud
+3. **Team visibility** - Changes visible instantly
+4. **No manual steps** - Fully automated workflow
+5. **Error recovery** - Clear guidance if push fails
+
+---
+
+**Cleanup Phase Summary:**
 
 **Why this is required:**
 - Automatically maintains repository cleanliness
@@ -1889,6 +1980,7 @@ Use the continuation prompt above to start another orchestration task.
 - Provides full transparency with before/after metrics
 - No manual cleanup burden on user
 - Repository stays organized and navigable
+- All changes automatically pushed to GitHub
 
 **Critical Rules:**
 1. Cleanup ALWAYS runs after main execution completes
@@ -1896,6 +1988,7 @@ Use the continuation prompt above to start another orchestration task.
 3. Cleanup must show detailed file-level changes
 4. Cleanup must follow CLAUDE.md organization rules
 5. Cleanup must not delete important work (only temps/duplicates)
+6. Push ALWAYS runs after cleanup completes
 
 ---
 
