@@ -16,7 +16,7 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, Optional, Any, List, Generator
 from contextlib import contextmanager
 from datetime import datetime
 import threading
@@ -50,13 +50,13 @@ class PerformanceTimer:
         self.end_time = None
         self.elapsed = None
 
-    def __enter__(self):
+    def __enter__(self) -> 'PerformanceTimer':
         self.start_time = time.perf_counter()
         if self.logger:
             self.logger.log(f"Starting: {self.name}", level="DEBUG")
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type: Optional[type], exc_val: Optional[BaseException], exc_tb: Optional[Any]) -> None:
         self.end_time = time.perf_counter()
         self.elapsed = self.end_time - self.start_time
         if self.logger:
@@ -80,7 +80,7 @@ class GPUMonitor:
             elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
                 self.device = "mps"
 
-    def start(self):
+    def start(self) -> None:
         """Start monitoring GPU in background thread"""
         if not self.device:
             return
@@ -110,7 +110,7 @@ class GPUMonitor:
             "max_memory_mb": max(s.get("memory_mb", 0) for s in self.stats),
         }
 
-    def _monitor_loop(self):
+    def _monitor_loop(self) -> None:
         """Background monitoring loop"""
         while self.monitoring:
             stats = self._get_gpu_stats()
@@ -199,13 +199,13 @@ class PerformanceLogger:
         # Start timestamp
         self.session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    def start_pipeline(self):
+    def start_pipeline(self) -> None:
         """Mark the start of the pipeline"""
         self.metrics["start_time"] = time.perf_counter()
         self.metrics["start_timestamp"] = datetime.now().isoformat()
         self.log(f"Pipeline '{self.name}' started", level="INFO")
 
-    def end_pipeline(self):
+    def end_pipeline(self) -> None:
         """Mark the end of the pipeline and generate reports"""
         self.metrics["end_time"] = time.perf_counter()
         self.metrics["end_timestamp"] = datetime.now().isoformat()
@@ -216,7 +216,7 @@ class PerformanceLogger:
         # Generate reports
         self.generate_reports()
 
-    def start_stage(self, stage_name: str):
+    def start_stage(self, stage_name: str) -> None:
         """Start tracking a new pipeline stage"""
         stage_data = {
             "name": stage_name,
@@ -235,7 +235,7 @@ class PerformanceLogger:
 
         self.log(f"[{stage_name}] Stage started", level="INFO")
 
-    def end_stage(self, stage_name: str = None):
+    def end_stage(self, stage_name: Optional[str] = None) -> None:
         """End tracking of current stage"""
         if not self.stage_stack:
             return
@@ -263,7 +263,7 @@ class PerformanceLogger:
         # Update current stage
         self.current_stage = self.stage_stack[-1] if self.stage_stack else None
 
-    def record_subprocess(self, name: str, duration: float, metadata: Dict = None):
+    def record_subprocess(self, name: str, duration: float, metadata: Optional[Dict] = None) -> None:
         """Record timing for a subprocess"""
         subprocess_data = {
             "duration": duration,
@@ -282,21 +282,21 @@ class PerformanceLogger:
 
         self.log(f"  [{name}] completed in {duration:.3f}s", level="DEBUG")
 
-    def record_timing(self, name: str, duration: float):
+    def record_timing(self, name: str, duration: float) -> None:
         """Record a simple timing measurement"""
         if name not in self.timings:
             self.timings[name] = []
         self.timings[name].append(duration)
 
     @contextmanager
-    def timer(self, name: str):
+    def timer(self, name: str) -> Generator[PerformanceTimer, None, None]:
         """Context manager for timing operations"""
         timer = PerformanceTimer(name, self)
         with timer:
             yield timer
 
     @contextmanager
-    def subprocess(self, name: str, metadata: Dict = None):
+    def subprocess(self, name: str, metadata: Optional[Dict] = None) -> Generator[None, None, None]:
         """Context manager for timing subprocesses"""
         start = time.perf_counter()
 
@@ -319,7 +319,7 @@ class PerformanceLogger:
 
             self.record_subprocess(name, duration, full_metadata)
 
-    def log(self, message: str, level: str = "INFO"):
+    def log(self, message: str, level: str = "INFO") -> None:
         """Log a message with timestamp"""
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
         log_entry = f"[{timestamp}] [{level}] {message}"
@@ -334,9 +334,9 @@ class PerformanceLogger:
         if HAS_PSUTIL:
             process = psutil.Process(os.getpid())
             return process.memory_info().rss / 1024 / 1024
-        return 0
+        return 0.0
 
-    def generate_reports(self):
+    def generate_reports(self) -> None:
         """Generate performance reports in multiple formats"""
         # Generate JSON report
         json_report = self.generate_json_report()
@@ -368,7 +368,7 @@ class PerformanceLogger:
 
     def generate_text_report(self) -> str:
         """Generate human-readable text report"""
-        lines = []
+        lines: List[str] = []
         lines.append("=" * 80)
         lines.append(f"Performance Report - {self.name}")
         lines.append(f"Session: {self.session_id}")
@@ -473,7 +473,7 @@ class PerformanceLogger:
 
         return summary
 
-    def print_summary(self):
+    def print_summary(self) -> None:
         """Print a brief performance summary"""
         if not self.verbose:
             return
@@ -529,7 +529,7 @@ def get_logger(name: str = "Pipeline", **kwargs) -> PerformanceLogger:
         _global_logger = PerformanceLogger(name=name, **kwargs)
     return _global_logger
 
-def reset_logger():
+def reset_logger() -> None:
     """Reset the global logger"""
     global _global_logger
     _global_logger = None

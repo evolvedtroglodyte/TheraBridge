@@ -630,38 +630,218 @@ TherapyBridge uses JWT-based authentication with refresh token rotation and emai
 4. User clicks link in email to verify account
 5. Account status updated to `is_verified=true`
 
-### Email Verification
+### Email Service Configuration
 
-Email verification is fully functional with support for multiple providers:
+TherapyBridge supports multiple email providers for sending verification emails, password resets, and notifications.
 
 **Supported Providers:**
-- **SMTP** (default) - Standard SMTP server
-- **SendGrid** - API-based email delivery
-- **AWS SES** - Amazon Simple Email Service
+1. **SMTP** (default) - Standard SMTP server (Gmail, Mailgun, custom servers)
+2. **SendGrid** - API-based email delivery with analytics
+3. **AWS SES** - Amazon Simple Email Service (cost-effective for high volume)
 
-**Configuration** (in `.env`):
+---
+
+#### Setup Guide: SMTP (Recommended for Development)
+
+SMTP works with any standard email server. Great for development and small deployments.
+
+**Common SMTP Providers:**
+- **Gmail**: smtp.gmail.com:587 (requires App Password)
+- **Mailgun**: smtp.mailgun.org:587
+- **SendInBlue**: smtp-relay.sendinblue.com:587
+
+**Configuration** (add to `.env`):
 ```bash
-# Email provider: smtp, sendgrid, ses
 EMAIL_PROVIDER=smtp
 EMAIL_FROM=noreply@therapybridge.com
-
-# SMTP Configuration
-SMTP_HOST=localhost
+SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USER=your_username
-SMTP_PASSWORD=your_password
-
-# SendGrid/SES (if using)
-EMAIL_API_KEY=your_api_key
-
-# Frontend URL for verification links
+SMTP_USERNAME=your-email@gmail.com
+SMTP_PASSWORD=your-app-password
 FRONTEND_URL=http://localhost:3000
 ```
 
-**Email Templates:**
-- HTML templates in `app/templates/emails/`
-- Verification email: `verification.html`
-- Password reset email: `password_reset.html` (template ready)
+**Gmail Setup:**
+1. Enable 2-factor authentication on your Google account
+2. Generate App Password: https://myaccount.google.com/apppasswords
+3. Use the 16-character App Password as `SMTP_PASSWORD`
+
+**Test SMTP:**
+```bash
+# Create test account (triggers verification email)
+curl -X POST http://localhost:8000/api/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@example.com",
+    "password": "SecurePass123!",
+    "first_name": "Test",
+    "last_name": "User",
+    "role": "therapist"
+  }'
+```
+
+---
+
+#### Setup Guide: SendGrid (Recommended for Production)
+
+SendGrid provides reliable API-based email delivery with deliverability analytics.
+
+**Setup Steps:**
+1. Sign up at https://sendgrid.com (free tier: 100 emails/day)
+2. Create API key: Settings → API Keys → Create API Key
+3. Select "Mail Send" permission
+4. Verify sender email or domain
+
+**Configuration** (add to `.env`):
+```bash
+EMAIL_PROVIDER=sendgrid
+EMAIL_FROM=noreply@therapybridge.com  # Must be verified in SendGrid
+EMAIL_API_KEY=SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+FRONTEND_URL=http://localhost:3000
+```
+
+**Install SendGrid SDK:**
+```bash
+pip install sendgrid
+pip freeze > requirements.txt
+```
+
+**Test SendGrid:**
+```bash
+# Check SendGrid dashboard after signup: https://app.sendgrid.com/email_activity
+curl -X POST http://localhost:8000/api/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"email": "your-email@example.com", "password": "SecurePass123!", "first_name": "Test", "last_name": "User", "role": "therapist"}'
+```
+
+---
+
+#### Setup Guide: AWS SES (Recommended for AWS Deployments)
+
+AWS SES is cost-effective for high-volume email ($0.10 per 1,000 emails).
+
+**Setup Steps:**
+1. Sign in to AWS Console → Amazon SES
+2. Verify email address: Identities → Create Identity
+3. Request production access (initially in sandbox mode)
+4. Create IAM user with `AmazonSESFullAccess` permission
+5. Generate access key and secret key
+
+**Configuration** (add to `.env`):
+```bash
+EMAIL_PROVIDER=ses
+EMAIL_FROM=noreply@therapybridge.com  # Must be verified in SES
+AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+AWS_DEFAULT_REGION=us-east-1
+FRONTEND_URL=http://localhost:3000
+```
+
+**Install boto3 (AWS SDK):**
+```bash
+pip install boto3
+pip freeze > requirements.txt
+```
+
+**Test AWS SES:**
+```bash
+# Verify AWS credentials
+aws ses get-send-quota
+
+# Test email sending (sandbox mode: recipient must be verified)
+curl -X POST http://localhost:8000/api/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"email": "verified-recipient@example.com", "password": "SecurePass123!", "first_name": "Test", "last_name": "User", "role": "therapist"}'
+```
+
+---
+
+#### Provider Comparison
+
+| Provider | Best For | Cost | Setup Complexity | Deliverability |
+|----------|----------|------|------------------|----------------|
+| **SMTP** | Development, small deployments | Free (Gmail) | Low | Medium |
+| **SendGrid** | Production, analytics | Free tier, then $15/mo | Medium | High |
+| **AWS SES** | AWS deployments, high volume | $0.10 per 1K emails | Medium-High | High |
+
+**Recommendations:**
+- **Development**: Gmail SMTP (quick setup)
+- **Production (non-AWS)**: SendGrid (best deliverability)
+- **Production (AWS)**: AWS SES (lowest cost)
+
+---
+
+#### Email Templates
+
+TherapyBridge uses Jinja2 HTML templates for professional emails.
+
+**Available Templates:**
+- `app/templates/emails/verification.html` - Email verification
+- `app/templates/emails/password_reset.html` - Password reset (ready for future use)
+
+**Customizing Templates:**
+1. Edit HTML files in `app/templates/emails/`
+2. Use variables: `{{ user_name }}`, `{{ verification_url }}`, `{{ frontend_url }}`
+3. Test by triggering verification emails
+
+---
+
+#### Troubleshooting
+
+**SMTP Issues:**
+- **"Authentication failed"**: Check SMTP_USERNAME and SMTP_PASSWORD
+- **Gmail blocking**: Use App Password, not regular password
+- **Connection refused**: Verify SMTP_PORT is 587
+
+**SendGrid Issues:**
+- **"Unauthorized"**: Verify EMAIL_API_KEY is correct
+- **"From email not verified"**: Verify sender in SendGrid dashboard
+- **403 error**: Check API key has Mail Send permission
+
+**AWS SES Issues:**
+- **"Email not verified"**: Verify sender email in SES console
+- **"MessageRejected"**: In sandbox mode, recipient must be verified
+- **"AccessDenied"**: Check IAM permissions for ses:SendEmail
+
+**Check Logs:**
+```bash
+# Server logs show email status
+uvicorn app.main:app --reload
+# Look for: "Email sent via SMTP/SendGrid/SES: user@example.com"
+```
+
+---
+
+#### Environment Variables Reference
+
+**Required (all providers):**
+```bash
+EMAIL_PROVIDER=smtp              # smtp, sendgrid, or ses
+EMAIL_FROM=noreply@example.com   # Sender email
+FRONTEND_URL=http://localhost:3000  # For verification links
+```
+
+**SMTP-specific:**
+```bash
+SMTP_HOST=smtp.gmail.com         # SMTP server
+SMTP_PORT=587                    # Port (587 for TLS)
+SMTP_USERNAME=user@example.com   # Auth username
+SMTP_PASSWORD=your-password      # Auth password
+```
+
+**SendGrid-specific:**
+```bash
+EMAIL_API_KEY=SG.xxxxxxxxx       # SendGrid API key
+```
+
+**AWS SES-specific:**
+```bash
+AWS_ACCESS_KEY_ID=AKIAxxxxx      # AWS access key
+AWS_SECRET_ACCESS_KEY=xxxxxx     # AWS secret key
+AWS_DEFAULT_REGION=us-east-1     # AWS region
+```
+
+---
 
 ### Token Details
 
@@ -1060,6 +1240,295 @@ echo $OPENAI_API_KEY
 - `psycopg2-binary` - Used by admin scripts (backup, migrations)
 - `alembic` - Database migrations
 - `pydub` + `audioop-lts` - Audio pipeline dependencies
+
+## Production Deployment
+
+### Worker Scaling & Database Connections
+
+When deploying TherapyBridge to production, understanding the relationship between application workers and database connections is critical to prevent "too many connections" errors.
+
+#### Connection Pool Math
+
+Each application worker maintains its own database connection pool. The total number of database connections is:
+
+```
+Total Connections = WORKERS × (DB_POOL_SIZE + DB_MAX_OVERFLOW)
+```
+
+**Example Calculations:**
+
+| Workers | Pool Size | Max Overflow | Connections per Worker | Total Connections |
+|---------|-----------|--------------|------------------------|-------------------|
+| 1       | 10        | 20           | 30                     | 30                |
+| 2       | 10        | 20           | 30                     | 60                |
+| 4       | 10        | 20           | 30                     | 120               |
+| 8       | 10        | 20           | 30                     | 240               |
+
+#### Neon PostgreSQL Connection Limits
+
+Neon PostgreSQL enforces connection limits based on your tier:
+
+| Tier          | Max Connections | Notes                                    |
+|---------------|-----------------|------------------------------------------|
+| Free          | ~100            | Shared across all databases              |
+| Paid (Scale)  | 200-500         | Varies by plan, check dashboard          |
+| Enterprise    | 1000+           | Custom limits available                  |
+
+**CRITICAL:** Exceeding your database connection limit causes the error:
+```
+FATAL: sorry, too many clients already
+```
+
+#### Recommended Worker Scaling Settings
+
+**Single Worker (Development/Low Traffic)**
+```bash
+WORKERS=1
+DB_POOL_SIZE=10
+DB_MAX_OVERFLOW=20
+# Total: 30 connections (safe for all tiers)
+```
+
+**2 Workers (Small Production)**
+```bash
+WORKERS=2
+DB_POOL_SIZE=5
+DB_MAX_OVERFLOW=10
+# Total: 30 connections (safe for free tier)
+```
+
+**4 Workers (Medium Production)**
+```bash
+WORKERS=4
+DB_POOL_SIZE=5
+DB_MAX_OVERFLOW=10
+# Total: 60 connections (safe for free tier with headroom)
+```
+
+**8 Workers (High Traffic)**
+```bash
+WORKERS=8
+DB_POOL_SIZE=3
+DB_MAX_OVERFLOW=7
+# Total: 80 connections (requires paid tier)
+```
+
+**16 Workers (Very High Traffic)**
+```bash
+WORKERS=16
+DB_POOL_SIZE=3
+DB_MAX_OVERFLOW=5
+# Total: 128 connections (requires paid tier with 200+ limit)
+```
+
+#### Deployment Checklist
+
+**Before Deploying:**
+
+1. **Calculate Total Connections**
+   ```bash
+   # Formula: WORKERS * (DB_POOL_SIZE + DB_MAX_OVERFLOW)
+   # Example: 4 * (5 + 10) = 60 connections
+   ```
+
+2. **Check Database Connection Limit**
+   - Log into Neon dashboard
+   - Navigate to your database settings
+   - Verify connection limit for your tier
+   - Ensure: `Total Connections < Database Limit - 10` (leave headroom)
+
+3. **Configure Environment Variables**
+   ```bash
+   # In .env or deployment config
+   WORKERS=4                    # Based on traffic requirements
+   DB_POOL_SIZE=5              # Calculated from formula above
+   DB_MAX_OVERFLOW=10          # Calculated from formula above
+   DB_POOL_TIMEOUT=30          # Seconds to wait for connection
+   ```
+
+4. **Test Under Load**
+   ```bash
+   # Run load test to verify connection handling
+   ab -n 1000 -c 50 http://your-api.com/health
+
+   # Monitor database connections in Neon dashboard
+   # Watch for "too many connections" errors in logs
+   ```
+
+**Production Environment Variables:**
+
+```bash
+# ============================================
+# Production Deployment Configuration
+# ============================================
+
+# Environment
+ENVIRONMENT=production
+DEBUG=false                      # CRITICAL: Never enable in production (exposes PHI)
+
+# Database
+DATABASE_URL=postgresql://user:pass@host/db?sslmode=require
+DB_POOL_SIZE=5                  # Adjust based on worker count
+DB_MAX_OVERFLOW=10              # Adjust based on worker count
+DB_POOL_TIMEOUT=30
+SQL_ECHO=false                  # CRITICAL: Never enable in production (exposes PHI)
+
+# Server
+WORKERS=4                        # Scale based on traffic and database limits
+HOST=0.0.0.0
+PORT=8000
+
+# Security
+JWT_SECRET_KEY=CHANGE_THIS      # Generate with: openssl rand -hex 32
+CORS_ORIGINS=https://your-frontend.com
+
+# OpenAI
+OPENAI_API_KEY=sk-production-key-here
+OPENAI_TIMEOUT=120
+OPENAI_MAX_RETRIES=3
+
+# Logging
+LOG_LEVEL=INFO                  # Use INFO or WARNING in production
+
+# Cleanup
+AUTO_CLEANUP_ON_STARTUP=false
+FAILED_SESSION_RETENTION_DAYS=7
+ORPHANED_FILE_RETENTION_HOURS=24
+
+# Analytics
+ENABLE_ANALYTICS_SCHEDULER=true
+DAILY_AGGREGATION_HOUR=3        # 3 AM UTC (low traffic period)
+SCHEDULER_TIMEZONE=UTC
+```
+
+### Deployment Platforms
+
+**AWS Lambda (Serverless)**
+- No worker configuration needed (auto-scales)
+- Use RDS Proxy to manage database connections
+- Connection pooling handled by proxy
+
+**Render/Railway (Container)**
+```bash
+# Set environment variables in dashboard
+WORKERS=4
+DB_POOL_SIZE=5
+DB_MAX_OVERFLOW=10
+```
+
+**Docker Deployment**
+```bash
+# Dockerfile
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+```
+
+**Gunicorn (Production WSGI)**
+```bash
+gunicorn app.main:app \
+  --workers 4 \
+  --worker-class uvicorn.workers.UvicornWorker \
+  --bind 0.0.0.0:8000 \
+  --timeout 120
+```
+
+### Monitoring Database Connections
+
+**Query Active Connections (PostgreSQL)**
+```sql
+-- View current connection count
+SELECT COUNT(*) FROM pg_stat_activity;
+
+-- View connections by application
+SELECT application_name, COUNT(*)
+FROM pg_stat_activity
+GROUP BY application_name;
+
+-- View connection limit
+SHOW max_connections;
+```
+
+**Neon Dashboard Monitoring:**
+1. Navigate to Neon Console → Database → Monitoring
+2. Check "Active Connections" graph
+3. Set alerts for when connections approach limit
+4. Review "Connection Pool" metrics
+
+**Application Logging:**
+```python
+# Add to app/main.py for connection monitoring
+@app.get("/api/health/connections")
+async def connection_health(db: Session = Depends(get_db)):
+    result = db.execute(text("SELECT COUNT(*) FROM pg_stat_activity"))
+    active_connections = result.scalar()
+    return {
+        "active_connections": active_connections,
+        "pool_size": DB_POOL_SIZE,
+        "max_overflow": DB_MAX_OVERFLOW,
+        "worker_count": WORKERS,
+        "theoretical_max": WORKERS * (DB_POOL_SIZE + DB_MAX_OVERFLOW)
+    }
+```
+
+### Scaling Strategy
+
+**Horizontal Scaling (Add Workers):**
+1. Calculate new total connections: `NEW_WORKERS * (POOL_SIZE + MAX_OVERFLOW)`
+2. Verify database can handle new total
+3. If exceeding limit, reduce `DB_POOL_SIZE` or `DB_MAX_OVERFLOW`
+4. Update environment variables
+5. Deploy with rolling restart
+6. Monitor connection count and error rates
+
+**Vertical Scaling (Upgrade Database):**
+1. Upgrade Neon tier to increase connection limit
+2. Keep worker count and pool settings constant
+3. Provides headroom for future growth
+
+### Troubleshooting
+
+**"Too Many Connections" Error**
+
+```bash
+# Symptom: FATAL: sorry, too many clients already
+
+# Step 1: Check current configuration
+echo "Total connections: $WORKERS * ($DB_POOL_SIZE + $DB_MAX_OVERFLOW)"
+
+# Step 2: Reduce connections immediately
+# Option A: Reduce workers (fastest)
+WORKERS=2  # Deploy immediately
+
+# Option B: Reduce pool size (requires restart)
+DB_POOL_SIZE=3
+DB_MAX_OVERFLOW=5
+
+# Step 3: Upgrade database tier (long-term solution)
+# Upgrade Neon plan in dashboard
+```
+
+**Connection Pool Exhausted**
+
+```bash
+# Symptom: QueuePool limit of size X overflow Y reached
+
+# Increase pool size (verify total doesn't exceed database limit)
+DB_MAX_OVERFLOW=30  # Allow more overflow connections
+DB_POOL_TIMEOUT=60  # Wait longer for available connection
+```
+
+**Slow Queries Blocking Connections**
+
+```sql
+-- Find long-running queries
+SELECT pid, now() - query_start AS duration, query
+FROM pg_stat_activity
+WHERE state = 'active'
+ORDER BY duration DESC
+LIMIT 10;
+
+-- Kill slow query (if safe)
+SELECT pg_terminate_backend(PID);
+```
 
 ## Next Steps
 

@@ -24,7 +24,7 @@ from pipeline_enhanced import (
     AudioPreprocessor,
     WhisperTranscriber,
     SpeakerDiarizer,
-    AudioTranscriptionPipeline
+    EnhancedAudioTranscriptionPipeline
 )
 
 
@@ -34,10 +34,13 @@ def test_basic_logging():
     print("TEST 1: Basic Performance Logging")
     print("="*60)
 
-    # Create a logger
+    # Create a logger with path relative to script location
+    script_dir = Path(__file__).parent
+    output_dir = script_dir.parent / "outputs" / "performance_logs" / "tests"
+
     logger = PerformanceLogger(
         name="BasicTest",
-        output_dir="outputs/performance_logs/tests",
+        output_dir=str(output_dir),
         verbose=True
     )
 
@@ -77,9 +80,13 @@ def test_subprocess_tracking():
     print("TEST 2: Subprocess Performance Tracking")
     print("="*60)
 
+    # Use path relative to script location
+    script_dir = Path(__file__).parent
+    output_dir = script_dir.parent / "outputs" / "performance_logs" / "tests"
+
     logger = PerformanceLogger(
         name="SubprocessTest",
-        output_dir="outputs/performance_logs/tests",
+        output_dir=str(output_dir),
         verbose=True
     )
 
@@ -129,9 +136,13 @@ def test_gpu_monitoring():
         print("⚠️  No GPU available, skipping GPU monitoring test")
         return
 
+    # Use path relative to script location
+    script_dir = Path(__file__).parent
+    output_dir = script_dir.parent / "outputs" / "performance_logs" / "tests"
+
     logger = PerformanceLogger(
         name="GPUTest",
-        output_dir="outputs/performance_logs/tests",
+        output_dir=str(output_dir),
         enable_gpu_monitoring=True,
         verbose=True
     )
@@ -170,17 +181,18 @@ def test_real_audio_pipeline():
     print("TEST 4: Real Audio Pipeline Performance")
     print("="*60)
 
-    # Look for test audio files
+    # Look for test audio files - use path relative to script location
+    script_dir = Path(__file__).parent
     test_files = [
-        "tests/samples/onemintestvid.mp3",
-        "test-audio.mp3",
-        "sample.mp3"
+        script_dir / "samples" / "compressed-cbt-session.m4a",
+        script_dir / "samples" / "LIVE Cognitive Behavioral Therapy Session (1).mp3",
+        script_dir / "samples" / "Person-Centred Therapy Session - Full Example [VLDDUL3HBIg].mp3",
     ]
 
     audio_file = None
     for file in test_files:
-        if os.path.exists(file):
-            audio_file = file
+        if file.exists():
+            audio_file = str(file)
             break
 
     if not audio_file:
@@ -189,10 +201,14 @@ def test_real_audio_pipeline():
 
     print(f"Testing with: {audio_file}")
 
+    # Use path relative to script location
+    script_dir = Path(__file__).parent
+    output_dir = script_dir.parent / "outputs" / "performance_logs" / "tests"
+
     # Run enhanced pipeline
-    pipeline = AudioTranscriptionPipeline(
+    pipeline = EnhancedAudioTranscriptionPipeline(
         enable_performance_logging=True,
-        output_dir="outputs/performance_logs/tests"
+        output_dir=str(output_dir)
     )
 
     try:
@@ -245,7 +261,7 @@ def test_performance_comparison():
 
     # Test CPU alignment
     logger = PerformanceLogger(name="ComparisonTest", verbose=False)
-    pipeline = AudioTranscriptionPipeline(enable_performance_logging=False)
+    pipeline = EnhancedAudioTranscriptionPipeline(enable_performance_logging=False)
     pipeline.logger = logger
 
     # CPU version
@@ -284,9 +300,12 @@ def analyze_performance_logs():
     print("PERFORMANCE LOG ANALYSIS")
     print("="*60)
 
-    log_dir = Path("outputs/performance_logs/tests")
+    # Use path relative to script location
+    script_dir = Path(__file__).parent
+    log_dir = script_dir.parent / "outputs" / "performance_logs" / "tests"
+
     if not log_dir.exists():
-        print("No performance logs found")
+        print(f"No performance logs found at: {log_dir.absolute()}")
         return
 
     # Find all JSON logs
@@ -350,8 +369,10 @@ def main():
     print("PERFORMANCE LOGGING TEST SUITE")
     print("="*60)
 
-    # Create output directory
-    Path("outputs/performance_logs/tests").mkdir(parents=True, exist_ok=True)
+    # Create output directory - use path relative to script location
+    script_dir = Path(__file__).parent
+    output_dir = script_dir.parent / "outputs" / "performance_logs" / "tests"
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     # Run tests
     test_basic_logging()
@@ -365,7 +386,7 @@ def main():
 
     print("\n" + "="*60)
     print("ALL TESTS COMPLETED")
-    print("Performance reports available in: outputs/performance_logs/tests/")
+    print(f"Performance reports available in: {output_dir.absolute()}/")
     print("="*60)
 
 

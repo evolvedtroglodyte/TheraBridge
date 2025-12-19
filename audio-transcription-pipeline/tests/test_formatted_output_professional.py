@@ -848,6 +848,10 @@ def validate_json_data(json_path: str) -> Dict:
 
 def parse_args():
     """Parse command-line arguments"""
+    # Default output dir relative to script location
+    script_dir = Path(__file__).parent
+    default_output_dir = script_dir / "outputs"
+
     parser = argparse.ArgumentParser(
         description='Generate formatted outputs from diarization results'
     )
@@ -865,7 +869,7 @@ def parse_args():
     parser.add_argument(
         '--output-dir',
         type=str,
-        default='tests/outputs',
+        default=str(default_output_dir),
         help='Directory for output files (default: tests/outputs)'
     )
     return parser.parse_args()
@@ -877,26 +881,31 @@ def main():
     args = parse_args()
 
     # Determine input file
+    script_dir = Path(__file__).parent
     if args.input:
-        json_path = args.input
-        if not os.path.exists(json_path):
+        json_path = Path(args.input)
+        if not json_path.exists():
             print(f"❌ Specified input file not found: {json_path}")
+            print(f"   Expected location: {json_path.absolute()}")
             sys.exit(1)
     else:
         # Check for input files in priority order
         json_paths = [
-            "tests/outputs/diarization_output_improved.json",
-            "tests/outputs/diarization_output.json"
+            script_dir / "outputs" / "diarization_output_improved.json",
+            script_dir / "outputs" / "diarization_output.json"
         ]
 
         json_path = None
         for path in json_paths:
-            if os.path.exists(path):
+            if path.exists():
                 json_path = path
                 break
 
         if not json_path:
             print("❌ No diarization output found")
+            print("   Checked locations:")
+            for path in json_paths:
+                print(f"     - {path.absolute()}")
             print("   Please run the transcription pipeline first:")
             print("   python tests/test_full_pipeline_improved.py")
             sys.exit(1)
@@ -904,12 +913,13 @@ def main():
     print(f"Loading diarization data from: {json_path}")
 
     # Validate and load data
-    data = validate_json_data(json_path)
+    data = validate_json_data(str(json_path))
     if not data:
         sys.exit(1)
 
     # Ensure output directory exists
-    os.makedirs(args.output_dir, exist_ok=True)
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     # Generate outputs based on format selection
     print("\nGenerating formatted outputs...")
@@ -922,21 +932,21 @@ def main():
 
     # 2. Standard HTML output (all timestamps)
     if args.format in ['all', 'standard']:
-        html_path = os.path.join(args.output_dir, "transcription_professional.html")
-        generate_html_output(data, html_path)
-        outputs_generated.append(('Standard HTML', html_path))
+        html_path = output_dir / "transcription_professional.html"
+        generate_html_output(data, str(html_path))
+        outputs_generated.append(('Standard HTML', str(html_path)))
 
     # 3. Speaker-only outputs
     if args.format in ['all', 'speaker-only']:
         # Speaker-only JSON output
-        speaker_json_path = os.path.join(args.output_dir, "speaker_only_output.json")
-        speaker_data = generate_speaker_only_json(data, speaker_json_path)
-        outputs_generated.append(('Speaker-only JSON', speaker_json_path))
+        speaker_json_path = output_dir / "speaker_only_output.json"
+        speaker_data = generate_speaker_only_json(data, str(speaker_json_path))
+        outputs_generated.append(('Speaker-only JSON', str(speaker_json_path)))
 
         # Speaker-only HTML output
-        speaker_html_path = os.path.join(args.output_dir, "transcription_speaker_only.html")
-        generate_speaker_only_html(data, speaker_html_path)
-        outputs_generated.append(('Speaker-only HTML', speaker_html_path))
+        speaker_html_path = output_dir / "transcription_speaker_only.html"
+        generate_speaker_only_html(data, str(speaker_html_path))
+        outputs_generated.append(('Speaker-only HTML', str(speaker_html_path)))
 
         # Generate statistics for speaker-only format
         if args.format == 'all' or args.format == 'speaker-only':

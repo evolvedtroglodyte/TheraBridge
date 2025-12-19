@@ -120,7 +120,7 @@ class ExportService:
         relationship = therapist_rel.scalar_one_or_none()
         therapist = relationship.therapist if relationship else None
 
-        # Query sessions in date range
+        # Query sessions in date range with eager loading to prevent N+1 queries
         sessions_query = (
             select(TherapySession)
             .where(
@@ -131,10 +131,12 @@ class ExportService:
                     TherapySession.status == 'processed'
                 )
             )
+            .options(joinedload(TherapySession.patient))
+            .options(joinedload(TherapySession.therapist))
             .order_by(TherapySession.session_date.asc())
         )
         sessions_result = await db.execute(sessions_query)
-        sessions = sessions_result.scalars().all()
+        sessions = sessions_result.scalars().unique().all()
 
         # Extract goals from extracted_notes JSONB field
         goals = []
@@ -367,9 +369,10 @@ class ExportService:
     def _serialize_user(self, user: Optional[User]) -> Optional[Dict[str, Any]]:
         """
         Convert User ORM model to dict for templates.
+        Also handles Patient objects from legacy schema.
 
         Args:
-            user: User model instance or None
+            user: User model instance, Patient model instance, or None
 
         Returns:
             Dictionary representation or None
@@ -377,6 +380,22 @@ class ExportService:
         if not user:
             return None
 
+        # Handle Patient objects from legacy schema (therapy_sessions.patient_id -> patients table)
+        if hasattr(user, 'name') and not hasattr(user, 'role'):
+            from app.models.db_models import Patient
+            if isinstance(user, Patient):
+                # Parse name into first/last if possible
+                name_parts = user.name.split(' ', 1)
+                return {
+                    "id": str(user.id),
+                    "full_name": user.name,
+                    "first_name": name_parts[0] if name_parts else user.name,
+                    "last_name": name_parts[1] if len(name_parts) > 1 else "",
+                    "email": user.email or "",
+                    "role": "patient"  # Legacy Patient records are always patients
+                }
+
+        # Handle User objects (standard case)
         return {
             "id": str(user.id),
             "full_name": user.full_name or f"{user.first_name} {user.last_name}".strip(),

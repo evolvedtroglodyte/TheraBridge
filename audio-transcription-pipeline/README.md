@@ -117,6 +117,231 @@ audio-transcription-pipeline/
 | Requirements | Internet, API key | GPU with 16+ GB VRAM |
 | Best For | Production, cloud deployment | Research, batch processing |
 
+## GPU Provider Detection
+
+The GPU pipeline automatically detects which cloud GPU provider you're using and optimizes settings accordingly. This happens transparently when you run `pipeline_gpu.py` or `transcribe_gpu.py`.
+
+### Supported Providers
+
+The detection logic in `src/gpu_config.py` identifies the following providers:
+
+| Provider | Detection Method | Priority |
+|----------|------------------|----------|
+| **Google Colab** | `/content` directory exists AND `COLAB_GPU` env variable | 1st |
+| **Vast.ai** | `VAST_CONTAINERLABEL` OR `VAST_CONTAINER_USER` env variables | 2nd |
+| **RunPod** | `RUNPOD_POD_ID` env variable | 3rd |
+| **Paperspace** | `PAPERSPACE_METRIC_URL` env variable OR `/storage` directory | 4th |
+| **Lambda Labs** | Hostname contains `lambda` or `lambdalabs` | 5th |
+| **Local/Docker** | `/.dockerenv` file exists | 6th |
+| **Unknown** | None of the above match | Fallback |
+
+### Environment Variables Checked
+
+The detection logic checks these environment variables (in order):
+
+1. **`COLAB_GPU`** - Set by Google Colab when GPU runtime is enabled
+2. **`VAST_CONTAINERLABEL`** - Vast.ai container label identifier
+3. **`VAST_CONTAINER_USER`** - Vast.ai container user identifier
+4. **`RUNPOD_POD_ID`** - RunPod pod instance identifier
+5. **`PAPERSPACE_METRIC_URL`** - Paperspace metrics endpoint URL
+
+Additionally checks:
+- **Filesystem paths**: `/content` (Colab), `/storage` (Paperspace), `/.dockerenv` (Docker)
+- **Hostname patterns**: `vast`, `vps`, `lambda`, `lambdalabs`
+
+### What Happens When Provider is Detected
+
+When a provider is successfully detected, the GPU config automatically optimizes:
+
+1. **Model Cache Directory** - Sets persistent storage location for model files:
+   - Colab: `/content/models`
+   - Vast.ai/RunPod: `/workspace/models`
+   - Paperspace: `/storage/models`
+   - Local/Unknown: `~/.cache/huggingface`
+
+2. **Compute Type & Batch Size** - Based on GPU model (detected via `torch.cuda.get_device_name()`):
+   - A100/H100: `float16`, batch size 16, TF32 enabled
+   - RTX 3090/4090/A6000: `int8`, batch size 8, TF32 disabled
+   - Other GPUs: `int8`, batch size 4, TF32 disabled
+
+3. **Environment Variables** - Sets caching paths:
+   - `TRANSFORMERS_CACHE={model_cache_dir}`
+   - `HF_HOME={model_cache_dir}`
+
+### What Happens if Provider is UNKNOWN
+
+If detection fails and provider is `UNKNOWN`, the pipeline will:
+
+1. **Use conservative defaults**:
+   - Model cache: `~/.cache/huggingface` (user home directory)
+   - Compute type: `int8` (safe for most GPUs)
+   - Batch size: 4 (low memory usage)
+   - TF32: Disabled
+
+2. **Continue processing** - The pipeline will still work, just with less optimal settings
+
+3. **Print warning** in GPU info output showing `Provider: unknown`
+
+**Impact of UNKNOWN provider:**
+- Slightly slower processing (smaller batch size)
+- May use more disk space (cache in home directory)
+- Still fully functional for transcription
+
+### Troubleshooting Detection Failures
+
+If your provider is showing as `UNKNOWN` when it shouldn't be:
+
+#### Check GPU Configuration
+```bash
+# Run diagnostic script
+cd audio-transcription-pipeline
+source venv/bin/activate
+python src/gpu_config.py
+```
+
+This prints:
+- Detected provider
+- GPU device name
+- VRAM available
+- Optimized settings (compute type, batch size, cache directory)
+
+#### Verify Environment Variables
+
+**For Vast.ai:**
+```bash
+# Check if Vast.ai env vars exist
+env | grep VAST
+# Should show VAST_CONTAINERLABEL or VAST_CONTAINER_USER
+```
+
+**For RunPod:**
+```bash
+# Check if RunPod env var exists
+env | grep RUNPOD
+# Should show RUNPOD_POD_ID
+```
+
+**For Paperspace:**
+```bash
+# Check if Paperspace env var or directory exists
+env | grep PAPERSPACE
+ls -la /storage
+# Should show PAPERSPACE_METRIC_URL or /storage directory
+```
+
+**For Google Colab:**
+```bash
+# Check if Colab env var exists
+env | grep COLAB
+ls -la /content
+# Should show COLAB_GPU and /content directory
+```
+
+#### Manual Provider Override
+
+If detection fails but you want provider-specific optimizations, you can manually set the environment variable before running:
+
+```bash
+# For Vast.ai
+export VAST_CONTAINERLABEL=manual_override
+
+# For RunPod
+export RUNPOD_POD_ID=manual_override
+
+# For Paperspace
+export PAPERSPACE_METRIC_URL=manual_override
+
+# For Colab (usually auto-detected, but if needed)
+export COLAB_GPU=1
+
+# Then run pipeline
+python transcribe_gpu.py audio.mp3
+```
+
+#### Common Detection Issues
+
+1. **Container/VM without provider env vars**
+   - Some bare-metal GPU instances may not have provider-specific variables
+   - Solution: Detection will show `UNKNOWN` but pipeline will still work with safe defaults
+
+2. **Custom Docker containers**
+   - Custom containers may not include provider environment variables
+   - Solution: Pass env vars when launching container (`docker run -e VAST_CONTAINERLABEL=...`)
+
+3. **SSH into GPU instance**
+   - Direct SSH connections may have different environment than container
+   - Solution: Check `env` output and manually export missing variables
+
+4. **Hostname-based detection fails**
+   - Some providers use generic hostnames
+   - Solution: Environment variable detection takes priority over hostname
+
+### Optimal Settings Per Provider
+
+Based on successful detection, here are the optimized configurations:
+
+#### Google Colab
+```python
+GPUConfig(
+    provider=COLAB,
+    device_name="Tesla T4",  # typical
+    compute_type="int8",     # T4 works best with int8
+    batch_size=4,
+    model_cache_dir="/content/models",
+    enable_tf32=False
+)
+```
+
+#### Vast.ai (tested on RTX 3090)
+```python
+GPUConfig(
+    provider=VASTAI,
+    device_name="NVIDIA GeForce RTX 3090",
+    compute_type="int8",     # cuDNN compatibility
+    batch_size=8,            # 24GB VRAM supports larger batches
+    model_cache_dir="/workspace/models",
+    enable_tf32=False
+)
+```
+
+#### RunPod
+```python
+GPUConfig(
+    provider=RUNPOD,
+    device_name="NVIDIA A100",  # typical
+    compute_type="float16",      # A100 optimized for FP16
+    batch_size=16,
+    model_cache_dir="/workspace/models",
+    enable_tf32=True            # A100 supports TF32
+)
+```
+
+#### Paperspace
+```python
+GPUConfig(
+    provider=PAPERSPACE,
+    device_name="varies",
+    compute_type="int8",
+    batch_size=4,
+    model_cache_dir="/storage/models",
+    enable_tf32=False
+)
+```
+
+#### Lambda Labs
+```python
+GPUConfig(
+    provider=LAMBDA,
+    device_name="NVIDIA A6000",  # typical
+    compute_type="int8",
+    batch_size=8,
+    model_cache_dir="~/.cache/huggingface",
+    enable_tf32=False
+)
+```
+
+**Note:** Actual settings vary based on detected GPU model. These are examples with typical hardware for each provider.
+
 ## GPU Performance Testing Results
 
 **Tested on Vast.ai - RTX 3090 (December 2025)**
@@ -135,10 +360,11 @@ audio-transcription-pipeline/
 **Speedup vs CPU:** 17-34x faster than CPU-based transcription
 
 **Tested Providers:**
-- ✅ Vast.ai - Verified working
+- ✅ Vast.ai - Verified working (RTX 3090)
 - ⏳ RunPod - Not yet tested
 - ⏳ Lambda Labs - Not yet tested
 - ⏳ Paperspace - Not yet tested
+- ⏳ Google Colab - Not yet tested
 
 ## Performance Monitoring
 
@@ -232,15 +458,28 @@ nano .env
 ### CPU/API Version (`requirements.txt`)
 - pydub - Audio processing
 - openai - Whisper API
-- pyannote.audio - Speaker diarization
+- pyannote.audio >=3.1.0 - Speaker diarization (supports 3.1.0 - 4.x)
 - python-dotenv - Environment variables
 
-### GPU Version (`requirements.txt`)
+### GPU Version (`requirements_gpu.txt`)
 - torch, torchaudio - GPU operations
 - faster-whisper - Local Whisper inference
-- pyannote.audio - Speaker diarization
+- pyannote.audio >=3.1.0 - Speaker diarization (supports 3.1.0 - 4.x)
 - julius - GPU audio resampling
 - ctranslate2 - Optimized inference
+
+### Pyannote Version Compatibility
+
+The pipeline includes automatic version detection for pyannote.audio:
+
+- **Supported versions:** pyannote.audio 3.1.0 through 4.x
+- **Version detection:** Automatic via `src/pyannote_compat.py`
+- **Compatibility layer:** Handles API differences transparently
+  - pyannote 3.x: Returns `Annotation` object directly from pipeline
+  - pyannote 4.x: Returns `DiarizeOutput` dataclass with `speaker_diarization` and `exclusive_speaker_diarization` attributes
+- **Preferred mode:** Uses `exclusive_speaker_diarization` (no overlapping speech) when available for cleaner alignment
+
+The compatibility layer automatically detects the installed version and uses the correct API, requiring no manual configuration.
 
 ## Known Issues and Solutions
 

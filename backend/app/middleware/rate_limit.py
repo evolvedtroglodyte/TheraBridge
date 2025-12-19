@@ -25,19 +25,26 @@ def custom_rate_limit_handler(request: Request, exc: RateLimitExceeded) -> JSONR
 
     Args:
         request: FastAPI request object
-        exc: Rate limit exception with retry_after info
+        exc: Rate limit exception
 
     Returns:
         JSONResponse with 429 status and retry headers
     """
+    # slowapi's RateLimitExceeded may not have retry_after attribute
+    retry_after = getattr(exc, 'retry_after', 60)  # Default to 60 seconds
+
+    response_content = {
+        "error": "rate_limit_exceeded",
+        "message": "Too many requests. Please try again later.",
+        "retry_after": retry_after
+    }
+
+    response_headers = {"Retry-After": str(retry_after)}
+
     return JSONResponse(
-        content={
-            "error": "rate_limit_exceeded",
-            "message": "Too many requests. Please try again later.",
-            "retry_after": exc.retry_after
-        },
+        content=response_content,
         status_code=429,
-        headers={"Retry-After": str(exc.retry_after)}
+        headers=response_headers
     )
 
 

@@ -1,4 +1,5 @@
 import { tokenStorage } from './token-storage';
+import { getValidatedApiUrl } from './env-validation';
 import type {
   ApiResult,
   ApiErrorType,
@@ -17,7 +18,16 @@ import {
   isValidationError,
 } from './api-types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// Get validated API base URL (throws error if invalid)
+// Falls back to localhost if validation fails (development mode)
+let API_BASE_URL: string;
+try {
+  API_BASE_URL = getValidatedApiUrl();
+} catch (error) {
+  // In development, fall back to localhost
+  API_BASE_URL = 'http://localhost:8000';
+  console.warn('Failed to get validated API URL, falling back to localhost:', error);
+}
 
 /**
  * Custom error class for API errors with full response details

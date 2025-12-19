@@ -1,0 +1,29 @@
+{
+  "internal_links": [
+    {
+      "href": "https://upheal.io/signup",
+      "text": "Sign up for free",
+      "title": "",
+      "base_domain": "upheal.io",
+      "head_data": null,
+      "head_extraction_status": null,
+      "head_extraction_error": null,
+      "intrinsic_score": 0.0,
+      "contextual_score": null,
+      "total_score": null
+    },
+    {
+      "href": "https://www.upheal.io/privacy-and-compliance",
+      "text": "Privacy and Compliance",
+      "title": "",
+      "base_domain": "upheal.io",
+      "head_data": null,
+      "head_extraction_status": null,
+      "head_extraction_error": null,
+      "intrinsic_score": 0.0,
+      "contextual_score": null,
+      "total_score": null
+    }
+  ],
+  "external_links": []
+}

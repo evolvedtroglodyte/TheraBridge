@@ -382,7 +382,7 @@ export function TemplateEditor({
   /**
    * Check if section has missing fields
    */
-  const getSectionMissingFields = (sectionId: string): string[] => {
+  const getSectionMissingFields = (sectionId: string): readonly string[] => {
     return autofillData?.missing_fields[sectionId] ?? [];
   };
 

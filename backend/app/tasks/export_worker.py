@@ -166,10 +166,13 @@ async def _fetch_timeline_data(
 ) -> list:
     """
     Fetch therapy sessions for patient within date range.
+    Uses eager loading to prevent N+1 queries when accessing patient/therapist relationships.
 
     Returns:
         List of session dictionaries with timeline data
     """
+    from sqlalchemy.orm import joinedload
+
     query = select(TherapySession).where(
         TherapySession.patient_id == patient_id
     )
@@ -179,10 +182,13 @@ async def _fetch_timeline_data(
     if end_date:
         query = query.where(TherapySession.session_date <= end_date)
 
+    # Add eager loading to prevent N+1 queries
+    query = query.options(joinedload(TherapySession.patient))
+    query = query.options(joinedload(TherapySession.therapist))
     query = query.order_by(TherapySession.session_date.desc())
 
     result = await db.execute(query)
-    sessions = result.scalars().all()
+    sessions = result.scalars().unique().all()
 
     # Convert to dictionaries
     timeline_data = []

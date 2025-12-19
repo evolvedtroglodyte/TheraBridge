@@ -52,11 +52,40 @@ Create `.env.local`:
 
 ```bash
 # API Configuration (required)
+# IMPORTANT: No trailing slash, no /api/v1 suffix
+# ✅ Correct: http://localhost:8000
+# ❌ Wrong:   http://localhost:8000/
+# ❌ Wrong:   http://localhost:8000/api/v1
 NEXT_PUBLIC_API_URL=http://localhost:8000
 
 # Feature flags (optional)
+# Set to 'true' to use real backend API, 'false' for mock data
 NEXT_PUBLIC_USE_REAL_API=true
 ```
+
+### Environment Validation
+
+The app automatically validates environment variables on startup and logs helpful warnings:
+
+- **Format validation**: Ensures `NEXT_PUBLIC_API_URL` has no trailing slash
+- **URL validation**: Verifies the URL is properly formatted
+- **Health check**: Optionally pings backend `/health` endpoint in development mode
+- **Console warnings**: Helpful error messages if configuration is incorrect
+
+**Example console output:**
+```
+🔍 TherapyBridge Environment Validation
+  ✅ Backend health check passed (http://localhost:8000/health) - 45ms
+  📋 Configuration:
+    ✓ NEXT_PUBLIC_API_URL: http://localhost:8000
+    ✓ NEXT_PUBLIC_USE_REAL_API: true
+  ✅ All required environment variables are valid
+```
+
+**Common validation errors:**
+- `NEXT_PUBLIC_API_URL must not have a trailing slash` - Remove the `/` at the end
+- `Cannot reach backend` - Ensure backend is running on the specified URL
+- `NEXT_PUBLIC_API_URL is not defined` - Create `.env.local` file with required variables
 
 ## Project Structure
 

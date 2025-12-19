@@ -36,20 +36,20 @@ class GPUAudioProcessor:
             print(f"[GPUAudio] GPU: {torch.cuda.get_device_name(0)}")
             print(f"[GPUAudio] VRAM: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
 
-    def __enter__(self):
+    def __enter__(self) -> "GPUAudioProcessor":
         """Context manager entry - returns self for use in with block"""
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
         """Context manager exit - guarantees GPU cleanup even on exception"""
         self.cleanup_gpu_memory()
         return False  # Don't suppress exceptions
 
-    def __del__(self):
+    def __del__(self) -> None:
         """Fallback cleanup for backward compatibility (not guaranteed to execute)"""
         self.cleanup_gpu_memory()
 
-    def cleanup_gpu_memory(self):
+    def cleanup_gpu_memory(self) -> None:
         """
         Cleanup GPU memory and clear cache
 
@@ -181,7 +181,7 @@ class GPUAudioProcessor:
                       sample_rate: int,
                       output_path: str,
                       format: str = "mp3",
-                      bitrate: str = "64k"):
+                      bitrate: str = "64k") -> None:
         """
         Save GPU tensor as audio file
 

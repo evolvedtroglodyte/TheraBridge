@@ -356,16 +356,30 @@ def try_interpolation(seg_start: float, seg_end: float, turns: List[Dict], max_g
 def main():
     # Input/output paths - use relative paths from test file location
     script_dir = Path(__file__).parent
-    input_audio = script_dir / "samples" / "LIVE Cognitive Behavioral Therapy Session (1).mp3"
+
+    # Try to find any available sample audio file
+    candidates = [
+        "compressed-cbt-session.m4a",
+        "LIVE Cognitive Behavioral Therapy Session (1).mp3",
+        "Person-Centred Therapy Session - Full Example [VLDDUL3HBIg].mp3",
+    ]
+
+    input_audio = None
+    for candidate in candidates:
+        test_path = script_dir / "samples" / candidate
+        if test_path.exists():
+            input_audio = test_path
+            break
+
+    if input_audio is None:
+        print(f"❌ No sample audio files found in tests/samples/")
+        print(f"")
+        print(f"Please add sample audio files to run this test.")
+        print(f"See tests/README.md for setup instructions.")
+        sys.exit(1)
+
     processed_audio = script_dir / "outputs" / "processed_audio.mp3"
     output_json = script_dir / "outputs" / "diarization_output_improved.json"
-
-    # Check input exists
-    if not input_audio.exists():
-        print(f"❌ Input file not found: {input_audio}")
-        print(f"   Expected location: {input_audio.absolute()}")
-        print(f"   Please ensure the sample audio file exists at the expected location.")
-        sys.exit(1)
 
     # Get API keys
     openai_key = os.getenv("OPENAI_API_KEY")

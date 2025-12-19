@@ -69,7 +69,8 @@ export function SessionNoteCard({ note, template }: SessionNoteCardProps) {
     return (
       <div className="space-y-2">
         {previewFields.map((field) => {
-          const value = note.content[firstSection.id]?.[field.id];
+          const sectionContent = note.content[firstSection.id] as Record<string, unknown> | undefined;
+          const value = sectionContent?.[field.id];
           return (
             <div key={field.id} className="text-sm">
               <span className="font-medium">{field.label}: </span>
@@ -107,7 +108,7 @@ export function SessionNoteCard({ note, template }: SessionNoteCardProps) {
     return (
       <div className="space-y-6 mt-4">
         {template.structure.sections.map((section) => {
-          const sectionData = note.content[section.id] || {};
+          const sectionData = (note.content[section.id] as Record<string, unknown>) || {};
           return (
             <div key={section.id}>
               <h4 className="font-semibold text-base mb-3">{section.name}</h4>

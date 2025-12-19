@@ -64,9 +64,14 @@ def test_local_transcription():
     # Use a short video
     test_url = "https://www.youtube.com/watch?v=VLDDUL3HBIg"
 
+    # Use paths relative to script location
+    script_dir = Path(__file__).parent
+    download_dir = script_dir / "downloads"
+    output_dir = script_dir / "outputs" / "youtube"
+
     pipeline = YouTubeTranscriptPipeline(
-        download_dir="tests/downloads",
-        output_dir="tests/outputs/youtube",
+        download_dir=str(download_dir),
+        output_dir=str(output_dir),
         whisper_model="base"  # Use smaller model for testing
     )
 

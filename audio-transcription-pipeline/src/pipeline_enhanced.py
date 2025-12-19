@@ -377,13 +377,11 @@ class SpeakerDiarizer:
 
             # Parse results with timing
             with self.logger.subprocess("diarization_parsing"):
-                # Handle both pyannote 3.x and 4.x
-                if hasattr(diarization, 'exclusive_speaker_diarization'):
-                    annotation = diarization.exclusive_speaker_diarization
-                elif hasattr(diarization, 'speaker_diarization'):
-                    annotation = diarization.speaker_diarization
-                else:
-                    annotation = diarization
+                from pyannote_compat import extract_annotation
+
+                # Use compatibility layer to extract Annotation object
+                annotation = extract_annotation(diarization)
+                self.logger.log(f"[Diarization] Extracted Annotation from {type(diarization).__name__}", level="INFO")
 
                 # Convert to list
                 turns = []

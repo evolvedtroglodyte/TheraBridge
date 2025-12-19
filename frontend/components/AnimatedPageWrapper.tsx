@@ -20,7 +20,7 @@ export function AnimatedPageWrapper({
       exit="exit"
       transition={{
         duration: 0.3,
-        ease: 'easeOut',
+        ease: 'easeOut' as const,
         delay,
       }}
     >

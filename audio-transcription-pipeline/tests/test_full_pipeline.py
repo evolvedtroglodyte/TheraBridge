@@ -167,6 +167,15 @@ class SpeakerDiarizer:
         import torch
         from pyannote.audio import Pipeline
         from pyannote.audio.core.task import Specifications, Problem, Resolution
+        import sys
+        from pathlib import Path
+
+        # Add src to path to import compatibility layer
+        src_path = Path(__file__).parent.parent / "src"
+        if str(src_path) not in sys.path:
+            sys.path.insert(0, str(src_path))
+
+        from pyannote_compat import log_version_info
 
         # Add safe globals for PyTorch 2.6+ compatibility
         import torch.serialization
@@ -186,6 +195,9 @@ class SpeakerDiarizer:
         hf_token = os.getenv("HF_TOKEN")
         if not hf_token:
             raise ValueError("HF_TOKEN not set - needed for pyannote model")
+
+        # Log pyannote version information
+        log_version_info(lambda msg: debug_log("DIARIZE", msg))
 
         debug_log("DIARIZE", "Loading pyannote speaker-diarization-3.1 model...")
         start = time.time()
@@ -226,17 +238,11 @@ class SpeakerDiarizer:
         debug_log("DIARIZE", "Running diarization model...")
         diarization = self.pipeline(audio_input, num_speakers=self.num_speakers)
 
-        # Pyannote 4.0 returns DiarizeOutput dataclass with speaker_diarization attribute
-        debug_log("DIARIZE", f"Diarization result type: {type(diarization)}")
-
-        # Handle both pyannote 3.x (Annotation directly) and 4.x (DiarizeOutput wrapper)
-        # Use exclusive_speaker_diarization for cleaner alignment (no overlapping speech)
-        if hasattr(diarization, 'exclusive_speaker_diarization'):
-            annotation = diarization.exclusive_speaker_diarization
-        elif hasattr(diarization, 'speaker_diarization'):
-            annotation = diarization.speaker_diarization
-        else:
-            annotation = diarization  # pyannote 3.x returns Annotation directly
+        # Use compatibility layer to extract Annotation object
+        # Handles both pyannote 3.x (Annotation directly) and 4.x (DiarizeOutput wrapper)
+        from pyannote_compat import extract_annotation
+        annotation = extract_annotation(diarization)
+        debug_log("DIARIZE", f"Extracted Annotation from {type(diarization).__name__}")
 
         # Convert to list of speaker turns
         turns = []
@@ -417,12 +423,30 @@ def main():
     if len(sys.argv) > 1:
         audio_file = Path(sys.argv[1])
     else:
-        audio_file = script_dir / "samples/onemintestvid.mp3"
+        # Try to find any available sample audio file
+        candidates = [
+            "compressed-cbt-session.m4a",
+            "LIVE Cognitive Behavioral Therapy Session (1).mp3",
+            "Person-Centred Therapy Session - Full Example [VLDDUL3HBIg].mp3",
+        ]
+        audio_file = None
+        for candidate in candidates:
+            test_path = script_dir / "samples" / candidate
+            if test_path.exists():
+                audio_file = test_path
+                break
 
-    if not audio_file.exists():
-        print(f"ERROR: Audio file not found: {audio_file}")
-        print(f"   Expected location: {audio_file.absolute()}")
-        print(f"   Please ensure the sample audio file exists or provide a path as argument.")
+    if audio_file is None or not audio_file.exists():
+        print(f"ERROR: No sample audio files found in tests/samples/")
+        print(f"")
+        print(f"Please add sample audio files to run this test.")
+        print(f"See tests/README.md for setup instructions.")
+        print(f"")
+        print(f"Quick setup:")
+        print(f"1. Download a therapy session from YouTube:")
+        print(f"   yt-dlp -x --audio-format mp3 'https://youtube.com/watch?v=...'")
+        print(f"2. Move file to: {script_dir / 'samples'}/")
+        print(f"3. Or provide audio file path as argument: python {__file__} /path/to/audio.mp3")
         return
 
     print(f"\nInput: {audio_file}")

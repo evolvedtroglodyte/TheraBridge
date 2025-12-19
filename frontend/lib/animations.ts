@@ -14,7 +14,7 @@ export const pageTransitionVariants = {
     y: 0,
     transition: {
       duration: 0.3,
-      ease: 'easeOut',
+      ease: 'easeOut' as const,
     },
   },
   exit: {
@@ -22,7 +22,7 @@ export const pageTransitionVariants = {
     y: -8,
     transition: {
       duration: 0.2,
-      ease: 'easeIn',
+      ease: 'easeIn' as const,
     },
   },
 };
@@ -36,7 +36,7 @@ export const cardVariants = {
     scale: 1.02,
     transition: {
       duration: 0.2,
-      ease: 'easeOut',
+      ease: 'easeOut' as const,
     },
   },
   tap: {
@@ -53,7 +53,7 @@ export const shadowElevationVariants = {
     boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
     transition: {
       duration: 0.2,
-      ease: 'easeOut',
+      ease: 'easeOut' as const,
     },
   },
 };
@@ -81,7 +81,7 @@ export const itemVariants = {
     y: 0,
     transition: {
       duration: 0.3,
-      ease: 'easeOut',
+      ease: 'easeOut' as const,
     },
   },
 };
@@ -95,14 +95,14 @@ export const modalOverlayVariants = {
     opacity: 1,
     transition: {
       duration: 0.2,
-      ease: 'easeOut',
+      ease: 'easeOut' as const,
     },
   },
   exit: {
     opacity: 0,
     transition: {
       duration: 0.15,
-      ease: 'easeIn',
+      ease: 'easeIn' as const,
     },
   },
 };
@@ -119,7 +119,7 @@ export const modalContentVariants = {
     y: 0,
     transition: {
       duration: 0.3,
-      ease: 'easeOut',
+      ease: 'easeOut' as const,
     },
   },
   exit: {
@@ -128,7 +128,7 @@ export const modalContentVariants = {
     y: 16,
     transition: {
       duration: 0.2,
-      ease: 'easeIn',
+      ease: 'easeIn' as const,
     },
   },
 };
@@ -140,7 +140,7 @@ export const spinnerVariants = {
     transition: {
       duration: 1,
       repeat: Infinity,
-      ease: 'linear',
+      ease: 'linear' as const,
     },
   },
 };
@@ -151,7 +151,7 @@ export const pulseVariants = {
     transition: {
       duration: 2,
       repeat: Infinity,
-      ease: 'easeInOut',
+      ease: 'easeInOut' as const,
     },
   },
 };
@@ -163,7 +163,7 @@ export const skeletonVariants = {
     transition: {
       duration: 1.5,
       repeat: Infinity,
-      ease: 'linear',
+      ease: 'linear' as const,
     },
   },
 };
@@ -177,7 +177,7 @@ export const buttonVariants = {
     scale: 1.05,
     transition: {
       duration: 0.15,
-      ease: 'easeOut',
+      ease: 'easeOut' as const,
     },
   },
   tap: {
@@ -196,7 +196,7 @@ export const interactiveCardVariants = {
     boxShadow: '0 8px 16px rgba(0,0,0,0.12)',
     transition: {
       duration: 0.2,
-      ease: 'easeOut',
+      ease: 'easeOut' as const,
     },
   },
   tap: {
@@ -206,7 +206,7 @@ export const interactiveCardVariants = {
 
 // Transition config for consistent timing
 export const transitionConfig = {
-  fast: { duration: 0.15, ease: 'easeOut' },
-  normal: { duration: 0.3, ease: 'easeOut' },
-  slow: { duration: 0.5, ease: 'easeOut' },
+  fast: { duration: 0.15, ease: 'easeOut' as const },
+  normal: { duration: 0.3, ease: 'easeOut' as const },
+  slow: { duration: 0.5, ease: 'easeOut' as const },
 };

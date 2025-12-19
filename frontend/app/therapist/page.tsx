@@ -18,34 +18,35 @@ export default function TherapistDashboard() {
   const { patients, isLoading: loadingPatients, isError: patientsError } = usePatients();
   const { sessions } = useSessions();
 
-  const getPatientStats = (patientId: string) => {
-    const patientSessions = sessions?.filter(s => s.patient_id === patientId) || [];
-    const latestSession = patientSessions.sort(
-      (a, b) => new Date(b.session_date).getTime() - new Date(a.session_date).getTime()
-    )[0];
-
-    const actionItems = patientSessions
-      .flatMap(s => s.extracted_notes?.action_items || [])
-      .length;
-
-    const riskFlags = patientSessions
-      .flatMap(s => s.extracted_notes?.risk_flags || [])
-      .length;
-
-    return {
-      totalSessions: patientSessions.length,
-      latestSession,
-      latestSessionDate: latestSession?.session_date,
-      actionItems,
-      riskFlags,
-    };
-  };
-
   // Build stats map for all patients
   const patientStats = useMemo(() => {
     if (!patients) return {};
 
-    const statsMap: Record<string, any> = {};
+    const getPatientStats = (patientId: string) => {
+      const patientSessions = sessions?.filter(s => s.patient_id === patientId) || [];
+      const latestSession = patientSessions.sort(
+        (a, b) => new Date(b.session_date).getTime() - new Date(a.session_date).getTime()
+      )[0];
+
+      const actionItems = patientSessions
+        .flatMap(s => s.extracted_notes?.action_items || [])
+        .length;
+
+      const riskFlags = patientSessions
+        .flatMap(s => s.extracted_notes?.risk_flags || [])
+        .length;
+
+      return {
+        totalSessions: patientSessions.length,
+        latestSession,
+        latestSessionDate: latestSession?.session_date,
+        actionItems,
+        riskFlags,
+      };
+    };
+
+    type PatientStats = ReturnType<typeof getPatientStats>;
+    const statsMap: Record<string, PatientStats> = {};
     patients.forEach((patient) => {
       statsMap[patient.id] = getPatientStats(patient.id);
     });

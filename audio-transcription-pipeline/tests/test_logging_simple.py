@@ -17,10 +17,14 @@ def main():
     print("PERFORMANCE LOGGING SYSTEM TEST")
     print("="*60)
 
+    # Use path relative to script location
+    script_dir = Path(__file__).parent
+    output_dir = script_dir.parent / "outputs" / "performance_logs"
+
     # Create a performance logger
     logger = PerformanceLogger(
         name="TestPipeline",
-        output_dir="outputs/performance_logs",
+        output_dir=str(output_dir),
         enable_gpu_monitoring=True,
         verbose=True
     )

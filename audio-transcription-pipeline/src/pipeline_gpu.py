@@ -102,6 +102,9 @@ class GPUTranscriptionPipeline:
         print(f"Model Cache: {self.config.model_cache_dir}")
         print(f"{'='*60}\n")
 
+        # Log initial GPU memory state
+        self._log_gpu_memory("Pipeline Initialization")
+
     def process(self,
                 audio_path: str,
                 num_speakers: int = 2,
@@ -124,12 +127,16 @@ class GPUTranscriptionPipeline:
         try:
             # Step 1: GPU Audio Preprocessing
             self.logger.start_stage("GPU Audio Preprocessing")
+            self._log_gpu_memory("Before Audio Preprocessing")
             preprocessed_audio = self._preprocess_gpu(audio_path)
+            self._log_gpu_memory("After Audio Preprocessing")
             self.logger.end_stage("GPU Audio Preprocessing")
 
             # Step 2: GPU Transcription
             self.logger.start_stage("GPU Transcription")
+            self._log_gpu_memory("Before Transcription")
             transcription = self._transcribe_gpu(preprocessed_audio, language)
+            self._log_gpu_memory("After Transcription (post-cleanup)")
             self.logger.end_stage("GPU Transcription")
 
             # Step 3: GPU Diarization (optional)
@@ -138,15 +145,19 @@ class GPUTranscriptionPipeline:
 
             if enable_diarization:
                 self.logger.start_stage("GPU Speaker Diarization")
+                self._log_gpu_memory("Before Diarization")
                 speaker_turns = self._diarize_gpu(preprocessed_audio, num_speakers)
+                self._log_gpu_memory("After Diarization (post-cleanup)")
                 self.logger.end_stage("GPU Speaker Diarization")
 
                 # Step 4: Speaker Alignment
                 self.logger.start_stage("Speaker Alignment")
+                self._log_gpu_memory("Before Speaker Alignment")
                 aligned_segments = self._align_speakers_gpu(
                     transcription['segments'],
                     speaker_turns
                 )
+                self._log_gpu_memory("After Speaker Alignment (post-cleanup)")
                 self.logger.end_stage("Speaker Alignment")
 
             # Compile results
@@ -273,10 +284,12 @@ class GPUTranscriptionPipeline:
             # Free Whisper model from GPU after transcription completes
             if self.transcriber is not None:
                 try:
+                    self._log_gpu_memory("Before Whisper Cleanup")
                     del self.transcriber
                     self.transcriber = None
                     if torch.cuda.is_available():
                         torch.cuda.empty_cache()
+                    self._log_gpu_memory("After Whisper Cleanup")
                     self.logger.log("GPU memory freed after transcription")
                 except Exception as e:
                     self.logger.log(f"Warning: Failed to free GPU memory after transcription: {str(e)}", level="WARNING")
@@ -288,6 +301,7 @@ class GPUTranscriptionPipeline:
             if self.diarizer is None:
                 with self.logger.subprocess("diarization_model_loading"):
                     from pyannote.audio import Pipeline
+                    from pyannote_compat import log_version_info
 
                     hf_token = os.getenv("HF_TOKEN")
                     if not hf_token:
@@ -295,6 +309,9 @@ class GPUTranscriptionPipeline:
                             "HF_TOKEN not found. Required for speaker diarization.\n"
                             "Get token at: https://huggingface.co/settings/tokens"
                         )
+
+                    # Log pyannote version information
+                    log_version_info(self.logger.log)
 
                     self.logger.log("Loading pyannote model...")
                     start_load = time.perf_counter()
@@ -311,6 +328,7 @@ class GPUTranscriptionPipeline:
 
             with self.logger.subprocess("diarization_inference"):
                 import torchaudio
+                from pyannote_compat import extract_annotation
 
                 waveform, sample_rate = torchaudio.load(audio_path)
                 waveform = waveform.to(self.device)
@@ -318,8 +336,12 @@ class GPUTranscriptionPipeline:
                 audio_input = {"waveform": waveform, "sample_rate": sample_rate}
                 diarization = self.diarizer(audio_input, num_speakers=num_speakers)
 
+                # Use compatibility layer to extract Annotation object
+                annotation = extract_annotation(diarization)
+                self.logger.log(f"Extracted Annotation from {type(diarization).__name__}")
+
                 turns = []
-                for turn, _, speaker in diarization.itertracks(yield_label=True):
+                for turn, _, speaker in annotation.itertracks(yield_label=True):
                     turns.append({
                         "speaker": speaker,
                         "start": turn.start,
@@ -333,9 +355,11 @@ class GPUTranscriptionPipeline:
             # Free waveform tensor from GPU memory
             if waveform is not None:
                 try:
+                    self._log_gpu_memory("Before Waveform Cleanup")
                     del waveform
                     if torch.cuda.is_available():
                         torch.cuda.empty_cache()
+                    self._log_gpu_memory("After Waveform Cleanup")
                     self.logger.log("GPU waveform freed after diarization")
                 except Exception as e:
                     self.logger.log(f"Warning: Failed to free waveform memory: {str(e)}", level="WARNING")
@@ -343,10 +367,12 @@ class GPUTranscriptionPipeline:
             # Free diarization model from GPU after diarization completes
             if self.diarizer is not None:
                 try:
+                    self._log_gpu_memory("Before Diarization Model Cleanup")
                     del self.diarizer
                     self.diarizer = None
                     if torch.cuda.is_available():
                         torch.cuda.empty_cache()
+                    self._log_gpu_memory("After Diarization Model Cleanup")
                     self.logger.log("GPU memory freed after diarization")
                 except Exception as e:
                     self.logger.log(f"Warning: Failed to free GPU memory after diarization: {str(e)}", level="WARNING")
@@ -405,12 +431,14 @@ class GPUTranscriptionPipeline:
         finally:
             # Free all GPU tensors from speaker alignment
             try:
+                self._log_gpu_memory("Before Alignment Tensors Cleanup")
                 for tensor in gpu_tensors:
                     if tensor is not None:
                         del tensor
                 gpu_tensors.clear()
                 if torch.cuda.is_available():
                     torch.cuda.empty_cache()
+                self._log_gpu_memory("After Alignment Tensors Cleanup")
                 self.logger.log("GPU tensors freed after speaker alignment")
             except Exception as e:
                 self.logger.log(f"Warning: Failed to free alignment tensors: {str(e)}", level="WARNING")
@@ -429,6 +457,58 @@ class GPUTranscriptionPipeline:
 
         return total_util / count if count > 0 else 0.0
 
+    def _log_gpu_memory(self, stage_name: str):
+        """
+        Log current GPU memory usage for monitoring and debugging.
+
+        This helps track memory consumption at critical pipeline stages
+        and identify potential memory leaks or OOM conditions before they occur.
+
+        Args:
+            stage_name: Name of the current stage for logging context
+        """
+        if not torch.cuda.is_available():
+            return
+
+        try:
+            # Get memory statistics
+            allocated = torch.cuda.memory_allocated(0) / (1024 ** 3)  # GB
+            reserved = torch.cuda.memory_reserved(0) / (1024 ** 3)    # GB
+            total = torch.cuda.get_device_properties(0).total_memory / (1024 ** 3)  # GB
+            free = total - allocated
+
+            # Calculate percentages
+            allocated_pct = (allocated / total) * 100
+            reserved_pct = (reserved / total) * 100
+
+            # Log memory state
+            log_msg = (
+                f"[GPU Memory] {stage_name}: "
+                f"Allocated: {allocated:.2f}GB ({allocated_pct:.1f}%) | "
+                f"Reserved: {reserved:.2f}GB ({reserved_pct:.1f}%) | "
+                f"Free: {free:.2f}GB | "
+                f"Total: {total:.2f}GB"
+            )
+
+            self.logger.log(log_msg, level="INFO")
+
+            # Warning if memory usage is high
+            if allocated_pct > 85:
+                warning_msg = (
+                    f"WARNING: GPU memory usage is critically high ({allocated_pct:.1f}%). "
+                    f"Consider reducing batch size or using a smaller model."
+                )
+                self.logger.log(warning_msg, level="WARNING")
+            elif allocated_pct > 70:
+                warning_msg = (
+                    f"NOTICE: GPU memory usage is elevated ({allocated_pct:.1f}%). "
+                    f"Monitor for potential OOM conditions."
+                )
+                self.logger.log(warning_msg, level="INFO")
+
+        except Exception as e:
+            self.logger.log(f"Failed to log GPU memory: {str(e)}", level="WARNING")
+
     def cleanup_models(self):
         """
         Cleanup GPU VRAM by unloading models
@@ -437,11 +517,18 @@ class GPUTranscriptionPipeline:
         - Unloads Whisper model from GPU memory
         - Unloads pyannote diarization model from GPU memory
         - Clears GPU cache
-        - Logs cleanup status
+        - Logs cleanup status and memory recovery
+
+        Best Practice:
+        - Always call this method when done processing, or use context manager
+        - Monitors memory before/after to verify cleanup effectiveness
         """
         cleanup_msg = []
 
         try:
+            # Log memory state before cleanup
+            self._log_gpu_memory("Before Final Cleanup")
+
             # Cleanup Whisper model
             if self.transcriber is not None:
                 try:
@@ -467,10 +554,8 @@ class GPUTranscriptionPipeline:
                 torch.cuda.empty_cache()
                 cleanup_msg.append("GPU cache cleared")
 
-                # Log remaining GPU memory
-                remaining_vram = torch.cuda.get_device_properties(0).total_memory - torch.cuda.memory_allocated()
-                remaining_vram_gb = remaining_vram / (1024 ** 3)
-                self.logger.log(f"GPU cleanup complete. Available VRAM: {remaining_vram_gb:.2f} GB")
+            # Log memory state after cleanup
+            self._log_gpu_memory("After Final Cleanup")
 
             if cleanup_msg:
                 print(f"\n[GPU Cleanup] {', '.join(cleanup_msg)}")

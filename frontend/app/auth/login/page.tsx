@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
@@ -15,10 +15,6 @@ import type { FailureResult } from '@/lib/api-types';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fieldValidation, setFieldValidation] = useState({
-    email: { isValid: true, errors: [], isDirty: false },
-    password: { isValid: true, errors: [], isDirty: false },
-  });
   const [serverError, setServerError] = useState<FormattedError | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [shouldRedirect, setShouldRedirect] = useState(false);
@@ -39,28 +35,20 @@ export default function LoginPage() {
     }
   }, [shouldRedirect, isAuthenticated, user, router]);
 
-  // Validate form on input change
-  useEffect(() => {
-    const validation = validateFields(
+  // Memoized validation - computed on demand, not stored in state
+  const fieldValidation = useMemo(() => {
+    return validateFields(
       { email, password },
       { email: emailRules, password: passwordRules }
     );
-    setFieldValidation(validation);
   }, [email, password]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setServerError(null);
 
-    // Validate all fields
-    const validation = validateFields(
-      { email, password },
-      { email: emailRules, password: passwordRules }
-    );
-    setFieldValidation(validation);
-
-    // Check if form is valid
-    if (!isAllValid(validation)) {
+    // Check if form is valid (using memoized validation)
+    if (!isAllValid(fieldValidation)) {
       return;
     }
 

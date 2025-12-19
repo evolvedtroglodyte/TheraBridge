@@ -4,6 +4,7 @@ import { AuthProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ToasterProvider } from "@/components/providers/toaster-provider";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { EnvValidator } from "@/components/env-validator";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,6 +32,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <EnvValidator />
         <ErrorBoundary>
           <ThemeProvider>
             <AuthProvider>

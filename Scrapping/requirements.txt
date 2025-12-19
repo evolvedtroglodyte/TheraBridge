@@ -9,6 +9,9 @@ lxml==5.1.0
 # Browser Automation (fallback for JS-heavy pages)
 playwright==1.42.0
 
+# Advanced Web Crawling (JS rendering, session management)
+crawl4ai>=0.7.4
+
 # Data Validation
 pydantic==2.6.3
 pydantic-settings==2.2.1
@@ -24,3 +27,6 @@ responses==0.25.0
 
 # Data Export
 pandas==2.2.1
+
+# LLM Integration (for relevance filtering)
+openai>=1.0.0

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
@@ -32,21 +32,15 @@ export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'therapist' | 'patient'>('patient');
-  const [fieldValidation, setFieldValidation] = useState({
-    firstName: { isValid: true, errors: [], isDirty: false },
-    lastName: { isValid: true, errors: [], isDirty: false },
-    email: { isValid: true, errors: [], isDirty: false },
-    password: { isValid: true, errors: [], isDirty: false },
-  });
   const [serverError, setServerError] = useState<FormattedError | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const { signup } = useAuth();
   const router = useRouter();
 
-  // Validate form on input change
-  useEffect(() => {
-    const validation = validateFields(
+  // Memoized validation - computed on demand, not stored in state
+  const fieldValidation = useMemo(() => {
+    return validateFields(
       { firstName, lastName, email, password },
       {
         firstName: firstNameRules,
@@ -55,27 +49,14 @@ export default function SignupPage() {
         password: passwordStrongRules,
       }
     );
-    setFieldValidation(validation);
   }, [firstName, lastName, email, password]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setServerError(null);
 
-    // Validate all fields
-    const validation = validateFields(
-      { firstName, lastName, email, password },
-      {
-        firstName: firstNameRules,
-        lastName: lastNameRules,
-        email: emailRules,
-        password: passwordStrongRules,
-      }
-    );
-    setFieldValidation(validation);
-
-    // Check if form is valid
-    if (!isAllValid(validation)) {
+    // Check if form is valid (using memoized validation)
+    if (!isAllValid(fieldValidation)) {
       return;
     }
 
