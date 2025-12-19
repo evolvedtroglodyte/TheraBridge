@@ -21,10 +21,14 @@ class UserRole(str, Enum):
 class SessionStatus(str, Enum):
     pending = "pending"
     uploading = "uploading"
+    preprocessing = "preprocessing"  # Added for audio preprocessing stage
     transcribing = "transcribing"
     transcribed = "transcribed"
+    diarizing = "diarizing"  # Added for speaker diarization stage
     extracting_notes = "extracting_notes"
+    generating_notes = "generating_notes"  # Alias for extracting_notes (Upheal-compatible)
     processed = "processed"
+    completed = "completed"  # Alias for processed (Upheal-compatible)
     failed = "failed"
 
 
@@ -150,6 +154,50 @@ class SessionCreate(SessionBase):
     pass
 
 
+class SessionUpdate(BaseModel):
+    """Request to update a session (PATCH /sessions/{id})"""
+    # Core fields (optional updates)
+    session_date: Optional[datetime] = None
+    duration_seconds: Optional[int] = None
+
+    # Audio/transcript fields
+    audio_filename: Optional[str] = None
+    audio_url: Optional[str] = None
+    transcript_text: Optional[str] = None
+
+    # Status fields
+    status: Optional[SessionStatus] = None
+    error_message: Optional[str] = None
+
+    # Upheal-inspired fields (optional for PATCH)
+    is_anonymous: Optional[bool] = Field(None, description="Hide client name in UI")
+    ai_summary: Optional[str] = Field(None, description="AI-generated session summary")
+    processing_status: Optional[str] = Field(None, description="Current processing stage")
+    processing_progress: Optional[int] = Field(None, ge=0, le=100, description="Processing progress (0-100)")
+    recording_deleted_at: Optional[datetime] = Field(None, description="When audio was deleted")
+    transcript_deleted_at: Optional[datetime] = Field(None, description="When transcript was deleted")
+
+    @field_validator('processing_progress')
+    @classmethod
+    def validate_progress_if_provided(cls, v: Optional[int]) -> Optional[int]:
+        """Ensure progress is between 0 and 100 if provided"""
+        if v is not None and not 0 <= v <= 100:
+            raise ValueError('Progress must be between 0 and 100')
+        return v
+
+    @field_validator('processing_status')
+    @classmethod
+    def validate_status_if_provided(cls, v: Optional[str]) -> Optional[str]:
+        """Ensure processing_status is valid SessionStatus if provided"""
+        if v is not None:
+            try:
+                SessionStatus(v)
+            except ValueError:
+                valid_values = [status.value for status in SessionStatus]
+                raise ValueError(f'processing_status must be one of: {", ".join(valid_values)}')
+        return v
+
+
 class SessionResponse(SessionBase):
     """Complete session data returned by API"""
     id: UUID
@@ -173,6 +221,35 @@ class SessionResponse(SessionBase):
     created_at: datetime
     updated_at: datetime
     processed_at: Optional[datetime] = None
+
+    # Upheal-inspired fields (Wave 2 Feature Implementation)
+    recording_deleted_at: Optional[datetime] = Field(None, description="When audio file was deleted for privacy")
+    transcript_deleted_at: Optional[datetime] = Field(None, description="When transcript was deleted for privacy")
+    is_anonymous: bool = Field(False, description="Hide client name in UI (show 'Anonymous individual')")
+    ai_summary: Optional[str] = Field(None, description="AI-generated session summary (short, patient-friendly)")
+    processing_status: str = Field("pending", description="Current processing stage (pending, uploading, preprocessing, etc.)")
+    processing_progress: int = Field(0, ge=0, le=100, description="Processing progress percentage (0-100)")
+    duration_mins: Optional[int] = Field(None, description="Session duration in minutes (computed from duration_seconds)")
+    client_display_name: Optional[str] = Field(None, description="Client name or 'Anonymous individual' (computed property)")
+
+    @field_validator('processing_progress')
+    @classmethod
+    def validate_progress_range(cls, v: int) -> int:
+        """Ensure progress is between 0 and 100"""
+        if not 0 <= v <= 100:
+            raise ValueError('Progress must be between 0 and 100')
+        return v
+
+    @field_validator('processing_status')
+    @classmethod
+    def validate_processing_status(cls, v: str) -> str:
+        """Ensure processing_status is a valid SessionStatus value"""
+        try:
+            SessionStatus(v)
+        except ValueError:
+            valid_values = [status.value for status in SessionStatus]
+            raise ValueError(f'processing_status must be one of: {", ".join(valid_values)}')
+        return v
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -625,3 +702,102 @@ class AutoFillResponse(BaseModel):
             if not 0.0 <= score <= 1.0:
                 raise ValueError(f'Confidence score for section "{section}" must be between 0.0 and 1.0')
         return v
+
+
+# ============================================================================
+# Note Template Schemas (User-specific templates)
+# ============================================================================
+
+class NoteTemplateBase(BaseModel):
+    """Base schema for user-specific note templates"""
+    name: str = Field(..., min_length=1, max_length=200, description="Template name")
+    template_type: TemplateType = Field(..., description="Template format type (soap, dap, birp, progress, custom)")
+    template_content: Dict[str, Any] = Field(..., description="Template structure (JSON with sections)")
+    is_default: bool = Field(default=False, description="Whether this is the user's default template")
+
+
+class NoteTemplateCreate(NoteTemplateBase):
+    """Schema for creating a new note template"""
+
+    @field_validator('template_content')
+    @classmethod
+    def validate_template_structure(cls, v: Dict[str, Any]) -> Dict[str, Any]:
+        """Ensure template_content has required structure"""
+        if 'sections' not in v:
+            raise ValueError('template_content must have "sections" key')
+        if not isinstance(v['sections'], list):
+            raise ValueError('sections must be a list')
+        if len(v['sections']) == 0:
+            raise ValueError('template_content must have at least one section')
+        return v
+
+
+class NoteTemplateUpdate(BaseModel):
+    """Schema for updating a note template (partial updates allowed)"""
+    name: Optional[str] = Field(None, min_length=1, max_length=200, description="Updated template name")
+    template_type: Optional[TemplateType] = Field(None, description="Updated template type")
+    template_content: Optional[Dict[str, Any]] = Field(None, description="Updated template structure")
+    is_default: Optional[bool] = Field(None, description="Updated default status")
+
+    @field_validator('template_content')
+    @classmethod
+    def validate_template_structure(cls, v: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+        """Ensure template_content has required structure if provided"""
+        if v is not None:
+            if 'sections' not in v:
+                raise ValueError('template_content must have "sections" key')
+            if not isinstance(v['sections'], list):
+                raise ValueError('sections must be a list')
+            if len(v['sections']) == 0:
+                raise ValueError('template_content must have at least one section')
+        return v
+
+
+class NoteTemplateResponse(NoteTemplateBase):
+    """Schema for note template GET responses"""
+    id: UUID = Field(..., description="Unique template identifier")
+    user_id: UUID = Field(..., description="User who created this template")
+    created_at: datetime = Field(..., description="Template creation timestamp")
+    updated_at: datetime = Field(..., description="Template last update timestamp")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+# Example template_content structure for NoteTemplate
+EXAMPLE_NOTE_TEMPLATE_CONTENT = {
+    "sections": [
+        {
+            "id": "subjective",
+            "name": "Subjective",
+            "prompt": "What the client reported in their own words...",
+            "ai_mapping": ["key_topics", "significant_quotes"],
+            "description": "Client's perspective and self-reported information"
+        },
+        {
+            "id": "objective",
+            "name": "Objective",
+            "prompt": "Observable behaviors, body language, affect...",
+            "ai_mapping": ["emotional_themes", "session_mood"],
+            "description": "Therapist's observations during the session"
+        },
+        {
+            "id": "assessment",
+            "name": "Assessment",
+            "prompt": "Clinical impressions, progress toward goals...",
+            "ai_mapping": ["mood_trajectory"],
+            "description": "Professional assessment and analysis"
+        },
+        {
+            "id": "plan",
+            "name": "Plan",
+            "prompt": "Homework, follow-up topics, next steps...",
+            "ai_mapping": ["action_items", "follow_up_topics"],
+            "description": "Treatment plan and next steps"
+        }
+    ],
+    "metadata": {
+        "format": "soap",
+        "version": "1.0",
+        "auto_fill_enabled": True
+    }
+}
