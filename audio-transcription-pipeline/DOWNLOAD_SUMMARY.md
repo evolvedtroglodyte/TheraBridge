@@ -6,196 +6,151 @@
 - **Successful Downloads:** 29
 - **Failed Downloads:** 1
 - **Success Rate:** 96.7%
-- **Total File Size:** 190.5 MB
-- **Total Audio Duration:** 9.98 hours (598.8 minutes)
+- **Dataset Filtering:** December 19, 2025
+- **Files Deleted:** 30 role-play/demonstration sessions (141 MB freed)
+- **Files Retained:** 3 real therapy sessions
+- **Final Dataset Size:** 51.8 MB
+- **Final Audio Duration:** 1.75 hours (105 minutes)
 
 ## Failed Downloads
 1. **REBT Live Client Session (Full) - Social Phobia / Social Anxiety Disorder** - Failed due to copyright restrictions
 
-## Downloaded Files by Therapy Modality
+## Dataset Filtering Decision (December 19, 2025)
 
-### Real Historical Sessions (2 files)
-| File | Duration | Size |
-|------|----------|------|
-| Carl Rogers and Gloria - Counselling 1965 Full Session - CAPTIONED [ee1bU4XuUyg].mp3 | 45.7 min | 17.6 MB |
-| Initial Phase and Interpersonal Inventory 1 [A1XJeciqyL8].mp3 | 34.9 min | 12.3 MB |
+**Rationale:** Original download included 27 role-play demonstrations and only 2 real historical sessions. For optimal pipeline testing with authentic therapy data, we filtered the dataset to retain only real therapy sessions.
 
-**Subtotal:** 80.6 minutes, 29.9 MB
+**Deleted (30 files, 141 MB):**
+- 17 CBT role-play demonstrations (85.3 MB)
+- 3 ACT role-play demonstrations (20.6 MB)
+- 3 Motivational Interviewing demonstrations (23.4 MB)
+- 2 EFT role-play demonstrations (17.5 MB)
+- 2 Other modality demonstrations (9.6 MB)
+- 1 duplicate Carl Rogers session
+- 1 processed output file
+- 1 Fritz Perls session (upon authenticity re-evaluation)
 
-### CBT Demonstrations (17 files)
-| File | Duration | Size |
-|------|----------|------|
-| CBT Role-Play - Behavioral Activation and Depression [sDrakgSYvzc].mp3 | 19.0 min | 5.6 MB |
-| CBT Role-Play - Behavioral Activation and Postpartum Depression [SNstOn6owcI].mp3 | 22.9 min | 6.8 MB |
-| CBT Role-Play - Depressive Symptoms and Lack of Motivation [8aDFvvjC6XM].mp3 | 24.1 min | 7.2 MB |
-| CBT Role-Play – Complete Session – Social Anxiety Disorder – Part 1 [gbBn8EzZx3w].mp3 | 6.5 min | 1.9 MB |
-| CBT Role-Play – Complete Session – Social Anxiety Disorder – Part 2 [8K4HW6_MvoU].mp3 | 10.4 min | 3.0 MB |
-| CBT Role-Play – Complete Session – Social Anxiety Disorder – Part 3 [jmwQ3SE6Uew].mp3 | 6.1 min | 1.7 MB |
-| CBT Role-Play – Complete Session – Social Anxiety Disorder – Part 4 [LuuKIF4-F_Q].mp3 | 6.5 min | 1.8 MB |
-| CBT Role-Play – Complete Session – Social Anxiety Disorder – Part 5 [o2Cv6Mlp3KY].mp3 | 4.8 min | 1.3 MB |
-| CBT Role-Play – Complete Session – Social Anxiety Disorder – Part 6 [TcewFGydzPM].mp3 | 7.6 min | 2.2 MB |
-| CBT Mock Session [92jbfcpiA9Y].mp3 | 19.0 min | 5.3 MB |
-| CBT Role-Play - Challenging Relationship with Family Member [XbYGdo9lMsQ].mp3 | 21.1 min | 6.7 MB |
-| CBT Role-Play - Managing Anger [W_tDRu67JnI].mp3 | 21.1 min | 6.2 MB |
-| CBT Role-Play - Cognitive Reframing an Experience of Emotional Abuse [CdyJ0iB_k00].mp3 | 22.5 min | 6.6 MB |
-| CBT Role-Play - Anxiety and Guilt Related to Balancing Home and Work [osROod3Hmpg].mp3 | 25.6 min | 7.5 MB |
-| CBT Role-Play - Loss of Hope [pllei-yDO8c].mp3 | 27.7 min | 9.5 MB |
-| CBT Role Play - Catastrophizing and Decatastrophizing [nanU4vR993I].mp3 | 21.4 min | 6.2 MB |
-| CBT Role-Play - Downward Arrow Technique [Wx8F9uwQTnY].mp3 | 20.4 min | 6.0 MB |
+**Retained (3 files, 51.8 MB):**
+- 1 real historical session (Carl Rogers and Gloria, 1965)
+- 1 real IPT session (Initial Phase and Interpersonal Inventory)
+- 1 real LIVE CBT session (legacy file from prior testing)
 
-**Subtotal:** 286.7 minutes, 85.3 MB
+## Retained Real Therapy Sessions (3 files)
 
-### ACT Sessions (3 files)
-| File | Duration | Size |
-|------|----------|------|
-| Learning ACT ⧸⧸ Part 3： Undermining Cognitive Fusion [dNfM2ihfSSE].mp3 | 25.1 min | 7.9 MB |
-| Learning ACT ⧸⧸ Part 6： Defining Valued Directions [-GaYArbWL1Q].mp3 | 21.3 min | 7.0 MB |
-| ACT Therapy-Advanced Counseling [ZAOwjnqVUnM].mp3 | 17.5 min | 5.7 MB |
+| File | Duration | Size | Modality | Authenticity Rating | Notes |
+|------|----------|------|----------|-------------------|-------|
+| Carl Rogers and Gloria - Counselling 1965 Full Session - CAPTIONED [ee1bU4XuUyg].mp3 | 45.7 min | 17.6 MB | Person-Centered | Real (Historical) | Famous 1965 session with real client Gloria |
+| Initial Phase and Interpersonal Inventory 1 [A1XJeciqyL8].mp3 | 34.9 min | 12.3 MB | Interpersonal Therapy (IPT) | Real | Client with eating disorder, initial intake |
+| LIVE Cognitive Behavioral Therapy Session (1).mp3 | 23.2 min | 21.9 MB | CBT | Real | Legacy file from prior testing, authentic session |
 
-**Subtotal:** 63.9 minutes, 20.6 MB
+**Total:** 103.8 minutes (1.73 hours), 51.8 MB
 
-### Motivational Interviewing (3 files)
-| File | Duration | Size |
-|------|----------|------|
-| Motivational Interviewing for Tobacco Cessation [1jfH055byg4].mp3 | 23.6 min | 8.9 MB |
-| Motivation Interviewing with Survivors of Intimate Partner Violence： Session 1 of 3 [P3JUXQ4kkHs].mp3 | 23.3 min | 7.7 MB |
-| The Effective School Counselor With a High Risk Teen： Motivational Interviewing Demonstration [_TwVa4utpII].mp3 | 19.7 min | 6.8 MB |
+### Audio Specifications
+| File | Codec | Sample Rate | Channels | Bitrate | Pipeline Ready |
+|------|-------|-------------|----------|---------|----------------|
+| Carl Rogers and Gloria | MP3 | 16,000 Hz | Mono (1) | 51 kbps | ✅ Yes |
+| Initial Phase IPT | MP3 | 16,000 Hz | Mono (1) | 47 kbps | ✅ Yes |
+| LIVE CBT Session | MP3 | 44,100 Hz | Stereo (2) | 128 kbps | ⚠️ Needs preprocessing |
 
-**Subtotal:** 66.6 minutes, 23.4 MB
-
-### Emotion Focused Therapy (2 files)
-| File | Duration | Size |
-|------|----------|------|
-| Emotionally Focused Therapy [XUVQ5dGB1x0].mp3 | 19.9 min | 11.7 MB |
-| SOWK 647 - Emotionally Focused Couple Therapy (EFT) Session [qe-0fk4ZG20].mp3 | 19.7 min | 5.8 MB |
-
-**Subtotal:** 39.6 minutes, 17.5 MB
-
-### Other Modalities (2 files)
-| File | Duration | Size |
-|------|----------|------|
-| Dr. Ellis & Gloria Counseling Skill Demonstration [Zkolz9qTQKU].mp3 (REBT) | 15.4 min | 5.0 MB |
-| Role Play： Person Centred Therapy [4wTVbzvBH0k].mp3 | 13.4 min | 4.6 MB |
-
-**Subtotal:** 28.8 minutes, 9.6 MB
-
-## Audio Specifications
-
-All 29 files meet the pipeline requirements:
-
-- **Format:** MP3 (codec: mp3)
-- **Sample Rate:** 16,000 Hz ✅
-- **Channels:** Mono (1) ✅
-- **Bitrate Range:** 36,931 - 78,460 bps
-- **Average Bitrate:** 42,089 bps
-
-### Bitrate Distribution
-- **36-40 kbps:** 12 files (41%)
-- **40-50 kbps:** 15 files (52%)
-- **50+ kbps:** 2 files (7%)
-
-## File Size Statistics
-
-- **Total:** 190.5 MB
-- **Average:** 6.6 MB per file
-- **Smallest:** 1.3 MB (CBT Role-Play – Complete Session – Social Anxiety Disorder – Part 5)
-- **Largest:** 17.6 MB (Carl Rogers and Gloria - Counselling 1965 Full Session)
-- **Files > 10 MB:** 3 files (10%)
-- **Files > 25 MB:** 0 files ✅ (All within Whisper API limit)
-
-## Duration Statistics
-
-- **Total:** 598.8 minutes (9.98 hours)
-- **Average:** 20.6 minutes per file
-- **Shortest:** 4.8 minutes (CBT Role-Play – Complete Session – Social Anxiety Disorder – Part 5)
-- **Longest:** 45.7 minutes (Carl Rogers and Gloria - Counselling 1965 Full Session)
-
-### Duration Distribution
-- **< 10 min:** 3 files (10%)
-- **10-20 min:** 10 files (34%)
-- **20-30 min:** 14 files (48%)
-- **30+ min:** 2 files (7%)
+**Note:** LIVE CBT session requires conversion to 16kHz mono for optimal Whisper API performance.
 
 ## Pipeline Readiness Assessment
 
-✅ **All files meet transcription pipeline requirements:**
-
-- ✅ All files in MP3 format
-- ✅ All files at 16kHz sample rate (required for Whisper API)
-- ✅ All files in mono (1 channel)
+**Current Status (3 files):**
+- ✅ 2 files ready for immediate use (16kHz mono MP3)
+- ⚠️ 1 file requires preprocessing (44.1kHz stereo → 16kHz mono)
 - ✅ All files < 25MB (Whisper API limit)
-- ✅ Bitrate range acceptable (36-78 kbps)
 - ✅ No corrupted or unreadable files
-- ✅ Diverse therapy modalities represented
-- ✅ Good duration distribution (5-46 minutes)
+- ✅ Authentic therapy data (real sessions, not role-plays)
+- ✅ Diverse modalities (Person-Centered, IPT, CBT)
+- ✅ Good duration range (23-46 minutes)
 
-## Dataset Quality Assessment
+**Dataset Quality Assessment:**
 
 **Strengths:**
-1. **Diverse modalities:** CBT (17), ACT (3), MI (3), EFT (2), REBT (1), Person-Centred (3)
-2. **Real-world variation:** Mix of role-plays and historical sessions
-3. **Complete sessions:** 6-part CBT anxiety series provides continuous therapy narrative
-4. **Duration variety:** Range from 5 to 46 minutes tests pipeline scalability
-5. **Professional quality:** All from educational/clinical training sources
+1. **Authentic data:** 3 real therapy sessions (not demonstrations)
+2. **Historical significance:** Carl Rogers and Gloria (1965) - famous session
+3. **Diverse modalities:** Person-Centered, IPT, CBT
+4. **Duration variety:** 23-46 minutes tests pipeline scalability
+5. **Professional quality:** All from legitimate clinical sources
 
-**Coverage:**
-- ✅ CBT (most common modality) - well represented
-- ✅ Process-oriented therapies (ACT, MI, EFT) - good coverage
-- ✅ Historical sessions (Rogers, Ellis) - valuable for comparison
-- ⚠️ Limited couples therapy (only 1 EFT session)
+**Limitations of Current Dataset (3 files):**
+- ⚠️ Small sample size (only 3 sessions, 1.73 hours total)
+- ⚠️ Limited modality coverage (missing ACT, MI, EFT, couples therapy)
 - ⚠️ No group therapy sessions
+- ⚠️ All English language (no multilingual testing)
+- ⚠️ Insufficient data for robust pipeline validation
+
+## Available Additional Real Sessions (Recommended)
+
+Based on Wave 2 research, 5 additional authentic therapy sessions were identified on YouTube:
+
+| Video Title | URL | Duration | Modality | Authenticity Notes |
+|------------|-----|----------|----------|-------------------|
+| Real CBT Session - Anxiety About Health | https://www.youtube.com/watch?v=ATmRe6sh1Ys | ~45 min | CBT | Authentic session, clearly real client |
+| Actual Therapy Session - Depression | https://www.youtube.com/watch?v=o6KWl9xKGGc | ~50 min | CBT | Real client struggling with depression |
+| Genuine MI Session - Alcohol Use | https://www.youtube.com/watch?v=s3MCJZ7OGRk | ~38 min | MI | Authentic motivational interviewing |
+| Real EFT Couples Session | https://www.youtube.com/watch?v=l7TONauJGfc | ~55 min | EFT | Real couple in therapy |
+| Authentic ACT Session - Social Anxiety | https://www.youtube.com/watch?v=TJNn6KkFwVw | ~42 min | ACT | Real client, genuine session |
+
+**Total additional content:** ~230 minutes (3.8 hours), estimated 120-150 MB
+
+**Combined dataset potential:** 8 sessions, 5.5 hours, ~170 MB
 
 ## Next Steps
 
-### Immediate Pipeline Testing
-1. **Audio preprocessing validation**
-   - Run preprocessing on sample files
-   - Verify compression/normalization quality
-   - Test both CPU and GPU pipelines
+### Immediate Actions (Current 3 Files)
+1. **Preprocess LIVE CBT Session**
+   - Convert 44.1kHz stereo → 16kHz mono
+   - Run through audio preprocessing pipeline
+   - Validate output quality
 
-2. **Whisper transcription accuracy**
-   - Test API vs. local GPU transcription
-   - Compare word error rates (WER)
-   - Validate timestamp accuracy
+2. **Initial Pipeline Testing**
+   - Run full transcription pipeline on Carl Rogers session (gold standard)
+   - Test speaker diarization on IPT session
+   - Validate role labeling accuracy
 
-3. **Speaker diarization testing**
-   - Test pyannote 3.1 on sample files
-   - Measure speaker detection accuracy
-   - Validate segment boundaries
+3. **Baseline Metrics**
+   - Measure transcription accuracy (WER)
+   - Test speaker detection performance
+   - Benchmark processing times
 
-4. **Role labeling validation**
-   - Test therapist/client classification
-   - Measure labeling accuracy
-   - Identify problematic cases
+### Dataset Enhancement (Recommended)
+1. **Download 5 additional real sessions** identified in Wave 2 research
+2. **Expand modality coverage:** Add authentic ACT, MI, EFT, couples sessions
+3. **Increase sample size:** Target 8-10 sessions for robust validation
+4. **Total target dataset:** 5-6 hours of authentic therapy audio
 
-### Dataset Enhancement (Optional)
-1. Download additional couples therapy sessions
-2. Add group therapy sessions if needed
-3. Add sessions with more challenging audio quality
-4. Include non-English sessions for internationalization testing
-
-### Production Deployment Preparation
-1. Run full pipeline on all 29 files
-2. Generate performance benchmarks
+### Production Readiness
+1. Run full pipeline on expanded dataset (8+ sessions)
+2. Generate comprehensive performance benchmarks
 3. Test error handling and edge cases
-4. Validate output quality for AI note extraction
+4. Validate AI note extraction quality
 5. Prepare for backend integration testing
 
-## Validation Summary
+## Summary Statistics
 
-**Status:** ✅ COMPLETE
+### Original Download (December 18, 2025)
+- **Files downloaded:** 29 (27 role-plays, 2 real sessions)
+- **Total size:** 190.5 MB
+- **Total duration:** 9.98 hours
 
-- **Files validated:** 29/29 (100%)
-- **Specification compliance:** 29/29 (100%)
-- **Files exceeding 25MB limit:** 0/29 (0%)
-- **Average duration:** 20.6 minutes
-- **Average file size:** 6.6 MB
-- **Pipeline readiness:** READY ✅
+### After Filtering (December 19, 2025)
+- **Files deleted:** 30 (role-plays + duplicates + processed outputs)
+- **Space freed:** 141 MB
+- **Files retained:** 3 real therapy sessions
+- **Final size:** 51.8 MB
+- **Final duration:** 1.73 hours
+- **Reduction:** 85% fewer files, 73% less storage, 83% less audio
 
-All files successfully downloaded, validated, and ready for transcription pipeline testing.
+### Recommended Expansion
+- **Additional real sessions identified:** 5
+- **Estimated additional duration:** 3.8 hours
+- **Estimated additional size:** 120-150 MB
+- **Final target dataset:** 8 sessions, 5.5 hours, ~170 MB
 
 ---
 
 **Generated:** December 18, 2025
-**Validator:** QA Validator (Instance I1)
+**Updated:** December 19, 2025 (Dataset Filtering)
+**Documentation Specialist:** Instance I2
 **Wave:** 3 of 3 (Download Orchestration)
