@@ -24,7 +24,7 @@ const patientSWRConfig = {
  */
 export function usePatients() {
   const swr = useSWRTyped<Patient[], ApiError>(
-    '/api/patients/',
+    '/api/v1/patients/',
     fetcher,
     patientSWRConfig
   );
@@ -52,7 +52,7 @@ export function usePatients() {
  */
 export function usePatient(patientId: string | null) {
   const swr = useSWRTyped<Patient, ApiError>(
-    patientId ? `/api/patients/${patientId}` : null,
+    patientId ? `/api/v1/patients/${patientId}` : null,
     fetcher,
     patientSWRConfig
   );

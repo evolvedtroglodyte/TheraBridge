@@ -1,4 +1,5 @@
 import type { Patient, Session, ExtractedNotes, SessionStatus, Template } from './types';
+import { tokenStorage } from './token-storage';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -14,9 +15,12 @@ export class ApiError extends Error {
 }
 
 async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  const accessToken = tokenStorage.getAccessToken();
+
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     headers: {
       'Content-Type': 'application/json',
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...options?.headers,
     },
     ...options,
@@ -59,10 +63,15 @@ export const uploadSession = async (patientId: string, file: File): Promise<Sess
   const formData = new FormData();
   formData.append('file', file);
 
+  const accessToken = tokenStorage.getAccessToken();
+
   const response = await fetch(
     `${API_BASE_URL}/api/v1/sessions/upload?patient_id=${patientId}`,
     {
       method: 'POST',
+      headers: {
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      },
       body: formData,
     }
   );

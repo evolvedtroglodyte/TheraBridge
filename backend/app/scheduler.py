@@ -51,8 +51,8 @@ def start_scheduler():
 
     from app.tasks import register_analytics_jobs, register_export_jobs
 
-    register_analytics_jobs()
-    register_export_jobs()
+    register_analytics_jobs(scheduler)
+    register_export_jobs(scheduler)
     scheduler.start()
     logger.info("✅ Analytics scheduler started")
 

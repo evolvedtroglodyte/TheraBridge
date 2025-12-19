@@ -1,0 +1,23 @@
+{
+  "success_count": 2,
+  "failed_count": 0,
+  "results": [
+    {
+      "url": "https://example.com",
+      "title": "Example Domain",
+      "description": null,
+      "content_length": 166,
+      "links_count": 1,
+      "images_count": 0
+    },
+    {
+      "url": "https://example.org",
+      "title": "Example Domain",
+      "description": null,
+      "content_length": 166,
+      "links_count": 1,
+      "images_count": 0
+    }
+  ],
+  "failed": []
+}

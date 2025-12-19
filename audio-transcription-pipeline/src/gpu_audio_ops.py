@@ -14,7 +14,13 @@ import julius
 
 
 class GPUAudioProcessor:
-    """GPU-accelerated audio processing operations"""
+    """
+    GPU-accelerated audio processing operations
+
+    Recommended usage with context manager (guarantees cleanup):
+        with GPUAudioProcessor() as processor:
+            waveform, sr = processor.load_audio("audio.mp3")
+    """
 
     def __init__(self, device: Optional[torch.device] = None):
         """Initialize with CUDA device (L4 GPU)"""
@@ -30,8 +36,17 @@ class GPUAudioProcessor:
             print(f"[GPUAudio] GPU: {torch.cuda.get_device_name(0)}")
             print(f"[GPUAudio] VRAM: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
 
+    def __enter__(self):
+        """Context manager entry - returns self for use in with block"""
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit - guarantees GPU cleanup even on exception"""
+        self.cleanup_gpu_memory()
+        return False  # Don't suppress exceptions
+
     def __del__(self):
-        """Cleanup GPU resources when processor is destroyed"""
+        """Fallback cleanup for backward compatibility (not guaranteed to execute)"""
         self.cleanup_gpu_memory()
 
     def cleanup_gpu_memory(self):

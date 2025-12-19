@@ -17,7 +17,7 @@ from app.auth.utils import (
     create_refresh_token,
     hash_refresh_token
 )
-from app.auth.config import auth_config
+from app.config import auth_config
 from app.middleware.rate_limit import limiter
 
 
@@ -215,22 +215,34 @@ def refresh_token(request: Request, token_data: TokenRefresh, db: Session = Depe
             detail="User not found or inactive"
         )
 
-    # REVOKE OLD TOKEN (rotation security)
-    session.is_revoked = True
-    db.commit()
-
     # Generate NEW tokens
     new_access_token = create_access_token(user.id, user.role.value)
     new_refresh_token = create_refresh_token()
 
-    # Create NEW session with new refresh token
-    new_session = AuthSession(
-        user_id=user.id,
-        refresh_token=hash_refresh_token(new_refresh_token),
-        expires_at=datetime.utcnow() + timedelta(days=auth_config.REFRESH_TOKEN_EXPIRE_DAYS)
-    )
-    db.add(new_session)
-    db.commit()
+    # ATOMIC TRANSACTION: Revoke old token AND create new session in single commit
+    # This ensures if new session creation fails, old token is NOT revoked
+    try:
+        # Mark old session as revoked
+        session.is_revoked = True
+
+        # Create new session with new refresh token
+        new_session = AuthSession(
+            user_id=user.id,
+            refresh_token=hash_refresh_token(new_refresh_token),
+            expires_at=datetime.utcnow() + timedelta(days=auth_config.REFRESH_TOKEN_EXPIRE_DAYS)
+        )
+        db.add(new_session)
+
+        # Single commit for both operations (atomic)
+        db.commit()
+
+    except Exception as e:
+        # Rollback ensures old token remains valid if new session creation fails
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to refresh token. Please try again."
+        )
 
     return TokenResponse(
         access_token=new_access_token,

@@ -1,16 +1,24 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { apiClient } from './api-client';
 import { tokenStorage } from './token-storage';
 
 interface User {
   id: string;
   email: string;
-  full_name: string;
+  first_name: string;
+  last_name: string;
   role: 'therapist' | 'patient' | 'admin';
   is_active: boolean;
+  is_verified?: boolean;
   created_at: string;
+}
+
+// Helper to get full name from user object
+export function getUserFullName(user: User | null): string {
+  if (!user) return '';
+  return `${user.first_name} ${user.last_name}`.trim();
 }
 
 interface AuthContextType {
@@ -29,12 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check auth status on mount
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async (): Promise<void> => {
+  const checkAuth = useCallback(async (): Promise<void> => {
     if (!tokenStorage.hasTokens()) {
       setIsLoading(false);
       return;
@@ -54,7 +57,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  // Check auth status on mount
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   const login = async (email: string, password: string): Promise<void> => {
     const result = await apiClient.post<{

@@ -377,13 +377,16 @@ async def snapshot_patient_progress() -> Dict[str, int]:
             raise
 
 
-def register_analytics_jobs() -> None:
+def register_analytics_jobs(scheduler) -> None:
     """
     Register all analytics background jobs with APScheduler.
 
     Called during application startup (in app/main.py lifespan handler).
-    Adds scheduled jobs with CronTrigger schedules to the global scheduler
+    Adds scheduled jobs with CronTrigger schedules to the provided scheduler
     instance.
+
+    Args:
+        scheduler: AsyncIOScheduler instance to register jobs with
 
     Jobs Registered:
         1. daily_stats_aggregation: Runs daily at configured hour (default: 00:00 UTC)
@@ -396,12 +399,13 @@ def register_analytics_jobs() -> None:
 
     Usage:
         # In app/main.py lifespan handler:
+        from app.scheduler import scheduler
         from app.tasks.aggregation import register_analytics_jobs
 
         @asynccontextmanager
         async def lifespan(app: FastAPI):
             # Startup
-            register_analytics_jobs()
+            register_analytics_jobs(scheduler)
             yield
             # Shutdown
 
@@ -413,26 +417,11 @@ def register_analytics_jobs() -> None:
 
     Example:
         >>> from app.scheduler import scheduler
-        >>> register_analytics_jobs()
+        >>> register_analytics_jobs(scheduler)
         >>> jobs = scheduler.get_jobs()
         >>> print([job.id for job in jobs])
         ['daily_stats_aggregation', 'weekly_progress_snapshot']
-
-    Dependencies:
-        Requires app.scheduler module to be imported and initialized.
-        The scheduler must be started separately (scheduler.start()).
     """
-    # Import scheduler here to avoid circular dependency
-    # scheduler.py will be created by DevOps Engineer (Instance I3)
-    try:
-        from app.scheduler import scheduler
-    except ImportError:
-        logger.error(
-            "❌ Failed to import scheduler. Ensure app.scheduler module exists. "
-            "Analytics background jobs will not be registered."
-        )
-        return
-
     try:
         from apscheduler.triggers.cron import CronTrigger
     except ImportError:

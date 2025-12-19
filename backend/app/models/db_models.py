@@ -119,7 +119,7 @@ class TherapySession(Base):
     patient_summary = Column(Text)
     risk_flags = Column(JSONB)
 
-    status = Column(String(50), default="pending")
+    status = Column(String(50), default="pending", index=True)
     error_message = Column(Text)
 
     created_at = Column(DateTime, default=datetime.utcnow)

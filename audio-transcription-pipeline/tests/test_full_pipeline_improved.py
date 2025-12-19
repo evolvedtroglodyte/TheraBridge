@@ -354,14 +354,17 @@ def try_interpolation(seg_start: float, seg_end: float, turns: List[Dict], max_g
 # MAIN PIPELINE
 # ============================================================================
 def main():
-    # Input/output paths
-    input_audio = "tests/samples/LIVE Cognitive Behavioral Therapy Session (1).mp3"
-    processed_audio = "tests/outputs/processed_audio.mp3"
-    output_json = "tests/outputs/diarization_output_improved.json"
+    # Input/output paths - use relative paths from test file location
+    script_dir = Path(__file__).parent
+    input_audio = script_dir / "samples" / "LIVE Cognitive Behavioral Therapy Session (1).mp3"
+    processed_audio = script_dir / "outputs" / "processed_audio.mp3"
+    output_json = script_dir / "outputs" / "diarization_output_improved.json"
 
     # Check input exists
-    if not os.path.exists(input_audio):
+    if not input_audio.exists():
         print(f"❌ Input file not found: {input_audio}")
+        print(f"   Expected location: {input_audio.absolute()}")
+        print(f"   Please ensure the sample audio file exists at the expected location.")
         sys.exit(1)
 
     # Get API keys
@@ -381,8 +384,8 @@ def main():
     try:
         # Step 1: Preprocess audio
         print("📌 Step 1: Preprocessing audio...")
-        os.makedirs("outputs", exist_ok=True)
-        processed = preprocess_audio(input_audio, processed_audio)
+        processed_audio.parent.mkdir(parents=True, exist_ok=True)
+        processed = preprocess_audio(str(input_audio), str(processed_audio))
         print()
 
         # Step 2: Transcribe with Whisper
@@ -434,8 +437,8 @@ def main():
 
         output_data = {
             "metadata": {
-                "input_file": input_audio,
-                "processed_file": processed_audio,
+                "input_file": str(input_audio),
+                "processed_file": str(processed_audio),
                 "duration": duration_seconds,
                 "duration_formatted": str(timedelta(seconds=int(duration_seconds))),
                 "total_segments": len(aligned_segments),
@@ -454,8 +457,8 @@ def main():
             "full_text": full_text
         }
 
-        os.makedirs(os.path.dirname(output_json), exist_ok=True)
-        with open(output_json, "w") as f:
+        output_json.parent.mkdir(parents=True, exist_ok=True)
+        with open(str(output_json), "w") as f:
             json.dump(output_data, f, indent=2)
 
         print(f"✅ Results saved to: {output_json}")

@@ -463,7 +463,7 @@ def test_logout_revokes_token(client, therapist_user, therapist_token, db_sessio
     from app.auth.models import AuthSession
     from app.auth.utils import hash_refresh_token, create_refresh_token
     from datetime import datetime, timedelta
-    from app.auth.config import auth_config
+    from app.config import auth_config
 
     # Create a refresh token session
     refresh_token = create_refresh_token()
@@ -494,7 +494,7 @@ def test_refresh_token_creates_new_access_token(client, therapist_user, db_sessi
     from app.auth.models import AuthSession
     from app.auth.utils import hash_refresh_token, create_refresh_token
     from datetime import datetime, timedelta
-    from app.auth.config import auth_config
+    from app.config import auth_config
 
     # Create a refresh token session
     refresh_token = create_refresh_token()
@@ -605,7 +605,7 @@ def test_expired_access_token_rejected(client):
     from datetime import datetime, timedelta
     from uuid import uuid4
     from jose import jwt
-    from app.auth.config import auth_config
+    from app.config import auth_config
 
     # Create an already-expired token
     user_id = uuid4()
@@ -726,7 +726,7 @@ def test_revoked_refresh_token_rejected(client, therapist_user, db_session):
     from app.auth.models import AuthSession
     from app.auth.utils import hash_refresh_token, create_refresh_token
     from datetime import datetime, timedelta
-    from app.auth.config import auth_config
+    from app.config import auth_config
 
     # Create a revoked refresh token
     refresh_token = create_refresh_token()
@@ -823,7 +823,7 @@ def test_all_roles_can_logout(client, therapist_auth_headers, patient_auth_heade
     from app.auth.models import AuthSession
     from app.auth.utils import hash_refresh_token, create_refresh_token
     from datetime import datetime, timedelta
-    from app.auth.config import auth_config
+    from app.config import auth_config
 
     # Create refresh tokens for all users
     tokens = []

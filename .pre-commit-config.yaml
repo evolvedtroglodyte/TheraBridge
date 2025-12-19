@@ -1,0 +1,90 @@
+# Pre-commit hooks for security and code quality
+# Installation: pip install pre-commit && pre-commit install
+# Run manually: pre-commit run --all-files
+# See https://pre-commit.com for more information
+
+repos:
+  # Detect hardcoded secrets, passwords, API keys
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args:
+          - '--baseline'
+          - '.secrets.baseline'
+          - '--exclude-files'
+          - '\.secrets\.baseline$'
+          - '--exclude-files'
+          - 'package-lock\.json$'
+          - '--exclude-files'
+          - 'poetry\.lock$'
+        exclude: |
+          (?x)^(
+              .*\.ipynb|
+              .*\.min\.js|
+              backend/tests/.*|
+              frontend/node_modules/.*
+          )$
+
+  # Standard pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      # Check for large files (>1MB)
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+
+      # Prevent case-insensitive filename conflicts
+      - id: check-case-conflict
+
+      # Detect unresolved merge conflict markers
+      - id: check-merge-conflict
+
+      # Validate YAML files
+      - id: check-yaml
+        exclude: '^frontend/.*\.yaml$'  # Some frontend yamls may have templates
+
+      # Validate JSON files
+      - id: check-json
+
+      # Detect private SSH/TLS keys
+      - id: detect-private-key
+
+      # Ensure files end with newline
+      - id: end-of-file-fixer
+
+      # Remove trailing whitespace
+      - id: trailing-whitespace
+
+      # Prevent commits directly to main/master
+      - id: no-commit-to-branch
+        args: ['--branch', 'main', '--branch', 'master']
+
+      # Detect AWS credentials
+      - id: detect-aws-credentials
+        args: ['--allow-missing-credentials']
+
+  # Python code formatting with Black
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        language_version: python3.13
+        files: '^(backend|audio-transcription-pipeline|Scrapping)/.*\.py$'
+        exclude: '^(backend|audio-transcription-pipeline|Scrapping)/(venv|\.venv|__pycache__)/.*$'
+
+  # Python import sorting
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ['--profile', 'black']
+        files: '^(backend|audio-transcription-pipeline|Scrapping)/.*\.py$'
+
+  # Prettier for frontend code formatting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        files: '^frontend/.*\.(ts|tsx|js|jsx|json|css|md)$'
+        exclude: '^frontend/(node_modules|\.next)/.*$'

@@ -66,7 +66,9 @@ peerbridge proj/
 ├── .claude/                   # Claude Code config (root only)
 │   ├── CLAUDE.md              # This file
 │   ├── agents/cl/
-│   └── commands/cl/
+│   ├── commands/cl/
+│   └── skills/                # Specialized capability extensions
+│       └── crawl4ai/          # Web crawling & data extraction skill
 ├── Project MDs/
 │   └── TherapyBridge.md       # Master documentation
 ├── README.md                  # Root README (project overview)
@@ -273,6 +275,46 @@ python -m pytest  # Run tests
 
 ## Session Log
 
+### 2025-12-18 - Added crawl4ai Skill for Web Crawling ✅
+**Installed comprehensive web crawling and data extraction skill:**
+
+1. **Skill installation** - Added crawl4ai skill to `.claude/skills/`
+   - Complete toolkit for web crawling using Crawl4AI library
+   - 15KB main skill documentation (SKILL.md)
+   - 5,196 line complete SDK reference
+   - 3 ready-to-use scripts (basic crawler, batch crawler, extraction pipeline)
+   - 4 test files with comprehensive examples
+
+2. **Skill capabilities**:
+   - Clean markdown generation from websites (perfect for docs)
+   - Schema-based structured data extraction (10-100x faster than LLM)
+   - JavaScript-heavy page support with dynamic content
+   - Session management for authenticated content
+   - Batch/concurrent crawling for multiple URLs
+   - Anti-detection and proxy support
+
+3. **Documentation updates**:
+   - Added "Available Skills" section to CLAUDE.md
+   - Updated repository structure diagram to include skills/
+   - Documented when and how to use the crawl4ai skill
+   - Added quick example commands and key features list
+
+4. **Use cases supported**:
+   - Website scraping for content or data
+   - Converting documentation sites to markdown
+   - Extracting structured data (products, articles, listings)
+   - Web content monitoring (prices, availability, news)
+   - Research and data collection from web sources
+
+**Files added:**
+- `.claude/skills/crawl4ai/SKILL.md` (complete user guide)
+- `.claude/skills/crawl4ai/references/complete-sdk-reference.md` (full SDK docs)
+- `.claude/skills/crawl4ai/scripts/` (basic_crawler.py, batch_crawler.py, extraction_pipeline.py)
+- `.claude/skills/crawl4ai/tests/` (4 test files + README)
+
+**Files updated:**
+- `.claude/CLAUDE.md` (added Available Skills section and repository structure update)
+
 ### 2025-12-18 - Wave 2 Environment Configuration Audit ✅
 **Standardized environment configuration across all projects:**
 
@@ -476,3 +518,62 @@ If you want to specify the exact number of agents (not recommended - automatic i
 **Documentation:**
 - **Complete methodology:** `.claude/DYNAMIC_WAVE_ORCHESTRATION.md`
 - **Agent with examples & tests:** `.claude/agents/cl/parallel-orchestrator.md`
+
+---
+
+## Available Skills
+
+Skills extend Claude Code with specialized capabilities for specific domains. Skills are automatically available when invoked using the `/skill-name` command.
+
+### crawl4ai - Web Crawling & Data Extraction
+
+**Location:** `.claude/skills/crawl4ai/`
+
+**What it does:**
+- Complete toolkit for web crawling and data extraction using Crawl4AI
+- Clean markdown generation from websites (perfect for documentation sites)
+- Schema-based structured data extraction (10-100x more efficient than LLM extraction)
+- JavaScript-heavy page support with dynamic content handling
+- Session management for authenticated content
+- Batch/concurrent crawling for multiple URLs
+- Anti-detection and proxy support
+
+**When to use:**
+- Scraping websites for content or data
+- Converting documentation sites to markdown
+- Extracting structured data (products, articles, listings)
+- Monitoring web content (prices, availability, news)
+- Research and data collection from web sources
+- Any task involving automated web data gathering
+
+**Quick examples:**
+```bash
+# Simple markdown extraction
+python .claude/skills/crawl4ai/scripts/basic_crawler.py https://example.com
+
+# Batch processing multiple URLs
+python .claude/skills/crawl4ai/scripts/batch_crawler.py urls.txt
+
+# Extract structured data with schema generation
+python .claude/skills/crawl4ai/scripts/extraction_pipeline.py --generate-schema https://shop.com "extract products"
+```
+
+**Resources:**
+- **SKILL.md** - Complete user guide with examples and best practices
+- **complete-sdk-reference.md** - Full SDK documentation (5,196 lines)
+- **scripts/** - Ready-to-use crawling scripts (basic, batch, extraction pipeline)
+- **tests/** - Validated code examples for all major features
+
+**Key features:**
+- ✅ Markdown generation with content filtering
+- ✅ Schema-based extraction (no LLM needed after initial schema generation)
+- ✅ Deep crawling and link discovery
+- ✅ Session persistence and authentication
+- ✅ Proxy and anti-detection support
+- ✅ Concurrent multi-URL processing
+- ✅ JavaScript execution and dynamic content handling
+
+**Installation:**
+Crawl4AI must be installed separately. See `.claude/skills/crawl4ai/SKILL.md` for installation instructions.
+
+---

@@ -14,7 +14,7 @@ from uuid import UUID
 from fastapi import HTTPException, status
 from jose import jwt, JWTError
 from passlib.context import CryptContext
-from app.auth.config import auth_config
+from app.config import auth_config
 
 # Password hashing context using bcrypt
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

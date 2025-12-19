@@ -6,8 +6,14 @@
 pydub==0.25.1
 audioop-lts>=0.2.1
 
+# GPU audio resampling (used by gpu_audio_ops.py for high-quality sinc interpolation)
+julius>=0.2.7
+
 # OpenAI Whisper API
 openai>=1.59.5
+
+# Retry logic with exponential backoff for API resilience
+tenacity>=8.2.0
 
 # Environment management
 python-dotenv>=1.0.0

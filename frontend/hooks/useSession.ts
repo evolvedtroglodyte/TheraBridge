@@ -58,7 +58,7 @@ export function useSession(
   };
 
   const swr = useSWRTyped<Session, ApiError>(
-    sessionId ? `/api/sessions/${sessionId}` : null,
+    sessionId ? `/api/v1/sessions/${sessionId}` : null,
     fetcher,
     {
       // Dynamic refresh interval based on processing status

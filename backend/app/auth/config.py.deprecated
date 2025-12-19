@@ -1,0 +1,26 @@
+"""
+DEPRECATED - DO NOT USE
+
+This file has been deprecated and replaced by the centralized configuration in app/config.py.
+
+ISSUE: This module generated a random SECRET_KEY on each import using secrets.token_urlsafe(32).
+If this file was imported before app.config, the JWT secret would differ from the centralized
+settings, causing authentication to break.
+
+MIGRATION:
+- All imports have been updated to use: from app.config import auth_config
+- The centralized config (app.config.Settings) provides a wrapper AuthConfig class
+- All auth configuration is now centralized with consistent JWT secrets across the application
+
+If you see this file being imported anywhere, it's a bug. Update the import to:
+    from app.config import auth_config
+
+This file is retained only for reference and will be deleted in a future cleanup.
+"""
+
+# This file should not be imported. If you're seeing this, update your imports to:
+# from app.config import auth_config
+
+raise ImportError(
+    "app.auth.config is deprecated. Use 'from app.config import auth_config' instead."
+)

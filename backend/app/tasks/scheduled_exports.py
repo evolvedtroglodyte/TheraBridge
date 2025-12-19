@@ -385,12 +385,15 @@ def calculate_next_run(schedule_type: str, config: dict) -> datetime:
         return now + timedelta(days=1)
 
 
-def register_export_jobs() -> None:
+def register_export_jobs(scheduler) -> None:
     """
     Register scheduled export tasks with APScheduler.
 
     Called during application startup (in app/main.py lifespan handler).
     Adds process_scheduled_reports job to run hourly and check for due reports.
+
+    Args:
+        scheduler: AsyncIOScheduler instance to register jobs with
 
     Jobs Registered:
         - scheduled_reports_processing: Runs every hour on the hour
@@ -403,12 +406,13 @@ def register_export_jobs() -> None:
 
     Usage:
         # In app/main.py lifespan handler:
+        from app.scheduler import scheduler
         from app.tasks.scheduled_exports import register_export_jobs
 
         @asynccontextmanager
         async def lifespan(app: FastAPI):
             # Startup
-            register_export_jobs()
+            register_export_jobs(scheduler)
             yield
             # Shutdown
 
@@ -424,25 +428,11 @@ def register_export_jobs() -> None:
 
     Example:
         >>> from app.scheduler import scheduler
-        >>> register_export_jobs()
+        >>> register_export_jobs(scheduler)
         >>> jobs = scheduler.get_jobs()
         >>> print([job.id for job in jobs])
         ['scheduled_reports_processing']
-
-    Dependencies:
-        Requires app.scheduler module to be imported and initialized.
-        The scheduler must be started separately (scheduler.start()).
     """
-    # Import scheduler here to avoid circular dependency
-    try:
-        from app.scheduler import scheduler
-    except ImportError:
-        logger.error(
-            "❌ Failed to import scheduler. Ensure app.scheduler module exists. "
-            "Scheduled export jobs will not be registered."
-        )
-        return
-
     try:
         from apscheduler.triggers.cron import CronTrigger
     except ImportError:

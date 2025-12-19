@@ -20,8 +20,16 @@ from app.database import Base
 # Import auth models (User, AuthSession for authentication)
 from app.auth.models import User, AuthSession
 
-# Import therapy session models
-from app.models.db_models import Session as DBSession
+# Import core session and patient models from db_models
+from app.models.db_models import (
+    TherapySession,
+    Patient,
+    TherapistPatient,
+    TimelineEvent,
+    NoteTemplate,
+    SessionNote,
+    TemplateUsage
+)
 
 # Import analytics models for Feature 2
 from app.models.analytics_models import SessionMetrics, DailyStats, PatientProgress
@@ -34,6 +42,36 @@ from app.models.tracking_models import (
     AssessmentScore,
     ProgressMilestone,
     GoalReminder
+)
+
+# Import treatment plan models for Feature 4
+from app.models.treatment_models import (
+    TreatmentPlan,
+    TreatmentPlanGoal,
+    Intervention,
+    GoalIntervention,
+    GoalProgress,
+    PlanReview
+)
+
+# Import security and compliance models for HIPAA compliance
+from app.models.security_models import (
+    AuditLog,
+    SecurityEvent,
+    MFAConfig,
+    UserSession,
+    AccessRequest,
+    EmergencyAccess,
+    ConsentRecord,
+    EncryptionKey
+)
+
+# Import export and reporting models for Feature 7
+from app.models.export_models import (
+    ExportTemplate,
+    ExportJob,
+    ExportAuditLog,
+    ScheduledReport
 )
 
 # this is the Alembic Config object, which provides

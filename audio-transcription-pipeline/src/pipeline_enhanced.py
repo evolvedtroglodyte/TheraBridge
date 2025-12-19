@@ -409,7 +409,7 @@ class SpeakerDiarizer:
         return turns
 
 
-class AudioTranscriptionPipeline:
+class EnhancedAudioTranscriptionPipeline:
     """Main pipeline with comprehensive performance tracking"""
 
     def __init__(self, enable_performance_logging: bool = True, output_dir: str = None):
@@ -611,7 +611,7 @@ def main():
     import json
 
     # Initialize enhanced pipeline
-    pipeline = AudioTranscriptionPipeline(
+    pipeline = EnhancedAudioTranscriptionPipeline(
         enable_performance_logging=True,
         output_dir="outputs/performance_logs"
     )

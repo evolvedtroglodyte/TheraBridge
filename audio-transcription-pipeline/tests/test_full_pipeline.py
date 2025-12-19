@@ -419,8 +419,10 @@ def main():
     else:
         audio_file = script_dir / "samples/onemintestvid.mp3"
 
-    if not os.path.exists(audio_file):
+    if not audio_file.exists():
         print(f"ERROR: Audio file not found: {audio_file}")
+        print(f"   Expected location: {audio_file.absolute()}")
+        print(f"   Please ensure the sample audio file exists or provide a path as argument.")
         return
 
     print(f"\nInput: {audio_file}")

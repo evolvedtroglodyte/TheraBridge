@@ -26,6 +26,7 @@ from pathlib import Path
 
 from pydantic import Field, field_validator, PostgresDsn, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Annotated
 
 
 class Environment(str, Enum):
@@ -160,7 +161,9 @@ class Settings(BaseSettings):
     # CORS Configuration
     # ============================================
 
-    CORS_ORIGINS: List[str] = Field(
+    # Use str annotation to prevent pydantic-settings from auto-parsing as JSON
+    # The field_validator will convert comma-separated string to List[str]
+    CORS_ORIGINS: str | List[str] = Field(
         default=[
             "http://localhost:3000",
             "http://localhost:5173",
@@ -189,7 +192,9 @@ class Settings(BaseSettings):
         description="Maximum upload file size in megabytes"
     )
 
-    ALLOWED_AUDIO_FORMATS: List[str] = Field(
+    # Use str annotation to prevent pydantic-settings from auto-parsing as JSON
+    # The field_validator will convert comma-separated string to List[str]
+    ALLOWED_AUDIO_FORMATS: str | List[str] = Field(
         default=["mp3", "wav", "m4a", "ogg", "flac"],
         description="Allowed audio file formats"
     )
@@ -245,6 +250,52 @@ class Settings(BaseSettings):
         ge=60,
         le=3600,
         description="Cache TTL for analytics endpoints (60s-1h)"
+    )
+
+    # ============================================
+    # Email Service Configuration
+    # ============================================
+
+    EMAIL_PROVIDER: str = Field(
+        default="smtp",
+        description="Email provider: 'smtp', 'sendgrid', or 'ses' (default: smtp)"
+    )
+
+    EMAIL_FROM: str = Field(
+        default="noreply@therapybridge.com",
+        description="From email address for outgoing emails"
+    )
+
+    EMAIL_API_KEY: Optional[SecretStr] = Field(
+        default=None,
+        description="API key for SendGrid or AWS SES (required if EMAIL_PROVIDER is sendgrid/ses)"
+    )
+
+    SMTP_HOST: str = Field(
+        default="localhost",
+        description="SMTP server hostname (required if EMAIL_PROVIDER is smtp)"
+    )
+
+    SMTP_PORT: int = Field(
+        default=587,
+        ge=1,
+        le=65535,
+        description="SMTP server port (default: 587 for STARTTLS)"
+    )
+
+    SMTP_USERNAME: Optional[str] = Field(
+        default=None,
+        description="SMTP authentication username (optional, required for authenticated SMTP)"
+    )
+
+    SMTP_PASSWORD: Optional[SecretStr] = Field(
+        default=None,
+        description="SMTP authentication password (optional, required for authenticated SMTP)"
+    )
+
+    FRONTEND_URL: str = Field(
+        default="http://localhost:3000",
+        description="Frontend URL for email verification links and password resets"
     )
 
     # ============================================
@@ -357,6 +408,8 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore",  # Allow extra env vars to exist
+        # Disable JSON parsing for env vars - handle parsing in validators instead
+        env_parse_enums=True,
     )
 
     # ============================================
@@ -387,19 +440,33 @@ class Settings(BaseSettings):
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
-    def parse_cors_origins(cls, v):
+    def parse_cors_origins(cls, v) -> List[str]:
         """Parse CORS_ORIGINS from comma-separated string or list."""
         if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",")]
-        return v
+            # Handle empty string
+            if not v.strip():
+                return []
+            # Split comma-separated values and strip whitespace
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
+        if isinstance(v, list):
+            return v
+        # Fallback for any other type
+        return []
 
     @field_validator("ALLOWED_AUDIO_FORMATS", mode="before")
     @classmethod
-    def parse_audio_formats(cls, v):
+    def parse_audio_formats(cls, v) -> List[str]:
         """Parse ALLOWED_AUDIO_FORMATS from comma-separated string or list."""
         if isinstance(v, str):
-            return [fmt.strip().lower() for fmt in v.split(",")]
-        return v
+            # Handle empty string
+            if not v.strip():
+                return []
+            # Split comma-separated values, strip whitespace, and lowercase
+            return [fmt.strip().lower() for fmt in v.split(",") if fmt.strip()]
+        if isinstance(v, list):
+            return [fmt.lower() if isinstance(fmt, str) else str(fmt) for fmt in v]
+        # Fallback for any other type
+        return []
 
     @field_validator("LOG_LEVEL")
     @classmethod
@@ -410,6 +477,16 @@ class Settings(BaseSettings):
         if v_upper not in valid_levels:
             raise ValueError(f"LOG_LEVEL must be one of {valid_levels}")
         return v_upper
+
+    @field_validator("EMAIL_PROVIDER")
+    @classmethod
+    def validate_email_provider(cls, v: str) -> str:
+        """Ensure EMAIL_PROVIDER is valid."""
+        valid_providers = {"smtp", "sendgrid", "ses"}
+        v_lower = v.lower()
+        if v_lower not in valid_providers:
+            raise ValueError(f"EMAIL_PROVIDER must be one of {valid_providers}")
+        return v_lower
 
     # ============================================
     # Post-initialization validation
@@ -470,6 +547,22 @@ class Settings(BaseSettings):
 
         # Create upload directory if it doesn't exist
         self.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+        # Email service configuration validation
+        # Only validate if email provider is configured (not using default 'smtp' with localhost)
+        if self.EMAIL_PROVIDER == "sendgrid" or self.EMAIL_PROVIDER == "ses":
+            if not self.EMAIL_API_KEY:
+                print(
+                    f"WARNING: EMAIL_PROVIDER is set to '{self.EMAIL_PROVIDER}' but EMAIL_API_KEY is not configured. "
+                    f"Email sending will fail. Set EMAIL_API_KEY in .env file."
+                )
+        elif self.EMAIL_PROVIDER == "smtp":
+            # Only warn if SMTP is configured with non-default host
+            if self.SMTP_HOST != "localhost" and (not self.SMTP_USERNAME or not self.SMTP_PASSWORD):
+                print(
+                    f"WARNING: SMTP_HOST is set to '{self.SMTP_HOST}' but SMTP_USERNAME/SMTP_PASSWORD are not configured. "
+                    f"Authenticated SMTP will fail. Set SMTP_USERNAME and SMTP_PASSWORD in .env file."
+                )
 
     # ============================================
     # Computed Properties

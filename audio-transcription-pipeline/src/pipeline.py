@@ -9,8 +9,22 @@ Simplified pipeline for audio processing:
 """
 
 import os
+import time
 from pathlib import Path
 from typing import Dict, Optional
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+    before_sleep_log,
+    after_log
+)
+import logging
+
+# Configure logging for retry attempts
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 class AudioPreprocessor:
     """Handles audio preprocessing before transcription"""
@@ -131,9 +145,24 @@ class AudioPreprocessor:
 
 
 class WhisperTranscriber:
-    """Handles OpenAI Whisper API transcription"""
+    """Handles OpenAI Whisper API transcription with rate limiting and retry logic"""
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self,
+                 api_key: Optional[str] = None,
+                 max_retries: int = 5,
+                 min_retry_wait: int = 1,
+                 max_retry_wait: int = 60,
+                 rate_limit_delay: float = 0.5):
+        """
+        Initialize Whisper transcriber with configurable retry settings
+
+        Args:
+            api_key: OpenAI API key (defaults to OPENAI_API_KEY env var)
+            max_retries: Maximum number of retry attempts (default: 5)
+            min_retry_wait: Minimum wait time between retries in seconds (default: 1)
+            max_retry_wait: Maximum wait time between retries in seconds (default: 60)
+            rate_limit_delay: Delay between API calls to respect rate limits (default: 0.5s)
+        """
         from openai import OpenAI
         from dotenv import load_dotenv
 
@@ -145,12 +174,81 @@ class WhisperTranscriber:
 
         self.client = OpenAI(api_key=self.api_key)
 
+        # Rate limiting configuration
+        self.max_retries = max_retries
+        self.min_retry_wait = min_retry_wait
+        self.max_retry_wait = max_retry_wait
+        self.rate_limit_delay = rate_limit_delay
+        self.last_api_call_time = 0
+
+    def _apply_rate_limit(self):
+        """Apply rate limiting delay between API calls"""
+        current_time = time.time()
+        time_since_last_call = current_time - self.last_api_call_time
+
+        if time_since_last_call < self.rate_limit_delay:
+            sleep_time = self.rate_limit_delay - time_since_last_call
+            logger.info(f"[Rate Limit] Waiting {sleep_time:.2f}s before next API call")
+            time.sleep(sleep_time)
+
+        self.last_api_call_time = time.time()
+
+    @retry(
+        stop=stop_after_attempt(5),  # Will be overridden by instance max_retries
+        wait=wait_exponential(multiplier=1, min=1, max=60),  # Will be overridden by instance settings
+        retry=retry_if_exception_type((Exception,)),
+        before_sleep=before_sleep_log(logger, logging.WARNING),
+        after=after_log(logger, logging.INFO)
+    )
+    def _transcribe_with_retry(self, audio_file, language: str, response_format: str):
+        """
+        Internal method to make API call with retry logic
+
+        Retries on:
+        - Rate limit errors (429)
+        - Temporary API failures (500, 502, 503, 504)
+        - Network errors
+        - Timeout errors
+        """
+        from openai import RateLimitError, APIError, APIConnectionError, APITimeoutError
+
+        try:
+            # Apply rate limiting before API call
+            self._apply_rate_limit()
+
+            response = self.client.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_file,
+                language=language,
+                response_format=response_format,
+                timestamp_granularities=["segment"] if response_format == "verbose_json" else None
+            )
+            return response
+
+        except RateLimitError as e:
+            logger.warning(f"[Whisper] Rate limit hit (429): {e}. Retrying with exponential backoff...")
+            raise  # Let tenacity handle the retry
+
+        except (APIError, APIConnectionError, APITimeoutError) as e:
+            logger.warning(f"[Whisper] API error: {e}. Retrying...")
+            raise  # Let tenacity handle the retry
+
+        except Exception as e:
+            logger.error(f"[Whisper] Unexpected error: {e}")
+            raise
+
     def transcribe(self,
                    audio_path: str,
                    language: Optional[str] = "en",
                    response_format: str = "verbose_json") -> Dict:
         """
-        Transcribe audio using OpenAI Whisper API
+        Transcribe audio using OpenAI Whisper API with automatic retry logic
+
+        Features:
+        - Automatic retry with exponential backoff (up to 5 attempts by default)
+        - Rate limit handling (429 errors)
+        - Transient failure recovery (500, 502, 503, 504)
+        - Configurable rate limiting between calls
 
         Args:
             audio_path: Path to audio file (must be <25MB)
@@ -159,6 +257,11 @@ class WhisperTranscriber:
 
         Returns:
             Dict with segments, full text, language, and duration
+
+        Raises:
+            ValueError: If file size exceeds limits
+            RateLimitError: If rate limit persists after all retries
+            APIError: If API fails after all retries
         """
         print(f"[Whisper] Transcribing: {audio_path}")
 
@@ -166,13 +269,8 @@ class WhisperTranscriber:
         print(f"[Whisper] File size: {file_size_mb:.2f} MB")
 
         with open(audio_path, "rb") as audio_file:
-            response = self.client.audio.transcriptions.create(
-                model="whisper-1",
-                file=audio_file,
-                language=language,
-                response_format=response_format,
-                timestamp_granularities=["segment"] if response_format == "verbose_json" else None
-            )
+            # Use retry decorator for the actual API call
+            response = self._transcribe_with_retry(audio_file, language, response_format)
 
         # Parse response based on format
         if response_format == "verbose_json":

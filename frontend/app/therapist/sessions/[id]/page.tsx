@@ -77,7 +77,7 @@ export default function SessionDetailPage({ params }: PageProps) {
     );
   }
 
-  const notes = session.extracted_notes;
+  const extractedNotes = session.extracted_notes;
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
@@ -115,8 +115,8 @@ export default function SessionDetailPage({ params }: PageProps) {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {notes?.session_mood && (
-                <MoodIndicator mood={notes.session_mood} trajectory={notes.mood_trajectory} />
+              {extractedNotes?.session_mood && (
+                <MoodIndicator mood={extractedNotes.session_mood} trajectory={extractedNotes.mood_trajectory} />
               )}
               {session.status === 'processed' && (
                 <Button onClick={() => setIsNoteModalOpen(true)}>
@@ -157,7 +157,7 @@ export default function SessionDetailPage({ params }: PageProps) {
         )}
       </Card>
 
-      {notes && (
+      {extractedNotes && (
         <>
           {/* Clinical Summary */}
           <Card>
@@ -166,7 +166,7 @@ export default function SessionDetailPage({ params }: PageProps) {
               <CardDescription>Therapist notes for clinical record</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">{notes.therapist_notes}</p>
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">{extractedNotes.therapist_notes}</p>
             </CardContent>
           </Card>
 
@@ -177,41 +177,41 @@ export default function SessionDetailPage({ params }: PageProps) {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-wrap gap-2">
-                {notes.key_topics.map((topic, index) => (
+                {extractedNotes.key_topics.map((topic, index) => (
                   <Badge key={index} variant="secondary">
                     {topic}
                   </Badge>
                 ))}
               </div>
-              <p className="text-sm text-muted-foreground">{notes.topic_summary}</p>
+              <p className="text-sm text-muted-foreground">{extractedNotes.topic_summary}</p>
             </CardContent>
           </Card>
 
           {/* Strategies and Triggers */}
-          {(notes.strategies.length > 0 || notes.triggers.length > 0) && (
+          {(extractedNotes.strategies.length > 0 || extractedNotes.triggers.length > 0) && (
             <div className="grid gap-6 md:grid-cols-2">
-              {notes.strategies.length > 0 && (
+              {extractedNotes.strategies.length > 0 && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
                     <Target className="w-5 h-5" />
-                    Strategies ({notes.strategies.length})
+                    Strategies ({extractedNotes.strategies.length})
                   </h3>
                   <div className="space-y-3">
-                    {notes.strategies.map((strategy, index) => (
+                    {extractedNotes.strategies.map((strategy, index) => (
                       <StrategyCard key={index} strategy={strategy} />
                     ))}
                   </div>
                 </div>
               )}
 
-              {notes.triggers.length > 0 && (
+              {extractedNotes.triggers.length > 0 && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
                     <AlertTriangle className="w-5 h-5" />
-                    Triggers ({notes.triggers.length})
+                    Triggers ({extractedNotes.triggers.length})
                   </h3>
                   <div className="space-y-3">
-                    {notes.triggers.map((trigger, index) => (
+                    {extractedNotes.triggers.map((trigger, index) => (
                       <TriggerCard key={index} trigger={trigger} />
                     ))}
                   </div>
@@ -221,14 +221,14 @@ export default function SessionDetailPage({ params }: PageProps) {
           )}
 
           {/* Action Items */}
-          {notes.action_items.length > 0 && (
+          {extractedNotes.action_items.length > 0 && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <CheckCircle className="w-5 h-5" />
-                Action Items ({notes.action_items.length})
+                Action Items ({extractedNotes.action_items.length})
               </h3>
               <div className="grid gap-3 md:grid-cols-2">
-                {notes.action_items.map((item, index) => (
+                {extractedNotes.action_items.map((item, index) => (
                   <ActionItemCard key={index} actionItem={item} />
                 ))}
               </div>
@@ -244,16 +244,16 @@ export default function SessionDetailPage({ params }: PageProps) {
               <div className="flex items-center gap-4">
                 <p className="text-sm font-medium">Session Mood:</p>
                 <MoodIndicator
-                  mood={notes.session_mood}
-                  trajectory={notes.mood_trajectory}
+                  mood={extractedNotes.session_mood}
+                  trajectory={extractedNotes.mood_trajectory}
                   size="md"
                 />
               </div>
-              {notes.emotional_themes.length > 0 && (
+              {extractedNotes.emotional_themes.length > 0 && (
                 <div>
                   <p className="text-sm font-medium mb-2">Emotional Themes:</p>
                   <div className="flex flex-wrap gap-2">
-                    {notes.emotional_themes.map((theme, index) => (
+                    {extractedNotes.emotional_themes.map((theme, index) => (
                       <Badge key={index} variant="outline">
                         {theme}
                       </Badge>
@@ -265,16 +265,16 @@ export default function SessionDetailPage({ params }: PageProps) {
           </Card>
 
           {/* Significant Quotes */}
-          {notes.significant_quotes.length > 0 && (
+          {extractedNotes.significant_quotes.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Quote className="w-5 h-5" />
-                  Significant Quotes ({notes.significant_quotes.length})
+                  Significant Quotes ({extractedNotes.significant_quotes.length})
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {notes.significant_quotes.map((quoteObj, index) => (
+                {extractedNotes.significant_quotes.map((quoteObj, index) => (
                   <div key={index} className="border-l-4 border-primary pl-4 py-2">
                     <p className="text-sm italic mb-2">&ldquo;{quoteObj.quote}&rdquo;</p>
                     <p className="text-xs text-muted-foreground">Context: {quoteObj.context}</p>
@@ -285,16 +285,16 @@ export default function SessionDetailPage({ params }: PageProps) {
           )}
 
           {/* Risk Flags */}
-          {notes.risk_flags.length > 0 && (
+          {extractedNotes.risk_flags.length > 0 && (
             <Card className="border-red-200 bg-red-50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-red-900">
                   <AlertTriangle className="w-5 h-5" />
-                  Risk Flags ({notes.risk_flags.length})
+                  Risk Flags ({extractedNotes.risk_flags.length})
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {notes.risk_flags.map((flag, index) => (
+                {extractedNotes.risk_flags.map((flag, index) => (
                   <div key={index} className="bg-white p-4 rounded-md border border-red-200">
                     <div className="flex items-start justify-between mb-2">
                       <p className="font-semibold text-red-900">{flag.type}</p>
@@ -308,17 +308,17 @@ export default function SessionDetailPage({ params }: PageProps) {
           )}
 
           {/* Follow-up Topics */}
-          {(notes.follow_up_topics.length > 0 || notes.unresolved_concerns.length > 0) && (
+          {(extractedNotes.follow_up_topics.length > 0 || extractedNotes.unresolved_concerns.length > 0) && (
             <Card>
               <CardHeader>
                 <CardTitle>Follow-up Topics & Unresolved Concerns</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {notes.follow_up_topics.length > 0 && (
+                {extractedNotes.follow_up_topics.length > 0 && (
                   <div>
                     <p className="text-sm font-medium mb-2">Follow-up Topics:</p>
                     <ul className="list-disc list-inside space-y-1">
-                      {notes.follow_up_topics.map((topic, index) => (
+                      {extractedNotes.follow_up_topics.map((topic, index) => (
                         <li key={index} className="text-sm text-muted-foreground">
                           {topic}
                         </li>
@@ -326,11 +326,11 @@ export default function SessionDetailPage({ params }: PageProps) {
                     </ul>
                   </div>
                 )}
-                {notes.unresolved_concerns.length > 0 && (
+                {extractedNotes.unresolved_concerns.length > 0 && (
                   <div>
                     <p className="text-sm font-medium mb-2">Unresolved Concerns:</p>
                     <ul className="list-disc list-inside space-y-1">
-                      {notes.unresolved_concerns.map((concern, index) => (
+                      {extractedNotes.unresolved_concerns.map((concern, index) => (
                         <li key={index} className="text-sm text-muted-foreground">
                           {concern}
                         </li>

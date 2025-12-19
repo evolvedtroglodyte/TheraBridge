@@ -454,9 +454,13 @@ def generate_terminal_output(data):
     print(f"\n{PURPLE}{'='*60}{RESET}\n")
 
 def main():
+    # Default path relative to script location
+    script_dir = Path(__file__).parent
+    default_input = script_dir / "outputs" / "diarization_output.json"
+
     parser = argparse.ArgumentParser(description='Generate formatted output from diarization JSON')
     parser.add_argument('--input', '-i',
-                       default='tests/outputs/diarization_output.json',
+                       default=str(default_input),
                        help='Input JSON file path')
     parser.add_argument('--format', '-f',
                        choices=['html', 'markdown', 'terminal', 'all'],
@@ -466,17 +470,20 @@ def main():
     args = parser.parse_args()
 
     # Check if input file exists
-    if not os.path.exists(args.input):
-        print(f"❌ Error: Input file not found: {args.input}")
+    input_path = Path(args.input)
+    if not input_path.exists():
+        print(f"❌ Error: Input file not found: {input_path}")
+        print(f"   Expected location: {input_path.absolute()}")
+        print(f"   Please ensure the diarization output file exists or provide a path with --input")
         sys.exit(1)
 
     # Load the data
-    print(f"📖 Loading diarization output from: {args.input}")
-    data = load_diarization_output(args.input)
+    print(f"📖 Loading diarization output from: {input_path}")
+    data = load_diarization_output(str(input_path))
 
     # Generate outputs based on format choice
-    output_dir = Path(args.input).parent
-    base_name = Path(args.input).stem
+    output_dir = input_path.parent
+    base_name = input_path.stem
 
     if args.format in ['markdown', 'all']:
         md_path = output_dir / f"{base_name}_formatted.md"
