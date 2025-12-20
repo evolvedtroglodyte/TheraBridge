@@ -243,3 +243,72 @@ def pytest_collection_modifyitems(config, items):
                 item.add_marker(pytest.mark.skip(reason="Integration test requires OPENAI_API_KEY"))
             elif not has_hf:
                 item.add_marker(pytest.mark.skip(reason="Integration test requires HF_TOKEN"))
+
+
+# ============================================================================
+# Mock Fixtures for GPU Pipeline Testing
+# ============================================================================
+
+@pytest.fixture
+def mock_gpu_available(monkeypatch):
+    """Mock torch.cuda.is_available to return True"""
+    import torch
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+
+
+@pytest.fixture
+def mock_cudnn_error():
+    """
+    Fixture to create a mock cuDNN error for testing fallback behavior.
+
+    Returns a RuntimeError with cuDNN error message.
+    """
+    return RuntimeError("cuDNN error: CUDNN_STATUS_NOT_SUPPORTED")
+
+
+@pytest.fixture
+def mock_whisper_model_with_cudnn_error(monkeypatch, mock_cudnn_error):
+    """
+    Mock WhisperModel to raise cuDNN error on GPU, succeed on CPU.
+
+    This simulates the real-world scenario where cuDNN has compatibility
+    issues on certain systems, requiring CPU fallback.
+    """
+    original_whisper_model = None
+
+    class MockWhisperModel:
+        def __init__(self, model_name, device, compute_type, **kwargs):
+            # First call (GPU) raises cuDNN error, second call (CPU) succeeds
+            if device == "cuda":
+                raise mock_cudnn_error
+            # CPU call succeeds - create minimal mock
+            self.device = device
+            self.model_name = model_name
+
+        def transcribe(self, audio_path, **kwargs):
+            # Return minimal mock response
+            class MockInfo:
+                language = "en"
+                duration = 60.0
+
+            class MockSegment:
+                def __init__(self, text, start, end):
+                    self.text = text
+                    self.start = start
+                    self.end = end
+
+            segments = [MockSegment("Test transcription", 0.0, 60.0)]
+            return segments, MockInfo()
+
+    try:
+        from faster_whisper import WhisperModel
+        original_whisper_model = WhisperModel
+        monkeypatch.setattr("faster_whisper.WhisperModel", MockWhisperModel)
+    except ImportError:
+        pass  # faster_whisper not installed, skip mocking
+
+    yield MockWhisperModel
+
+    # Restore original if it was saved
+    if original_whisper_model is not None:
+        monkeypatch.setattr("faster_whisper.WhisperModel", original_whisper_model)

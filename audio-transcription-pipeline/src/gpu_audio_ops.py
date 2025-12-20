@@ -134,8 +134,28 @@ class GPUAudioProcessor:
     def trim_silence_gpu(self, waveform: torch.Tensor,
                         threshold_db: float = -40.0,
                         min_silence_duration: float = 0.5,
-                        sample_rate: int = 16000) -> torch.Tensor:
-        """Remove leading and trailing silence using GPU"""
+                        sample_rate: int = 16000,
+                        enable: bool = False) -> torch.Tensor:
+        """
+        Remove leading and trailing silence using GPU
+
+        Args:
+            waveform: Input audio waveform tensor
+            threshold_db: Silence threshold in decibels (default: -40.0)
+            min_silence_duration: Minimum silence duration in seconds (default: 0.5)
+            sample_rate: Audio sample rate (default: 16000)
+            enable: Whether to perform silence trimming (default: False)
+                   Note: Disabled by default for MVP to avoid performance bottleneck
+                   (~537s overhead on 45-min audio). Enable only if needed.
+
+        Returns:
+            Trimmed waveform (or original if enable=False)
+        """
+        if not enable:
+            # Skip silence trimming for performance (default behavior)
+            return waveform
+
+        # Original silence trimming logic (only runs if enable=True)
         silence_mask, silence_regions = self.detect_silence_gpu(
             waveform, threshold_db, min_silence_duration, sample_rate
         )

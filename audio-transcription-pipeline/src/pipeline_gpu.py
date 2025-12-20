@@ -38,14 +38,19 @@ class GPUTranscriptionPipeline:
 
     def __init__(self,
                  whisper_model: str = "large-v3",
-                 config: Optional[GPUConfig] = None):
+                 config: Optional[GPUConfig] = None,
+                 enable_silence_trimming: bool = False):
         """
         Initialize GPU pipeline with auto-configuration
 
         Args:
             whisper_model: faster-whisper model size (base, small, medium, large-v3)
             config: Optional GPU config (auto-detected if None)
+            enable_silence_trimming: Enable silence trimming during preprocessing (default: False)
+                                    Note: Disabled by default for performance. Adds ~537s overhead
+                                    on 45-min audio files. Enable only if absolutely needed.
         """
+        self.enable_silence_trimming = enable_silence_trimming
         # Auto-detect optimal configuration
         self.config = config or get_optimal_config()
 
@@ -57,6 +62,9 @@ class GPUTranscriptionPipeline:
 
         self.device = torch.device("cuda")
         self.whisper_model = whisper_model
+
+        # Track CPU fallback status (set to True if cuDNN errors force CPU mode)
+        self.used_cpu_fallback = False
 
         # Initialize performance logger
         log_dir = Path(self.config.model_cache_dir).parent / "logs"
@@ -169,6 +177,7 @@ class GPUTranscriptionPipeline:
                 'duration': transcription['duration'],
                 'speaker_turns': speaker_turns,
                 'provider': self.config.provider.value,
+                'used_cpu_fallback': self.used_cpu_fallback,
                 'performance_metrics': self.logger.get_summary()
             }
 
@@ -185,6 +194,10 @@ class GPUTranscriptionPipeline:
             print(f"Processing Time: {total_time:.1f}s")
             print(f"Speed: {speed_factor:.1f}x real-time")
             print(f"GPU Utilization: {self._get_avg_gpu_util():.1f}%")
+            if self.used_cpu_fallback:
+                print(f"Device: CPU (fallback due to cuDNN error)")
+            else:
+                print(f"Device: GPU (CUDA)")
             print(f"Segments: {len(transcription['segments'])}")
             if enable_diarization:
                 print(f"Speaker Turns: {len(speaker_turns)}")
@@ -211,8 +224,15 @@ class GPUTranscriptionPipeline:
             self.logger.log(f"Loaded: shape={waveform.shape}, sr={sample_rate}")
 
         with self.logger.subprocess("gpu_silence_trimming"):
-            waveform = self.audio_processor.trim_silence_gpu(waveform, sample_rate=sample_rate)
-            self.logger.log(f"Trimmed: shape={waveform.shape}")
+            waveform = self.audio_processor.trim_silence_gpu(
+                waveform,
+                sample_rate=sample_rate,
+                enable=self.enable_silence_trimming
+            )
+            if self.enable_silence_trimming:
+                self.logger.log(f"Trimmed: shape={waveform.shape}")
+            else:
+                self.logger.log(f"Silence trimming disabled (performance optimization)")
 
         with self.logger.subprocess("gpu_normalization"):
             waveform = self.audio_processor.normalize_gpu(waveform)
@@ -228,7 +248,12 @@ class GPUTranscriptionPipeline:
         return output_path
 
     def _transcribe_gpu(self, audio_path: str, language: str) -> Dict:
-        """Transcribe using faster-whisper on GPU"""
+        """
+        Transcribe using faster-whisper on GPU with automatic CPU fallback
+
+        Automatically falls back to CPU mode if cuDNN errors occur during model loading.
+        This ensures the pipeline works on any system, even if cuDNN has compatibility issues.
+        """
         try:
             if self.transcriber is None:
                 with self.logger.subprocess("whisper_model_loading"):
@@ -236,16 +261,52 @@ class GPUTranscriptionPipeline:
                     self.logger.log(f"Loading {self.whisper_model} model...")
                     start_load = time.perf_counter()
 
-                    self.transcriber = WhisperModel(
-                        self.whisper_model,
-                        device="cuda",
-                        compute_type=self.config.compute_type,
-                        num_workers=self.config.num_workers,
-                        download_root=self.config.model_cache_dir
-                    )
+                    try:
+                        # Attempt GPU-accelerated model loading
+                        self.transcriber = WhisperModel(
+                            self.whisper_model,
+                            device="cuda",
+                            compute_type=self.config.compute_type,
+                            num_workers=self.config.num_workers,
+                            download_root=self.config.model_cache_dir
+                        )
+                        self.logger.log(f"Successfully loaded on GPU (device=cuda)")
+
+                    except RuntimeError as e:
+                        # Check if this is a cuDNN-related error
+                        if "cuDNN" in str(e) or "cudnn" in str(e).lower():
+                            # Log the cuDNN error and fallback to CPU
+                            self.logger.log(
+                                f"cuDNN error detected: {str(e)}",
+                                level="WARNING"
+                            )
+                            self.logger.log(
+                                "Falling back to CPU mode for transcription (slower but reliable)",
+                                level="WARNING"
+                            )
+
+                            # Load model on CPU instead
+                            self.transcriber = WhisperModel(
+                                self.whisper_model,
+                                device="cpu",
+                                compute_type="int8",  # CPU-compatible compute type
+                                num_workers=self.config.num_workers,
+                                download_root=self.config.model_cache_dir
+                            )
+
+                            # Mark that we used CPU fallback
+                            self.used_cpu_fallback = True
+                            self.logger.log(
+                                "Successfully loaded on CPU (device=cpu)",
+                                level="WARNING"
+                            )
+                        else:
+                            # Not a cuDNN error - re-raise the exception
+                            raise
 
                     load_time = time.perf_counter() - start_load
-                    self.logger.log(f"Model loaded in {load_time:.2f}s")
+                    device_info = "CPU (fallback)" if self.used_cpu_fallback else "GPU"
+                    self.logger.log(f"Model loaded on {device_info} in {load_time:.2f}s")
 
             with self.logger.subprocess("whisper_inference"):
                 start_time = time.perf_counter()
@@ -569,12 +630,13 @@ def main():
     import sys
 
     if len(sys.argv) < 2:
-        print("Usage: python pipeline_gpu.py <audio_file> [--num-speakers N] [--no-diarization]")
+        print("Usage: python pipeline_gpu.py <audio_file> [--num-speakers N] [--no-diarization] [--enable-silence-trimming]")
         sys.exit(1)
 
     audio_file = sys.argv[1]
     num_speakers = 2
     enable_diarization = True
+    enable_silence_trimming = False
 
     # Parse arguments
     if "--num-speakers" in sys.argv:
@@ -584,8 +646,15 @@ def main():
     if "--no-diarization" in sys.argv:
         enable_diarization = False
 
+    if "--enable-silence-trimming" in sys.argv:
+        enable_silence_trimming = True
+        print("[Performance] Warning: Silence trimming enabled. This adds ~537s overhead on 45-min files.")
+
     # Process using context manager (guarantees cleanup)
-    with GPUTranscriptionPipeline(whisper_model="large-v3") as pipeline:
+    with GPUTranscriptionPipeline(
+        whisper_model="large-v3",
+        enable_silence_trimming=enable_silence_trimming
+    ) as pipeline:
         result = pipeline.process(
             audio_file,
             num_speakers=num_speakers,

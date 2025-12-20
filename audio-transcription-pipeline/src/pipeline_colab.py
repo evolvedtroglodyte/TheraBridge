@@ -21,7 +21,8 @@ class ColabTranscriptionPipeline:
     def __init__(self,
                  whisper_model: str = "large-v3",
                  device: str = "cuda",
-                 compute_type: str = "float16"):
+                 compute_type: str = "float16",
+                 enable_silence_trimming: bool = False):
         """
         Initialize pipeline for Colab L4 GPU
 
@@ -29,7 +30,9 @@ class ColabTranscriptionPipeline:
             whisper_model: faster-whisper model size
             device: Must be "cuda" for L4
             compute_type: "float16" for optimal L4 performance
+            enable_silence_trimming: Enable silence trimming (default: False for performance)
         """
+        self.enable_silence_trimming = enable_silence_trimming
         # Verify CUDA availability
         if not torch.cuda.is_available():
             raise RuntimeError("CUDA not available. This pipeline requires GPU.")
@@ -137,9 +140,16 @@ class ColabTranscriptionPipeline:
             self.logger.log(f"[Preprocess] Loaded to GPU: shape={waveform.shape}, sr={sample_rate}")
 
         with self.logger.subprocess("gpu_silence_trimming"):
-            # Trim silence on GPU
-            waveform = self.audio_processor.trim_silence_gpu(waveform, sample_rate=sample_rate)
-            self.logger.log(f"[Preprocess] Trimmed: shape={waveform.shape}")
+            # Trim silence on GPU (disabled by default for performance)
+            waveform = self.audio_processor.trim_silence_gpu(
+                waveform,
+                sample_rate=sample_rate,
+                enable=self.enable_silence_trimming
+            )
+            if self.enable_silence_trimming:
+                self.logger.log(f"[Preprocess] Trimmed: shape={waveform.shape}")
+            else:
+                self.logger.log(f"[Preprocess] Silence trimming disabled (performance optimization)")
 
         with self.logger.subprocess("gpu_normalization"):
             # Normalize on GPU
