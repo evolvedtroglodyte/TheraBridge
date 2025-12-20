@@ -1,14 +1,16 @@
 'use client';
 
 /**
- * Timeline sidebar component
- * - Vertical gradient connector line
- * - Colored dots for mood (star icons for milestones)
- * - Click to show popover with session preview
- * - Enhanced popover matching PAGE_LAYOUT_ARCHITECTURE.md spec
- * - Keyboard accessible (Escape to close)
- * - Click outside to close
- * - FIXED: Dark mode support
+ * Timeline sidebar component - FIXED per PAGE_LAYOUT_ARCHITECTURE.md
+ *
+ * SPEC REQUIREMENTS:
+ * - Vertical gradient connector line (teal → lavender → coral)
+ * - Mood-colored dots (10px) for regular sessions
+ * - Star icons (14px with glow) ONLY for milestone sessions
+ * - Popover appears to the LEFT of timeline (not right!)
+ * - Click entry → scroll to session card in grid
+ * - Sticky positioning (stays visible while scrolling)
+ * - No emojis - use colored dots instead
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -35,8 +37,8 @@ export function TimelineSidebar({ onViewSession, onScrollToSession }: TimelineSi
     const isClosing = selectedEntry?.sessionId === entry.sessionId;
     setSelectedEntry(isClosing ? null : entry);
 
-    // Scroll to card when opening (not when closing)
-    if (!isClosing && onScrollToSession) {
+    // ALWAYS scroll to card when clicking (even if popover is open)
+    if (onScrollToSession) {
       onScrollToSession(entry.sessionId);
     }
   };
@@ -100,16 +102,16 @@ export function TimelineSidebar({ onViewSession, onScrollToSession }: TimelineSi
 
       {/* Timeline Entries */}
       <div className="relative">
-        {/* Gradient Connector Line */}
+        {/* Gradient Connector Line - centered under dots (left: 11px centers a 2px line under 10px dots at left:7px) */}
         <div
-          className="absolute left-[7px] top-0 bottom-0 w-[2px]"
+          className="absolute left-[11px] top-2 bottom-2 w-[2px]"
           style={{
             background: 'linear-gradient(180deg, #5AB9B4 0%, #B8A5D6 50%, #F4A69D 100%)'
           }}
         />
 
         {/* Entries */}
-        <div className="space-y-6 relative">
+        <div className="space-y-4 relative">
           {timelineData.map((entry) => {
             const moodColor = getMoodColor(entry.mood);
             const isMilestone = !!entry.milestone;
@@ -121,24 +123,25 @@ export function TimelineSidebar({ onViewSession, onScrollToSession }: TimelineSi
                   onClick={() => handleEntryClick(entry)}
                   aria-expanded={isSelected}
                   aria-haspopup="dialog"
-                  className={`flex items-start gap-4 w-full text-left rounded-lg p-2 -ml-2 transition-all duration-200
+                  data-session-id={entry.sessionId}
+                  className={`flex items-start gap-3 w-full text-left rounded-lg py-2 px-1 transition-all duration-200
                     ${isSelected
                       ? 'bg-gray-100 dark:bg-[#3d3548] ring-2 ring-[#5AB9B4]/50 dark:ring-[#a78bfa]/50'
                       : 'hover:bg-gray-50 dark:hover:bg-[#3d3548]/50'
                     }`}
                 >
-                  {/* Timeline Dot/Icon */}
-                  <div className="relative flex-shrink-0">
+                  {/* Timeline Dot/Icon - SPEC: dots 10px, stars 14px with glow */}
+                  <div className="relative flex-shrink-0 w-6 flex items-center justify-center">
                     {isMilestone ? (
                       <Star
-                        className="w-[14px] h-[14px] text-amber-600 fill-amber-600 relative z-10"
+                        className="w-[14px] h-[14px] text-amber-500 fill-amber-400 relative z-10"
                         style={{
-                          filter: 'drop-shadow(0 0 4px rgba(251,191,36,0.4))'
+                          filter: 'drop-shadow(0 0 6px rgba(251,191,36,0.5))'
                         }}
                       />
                     ) : (
                       <div
-                        className={`w-[10px] h-[10px] rounded-full relative z-10 transition-transform duration-200 ${
+                        className={`w-[10px] h-[10px] rounded-full relative z-10 transition-transform duration-200 ring-2 ring-white dark:ring-[#2a2435] ${
                           isSelected ? 'scale-125' : 'hover:scale-110'
                         }`}
                         style={{ backgroundColor: moodColor }}
@@ -151,14 +154,14 @@ export function TimelineSidebar({ onViewSession, onScrollToSession }: TimelineSi
                     <p className="text-[13px] font-medium text-gray-800 dark:text-gray-200">{entry.date}</p>
                     <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{entry.topic}</p>
                     {isMilestone && (
-                      <p className="text-[11px] italic text-amber-700 dark:text-amber-500 mt-0.5">
+                      <p className="text-[11px] italic text-amber-700 dark:text-amber-400 mt-0.5">
                         {entry.milestone?.title.split(':')[0]}
                       </p>
                     )}
                   </div>
                 </button>
 
-                {/* Enhanced Popover */}
+                {/* FIXED: Popover appears to the LEFT (right-full = positioned to the left of parent) */}
                 <AnimatePresence>
                   {isSelected && (
                     <motion.div
@@ -170,12 +173,12 @@ export function TimelineSidebar({ onViewSession, onScrollToSession }: TimelineSi
                       role="dialog"
                       aria-label={`Session ${entry.sessionId.replace('s', '')} details`}
                       tabIndex={-1}
-                      className="absolute left-full ml-3 top-0 w-[300px] bg-white dark:bg-[#2a2435] rounded-xl shadow-2xl p-5 z-50 border-2 border-gray-200 dark:border-[#4a4258]"
+                      className="absolute right-full mr-3 top-0 w-[300px] bg-white dark:bg-[#2a2435] rounded-xl shadow-2xl p-5 z-50 border-2 border-gray-200 dark:border-[#4a4258]"
                     >
-                      {/* Arrow pointing to timeline entry */}
-                      <div className="absolute right-full top-4">
-                        <div className="w-0 h-0 border-t-[8px] border-b-[8px] border-r-[10px] border-transparent border-r-gray-200 dark:border-r-[#4a4258]" />
-                        <div className="absolute top-[-6px] left-[2px] w-0 h-0 border-t-[6px] border-b-[6px] border-r-[8px] border-transparent border-r-white dark:border-r-[#2a2435]" />
+                      {/* Arrow pointing RIGHT (toward the timeline entry) */}
+                      <div className="absolute left-full top-4">
+                        <div className="w-0 h-0 border-t-[8px] border-b-[8px] border-l-[10px] border-transparent border-l-gray-200 dark:border-l-[#4a4258]" />
+                        <div className="absolute top-[-6px] right-[2px] w-0 h-0 border-t-[6px] border-b-[6px] border-l-[8px] border-transparent border-l-white dark:border-l-[#2a2435]" />
                       </div>
 
                       {/* Header: Session number + date */}

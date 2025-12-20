@@ -397,16 +397,199 @@ async def run_vast_pipeline(job_id: str, audio_path: Path, num_speakers: int = 2
         jobs[job_id]["progress"] = 10
         jobs[job_id]["step"] = f"Connecting to Vast.ai instance {VAST_INSTANCE_ID}"
 
-        # This would need to be implemented based on your Vast.ai setup
-        # Could use SSH, API, or other remote execution method
+        # Get SSH connection details
+        result = subprocess.run(
+            ["vastai", "show", "instances"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            env={**os.environ, "VAST_API_KEY": VAST_API_KEY}
+        )
 
-        # For now, return an error indicating implementation needed
-        jobs[job_id]["status"] = "failed"
-        jobs[job_id]["error"] = "Vast.ai pipeline execution not yet implemented. Use local GPU or implement remote execution."
+        ssh_host = None
+        ssh_port = None
+
+        if result.returncode == 0:
+            for line in result.stdout.split('\n'):
+                if line.startswith(VAST_INSTANCE_ID):
+                    parts = line.split()
+                    if len(parts) > 11:
+                        ssh_host = parts[9]  # SSH host
+                        ssh_port = parts[10]  # SSH port
+                        break
+
+        if not ssh_host or not ssh_port:
+            jobs[job_id]["status"] = "failed"
+            jobs[job_id]["error"] = "Could not get SSH details for Vast.ai instance"
+            return
+
+        jobs[job_id]["progress"] = 20
+        jobs[job_id]["step"] = f"Uploading to Vast.ai ({ssh_host}:{ssh_port})"
+
+        # Upload audio file via SCP
+        upload_cmd = [
+            "scp",
+            "-o", "StrictHostKeyChecking=no",
+            "-o", "UserKnownHostsFile=/dev/null",
+            "-P", ssh_port,
+            str(audio_path),
+            f"root@{ssh_host}:/root/audio_input.mp3"
+        ]
+
+        print(f"[Vast.ai] Uploading audio to instance...")
+        upload_process = await asyncio.create_subprocess_exec(
+            *upload_cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        await upload_process.communicate()
+
+        jobs[job_id]["progress"] = 40
+        jobs[job_id]["step"] = "Running GPU pipeline on Vast.ai"
+
+        # Create remote processing script
+        remote_script = f"""#!/bin/bash
+set -e
+
+echo "==> Checking environment..."
+if [ ! -d "TheraBridge" ]; then
+    echo "==> Cloning repository..."
+    git clone -q https://github.com/evolvedtroglodyte/TheraBridge.git
+fi
+
+cd TheraBridge/audio-transcription-pipeline
+
+echo "==> Installing dependencies..."
+pip install -q torch torchaudio faster-whisper pyannote.audio pydub
+
+export HF_TOKEN={os.getenv('HF_TOKEN', '')}
+
+echo "==> Processing audio with GPU pipeline..."
+python3 << 'EOF'
+import os
+import json
+import sys
+from pathlib import Path
+
+sys.path.insert(0, 'src')
+
+from pipeline_gpu import GPUTranscriptionPipeline
+
+with GPUTranscriptionPipeline(whisper_model="large-v3") as pipeline:
+    results = pipeline.process(
+        audio_path="/root/audio_input.mp3",
+        num_speakers={num_speakers},
+        language="en",
+        enable_diarization=True
+    )
+
+with open('/root/results.json', 'w') as f:
+    json.dump(results, f, indent=2, default=str)
+
+print("Processing complete!")
+EOF
+"""
+
+        # Save script locally
+        script_path = TEMP_DIR / f"{job_id}_remote.sh"
+        script_path.write_text(remote_script)
+
+        # Upload script
+        script_upload_cmd = [
+            "scp",
+            "-o", "StrictHostKeyChecking=no",
+            "-o", "UserKnownHostsFile=/dev/null",
+            "-P", ssh_port,
+            str(script_path),
+            f"root@{ssh_host}:/root/process.sh"
+        ]
+
+        await asyncio.create_subprocess_exec(
+            *script_upload_cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+
+        jobs[job_id]["progress"] = 50
+        jobs[job_id]["step"] = "Processing audio on GPU"
+
+        # Execute script on remote
+        ssh_cmd = [
+            "ssh",
+            "-o", "StrictHostKeyChecking=no",
+            "-o", "UserKnownHostsFile=/dev/null",
+            "-p", ssh_port,
+            f"root@{ssh_host}",
+            "bash /root/process.sh"
+        ]
+
+        print(f"[Vast.ai] Executing pipeline on remote GPU...")
+        process = await asyncio.create_subprocess_exec(
+            *ssh_cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+
+        stdout, stderr = await process.communicate()
+
+        if process.returncode != 0:
+            jobs[job_id]["status"] = "failed"
+            jobs[job_id]["error"] = f"Remote execution failed: {stderr.decode()}"
+            print(f"[Vast.ai] Failed: {stderr.decode()}")
+            return
+
+        jobs[job_id]["progress"] = 80
+        jobs[job_id]["step"] = "Downloading results"
+
+        # Download results
+        output_file = RESULTS_DIR / f"{job_id}.json"
+        download_cmd = [
+            "scp",
+            "-o", "StrictHostKeyChecking=no",
+            "-o", "UserKnownHostsFile=/dev/null",
+            "-P", ssh_port,
+            f"root@{ssh_host}:/root/results.json",
+            str(output_file)
+        ]
+
+        download_process = await asyncio.create_subprocess_exec(
+            *download_cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+
+        await download_process.communicate()
+
+        if output_file.exists():
+            jobs[job_id]["status"] = "completed"
+            jobs[job_id]["progress"] = 100
+            jobs[job_id]["step"] = "Processing complete"
+            jobs[job_id]["output_file"] = str(output_file)
+            print(f"[Vast.ai] Completed: {output_file}")
+        else:
+            jobs[job_id]["status"] = "failed"
+            jobs[job_id]["error"] = "Could not download results from Vast.ai"
+
+        # Cleanup remote files
+        cleanup_cmd = [
+            "ssh",
+            "-o", "StrictHostKeyChecking=no",
+            "-o", "UserKnownHostsFile=/dev/null",
+            "-p", ssh_port,
+            f"root@{ssh_host}",
+            "rm -f /root/audio_input.mp3 /root/results.json /root/process.sh"
+        ]
+
+        await asyncio.create_subprocess_exec(
+            *cleanup_cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
 
     except Exception as e:
         jobs[job_id]["status"] = "failed"
         jobs[job_id]["error"] = str(e)
+        print(f"[Vast.ai] Exception: {e}")
 
     finally:
         # Cleanup temp file

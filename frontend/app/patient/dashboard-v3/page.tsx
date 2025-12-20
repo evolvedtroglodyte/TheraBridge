@@ -74,7 +74,7 @@ export default function DashboardV3Page() {
                 onSessionClose={() => setSelectedSessionId(null)}
               />
             </div>
-            <div className="h-[650px] sticky top-[84px]">
+            <div className="h-[650px]">
               <TimelineSidebar
                 onViewSession={(sessionId) => setSelectedSessionId(sessionId)}
                 onScrollToSession={handleScrollToSession}
