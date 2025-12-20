@@ -51,6 +51,54 @@ const elements = {
 };
 
 // ========================================
+// GPU Status Check
+// ========================================
+async function checkGPUStatus() {
+    const statusElement = document.getElementById('gpuStatus');
+    const statusIcon = document.getElementById('gpuStatusIcon');
+    const statusText = document.getElementById('gpuStatusText');
+
+    try {
+        const response = await fetch(`${API_CONFIG.baseUrl}/api/gpu-status`);
+        const status = await response.json();
+
+        if (status.available) {
+            statusElement.className = 'gpu-status available';
+            statusIcon.textContent = '✅';
+            if (status.type === 'local') {
+                statusText.textContent = `GPU Ready: ${status.gpu_name || 'Local GPU'}`;
+            } else if (status.type === 'vast') {
+                statusText.textContent = `Vast.ai Ready: Instance ${status.vast_instance}`;
+            } else {
+                statusText.textContent = 'GPU Available';
+            }
+            // Enable upload button if file is selected
+            if (state.selectedFile) {
+                elements.uploadBtn.disabled = false;
+            }
+        } else {
+            statusElement.className = 'gpu-status unavailable';
+            statusIcon.textContent = '❌';
+            statusText.textContent = 'No GPU Available';
+            // Disable upload button
+            elements.uploadBtn.disabled = true;
+
+            // Show detailed error in console
+            console.error('GPU Status:', status.message);
+        }
+    } catch (error) {
+        statusElement.className = 'gpu-status unavailable';
+        statusIcon.textContent = '⚠️';
+        statusText.textContent = 'Cannot connect to server';
+        elements.uploadBtn.disabled = true;
+        console.error('Failed to check GPU status:', error);
+    }
+}
+
+// Check GPU status on page load and periodically
+setInterval(checkGPUStatus, 30000); // Check every 30 seconds
+
+// ========================================
 // Theme Management
 // ========================================
 function initTheme() {
@@ -113,7 +161,9 @@ function handleFileSelect(file) {
 
     state.selectedFile = file;
     displayFileInfo(file);
-    elements.uploadBtn.disabled = false;
+
+    // Check GPU status before enabling upload button
+    checkGPUStatus();
 }
 
 function displayFileInfo(file) {
@@ -589,6 +639,7 @@ function initEventListeners() {
 function init() {
     initTheme();
     initEventListeners();
+    checkGPUStatus(); // Check GPU status on load
 
     console.log('Audio Diarization Pipeline UI initialized');
     console.log('Supported formats:', ALLOWED_EXTENSIONS.join(', '));
