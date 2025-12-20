@@ -199,7 +199,7 @@ async function uploadAndProcess(file) {
     try {
         // 1. Upload file to server
         const formData = new FormData();
-        formData.append('audio', file);
+        formData.append('file', file);
 
         const uploadResponse = await fetch(`${API_CONFIG.baseUrl}${API_CONFIG.endpoints.upload}`, {
             method: 'POST',
