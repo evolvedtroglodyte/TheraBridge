@@ -22,8 +22,8 @@ else
 fi
 cd TheraBridge/audio-transcription-pipeline
 
-# Set HuggingFace token
-export HF_TOKEN=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
+# Set HuggingFace token from environment (user must set before running)
+# export HF_TOKEN=your_token_here  # Set this in your environment or .env file
 
 echo "==> Checking if audio file exists..."
 if [ ! -f "/root/test_audio.mp3" ]; then

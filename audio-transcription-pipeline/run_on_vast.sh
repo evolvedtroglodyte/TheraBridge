@@ -73,8 +73,8 @@ fi
 git clone -q https://github.com/evolvedtroglodyte/TheraBridge.git
 cd TheraBridge/audio-transcription-pipeline
 
-# Set HuggingFace token
-export HF_TOKEN=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
+# Set HuggingFace token from environment (user must set before running)
+# export HF_TOKEN=your_token_here  # Set this in your environment or .env file
 
 echo "==> Processing audio with GPU pipeline..."
 python3 << 'PYTHON_SCRIPT'
