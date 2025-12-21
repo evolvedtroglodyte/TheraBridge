@@ -533,17 +533,22 @@ export LD_LIBRARY_PATH=$(python3 -c 'import os; import nvidia.cublas.lib; import
 echo "✓ LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
 
 # Install pyannote.audio 4.x (will install PyTorch 2.8.0 as dependency)
-echo "==> [STEP 3/5] Installing pyannote.audio 4.x with PyTorch 2.8.0..."
+echo "==> [STEP 3/6] Installing pyannote.audio 4.x with PyTorch 2.8.0..."
 pip install --no-cache-dir --upgrade "pyannote.audio>=4.0.0"
 echo "✓ pyannote.audio installed"
 
+# Install torchvision compatible with PyTorch 2.8.0
+echo "==> [STEP 4/6] Installing torchvision 0.21.0 (compatible with PyTorch 2.8.0)..."
+pip install --no-cache-dir torchvision==0.21.0
+echo "✓ torchvision 0.21.0 installed"
+
 # Install faster-whisper (compatible with PyTorch 2.8.0)
-echo "==> [STEP 4/5] Installing faster-whisper..."
+echo "==> [STEP 5/6] Installing faster-whisper..."
 pip install --no-cache-dir faster-whisper>=1.2.0
 echo "✓ faster-whisper installed"
 
 # Install additional dependencies
-echo "==> [STEP 5/5] Installing additional dependencies (pydub, julius, python-dotenv)..."
+echo "==> [STEP 6/6] Installing additional dependencies (pydub, julius, python-dotenv)..."
 pip install --no-cache-dir pydub julius python-dotenv
 echo "✓ All dependencies installed"
 
