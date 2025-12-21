@@ -5,7 +5,16 @@
  * - Timeline and chat conversation data
  */
 
-import { Session, Task, ProgressMetric, ChatMessage, TimelineEntry } from './types';
+import {
+  Session,
+  Task,
+  ProgressMetric,
+  ChatMessage,
+  TimelineEntry,
+  MajorEventEntry,
+  SessionTimelineEvent,
+  TimelineEvent
+} from './types';
 
 export const sessions: Session[] = [
   {
@@ -264,6 +273,9 @@ export const chatPrompts: string[] = [
   'Send message to my therapist'
 ];
 
+/**
+ * @deprecated Use unifiedTimeline instead for mixed event support
+ */
 export const timelineData: TimelineEntry[] = sessions.map(s => ({
   sessionId: s.id,
   date: s.date,
@@ -273,6 +285,110 @@ export const timelineData: TimelineEntry[] = sessions.map(s => ({
   mood: s.mood,
   milestone: s.milestone
 }));
+
+// ============================================
+// Major Events (from Chatbot, AI-detected)
+// ============================================
+
+/**
+ * Major events detected from chatbot conversations.
+ * These are significant life events that the AI identified
+ * and the patient confirmed should appear on their timeline.
+ */
+export const majorEvents: MajorEventEntry[] = [
+  {
+    id: 'me1',
+    eventType: 'major_event',
+    date: 'Dec 14',
+    timestamp: new Date('2024-12-14'),
+    title: 'Got promoted at work',
+    summary: 'Received a promotion to Senior Developer role after successfully leading the Q4 project. This represents growth in managing work stress and perfectionism.',
+    chatContext: 'Patient shared excitement about promotion while also expressing anxiety about increased responsibilities. Discussed how therapy strategies helped manage imposter syndrome during the interview process.',
+    relatedSessionId: 's8',  // Dec 3 - Work stress session
+    confirmedByPatient: true,
+    reflection: undefined
+  },
+  {
+    id: 'me2',
+    eventType: 'major_event',
+    date: 'Nov 22',
+    timestamp: new Date('2024-11-22'),
+    title: 'Set boundary with mother about holidays',
+    summary: 'Had a difficult but successful conversation with mother about limiting holiday visit duration. Applied assertiveness techniques from therapy.',
+    chatContext: 'Patient reported feeling anxious before the conversation but proud afterward. Used I-statements and stayed calm when mother initially pushed back.',
+    relatedSessionId: 's6',  // Nov 19 - Depression/Isolation (closest session)
+    confirmedByPatient: true,
+    reflection: 'This was so hard but I did it! Mom was upset at first but she understood eventually.'
+  },
+  {
+    id: 'me3',
+    eventType: 'major_event',
+    date: 'Nov 8',
+    timestamp: new Date('2024-11-08'),
+    title: 'Started daily meditation practice',
+    summary: 'Committed to 10-minute daily meditation after discussing coping strategies. Has maintained the practice for 3 weeks.',
+    chatContext: 'Patient asked about additional self-care practices. AI suggested meditation as complement to TIPP technique. Patient reported trying it and finding it helpful for morning anxiety.',
+    relatedSessionId: 's5',  // Nov 12 - Active listening/communication (closest)
+    confirmedByPatient: true,
+    reflection: undefined
+  },
+  {
+    id: 'me4',
+    eventType: 'major_event',
+    date: 'Oct 25',
+    timestamp: new Date('2024-10-25'),
+    title: 'First panic-free week in months',
+    summary: 'Went an entire week without a panic attack for the first time since starting therapy. TIPP and grounding techniques proving effective.',
+    chatContext: 'Patient excitedly shared this milestone in chat. Discussed what contributed to success and how to maintain progress.',
+    relatedSessionId: 's2',  // Oct 22 - DBT skills/TIPP
+    confirmedByPatient: true,
+    reflection: 'I never thought I could do this. The techniques actually work when I use them consistently.'
+  }
+];
+
+// ============================================
+// Unified Timeline (Sessions + Major Events)
+// ============================================
+
+/**
+ * Helper to convert Session to SessionTimelineEvent
+ */
+const sessionToTimelineEvent = (s: Session): SessionTimelineEvent => ({
+  id: `session-${s.id}`,
+  eventType: 'session',
+  date: s.date,
+  timestamp: parseDateString(s.date),
+  sessionId: s.id,
+  duration: s.duration,
+  topic: s.topics.join(', '),
+  strategy: s.strategy,
+  mood: s.mood,
+  milestone: s.milestone
+});
+
+/**
+ * Parse display date string to Date object for sorting.
+ * Assumes current year (2024) for dates like "Dec 17"
+ */
+function parseDateString(dateStr: string): Date {
+  const months: Record<string, number> = {
+    'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+    'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+  };
+  const parts = dateStr.split(' ');
+  const month = months[parts[0]];
+  const day = parseInt(parts[1], 10);
+  return new Date(2024, month, day);
+}
+
+/**
+ * Unified timeline combining sessions and major events.
+ * Sorted chronologically (newest first).
+ */
+export const unifiedTimeline: TimelineEvent[] = [
+  ...sessions.map(sessionToTimelineEvent),
+  ...majorEvents
+].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
 export const notesGoalsContent = {
   summary: "Based on 10 sessions, you've made remarkable progress in your therapeutic journey.",

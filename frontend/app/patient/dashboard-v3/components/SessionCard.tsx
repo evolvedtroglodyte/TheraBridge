@@ -96,10 +96,10 @@ export function SessionCard({ session, onClick, id }: SessionCardProps) {
             <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-200 dark:bg-[#3d3548] opacity-50 -translate-x-1/2" />
 
             {/* Left Column - Topics */}
-            <div className="pr-3">
+            <div className="pr-3 min-w-0">
               <ul className="space-y-2.5">
                 {session.topics.map((topic, idx) => (
-                  <li key={idx} className="text-[15px] font-[350] text-gray-700 dark:text-gray-300 leading-relaxed">
+                  <li key={idx} className="text-[15px] font-[350] text-gray-700 dark:text-gray-300 leading-relaxed break-words">
                     {topic}
                   </li>
                 ))}
@@ -107,8 +107,8 @@ export function SessionCard({ session, onClick, id }: SessionCardProps) {
             </div>
 
             {/* Right Column - Strategy */}
-            <div className="pl-3">
-              <p className="text-[15px] font-semibold text-[#5AB9B4] dark:text-[#a78bfa] leading-relaxed">
+            <div className="pl-3 min-w-0">
+              <p className="text-[15px] font-semibold text-[#5AB9B4] dark:text-[#a78bfa] leading-relaxed break-words">
                 {session.strategy}
               </p>
             </div>

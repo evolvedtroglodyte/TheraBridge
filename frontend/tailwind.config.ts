@@ -9,6 +9,12 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'crimson': ['var(--font-crimson-pro)', 'serif'],
+        'jakarta': ['var(--font-plus-jakarta)', 'sans-serif'],
+        'dm': ['var(--font-dm-sans)', 'sans-serif'],
+        'nunito': ['var(--font-nunito)', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

@@ -10,6 +10,7 @@ import json
 import uuid
 import asyncio
 import subprocess
+import re
 from pathlib import Path
 from typing import Optional, Dict
 from datetime import datetime
@@ -217,8 +218,211 @@ def get_gpu_status():
     return gpu_status_cache
 
 # ========================================
+# Vast.ai Instance Management
+# ========================================
+class VastInstanceManager:
+    """Manage Vast.ai GPU instances"""
+
+    def __init__(self):
+        self.api_key = VAST_API_KEY
+        self.current_instance_id = VAST_INSTANCE_ID
+
+    def search_instances(self, gpu_ram_min=16, max_price=0.3):
+        """Search for available GPU instances"""
+        try:
+            cmd = [
+                "vastai", "search", "offers",
+                f"gpu_ram>={gpu_ram_min} cuda_vers>=12.0 disk_space>=50 inet_down>=500 rented=False reliability>0.95 dph<={max_price}",
+                "-o", "dph+", "--raw"
+            ]
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                env={**os.environ, "VAST_API_KEY": self.api_key}
+            )
+
+            if result.returncode == 0:
+                offers = json.loads(result.stdout)
+                return offers[:5]  # Top 5 cheapest
+        except Exception as e:
+            print(f"Search error: {e}")
+        return []
+
+    def create_instance(self, offer_id):
+        """Create and start a new GPU instance"""
+        try:
+            cmd = [
+                "vastai", "create", "instance", str(offer_id),
+                "--image", "pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime",
+                "--disk", "64",
+                "--ssh",
+                "--direct"
+            ]
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                env={**os.environ, "VAST_API_KEY": self.api_key}
+            )
+
+            if result.returncode == 0:
+                # Parse instance ID
+                import re
+                match = re.search(r'(\d+)', result.stdout)
+                if match:
+                    instance_id = match.group(1)
+                    return {"success": True, "instance_id": instance_id}
+        except Exception as e:
+            print(f"Create error: {e}")
+            return {"success": False, "error": str(e)}
+        return {"success": False, "error": "Failed to create instance"}
+
+    def setup_instance(self, instance_id):
+        """Setup dependencies on GPU instance"""
+        try:
+            # Get SSH info
+            result = subprocess.run(
+                ["vastai", "show", "instance", str(instance_id), "--raw"],
+                capture_output=True,
+                text=True,
+                env={**os.environ, "VAST_API_KEY": self.api_key}
+            )
+
+            if result.returncode == 0:
+                data = json.loads(result.stdout)
+                ssh_host = data.get("ssh_host")
+                ssh_port = data.get("ssh_port")
+
+                if ssh_host and ssh_port:
+                    # Upload and run setup script
+                    setup_commands = [
+                        "apt-get update && apt-get install -y git rsync",
+                        f"git clone https://github.com/yourusername/audio-transcription-pipeline.git /workspace/pipeline || true",
+                        "cd /workspace/pipeline && pip install -q -r requirements_gpu.txt",
+                        f"echo 'export HF_TOKEN={os.getenv('HF_TOKEN', '')}' >> ~/.bashrc"
+                    ]
+
+                    for cmd in setup_commands:
+                        ssh_cmd = f"ssh -o StrictHostKeyChecking=no -p {ssh_port} root@{ssh_host} '{cmd}'"
+                        subprocess.run(ssh_cmd, shell=True, timeout=300)
+
+                    return {"success": True, "ssh_host": ssh_host, "ssh_port": ssh_port}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+        return {"success": False, "error": "Failed to setup instance"}
+
+    def destroy_instance(self, instance_id):
+        """Destroy instance to stop charges"""
+        try:
+            result = subprocess.run(
+                ["vastai", "destroy", "instance", str(instance_id)],
+                capture_output=True,
+                text=True,
+                env={**os.environ, "VAST_API_KEY": self.api_key}
+            )
+            return result.returncode == 0
+        except Exception as e:
+            print(f"Destroy error: {e}")
+            return False
+
+vast_manager = VastInstanceManager()
+
+# ========================================
 # API Endpoints
 # ========================================
+
+@app.post("/api/vast/search")
+async def search_vast_instances(gpu_ram_min: int = 16, max_price: float = 0.3):
+    """Search for available Vast.ai GPU instances"""
+    if not VAST_API_KEY:
+        raise HTTPException(status_code=400, detail="VAST_API_KEY not configured")
+
+    offers = vast_manager.search_instances(gpu_ram_min, max_price)
+    return {"offers": offers}
+
+@app.post("/api/vast/boot")
+async def boot_vast_instance(offer_id: int, background_tasks: BackgroundTasks):
+    """Boot up a new Vast.ai GPU instance with automatic setup"""
+    if not VAST_API_KEY:
+        raise HTTPException(status_code=400, detail="VAST_API_KEY not configured")
+
+    # Create instance
+    result = vast_manager.create_instance(offer_id)
+    if not result["success"]:
+        raise HTTPException(status_code=500, detail=result.get("error", "Failed to create instance"))
+
+    instance_id = result["instance_id"]
+
+    # Wait for SSH and setup in background
+    background_tasks.add_task(setup_vast_instance_background, instance_id)
+
+    return {
+        "success": True,
+        "instance_id": instance_id,
+        "message": "Instance created. Setting up dependencies in background..."
+    }
+
+async def setup_vast_instance_background(instance_id: str):
+    """Background task to setup Vast.ai instance"""
+    import time
+
+    # Wait for SSH to be ready (max 3 minutes)
+    max_wait = 180
+    start_time = time.time()
+
+    while time.time() - start_time < max_wait:
+        await asyncio.sleep(5)
+
+        try:
+            # Check if SSH is ready
+            result = subprocess.run(
+                ["vastai", "show", "instance", str(instance_id), "--raw"],
+                capture_output=True,
+                text=True,
+                env={**os.environ, "VAST_API_KEY": VAST_API_KEY}
+            )
+
+            if result.returncode == 0:
+                data = json.loads(result.stdout)
+                if data.get("actual_status") == "running" and data.get("ssh_host"):
+                    # SSH ready, run setup
+                    setup_result = vast_manager.setup_instance(instance_id)
+                    if setup_result["success"]:
+                        print(f"✓ Vast.ai instance {instance_id} setup complete")
+                        # Update .env file with new instance ID
+                        env_path = Path(__file__).parent.parent / ".env"
+                        if env_path.exists():
+                            with open(env_path, 'r') as f:
+                                env_content = f.read()
+                            # Update VAST_INSTANCE_ID
+                            if "VAST_INSTANCE_ID=" in env_content:
+                                env_content = re.sub(
+                                    r'VAST_INSTANCE_ID=.*',
+                                    f'VAST_INSTANCE_ID={instance_id}',
+                                    env_content
+                                )
+                            else:
+                                env_content += f'\nVAST_INSTANCE_ID={instance_id}\n'
+                            with open(env_path, 'w') as f:
+                                f.write(env_content)
+                    return
+        except Exception as e:
+            print(f"Setup check error: {e}")
+
+    print(f"⚠️  Vast.ai instance {instance_id} setup timeout")
+
+@app.post("/api/vast/destroy/{instance_id}")
+async def destroy_vast_instance(instance_id: str):
+    """Destroy Vast.ai instance to stop charges"""
+    if not VAST_API_KEY:
+        raise HTTPException(status_code=400, detail="VAST_API_KEY not configured")
+
+    success = vast_manager.destroy_instance(instance_id)
+    if success:
+        return {"success": True, "message": f"Instance {instance_id} destroyed"}
+    else:
+        raise HTTPException(status_code=500, detail="Failed to destroy instance")
 
 @app.get("/api/gpu-status", response_model=GPUStatus)
 async def get_gpu_status_endpoint():
@@ -320,6 +524,7 @@ async def upload_audio(
         "num_speakers": num_speakers,
         "gpu_type": gpu_status["type"]
     }
+    print(f"[BACKEND LOG] Job {job_id} initialized - step: '{jobs[job_id]['step']}'")
 
     # Start processing in background
     if gpu_status["type"] == "local":
@@ -339,6 +544,7 @@ async def run_local_gpu_pipeline(job_id: str, audio_path: Path, num_speakers: in
         jobs[job_id]["status"] = "processing"
         jobs[job_id]["progress"] = 10
         jobs[job_id]["step"] = "Starting local GPU pipeline"
+        print(f"[BACKEND LOG] Job {job_id} - progress: {jobs[job_id]['progress']}%, step: '{jobs[job_id]['step']}'")
 
         output_file = RESULTS_DIR / f"{job_id}.json"
 
@@ -400,6 +606,7 @@ async def run_vast_pipeline(job_id: str, audio_path: Path, num_speakers: int = 2
         jobs[job_id]["status"] = "processing"
         jobs[job_id]["progress"] = 10
         jobs[job_id]["step"] = f"Connecting to Vast.ai instance {VAST_INSTANCE_ID}"
+        print(f"[BACKEND LOG] Job {job_id} - progress: {jobs[job_id]['progress']}%, step: '{jobs[job_id]['step']}'")
 
         # Get SSH connection details using vastai ssh-url
         result = subprocess.run(
@@ -458,6 +665,7 @@ async def run_vast_pipeline(job_id: str, audio_path: Path, num_speakers: int = 2
 
         jobs[job_id]["progress"] = 30
         jobs[job_id]["step"] = "Transferring audio file to GPU instance"
+        print(f"[BACKEND LOG] Job {job_id} - progress: {jobs[job_id]['progress']}%, step: '{jobs[job_id]['step']}'")
 
         # Retry logic for SSH connection (handles rate limiting)
         max_retries = 3
@@ -694,9 +902,11 @@ echo "============================================================"
             elif "GPU Transcription" in line_str or "Transcribing" in line_str:
                 jobs[job_id]["progress"] = 80
                 jobs[job_id]["step"] = "Transcribing with Whisper large-v3"
+                print(f"[BACKEND LOG] Job {job_id} - progress: {jobs[job_id]['progress']}%, step: '{jobs[job_id]['step']}'")
             elif "GPU Speaker Diarization" in line_str or "Diarization" in line_str:
                 jobs[job_id]["progress"] = 85
                 jobs[job_id]["step"] = "Running pyannote speaker diarization"
+                print(f"[BACKEND LOG] Job {job_id} - progress: {jobs[job_id]['progress']}%, step: '{jobs[job_id]['step']}'")
             elif "Speaker Alignment" in line_str or "Aligning" in line_str:
                 jobs[job_id]["progress"] = 90
                 jobs[job_id]["step"] = "Aligning speakers with transcript"
@@ -804,13 +1014,15 @@ async def get_job_status(job_id: str):
         raise HTTPException(status_code=404, detail="Job not found")
 
     job = jobs[job_id]
-    return JobStatus(
+    response = JobStatus(
         job_id=job_id,
         status=job["status"],
         progress=job.get("progress", 0),
         step=job.get("step", ""),
         error=job.get("error")
     )
+    print(f"[BACKEND LOG] Returning status for {job_id}: progress={response.progress}%, step='{response.step}', status={response.status}")
+    return response
 
 @app.get("/api/results/{job_id}")
 async def get_results(job_id: str):
@@ -848,7 +1060,7 @@ app.mount("/", StaticFiles(directory=str(Path(__file__).parent), html=True), nam
 
 @app.on_event("startup")
 async def startup_event():
-    """Check GPU on startup"""
+    """Check GPU on startup and auto-boot Vast.ai if needed"""
     print("\n" + "="*60)
     print("GPU-Only Transcription Pipeline Server")
     print("="*60)
@@ -872,7 +1084,74 @@ async def startup_event():
         else:
             print("  - Vast.ai not configured (set VAST_INSTANCE_ID and VAST_API_KEY)")
 
+        # Auto-boot Vast.ai GPU for developer testing
+        await dev_auto_boot()
+
     print("="*60 + "\n")
+
+async def dev_auto_boot():
+    """Auto-boot GPU for dev testing - skip if instance already running"""
+    instance_id = os.getenv("VAST_INSTANCE_ID")
+
+    # Check existing instance
+    if instance_id:
+        status = check_vast_connection()
+        if status.get("available"):
+            print(f"✓ GPU instance {instance_id} already running")
+            return
+
+    # Only auto-boot if API key is configured
+    if not VAST_API_KEY:
+        print("⚠️  Skipping auto-boot: VAST_API_KEY not configured")
+        return
+
+    print("⚡ Auto-booting Vast.ai GPU for testing...")
+
+    try:
+        # Search and boot cheapest instance
+        result = subprocess.run(
+            ["vastai", "search", "offers", "gpu_ram>=16", "-o", "dph+", "--limit", "1", "--raw"],
+            capture_output=True, text=True, check=True,
+            env={**os.environ, "VAST_API_KEY": VAST_API_KEY}
+        )
+        offers = json.loads(result.stdout)
+
+        if not offers:
+            print("✗ No GPU instances available")
+            return
+
+        offer_id = offers[0]["id"]
+        gpu_name = offers[0].get("gpu_name", "Unknown")
+        price = offers[0].get("dph_total", 0)
+
+        print(f"  Booting {gpu_name} @ ${price}/hr...")
+
+        # Create instance
+        result = subprocess.run(
+            ["vastai", "create", "instance", str(offer_id),
+             "--image", "pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime",
+             "--disk", "64", "--ssh"],
+            capture_output=True, text=True, check=True,
+            env={**os.environ, "VAST_API_KEY": VAST_API_KEY}
+        )
+
+        # Extract instance ID
+        match = re.search(r'(\d+)', result.stdout)
+        if match:
+            new_id = match.group(1)
+            print(f"✓ Instance {new_id} created (setup running in background)")
+
+            # Save to .env
+            env_path = Path(__file__).parent.parent / ".env"
+            with open(env_path, 'a') as f:
+                f.write(f"\nVAST_INSTANCE_ID={new_id}\n")
+
+            print(f"✓ Instance ID saved to .env")
+            print(f"  GPU will be ready in 2-3 minutes")
+
+    except Exception as e:
+        print(f"✗ Auto-boot failed: {e}")
+        print("  You can manually boot from UI")
 
 if __name__ == "__main__":
     import uvicorn

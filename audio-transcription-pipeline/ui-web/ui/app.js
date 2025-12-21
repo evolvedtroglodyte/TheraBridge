@@ -267,6 +267,9 @@ async function uploadAndProcess(file) {
         console.log('Upload successful. Job ID:', currentJobId);
 
         // 2. Start polling for status updates
+        console.log(`[NETWORK] Starting status polling for job: ${currentJobId}`);
+        console.log(`[NETWORK] Poll interval: ${API_CONFIG.pollInterval}ms`);
+        console.log(`[NETWORK] Status endpoint: ${API_CONFIG.baseUrl}${API_CONFIG.endpoints.status}/${currentJobId}`);
         pollProcessingStatus();
 
     } catch (error) {
@@ -296,10 +299,22 @@ async function pollProcessingStatus() {
         );
 
         if (!statusResponse.ok) {
+            console.error(`[NETWORK ERROR] Status fetch failed: ${statusResponse.status} ${statusResponse.statusText}`);
+            console.error(`[NETWORK ERROR] URL: ${API_CONFIG.baseUrl}${API_CONFIG.endpoints.status}/${currentJobId}`);
             throw new Error('Failed to get status');
         }
 
         const statusData = await statusResponse.json();
+
+        // [DEBUG] Log complete API response
+        const timestamp = new Date().toISOString();
+        console.log(`[NETWORK ${timestamp}] Status API Response:`, JSON.stringify(statusData, null, 2));
+        console.log(`[NETWORK ${timestamp}] job_id: ${currentJobId}`);
+        console.log(`[NETWORK ${timestamp}] statusData.status: ${statusData.status}`);
+        console.log(`[NETWORK ${timestamp}] statusData.progress: ${statusData.progress}`);
+        console.log(`[NETWORK ${timestamp}] statusData.step: "${statusData.step}"`);
+        console.log(`[NETWORK ${timestamp}] statusData.step type: ${typeof statusData.step}`);
+        console.log(`[NETWORK ${timestamp}] statusData.step is null/undefined: ${statusData.step == null}`);
 
         // Update UI with current status
         updateProcessingUI(statusData);
@@ -320,6 +335,7 @@ async function pollProcessingStatus() {
             }, 3000);
         } else {
             // Continue polling
+            console.log(`[NETWORK] Continuing to poll (status: ${statusData.status}, progress: ${statusData.progress}%)`);
             statusPollInterval = setTimeout(pollProcessingStatus, API_CONFIG.pollInterval);
         }
 
@@ -337,49 +353,133 @@ async function pollProcessingStatus() {
     }
 }
 
-function updateProcessingUI(statusData) {
-    // Update progress bar
-    const progress = statusData.progress || 0;
-    updateProgress(progress);
+function detectCurrentStepFromMessage(message) {
+    console.log(`[TRACE] detectCurrentStepFromMessage() called with message: "${message}"`);
+    console.log(`[TRACE] message type: ${typeof message}, is null/undefined: ${message == null}`);
 
-    // Map API step to UI step
-    const stepMapping = {
-        'uploading': { element: elements.steps.step1, status: 'Uploading...' },
-        'transcribing': { element: elements.steps.step2, status: 'Transcribing...' },
-        'diarizing': { element: elements.steps.step3, status: 'Analyzing speakers...' },
-        'aligning': { element: elements.steps.step4, status: 'Finalizing...' }
-    };
+    if (!message) {
+        console.log(`[TRACE] detectCurrentStepFromMessage() returning null (no message)`);
+        return null;
+    }
 
-    const currentStep = statusData.step || 'uploading';
+    const msgLower = message.toLowerCase();
+    console.log(`[TRACE] msgLower: "${msgLower}"`);
 
-    // Update step indicators
-    Object.entries(stepMapping).forEach(([stepName, stepInfo]) => {
-        const stepElement = stepInfo.element;
-        const statusElement = stepElement.querySelector('.step-status');
+    // Step 1: Upload/Initialization (keywords: upload, initializing, connecting, transferring)
+    if (msgLower.includes('upload') || msgLower.includes('initializ') ||
+        msgLower.includes('connect') || msgLower.includes('transfer')) {
+        console.log(`[TRACE] detectCurrentStepFromMessage() matched Step 1 - returning 'step1'`);
+        return 'step1';
+    }
 
-        if (stepName === currentStep) {
-            // Current step - mark as active
-            stepElement.classList.remove('completed');
-            stepElement.classList.add('active');
-            statusElement.textContent = stepInfo.status;
-        } else if (shouldMarkCompleted(stepName, currentStep)) {
-            // Previous steps - mark as completed
-            stepElement.classList.remove('active');
-            stepElement.classList.add('completed');
-            statusElement.textContent = 'Completed';
-        } else {
-            // Future steps - waiting
-            stepElement.classList.remove('active', 'completed');
-            statusElement.textContent = 'Waiting...';
-        }
-    });
+    // Step 2: Transcription (keywords: transcrib, preprocessing, whisper)
+    if (msgLower.includes('transcrib') || msgLower.includes('preprocess') ||
+        msgLower.includes('whisper')) {
+        console.log(`[TRACE] detectCurrentStepFromMessage() matched Step 2 - returning 'step2'`);
+        return 'step2';
+    }
+
+    // Step 3: Diarization (keywords: diariz, speaker, pyannote)
+    if (msgLower.includes('diariz') || msgLower.includes('speaker') ||
+        msgLower.includes('pyannote')) {
+        console.log(`[TRACE] detectCurrentStepFromMessage() matched Step 3 - returning 'step3'`);
+        return 'step3';
+    }
+
+    // Step 4: Finalization (keywords: align, finaliz, download, preparing, complete)
+    if (msgLower.includes('align') || msgLower.includes('finaliz') ||
+        msgLower.includes('download') || msgLower.includes('preparing') ||
+        msgLower.includes('complete')) {
+        console.log(`[TRACE] detectCurrentStepFromMessage() matched Step 4 - returning 'step4'`);
+        return 'step4';
+    }
+
+    console.log(`[TRACE] detectCurrentStepFromMessage() returning null (no keyword matches)`);
+    return null;
 }
 
-function shouldMarkCompleted(stepName, currentStep) {
-    const stepOrder = ['uploading', 'transcribing', 'diarizing', 'aligning'];
-    const currentIndex = stepOrder.indexOf(currentStep);
-    const stepIndex = stepOrder.indexOf(stepName);
-    return stepIndex < currentIndex;
+function updateStepStatus(stepElement, state, message = null) {
+    console.log(`[TRACE] updateStepStatus() called:`, {
+        stepElementId: stepElement.id,
+        state: state,
+        message: message,
+        messageType: typeof message
+    });
+
+    const statusElement = stepElement.querySelector('.step-status');
+    console.log(`[TRACE] statusElement found: ${statusElement != null}, current text: "${statusElement?.textContent}"`);
+
+    stepElement.classList.remove('active', 'completed');
+
+    if (state === 'active') {
+        console.log(`[TRACE] Setting ${stepElement.id} to ACTIVE with message: "${message}"`);
+        stepElement.classList.add('active');
+        // Display actual backend message if provided, otherwise use generic status
+        statusElement.textContent = message || 'Processing...';
+        console.log(`[TRACE] After update - statusElement.textContent: "${statusElement.textContent}"`);
+    } else if (state === 'completed') {
+        console.log(`[TRACE] Setting ${stepElement.id} to COMPLETED`);
+        stepElement.classList.add('completed');
+        statusElement.textContent = 'Completed';
+    } else {
+        console.log(`[TRACE] Setting ${stepElement.id} to WAITING`);
+        // waiting state
+        statusElement.textContent = 'Waiting...';
+    }
+}
+
+function updateProcessingUI(statusData) {
+    console.log(`[TRACE] ========================================`);
+    console.log(`[TRACE] updateProcessingUI() called with:`, {
+        status: statusData.status,
+        progress: statusData.progress,
+        step: statusData.step,
+        stepType: typeof statusData.step
+    });
+
+    // Update progress bar with step message
+    const progress = statusData.progress || 0;
+    console.log(`[TRACE] Calling updateProgress(${progress}, "${statusData.step}")`);
+    updateProgress(progress, statusData.step);
+
+    // Detect current step from backend message
+    console.log(`[TRACE] Calling detectCurrentStepFromMessage("${statusData.step}")`);
+    const currentStepId = detectCurrentStepFromMessage(statusData.step);
+    console.log(`[TRACE] detectCurrentStepFromMessage returned: ${currentStepId}`);
+
+    if (!currentStepId) {
+        // No step detected, keep all waiting
+        console.log(`[TRACE] ⚠️ No step detected! Exiting updateProcessingUI early.`);
+        console.log(`[TRACE] This means the backend message didn't match any keywords.`);
+        return;
+    }
+
+    // Map step IDs to step numbers
+    const stepOrder = ['step1', 'step2', 'step3', 'step4'];
+    const currentStepIndex = stepOrder.indexOf(currentStepId);
+    console.log(`[TRACE] currentStepIndex = ${currentStepIndex}`);
+
+    // Update each step indicator
+    console.log(`[TRACE] Looping through steps...`);
+    stepOrder.forEach((stepId, index) => {
+        const stepElement = elements.steps[stepId];
+        console.log(`[TRACE] Processing ${stepId} (index ${index})`);
+
+        if (index < currentStepIndex) {
+            // Previous steps - mark as completed
+            console.log(`[TRACE] ${stepId}: index(${index}) < currentStepIndex(${currentStepIndex}) → completed`);
+            updateStepStatus(stepElement, 'completed');
+        } else if (index === currentStepIndex) {
+            // Current step - mark as active with backend message
+            console.log(`[TRACE] ${stepId}: index(${index}) === currentStepIndex(${currentStepIndex}) → active`);
+            updateStepStatus(stepElement, 'active', statusData.step);
+        } else {
+            // Future steps - waiting
+            console.log(`[TRACE] ${stepId}: index(${index}) > currentStepIndex(${currentStepIndex}) → waiting`);
+            updateStepStatus(stepElement, 'waiting');
+        }
+    });
+    console.log(`[TRACE] ========================================`);
 }
 
 async function fetchAndDisplayResults() {
@@ -478,10 +578,24 @@ function startProcessing() {
     uploadAndProcess(state.selectedFile);
 }
 
-function updateProgress(percent) {
+function updateProgress(percent, stepMessage = null) {
+    console.log(`[TRACE] updateProgress() called: percent=${percent}, stepMessage="${stepMessage}"`);
+    console.log(`[TRACE] stepMessage type: ${typeof stepMessage}, is null/undefined: ${stepMessage == null}`);
+
     state.processingProgress = percent;
     elements.progressFill.style.width = `${percent}%`;
-    elements.progressText.textContent = `${percent}%`;
+
+    // Display percentage and optional step message
+    if (stepMessage) {
+        console.log(`[TRACE] stepMessage exists, setting innerHTML with message`);
+        const newHTML = `${percent}%<br><small style="font-size: 0.85em; opacity: 0.9;">${stepMessage}</small>`;
+        console.log(`[TRACE] New innerHTML: "${newHTML}"`);
+        elements.progressText.innerHTML = newHTML;
+        console.log(`[TRACE] After update - progressText.innerHTML: "${elements.progressText.innerHTML}"`);
+    } else {
+        console.log(`[TRACE] No stepMessage, setting textContent to percentage only`);
+        elements.progressText.textContent = `${percent}%`;
+    }
 }
 
 async function completeProcessing(resultsData) {
@@ -579,6 +693,52 @@ function getAudioDuration(file) {
 }
 
 // ========================================
+// DOM Verification (Debugging)
+// ========================================
+function verifyDOMState() {
+    console.log('[DOM VERIFY] ========================================');
+    console.log('[DOM VERIFY] Checking DOM element existence and state...');
+
+    // Check progressText element
+    const progressText = document.getElementById('progressText');
+    console.log('[DOM VERIFY] progressText element:', {
+        exists: progressText !== null,
+        id: progressText?.id,
+        textContent: progressText?.textContent,
+        innerHTML: progressText?.innerHTML,
+        display: progressText ? window.getComputedStyle(progressText).display : 'N/A',
+        visibility: progressText ? window.getComputedStyle(progressText).visibility : 'N/A'
+    });
+
+    // Check progressFill element
+    const progressFill = document.getElementById('progressFill');
+    console.log('[DOM VERIFY] progressFill element:', {
+        exists: progressFill !== null,
+        width: progressFill?.style.width,
+        computedWidth: progressFill ? window.getComputedStyle(progressFill).width : 'N/A'
+    });
+
+    // Check step elements
+    ['step1', 'step2', 'step3', 'step4'].forEach(stepId => {
+        const stepElement = document.getElementById(stepId);
+        const statusElement = stepElement?.querySelector('.step-status');
+
+        console.log(`[DOM VERIFY] ${stepId}:`, {
+            exists: stepElement !== null,
+            classList: stepElement ? Array.from(stepElement.classList) : [],
+            statusExists: statusElement !== null,
+            statusText: statusElement?.textContent,
+            display: stepElement ? window.getComputedStyle(stepElement).display : 'N/A'
+        });
+    });
+
+    console.log('[DOM VERIFY] ========================================');
+}
+
+// Make it globally accessible for console testing
+window.verifyDOMState = verifyDOMState;
+
+// ========================================
 // Event Listeners
 // ========================================
 function initEventListeners() {
@@ -644,6 +804,23 @@ function init() {
     console.log('Audio Diarization Pipeline UI initialized');
     console.log('Supported formats:', ALLOWED_EXTENSIONS.join(', '));
     console.log('Max file size:', formatFileSize(MAX_FILE_SIZE));
+
+    // Verify critical DOM elements exist
+    console.log('[DOM INIT] Verifying critical elements...');
+    console.log('[DOM INIT] progressText exists:', elements.progressText !== null);
+    console.log('[DOM INIT] progressFill exists:', elements.progressFill !== null);
+    console.log('[DOM INIT] step1 exists:', elements.steps.step1 !== null);
+    console.log('[DOM INIT] step2 exists:', elements.steps.step2 !== null);
+    console.log('[DOM INIT] step3 exists:', elements.steps.step3 !== null);
+    console.log('[DOM INIT] step4 exists:', elements.steps.step4 !== null);
+
+    if (!elements.progressText || !elements.progressFill ||
+        !elements.steps.step1 || !elements.steps.step2 ||
+        !elements.steps.step3 || !elements.steps.step4) {
+        console.error('[DOM INIT] ⚠️ Some critical elements are missing!');
+    } else {
+        console.log('[DOM INIT] ✓ All critical elements found');
+    }
 }
 
 // Initialize when DOM is ready

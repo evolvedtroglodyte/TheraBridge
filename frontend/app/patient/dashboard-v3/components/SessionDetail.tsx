@@ -42,14 +42,14 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
         initial="hidden"
         animate="visible"
         exit="exit"
-        className="fixed top-0 left-0 right-0 bottom-0 bg-white dark:bg-[#1a1625] z-[2000] flex flex-col border-2 border-gray-300 dark:border-gray-600"
+        className="fixed top-0 left-0 right-0 bottom-0 bg-[#F8F7F4] dark:bg-[#1a1625] z-[2000] flex flex-col border-2 border-[#E0DDD8] dark:border-gray-600"
         style={{ margin: 0 }}
         role="dialog"
         aria-modal="true"
         aria-labelledby="session-detail-title"
       >
         {/* Top Bar */}
-        <div className="h-[60px] border-b border-gray-200 dark:border-[#3d3548] flex items-center justify-between px-6 flex-shrink-0 bg-white dark:bg-[#1a1625]">
+        <div className="h-[60px] border-b border-[#E0DDD8] dark:border-[#3d3548] flex items-center justify-between px-6 flex-shrink-0 bg-[#F8F7F4] dark:bg-[#1a1625]">
           <button
             onClick={onClose}
             className="flex items-center gap-2 text-[#5AB9B4] dark:text-[#a78bfa] hover:opacity-80 transition-colors"
@@ -83,7 +83,7 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
         {/* Two-column Content */}
         <div className="flex-1 grid grid-cols-2 overflow-hidden">
           {/* Left Column - Transcript */}
-          <div className="border-r border-gray-200 dark:border-[#3d3548] overflow-y-auto p-8 bg-white dark:bg-[#1a1625]">
+          <div className="border-r border-[#E0DDD8] dark:border-[#3d3548] overflow-y-auto p-8 bg-[#F8F7F4] dark:bg-[#1a1625]">
             <h3 className="text-xl font-serif font-semibold text-gray-800 dark:text-gray-200 mb-6">
               Session Transcript
             </h3>
@@ -115,7 +115,7 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
             </h3>
 
             {/* Metadata */}
-            <div className="mb-6 p-4 bg-white dark:bg-[#1a1625] rounded-xl border border-gray-200 dark:border-[#3d3548]">
+            <div className="mb-6 p-4 bg-[#ECEAE5] dark:bg-[#1a1625] rounded-xl border border-[#E0DDD8] dark:border-[#3d3548]">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-gray-500 dark:text-gray-500 mb-1">Duration</p>

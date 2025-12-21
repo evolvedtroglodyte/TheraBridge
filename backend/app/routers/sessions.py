@@ -26,7 +26,6 @@ from app.models.schemas import (
 )
 from app.models import db_models
 from app.services.note_extraction import get_extraction_service, NoteExtractionService
-from app.services.transcription import transcribe_audio_file
 from app.services.progress_tracker import get_progress_tracker, ProgressTracker, ProgressUpdate
 from app.validators import (
     sanitize_filename,

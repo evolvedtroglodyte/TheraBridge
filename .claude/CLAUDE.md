@@ -275,6 +275,116 @@ python -m pytest  # Run tests
 
 ## Session Log
 
+### 2025-12-21 - Timeline Enhancement: Mixed Events, Search & Export (Dashboard v3) ✅
+**Implemented comprehensive timeline enhancement transforming it from session-only to mixed patient journey:**
+
+1. **Data Foundation (Phase 1):**
+   - Added discriminated union types: `TimelineEvent = SessionTimelineEvent | MajorEventEntry`
+   - Created 4 mock major events with realistic therapy context
+   - Unified timeline merges sessions + events, sorted chronologically
+
+2. **Major Event Modal (Phase 2):**
+   - New `MajorEventModal.tsx` component with purple accent color
+   - Displays title, date, AI-generated summary, chat context
+   - Related session link navigation
+   - Reflection add/edit functionality with save persistence
+
+3. **Mixed Timeline Sidebar (Phase 3):**
+   - Sessions: Mood-colored dots (green/blue/rose) + amber stars for milestones
+   - Major Events: Purple diamond icons with glow effect
+   - Click behavior: Sessions → session detail, Events → event modal
+   - Both compact sidebar and expanded modal updated
+
+4. **Search Functionality (Phase 4):**
+   - Search bar in expanded timeline modal
+   - Debounced filtering (300ms) across topic, strategy, title, summary
+   - Results count display, empty state, clear button
+
+5. **Export Functionality (Phase 5):**
+   - PDF export via print dialog (zero dependencies)
+   - Clean printable HTML with stats, entries, reflections
+   - Mock shareable link with clipboard copy + success toast
+
+6. **Playwright Tests (Phase 7):**
+   - 42 E2E tests across 4 files
+   - Coverage: mixed events, modal, search, export, reflections
+
+**Files created:**
+- `components/MajorEventModal.tsx` - Major event detail modal
+- `components/ExportDropdown.tsx` - Export menu dropdown
+- `lib/timelineSearch.ts` - Search/filter utilities
+- `lib/exportTimeline.ts` - PDF generation + share link
+- `tests/timeline-mixed-events.spec.ts` - 8 tests
+- `tests/timeline-major-event-modal.spec.ts` - 14 tests
+- `tests/timeline-search.spec.ts` - 11 tests
+- `tests/timeline-export.spec.ts` - 9 tests
+
+**Files modified:**
+- `lib/types.ts` - Added TimelineEvent union types
+- `lib/mockData.ts` - Added majorEvents, unifiedTimeline
+- `lib/usePatientSessions.ts` - Unified timeline + reflection updates
+- `contexts/SessionDataContext.tsx` - New fields exposed
+- `components/TimelineSidebar.tsx` - Complete rewrite for mixed events
+
+**Implementation plan:** `app/patient/dashboard-v3/TIMELINE_ENHANCEMENT_PLAN.md`
+
+### 2025-12-21 - Font Alignment & Session Card Text Fix (Dashboard v3) ✅
+**Aligned fonts across all cards to match Therapist Bridge, fixed text overflow:**
+
+1. **Font alignment completed:**
+   - All compact card titles: `system-ui, font-light (300), 18px` - centered
+   - All modal titles: `system-ui, font-light (300), 24px`
+   - All body text: `font-light (300)`
+   - Removed `Crimson Pro` (serif) from Notes/Goals
+   - Removed `Space Mono` (monospace) from Progress Patterns
+
+2. **Progress Patterns card UX improvement:**
+   - Removed expand button (Maximize2 icon)
+   - Made entire card clickable to open modal (matching other cards)
+   - Added `e.stopPropagation()` to carousel nav buttons
+
+3. **Session card text overflow fixed:**
+   - Added `min-w-0` and `break-words` to topic/strategy columns
+   - Text now wraps properly within the two-column grid
+
+**Files modified:**
+- `app/patient/dashboard-v3/components/NotesGoalsCard.tsx` - Fonts, centered title
+- `app/patient/dashboard-v3/components/ToDoCard.tsx` - Fonts, centered title
+- `app/patient/dashboard-v3/components/ProgressPatternsCard.tsx` - Fonts, clickable card, removed expand button
+- `app/patient/dashboard-v3/components/SessionCard.tsx` - Text overflow fix
+
+**Files added:**
+- `tests/card-styling.spec.ts` - Font and text overflow verification tests
+
+### 2025-12-21 - Fixed Modal Positioning Bug (Dashboard v3) ✅
+**Fixed critical bug where expandable card modals appeared in bottom-right corner instead of centered:**
+
+1. **Root cause identified via Playwright tests:**
+   - Framer Motion's `scale` animation was overwriting the CSS `transform: translate(-50%, -50%)`
+   - Modal positioned at `top: 50%, left: 50%` but transform was `none` after animation
+   - Result: Modal started FROM center point, not centered ON it
+
+2. **Solution implemented:**
+   - Updated `modalVariants` in `lib/utils.ts` to include `x: '-50%'` and `y: '-50%'` in all states
+   - Framer Motion now composes both scale AND translate transforms together
+   - Removed conflicting inline `transform` from all card components
+
+3. **Files modified:**
+   - `app/patient/dashboard-v3/lib/utils.ts` - Added x/y to modalVariants
+   - `app/patient/dashboard-v3/components/ToDoCard.tsx` - Removed inline transform
+   - `app/patient/dashboard-v3/components/NotesGoalsCard.tsx` - Removed inline transform
+   - `app/patient/dashboard-v3/components/ProgressPatternsCard.tsx` - Removed inline transform
+   - `app/patient/dashboard-v3/components/TherapistBridgeCard.tsx` - Removed inline transform
+
+4. **Verification:**
+   - Playwright tests confirm modal center now matches viewport center (0px difference)
+   - Grey backdrop visible and covers full screen
+   - Spring animation preserved with correct centering
+
+**Files added for testing:**
+- `playwright.config.ts` - Playwright configuration
+- `tests/modal-positioning.spec.ts` - Modal positioning verification tests
+
 ### 2025-12-18 - Added crawl4ai Skill for Web Crawling ✅
 **Installed comprehensive web crawling and data extraction skill:**
 

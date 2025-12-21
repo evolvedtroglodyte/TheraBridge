@@ -1,0 +1,23 @@
+# FastAPI and server
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+websockets==14.1
+
+# Core dependencies (matching existing pipeline)
+pydub==0.25.1
+pyaudioop-lts
+openai==1.59.6
+pyannote.audio>=3.3.2
+torch>=2.0.0
+torchaudio>=2.0.0
+
+# Utilities
+python-dotenv==1.0.1
+pydantic-settings==2.7.0
+tenacity==9.0.0
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.24.0
+httpx==0.28.1

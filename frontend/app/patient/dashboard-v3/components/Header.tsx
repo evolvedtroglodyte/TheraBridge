@@ -3,14 +3,76 @@
 /**
  * Dashboard sticky header component
  * - Navigation links (Dashboard, Ask AI, Upload)
- * - Home icon + theme toggle (Sun/Moon)
+ * - Custom Home icon + theme toggle (Sun/Moon) with glow effects
  * - Minimal height design (~60px)
  * - FIXED: Full dark mode support for entire header
  * - Ask AI button triggers fullscreen chat via callback
  */
 
-import { Home, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+
+// Custom Home Icon with glow effect (matches fullscreen chat)
+function HomeIcon({ isDark }: { isDark: boolean }) {
+  const stroke = isDark ? '#9B7AC4' : '#5AB9B4';
+  const glow = isDark
+    ? 'drop-shadow(0 0 3px rgba(155, 122, 196, 0.4))'
+    : 'drop-shadow(0 0 3px rgba(90, 185, 180, 0.4))';
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={stroke}
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-[22px] h-[22px]"
+      style={{ filter: glow }}
+    >
+      <path d="M4 10.5V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.5" />
+      <path d="M2.5 12L12 3l9.5 9" />
+      <rect x="9" y="14" width="6" height="7" rx="1" />
+    </svg>
+  );
+}
+
+// Custom Theme Toggle Icon with glow effect (matches fullscreen chat)
+function ThemeIcon({ isDark }: { isDark: boolean }) {
+  if (isDark) {
+    // Moon icon for dark mode
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#93B4DC"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-[22px] h-[22px]"
+        style={{ filter: 'drop-shadow(0 0 4px rgba(147, 180, 220, 0.6)) drop-shadow(0 0 10px rgba(147, 180, 220, 0.3))' }}
+      >
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+      </svg>
+    );
+  }
+
+  // Sun icon for light mode
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#F5A623"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-[22px] h-[22px]"
+      style={{ filter: 'drop-shadow(0 0 4px rgba(245, 166, 35, 0.5)) drop-shadow(0 0 8px rgba(245, 166, 35, 0.25))' }}
+    >
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+    </svg>
+  );
+}
 
 interface HeaderProps {
   onAskAIClick?: () => void;
@@ -19,27 +81,29 @@ interface HeaderProps {
 export function Header({ onAskAIClick }: HeaderProps) {
   const { isDark, toggleTheme } = useTheme();
 
+  // Scroll to top of dashboard
+  const handleHomeClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <header className="sticky top-0 z-50 bg-white dark:bg-[#1a1625] border-b border-gray-200 dark:border-[#3d3548] h-[60px] flex items-center px-12 transition-colors duration-300">
+    <header className="sticky top-0 z-50 bg-[#F8F7F4] dark:bg-[#1a1625] border-b border-[#E0DDD8] dark:border-[#3d3548] h-[60px] flex items-center px-12 transition-colors duration-300">
       <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between">
-        {/* Left section - Home icon + Theme toggle */}
-        <div className="flex items-center gap-2">
-          <button
-            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-[#3d3548] transition-colors"
-            aria-label="Go to home"
-          >
-            <Home className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-          </button>
+        {/* Left section - Theme toggle + Home icon */}
+        <div className="flex items-center gap-3">
           <button
             onClick={toggleTheme}
             className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-[#3d3548] transition-colors"
             aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
           >
-            {isDark ? (
-              <Sun className="w-5 h-5 text-amber-400" />
-            ) : (
-              <Moon className="w-5 h-5 text-gray-600" />
-            )}
+            <ThemeIcon isDark={isDark} />
+          </button>
+          <button
+            onClick={handleHomeClick}
+            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-[#3d3548] transition-colors"
+            aria-label="Scroll to top"
+          >
+            <HomeIcon isDark={isDark} />
           </button>
         </div>
 

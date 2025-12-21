@@ -15,8 +15,8 @@ from typing import Dict, List, Optional
 # Import the improved alignment functions
 from improved_alignment import (
     align_speakers_with_segments_improved,
+    find_speaker_role_labels,
     interpolate_unknown_speakers,
-    find_speaker_role_labels
 )
 
 
@@ -296,8 +296,8 @@ def generate_html_output(data: Dict, output_path: str) -> None:
 </html>"""
 
     # Calculate statistics
-    segments = data.get('diarized_segments', [])
-    unknown_count = sum(1 for s in segments if s.get('speaker') == 'UNKNOWN')
+    segments = data.get("diarized_segments", [])
+    unknown_count = sum(1 for s in segments if s.get("speaker") == "UNKNOWN")
     unknown_percentage = (unknown_count / len(segments) * 100) if segments else 0
 
     # Determine improvement message
@@ -316,123 +316,141 @@ def generate_html_output(data: Dict, output_path: str) -> None:
     speaker_segments = []
 
     for segment in segments:
-        speaker = segment.get('speaker', 'UNKNOWN')
-        text = segment.get('text', '').strip()
-        start = segment.get('start', 0)
-        overlap_ratio = segment.get('overlap_ratio', 0)
-        is_interpolated = segment.get('interpolated', False)
+        speaker = segment.get("speaker", "UNKNOWN")
+        text = segment.get("text", "").strip()
+        start = segment.get("start", 0)
+        overlap_ratio = segment.get("overlap_ratio", 0)
+        is_interpolated = segment.get("interpolated", False)
 
         if speaker != current_speaker:
             # Output previous speaker block if exists
             if current_speaker and speaker_segments:
                 speaker_role = role_labels.get(current_speaker, current_speaker)
                 speaker_class = speaker_role.lower()
-                if speaker_class not in ['therapist', 'client', 'unknown']:
-                    speaker_class = 'unknown'
+                if speaker_class not in ["therapist", "client", "unknown"]:
+                    speaker_class = "unknown"
 
-                block_html = f'''
+                block_html = f"""
                 <div class="speaker-block">
                     <span class="speaker-label {speaker_class}">{speaker_role}</span>
-                    <div class="speaker-text {speaker_class}-text">'''
+                    <div class="speaker-text {speaker_class}-text">"""
 
                 for seg in speaker_segments:
-                    interpolated_class = ' interpolated' if seg.get('interpolated') else ''
-                    overlap_info = f'<span class="overlap-info">({seg["overlap_ratio"]*100:.0f}% overlap)</span>' if seg["overlap_ratio"] > 0 and seg["speaker"] != "UNKNOWN" else ''
-                    block_html += f'''
-                        <span class="timestamp">{seg['time']}</span>
-                        <span class="segment-text{interpolated_class}">{seg['text']}</span>
-                        {overlap_info}<br>'''
+                    interpolated_class = (
+                        " interpolated" if seg.get("interpolated") else ""
+                    )
+                    overlap_info = (
+                        f'<span class="overlap-info">({seg["overlap_ratio"] * 100:.0f}% overlap)</span>'
+                        if seg["overlap_ratio"] > 0 and seg["speaker"] != "UNKNOWN"
+                        else ""
+                    )
+                    block_html += f"""
+                        <span class="timestamp">{seg["time"]}</span>
+                        <span class="segment-text{interpolated_class}">{seg["text"]}</span>
+                        {overlap_info}<br>"""
 
-                block_html += '''
+                block_html += """
                     </div>
-                </div>'''
+                </div>"""
 
                 transcript_blocks.append(block_html)
 
             # Start new speaker
             current_speaker = speaker
-            speaker_segments = [{
-                'time': format_time(start),
-                'text': text,
-                'overlap_ratio': overlap_ratio,
-                'interpolated': is_interpolated,
-                'speaker': speaker
-            }]
+            speaker_segments = [
+                {
+                    "time": format_time(start),
+                    "text": text,
+                    "overlap_ratio": overlap_ratio,
+                    "interpolated": is_interpolated,
+                    "speaker": speaker,
+                }
+            ]
         else:
             # Add to current speaker
-            speaker_segments.append({
-                'time': format_time(start),
-                'text': text,
-                'overlap_ratio': overlap_ratio,
-                'interpolated': is_interpolated,
-                'speaker': speaker
-            })
+            speaker_segments.append(
+                {
+                    "time": format_time(start),
+                    "text": text,
+                    "overlap_ratio": overlap_ratio,
+                    "interpolated": is_interpolated,
+                    "speaker": speaker,
+                }
+            )
 
     # Output last speaker block
     if current_speaker and speaker_segments:
         speaker_role = role_labels.get(current_speaker, current_speaker)
         speaker_class = speaker_role.lower()
-        if speaker_class not in ['therapist', 'client', 'unknown']:
-            speaker_class = 'unknown'
+        if speaker_class not in ["therapist", "client", "unknown"]:
+            speaker_class = "unknown"
 
-        block_html = f'''
+        block_html = f"""
         <div class="speaker-block">
             <span class="speaker-label {speaker_class}">{speaker_role}</span>
-            <div class="speaker-text {speaker_class}-text">'''
+            <div class="speaker-text {speaker_class}-text">"""
 
         for seg in speaker_segments:
-            interpolated_class = ' interpolated' if seg.get('interpolated') else ''
-            overlap_info = f'<span class="overlap-info">({seg["overlap_ratio"]*100:.0f}% overlap)</span>' if seg["overlap_ratio"] > 0 and seg["speaker"] != "UNKNOWN" else ''
-            block_html += f'''
-                <span class="timestamp">{seg['time']}</span>
-                <span class="segment-text{interpolated_class}">{seg['text']}</span>
-                {overlap_info}<br>'''
+            interpolated_class = " interpolated" if seg.get("interpolated") else ""
+            overlap_info = (
+                f'<span class="overlap-info">({seg["overlap_ratio"] * 100:.0f}% overlap)</span>'
+                if seg["overlap_ratio"] > 0 and seg["speaker"] != "UNKNOWN"
+                else ""
+            )
+            block_html += f"""
+                <span class="timestamp">{seg["time"]}</span>
+                <span class="segment-text{interpolated_class}">{seg["text"]}</span>
+                {overlap_info}<br>"""
 
-        block_html += '''
+        block_html += """
             </div>
-        </div>'''
+        </div>"""
 
         transcript_blocks.append(block_html)
 
     # Fill in template
-    metadata = data.get('metadata', {})
+    metadata = data.get("metadata", {})
     html_content = html_template.format(
         improvement_message=improvement_message,
-        duration=format_time(metadata.get('duration', 0)),
-        language=metadata.get('language', 'Unknown').title(),
-        num_segments=metadata.get('num_segments', 0),
+        duration=format_time(metadata.get("duration", 0)),
+        language=metadata.get("language", "Unknown").title(),
+        num_segments=metadata.get("num_segments", 0),
         unknown_count=unknown_count,
         unknown_percentage=unknown_percentage,
-        transcript_html='\n'.join(transcript_blocks),
-        timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        improvement_factor=round(8.4 / max(unknown_percentage, 0.1), 1)  # Original was 8.4%
+        transcript_html="\n".join(transcript_blocks),
+        timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        improvement_factor=round(
+            8.4 / max(unknown_percentage, 0.1), 1
+        ),  # Original was 8.4%
     )
 
     # Write to file
-    with open(output_path, 'w') as f:
+    with open(output_path, "w") as f:
         f.write(html_content)
 
     print(f"✅ HTML transcript saved to: {output_path}")
 
 
-def process_with_improved_alignment(input_json_path: str, output_dir: Optional[str] = None) -> None:
+def process_with_improved_alignment(
+    input_json_path: str, output_dir: Optional[str] = None
+) -> None:
     """
     Process an existing diarization JSON output with improved alignment.
     Generates both updated JSON and HTML outputs.
     """
 
-    print("="*60)
+    print("=" * 60)
     print("APPLYING IMPROVED ALIGNMENT")
-    print("="*60)
+    print("=" * 60)
     print()
 
     # Load existing diarization output
-    with open(input_json_path, 'r') as f:
+    with open(input_json_path, "r") as f:
         data = json.load(f)
 
     # The JSON has 'diarized_segments' not 'segments'
-    segments = data.get('diarized_segments', [])
-    speaker_turns = data.get('speaker_turns', [])
+    segments = data.get("diarized_segments", [])
+    speaker_turns = data.get("speaker_turns", [])
 
     if not segments or not speaker_turns:
         print("❌ Error: No segments or speaker turns found in input file")
@@ -448,7 +466,7 @@ def process_with_improved_alignment(input_json_path: str, output_dir: Optional[s
         turns=speaker_turns,
         overlap_threshold=0.3,  # Use 30% threshold
         use_nearest_fallback=True,
-        debug=True
+        debug=True,
     )
     print()
 
@@ -458,30 +476,30 @@ def process_with_improved_alignment(input_json_path: str, output_dir: Optional[s
     print()
 
     # Update data structure
-    data['diarized_segments'] = aligned
-    data['metadata']['alignment_algorithm'] = 'improved_v2'
-    data['metadata']['overlap_threshold'] = 0.3
-    data['metadata']['num_segments'] = len(aligned)
+    data["diarized_segments"] = aligned
+    data["metadata"]["alignment_algorithm"] = "improved_v2"
+    data["metadata"]["overlap_threshold"] = 0.3
+    data["metadata"]["num_segments"] = len(aligned)
 
     # Count speaker turns
     current_speaker = None
     turn_count = 0
     for seg in aligned:
-        if seg['speaker'] != current_speaker:
+        if seg["speaker"] != current_speaker:
             turn_count += 1
-            current_speaker = seg['speaker']
-    data['metadata']['num_speaker_turns'] = turn_count
+            current_speaker = seg["speaker"]
+    data["metadata"]["num_speaker_turns"] = turn_count
 
     # Set output directory
     if output_dir is None:
         output_dir = Path(input_json_path).parent
 
     # Generate both JSON and HTML outputs
-    base_name = Path(input_json_path).stem.replace('_output', '')
+    base_name = Path(input_json_path).stem.replace("_output", "")
 
     # Save JSON
     json_output_path = Path(output_dir) / f"{base_name}_improved.json"
-    with open(json_output_path, 'w') as f:
+    with open(json_output_path, "w") as f:
         json.dump(data, f, indent=2)
     print(f"✅ JSON output saved to: {json_output_path}")
 
@@ -490,9 +508,9 @@ def process_with_improved_alignment(input_json_path: str, output_dir: Optional[s
     generate_html_output(data, html_output_path)
 
     print()
-    print("="*60)
+    print("=" * 60)
     print("✅ IMPROVED ALIGNMENT COMPLETE!")
-    print("="*60)
+    print("=" * 60)
 
 
 def main():

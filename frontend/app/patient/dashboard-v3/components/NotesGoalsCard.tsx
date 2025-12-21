@@ -43,11 +43,11 @@ export function NotesGoalsCard() {
       {/* Compact Card */}
       <motion.div
         onClick={() => setIsExpanded(true)}
-        className="bg-gradient-to-br from-white to-[#FFF9F5] dark:from-[#2a2435] dark:to-[#1a1625] rounded-2xl p-6 shadow-lg cursor-pointer h-[280px] overflow-hidden transition-colors duration-300 border border-gray-200/50 dark:border-[#3d3548]"
+        className="bg-gradient-to-br from-white to-[#FFF9F5] dark:from-[#2a2435] dark:to-[#1a1625] rounded-2xl p-6 shadow-lg cursor-pointer h-[525px] overflow-hidden transition-colors duration-300 border border-gray-200/50 dark:border-[#3d3548]"
         whileHover={{ scale: 1.01, boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}
         transition={{ duration: 0.2 }}
       >
-        <h2 className="text-xl font-serif font-semibold text-gray-800 dark:text-gray-200 mb-4">Notes / Goals</h2>
+        <h2 className="text-lg font-light text-gray-800 dark:text-gray-200 mb-4 text-center">Notes / Goals</h2>
 
         <p className="text-sm font-light text-gray-600 dark:text-gray-400 mb-4">{notesGoalsContent.summary}</p>
 
@@ -87,12 +87,10 @@ export function NotesGoalsCard() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="fixed w-[700px] max-h-[80vh] bg-white dark:bg-[#2a2435] rounded-3xl shadow-2xl p-8 z-[1001] overflow-y-auto border-2 border-gray-300 dark:border-gray-600"
+              className="fixed w-[700px] max-h-[80vh] bg-[#F8F7F4] dark:bg-[#2a2435] rounded-3xl shadow-2xl p-8 z-[1001] overflow-y-auto border-2 border-[#E0DDD8] dark:border-gray-600"
               style={{
                 top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                margin: 0
+                left: '50%'
               }}
               onClick={(e) => e.stopPropagation()}
               role="dialog"
@@ -108,11 +106,11 @@ export function NotesGoalsCard() {
               </button>
 
               {/* Content */}
-              <h2 className="text-2xl font-serif font-semibold text-gray-800 dark:text-gray-200 mb-4 pr-12">
+              <h2 className="text-2xl font-light text-gray-800 dark:text-gray-200 mb-4 pr-12">
                 Your Therapy Journey
               </h2>
 
-              <p className="text-base text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
+              <p className="text-base font-light text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
                 {notesGoalsContent.summary}
               </p>
 
@@ -122,7 +120,7 @@ export function NotesGoalsCard() {
                 </h3>
                 <ul className="space-y-2">
                   {notesGoalsContent.achievements.map((achievement, idx) => (
-                    <li key={idx} className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300">
+                    <li key={idx} className="flex items-start gap-3 text-sm font-light text-gray-700 dark:text-gray-300">
                       <span className="w-2 h-2 rounded-full bg-[#5AB9B4] dark:bg-[#a78bfa] mt-1.5 flex-shrink-0" />
                       <span>{achievement}</span>
                     </li>
@@ -136,7 +134,7 @@ export function NotesGoalsCard() {
                 </h3>
                 <ul className="space-y-2">
                   {notesGoalsContent.currentFocus.map((focus, idx) => (
-                    <li key={idx} className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300">
+                    <li key={idx} className="flex items-start gap-3 text-sm font-light text-gray-700 dark:text-gray-300">
                       <span className="w-2 h-2 rounded-full bg-[#B8A5D6] dark:bg-[#c084fc] mt-1.5 flex-shrink-0" />
                       <span>{focus}</span>
                     </li>
@@ -161,7 +159,7 @@ export function NotesGoalsCard() {
                     </button>
                     {openSections.has(idx) && (
                       <div className="p-4 bg-white dark:bg-[#2a2435]">
-                        <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{section.content}</p>
+                        <p className="text-sm font-light text-gray-700 dark:text-gray-300 leading-relaxed">{section.content}</p>
                       </div>
                     )}
                   </div>

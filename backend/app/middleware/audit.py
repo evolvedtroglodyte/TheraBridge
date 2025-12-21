@@ -136,6 +136,10 @@ class AuditMiddleware(BaseHTTPMiddleware):
         Returns:
             True if path should be excluded
         """
+        # Skip WebSocket connections
+        if request.headers.get("upgrade") == "websocket":
+            return True
+
         path = request.url.path
 
         # Check exact matches

@@ -10,7 +10,7 @@
 
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, ChevronDown, Maximize2, TrendingUp, Activity, Calendar, Target } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, ChevronDown, TrendingUp, Activity, Calendar, Target } from 'lucide-react';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   AreaChart, Area, CartesianGrid
@@ -201,7 +201,8 @@ export function ProgressPatternsCard() {
       {/* Compact Card */}
       <motion.div
         layoutId="progress-card"
-        className="relative overflow-hidden rounded-[24px] border border-white/40 dark:border-[#3d3548] shadow-xl h-[280px] bg-gradient-to-br from-white/20 to-white/10 dark:from-[#2a2435] dark:to-[#1a1625]"
+        onClick={() => setIsExpanded(true)}
+        className="relative overflow-hidden rounded-[24px] border border-white/40 dark:border-[#3d3548] shadow-xl h-[280px] bg-gradient-to-br from-white/20 to-white/10 dark:from-[#2a2435] dark:to-[#1a1625] cursor-pointer"
         style={{
           backdropFilter: 'blur(20px)',
           boxShadow: '0 4px 6px rgba(0,0,0,0.05), 0 10px 20px rgba(0,0,0,0.08), 0 25px 50px rgba(90,185,180,0.15)'
@@ -219,27 +220,13 @@ export function ProgressPatternsCard() {
         {/* Content Container */}
         <div className="relative z-10 p-5 flex flex-col h-full">
           {/* Header */}
-          <div className="flex justify-between items-start mb-3 flex-shrink-0">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-white/40 dark:bg-white/10 shadow-sm border border-white/50 dark:border-white/20 text-[#5AB9B4] dark:text-[#a78bfa]">
-                <CurrentIcon size={18} />
-              </div>
-              <div>
-                <h3 className="text-sm font-light text-gray-800 dark:text-gray-200 tracking-wide uppercase font-mono opacity-80">
-                  {currentMetric.title}
-                </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 font-light mt-0.5">
-                  {currentMetric.description}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => setIsExpanded(true)}
-              className="p-1.5 rounded-full hover:bg-white/30 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 transition-colors flex-shrink-0"
-              aria-label="Expand view"
-            >
-              <Maximize2 size={15} />
-            </button>
+          <div className="flex flex-col items-center mb-3 flex-shrink-0">
+            <h3 className="text-lg font-light text-gray-800 dark:text-gray-200 text-center mb-1">
+              {currentMetric.title}
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-light text-center">
+              {currentMetric.description}
+            </p>
           </div>
 
           {/* Chart Area */}
@@ -281,7 +268,7 @@ export function ProgressPatternsCard() {
               {progressMetrics.map((_, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setCurrentIndex(idx)}
+                  onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}
                   className={`
                     transition-all duration-300 rounded-full
                     ${idx === currentIndex ? 'w-6 h-1.5 bg-[#5AB9B4] dark:bg-[#a78bfa]' : 'w-1.5 h-1.5 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'}
@@ -293,13 +280,13 @@ export function ProgressPatternsCard() {
 
             <div className="flex gap-2">
               <button
-                onClick={prevSlide}
+                onClick={(e) => { e.stopPropagation(); prevSlide(); }}
                 className="w-7 h-7 flex items-center justify-center rounded-full bg-white/30 dark:bg-white/10 hover:bg-white/60 dark:hover:bg-white/20 text-gray-600 dark:text-gray-300 transition-colors border border-white/40 dark:border-white/20"
               >
                 <ChevronLeft size={14} />
               </button>
               <button
-                onClick={nextSlide}
+                onClick={(e) => { e.stopPropagation(); nextSlide(); }}
                 className="w-7 h-7 flex items-center justify-center rounded-full bg-white/30 dark:bg-white/10 hover:bg-white/60 dark:hover:bg-white/20 text-gray-600 dark:text-gray-300 transition-colors border border-white/40 dark:border-white/20"
               >
                 <ChevronRight size={14} />
@@ -327,12 +314,10 @@ export function ProgressPatternsCard() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="fixed w-[800px] max-h-[85vh] bg-white dark:bg-[#2a2435] rounded-3xl shadow-2xl p-8 z-[1001] overflow-y-auto border-2 border-gray-300 dark:border-gray-600"
+              className="fixed w-[800px] max-h-[85vh] bg-[#F8F7F4] dark:bg-[#2a2435] rounded-3xl shadow-2xl p-8 z-[1001] overflow-y-auto border-2 border-[#E0DDD8] dark:border-gray-600"
               style={{
                 top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                margin: 0
+                left: '50%'
               }}
               role="dialog"
               aria-modal="true"
@@ -341,7 +326,7 @@ export function ProgressPatternsCard() {
             >
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
-                <h2 id="progress-patterns-title" className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                <h2 id="progress-patterns-title" className="text-2xl font-light text-gray-800 dark:text-gray-200">
                   Progress Patterns
                 </h2>
                 <button
@@ -373,10 +358,10 @@ export function ProgressPatternsCard() {
                             <Icon size={20} />
                           </div>
                           <div className="text-left">
-                            <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+                            <h3 className="font-light text-gray-800 dark:text-gray-200">
                               {metric.title}
                             </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                               {metric.description}
                             </p>
                           </div>
@@ -410,7 +395,7 @@ export function ProgressPatternsCard() {
                                 <h4 className="text-[#5AB9B4] dark:text-[#a78bfa] font-semibold uppercase tracking-wider text-xs mb-1">
                                   Key Insight
                                 </h4>
-                                <p className="text-gray-700 dark:text-gray-300 text-sm">
+                                <p className="text-gray-700 dark:text-gray-300 text-sm font-light">
                                   {metric.insight}
                                 </p>
                               </div>

@@ -47,13 +47,13 @@ export function ToDoCard() {
       {/* Compact Card */}
       <motion.div
         onClick={() => setIsExpanded(true)}
-        className="bg-white dark:bg-[#2a2435] rounded-lg border border-gray-200 dark:border-[#3d3548] p-5 shadow-lg cursor-pointer h-[280px] flex flex-col transition-colors duration-300"
+        className="bg-[#F8F7F4] dark:bg-[#2a2435] rounded-lg border border-[#E0DDD8] dark:border-[#3d3548] p-5 shadow-lg cursor-pointer h-[280px] flex flex-col transition-colors duration-300"
         whileHover={{ y: -2, boxShadow: '0 6px 16px rgba(0,0,0,0.12)' }}
         transition={{ duration: 0.2 }}
       >
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-light text-gray-800 dark:text-gray-200">To-Do</h2>
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+        <h2 className="text-lg font-light text-gray-800 dark:text-gray-200 mb-2 text-center">To-Do</h2>
+        <div className="flex items-center justify-center mb-4">
+          <span className="text-sm font-light text-gray-600 dark:text-gray-400">
             {progressPercent}% ({completedCount}/{totalCount})
           </span>
         </div>
@@ -137,15 +137,13 @@ export function ToDoCard() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="fixed w-[600px] max-h-[80vh] bg-white dark:bg-[#2a2435] rounded-3xl shadow-2xl p-8 z-[1001] overflow-y-auto border-2 border-gray-300 dark:border-gray-600"
+              className="fixed w-[600px] max-h-[80vh] bg-[#F8F7F4] dark:bg-[#2a2435] rounded-3xl shadow-2xl p-8 z-[1001] overflow-y-auto border-2 border-[#E0DDD8] dark:border-gray-600"
               role="dialog"
               aria-modal="true"
               aria-labelledby="todo-title"
               style={{
                 top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                margin: 0
+                left: '50%'
               }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -156,8 +154,8 @@ export function ToDoCard() {
                 <X className="w-6 h-6 text-gray-600 dark:text-gray-400" />
               </button>
 
-              <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Homework Tasks</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              <h2 className="text-2xl font-light text-gray-800 dark:text-gray-200 mb-2">Homework Tasks</h2>
+              <p className="text-sm font-light text-gray-600 dark:text-gray-400 mb-6">
                 {progressPercent}% complete ({completedCount}/{totalCount} tasks)
               </p>
 
@@ -184,7 +182,7 @@ export function ToDoCard() {
                           className="w-5 h-5 rounded-full border-2 border-[#5AB9B4] dark:border-[#a78bfa] flex-shrink-0 mt-0.5 hover:bg-[#5AB9B4]/10 dark:hover:bg-[#a78bfa]/10 transition-colors"
                         />
                         <div className="flex-1">
-                          <p className="text-sm text-gray-700 dark:text-gray-300">{task.text}</p>
+                          <p className="text-sm font-light text-gray-700 dark:text-gray-300">{task.text}</p>
                           <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
                             From: Session {task.sessionId.replace('s', '')} ({task.sessionDate})
                           </p>
@@ -220,7 +218,7 @@ export function ToDoCard() {
                           </svg>
                         </button>
                         <div className="flex-1">
-                          <p className="text-sm text-gray-700 dark:text-gray-400 line-through">{task.text}</p>
+                          <p className="text-sm font-light text-gray-700 dark:text-gray-400 line-through">{task.text}</p>
                           <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
                             From: Session {task.sessionId.replace('s', '')} ({task.sessionDate})
                           </p>

@@ -117,6 +117,10 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         Returns:
             HTTP response with security headers added
         """
+        # Skip WebSocket connections
+        if request.headers.get("upgrade") == "websocket":
+            return await call_next(request)
+
         # Process request
         response = await call_next(request)
 

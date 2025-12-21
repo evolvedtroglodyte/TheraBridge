@@ -104,15 +104,13 @@ export function TherapistBridgeCard() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="fixed w-[700px] max-h-[80vh] bg-white dark:bg-[#2a2435] rounded-3xl shadow-2xl p-8 z-[1001] overflow-y-auto border-2 border-gray-300 dark:border-gray-600"
+              className="fixed w-[700px] max-h-[80vh] bg-[#F8F7F4] dark:bg-[#2a2435] rounded-3xl shadow-2xl p-8 z-[1001] overflow-y-auto border-2 border-[#E0DDD8] dark:border-gray-600"
               role="dialog"
               aria-modal="true"
               aria-labelledby="therapist-bridge-title"
               style={{
                 top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                margin: 0
+                left: '50%'
               }}
               onClick={(e) => e.stopPropagation()}
             >

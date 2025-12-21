@@ -1,0 +1,29 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "npm install && npm run build"
+  },
+  "deploy": {
+    "numReplicas": 1,
+    "sleepApplication": false,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  },
+  "environments": {
+    "production": {
+      "variables": {
+        "NODE_ENV": "production",
+        "API_HOST": "0.0.0.0",
+        "API_PORT": "${{ PORT }}",
+        "CORS_ORIGINS": "${{ RAILWAY_STATIC_URL }}",
+        "MAX_CONCURRENT_JOBS": "3",
+        "LOG_LEVEL": "INFO"
+      },
+      "secrets": [
+        "OPENAI_API_KEY",
+        "HUGGINGFACE_TOKEN"
+      ]
+    }
+  }
+}

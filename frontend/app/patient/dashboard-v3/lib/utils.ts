@@ -45,11 +45,15 @@ const springBounce = [0.34, 1.56, 0.64, 1] as const;
 export const modalVariants = {
   hidden: {
     opacity: 0,
-    scale: 0.9
+    scale: 0.9,
+    x: '-50%',
+    y: '-50%'
   },
   visible: {
     opacity: 1,
     scale: 1,
+    x: '-50%',
+    y: '-50%',
     transition: {
       duration: 0.4,
       ease: springBounce
@@ -58,6 +62,8 @@ export const modalVariants = {
   exit: {
     opacity: 0,
     scale: 0.9,
+    x: '-50%',
+    y: '-50%',
     transition: {
       duration: 0.3,
       ease: 'easeOut' as const
