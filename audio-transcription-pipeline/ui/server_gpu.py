@@ -486,26 +486,29 @@ cd TheraBridge/audio-transcription-pipeline
 
 echo "==> Installing dependencies with CUDA 12.4 + cuDNN 9 support..."
 
+# Clear pip cache to avoid version conflicts
+pip cache purge 2>/dev/null || true
+
 # Install PyTorch with CUDA 12.4 support FIRST (critical for cuDNN 9 compatibility)
-pip install -q torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu124
+pip install --no-cache-dir -q torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu124
 
 # Install ctranslate2 (requires cuDNN 9, compatible with PyTorch 2.5.1)
-pip install -q ctranslate2>=4.6.1
+pip install --no-cache-dir -q ctranslate2>=4.6.1
 
 # Install NVIDIA CUDA libraries for cuDNN 9 (REQUIRED)
-pip install -q nvidia-cublas-cu12 nvidia-cudnn-cu12==9.*
+pip install --no-cache-dir -q nvidia-cublas-cu12 nvidia-cudnn-cu12==9.*
 
 # Set library path for cuDNN 9
 export LD_LIBRARY_PATH=$(python3 -c 'import os; import nvidia.cublas.lib; import nvidia.cudnn.lib; print(os.path.dirname(nvidia.cublas.lib.__file__) + ":" + os.path.dirname(nvidia.cudnn.lib.__file__))')
 
 # Install faster-whisper (will use existing PyTorch and ctranslate2)
-pip install -q faster-whisper>=1.2.0
+pip install --no-cache-dir -q faster-whisper>=1.2.0
 
-# Install pyannote.audio 4.x (uses 'token=' parameter)
-pip install -q pyannote.audio>=4.0.0
+# Install pyannote.audio 4.x (uses 'token=' parameter) - FORCE latest version
+pip install --no-cache-dir --upgrade -q "pyannote.audio>=4.0.0"
 
 # Install additional dependencies
-pip install -q pydub julius python-dotenv
+pip install --no-cache-dir -q pydub julius python-dotenv
 
 # Verify CUDA setup
 echo "==> Verifying CUDA/cuDNN installation..."
