@@ -40,9 +40,9 @@ export default function UploadPageComplete() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Mock patient/therapist IDs
-  const MOCK_PATIENT_ID = 'patient-123';
-  const MOCK_THERAPIST_ID = 'therapist-456';
+  // Mock patient/therapist IDs (proper UUIDs for Supabase)
+  const MOCK_PATIENT_ID = '00000000-0000-0000-0000-000000000003';
+  const MOCK_THERAPIST_ID = '00000000-0000-0000-0000-000000000001';
 
   // Processing steps
   const steps = [
