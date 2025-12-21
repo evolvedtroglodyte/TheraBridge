@@ -45,12 +45,14 @@ Transform therapy sessions into actionable insights with automatic transcription
 
 ## 📦 Deployment (Hackathon-Ready)
 
-**Deploy in 10 minutes:** See [DEPLOYMENT.md](./DEPLOYMENT.md)
+**Deploy in 10 minutes:** See [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md)
 
 **Stack:**
-- ✅ **Vercel** - Next.js hosting + serverless functions (FREE)
+- ✅ **Railway** - Next.js hosting + backend support ($5 FREE credit)
 - ✅ **Supabase** - PostgreSQL + file storage (FREE)
 - ⚠️ **OpenAI** - Whisper API + GPT-4 (~$0.40 per session)
+
+**Why Railway over Vercel:** Transparent pricing, no dark patterns, developer-first platform
 
 ---
 
@@ -85,9 +87,10 @@ Transform therapy sessions into actionable insights with automatic transcription
 ```
 ┌─────────────────────────────────┐
 │   Next.js 16 + React 19         │
+│   (Deployed on Railway)         │
 │   - App Router                  │
 │   - Server Components           │
-│   - API Routes (Serverless)     │
+│   - API Routes                  │
 └───────────┬─────────────────────┘
             │
             ├─► Supabase

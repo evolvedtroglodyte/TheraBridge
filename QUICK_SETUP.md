@@ -68,7 +68,7 @@
 
 ---
 
-## Step 3: Deploy to Vercel (5 minutes)
+## Step 3: Deploy to Railway (5 minutes)
 
 1. **Push to GitHub**
    ```bash
@@ -77,17 +77,20 @@
    git push origin main
    ```
 
-2. **Create Vercel Project**
-   - Go to [vercel.com](https://vercel.com)
-   - Sign up with GitHub
-   - Click "Add New Project"
-   - Import your repository
+2. **Create Railway Project**
+   - Go to [railway.app](https://railway.app)
+   - Sign up with GitHub (get $5 FREE credit!)
+   - Click "New Project"
+   - Select "Deploy from GitHub repo"
+   - Authorize Railway to access your repository
+   - Select your repository
    - **Important:** Set Root Directory to `frontend`
-   - Framework Preset: Next.js (auto-detected)
+   - Railway auto-detects Next.js ✅
    - Click "Deploy"
 
 3. **Add Environment Variables** (while deployment is running)
-   - Go to Project Settings → Environment Variables
+   - Click on your service in Railway dashboard
+   - Go to "Variables" tab
    - Add these 3 variables:
 
    | Variable Name | Value | Where to get it |
@@ -96,14 +99,17 @@
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJ...` | Supabase → Project Settings → API |
    | `OPENAI_API_KEY` | `sk-proj-...` | Your OpenAI account |
 
-   - Click "Save" for each
-   - **Important:** Redeploy after adding env vars
-     - Go to Deployments tab
-     - Click "..." on latest deployment
-     - Click "Redeploy"
+   - Click "Deploy" after adding all variables
+   - Railway will automatically redeploy
 
-4. **Test Your Live App**
-   - Copy your Vercel URL (e.g., `https://therapybridge-xxx.vercel.app`)
+4. **Get Your Public URL**
+   - Go to "Settings" tab
+   - Under "Networking" → "Public Networking"
+   - Click "Generate Domain"
+   - Copy your URL (e.g., `therapybridge-production.up.railway.app`)
+
+5. **Test Your Live App**
+   - Open your Railway URL
    - Navigate to `/patient/dashboard-v3`
    - Click "Upload"
    - Upload a test audio file
@@ -114,7 +120,7 @@
 ## Troubleshooting
 
 ### Error: "Missing Supabase environment variables"
-**Solution:** Make sure you added the env vars in Vercel and redeployed.
+**Solution:** Make sure you added the env vars in Railway and redeployed.
 
 ### Error: "Failed to upload file"
 **Solution:** Check Supabase Storage:
@@ -124,9 +130,9 @@
 
 ### Error: "Processing failed"
 **Solution:** Check function logs:
-1. Vercel Dashboard → Deployments → Click on latest
-2. Functions tab → Find `/api/process`
-3. Check error messages
+1. Railway Dashboard → Your service → Deployments
+2. Click on latest deployment → View Logs
+3. Check error messages in real-time
 
 ### Error: "Row Level Security policy violation"
 **Solution:** For hackathon demo, you can temporarily disable RLS:
@@ -200,7 +206,7 @@ Need test audio? Use these:
 ## Costs (Hackathon)
 
 **Free Tier:**
-- ✅ Vercel: Unlimited deployments, 100GB bandwidth/month
+- ✅ Railway: $5 credit/month (no credit card required!)
 - ✅ Supabase: 500MB database, 1GB file storage
 
 **Pay-per-use:**
@@ -238,7 +244,7 @@ If you want to take this to production:
 ## You're Ready! 🚀
 
 Your hackathon demo is now:
-- ✅ Deployed globally on Vercel
+- ✅ Deployed globally on Railway (ethical, transparent pricing!)
 - ✅ Connected to Supabase database
 - ✅ Processing audio with OpenAI
 - ✅ Showing real-time progress
