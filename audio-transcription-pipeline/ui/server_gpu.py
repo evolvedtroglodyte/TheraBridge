@@ -509,8 +509,8 @@ pip install -q pydub julius python-dotenv
 
 # Verify CUDA setup
 echo "==> Verifying CUDA/cuDNN installation..."
-python3 -c "import torch; print(f'PyTorch: {torch.__version__}, CUDA: {torch.cuda.is_available()}, cuDNN: {torch.backends.cudnn.version()}')"
-python3 -c "import ctranslate2; print(f'ctranslate2: {ctranslate2.__version__}, CUDA devices: {ctranslate2.get_cuda_device_count()}')"
+python3 -c "import torch; print(f'PyTorch: {{torch.__version__}}, CUDA: {{torch.cuda.is_available()}}, cuDNN: {{torch.backends.cudnn.version()}}')" || echo "Warning: Could not verify PyTorch"
+python3 -c "import ctranslate2; print(f'ctranslate2: {{ctranslate2.__version__}}, CUDA devices: {{ctranslate2.get_cuda_device_count()}}')" || echo "Warning: Could not verify ctranslate2"
 
 export HF_TOKEN={os.getenv('HF_TOKEN', '')}
 
