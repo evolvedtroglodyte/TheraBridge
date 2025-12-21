@@ -1,42 +1,150 @@
-# TherapyBridge - Monorepo
+# TherapyBridge
 
-AI-powered therapy session transcription and analysis platform.
+**AI-powered therapy session transcription and analysis platform**
+
+Transform therapy sessions into actionable insights with automatic transcription, speaker diarization, and intelligent analysis.
+
+---
+
+## 🚀 Quick Start (Local Development)
+
+### Prerequisites
+- Node.js 20+
+- Supabase account (free tier)
+- OpenAI API key
+
+### Setup
+
+1. **Clone and install**
+   ```bash
+   git clone <your-repo>
+   cd "peerbridge proj/frontend"
+   npm install
+   ```
+
+2. **Configure environment**
+   ```bash
+   # Edit frontend/.env.local with your credentials:
+   # - NEXT_PUBLIC_SUPABASE_URL
+   # - NEXT_PUBLIC_SUPABASE_ANON_KEY
+   # - OPENAI_API_KEY
+   ```
+
+3. **Set up Supabase**
+   - Create project at [supabase.com](https://supabase.com)
+   - Run `supabase/schema.sql` in SQL Editor
+   - Copy URL and anon key to `.env.local`
+
+4. **Run development server**
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000/patient/dashboard-v3](http://localhost:3000/patient/dashboard-v3)
+
+---
+
+## 📦 Deployment (Hackathon-Ready)
+
+**Deploy in 10 minutes:** See [DEPLOYMENT.md](./DEPLOYMENT.md)
+
+**Stack:**
+- ✅ **Vercel** - Next.js hosting + serverless functions (FREE)
+- ✅ **Supabase** - PostgreSQL + file storage (FREE)
+- ⚠️ **OpenAI** - Whisper API + GPT-4 (~$0.40 per session)
+
+---
+
+## ✨ Features
+
+### Patient Dashboard
+- **Session Timeline** - Chronological view of all therapy sessions
+- **AI Chat (Dobby)** - Ask questions about your therapy journey
+- **Notes & Goals** - Track progress and treatment plans
+- **Progress Patterns** - Visualize mood and topic trends
+- **Upload Page** - Drag-drop audio files for processing
+
+### Audio Processing
+- **Automatic Transcription** - OpenAI Whisper API (accurate, fast)
+- **Speaker Diarization** - Identify Therapist vs. Client
+- **Session Analysis** - GPT-4 extracts:
+  - Overall mood/tone
+  - Main topics discussed
+  - Key insights
+  - Action items
+  - Brief summary
+
+### Real-Time Progress
+- Live progress bar during processing
+- Status polling every 2 seconds
+- Estimated completion time
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────┐
+│   Next.js 16 + React 19         │
+│   - App Router                  │
+│   - Server Components           │
+│   - API Routes (Serverless)     │
+└───────────┬─────────────────────┘
+            │
+            ├─► Supabase
+            │   - PostgreSQL (sessions, users, notes)
+            │   - Storage (audio files)
+            │   - Row Level Security
+            │
+            └─► OpenAI APIs
+                - Whisper (transcription)
+                - GPT-4 (analysis)
+```
+
+### Database Schema
+
+**Core Tables:**
+- `users` - Therapists and patients
+- `patients` - Extended patient info
+- `therapy_sessions` - Session metadata + results
+- `session_notes` - AI-extracted clinical notes
+- `treatment_goals` - Goal tracking
+
+**Storage:**
+- `audio-sessions` bucket - Uploaded audio files
+
+---
 
 ## Project Structure
 
-This monorepo contains two independent, deployable projects:
-
 ```
 peerbridge proj/
-├── .claude/                          # Claude Code config & orchestration methodology
-├── Project MDs/
-│   └── TherapyBridge.md             # Master documentation (read this first!)
-├── audio-transcription-pipeline/    # Standalone audio processing
-├── backend/                          # Standalone FastAPI server
-└── frontend/                         # Next.js dashboard (in development)
+├── frontend/                      # Next.js application
+│   ├── app/
+│   │   ├── api/                   # Serverless API routes
+│   │   │   ├── upload/            # File upload endpoint
+│   │   │   ├── process/           # Audio processing
+│   │   │   ├── status/[id]/       # Status polling
+│   │   │   └── trigger-processing/ # Async trigger
+│   │   └── patient/dashboard-v3/  # Main dashboard
+│   │       ├── upload/            # Upload page
+│   │       └── components/        # UI components
+│   ├── lib/
+│   │   ├── supabase.ts            # Supabase client + types
+│   │   └── api-client.ts          # API helpers
+│   └── package.json
+│
+├── audio-transcription-pipeline/  # Original pipeline (reference)
+│   ├── src/
+│   │   ├── pipeline.py            # CPU/API pipeline
+│   │   └── pipeline_gpu.py        # GPU pipeline (legacy)
+│   └── ui-web/                    # React UI (reference)
+│
+├── supabase/
+│   └── schema.sql                 # Database schema
+│
+├── DEPLOYMENT.md                  # Deployment guide
+└── README.md                      # This file
 ```
-
-### Projects
-
-**1. Audio Transcription Pipeline** (`audio-transcription-pipeline/`)
-- Converts therapy audio to speaker-labeled transcripts
-- CPU/API and GPU/Vast.ai implementations
-- Standalone deployment
-- See: `audio-transcription-pipeline/README.md`
-
-**2. Backend API** (`backend/`)
-- FastAPI server for session management
-- AI-powered note extraction (GPT-4o)
-- PostgreSQL database integration
-- Standalone deployment
-- See: `backend/README.md`
-
-**3. Frontend Dashboard** (`frontend/`)
-- Next.js 16 + React 19 + Tailwind CSS
-- Therapist and patient dashboards
-- Session transcript viewer
-- In active development
-- See: `frontend/README.md`
 
 ## Quick Start
 

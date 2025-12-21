@@ -10,6 +10,7 @@
  */
 
 import { useTheme } from '../contexts/ThemeContext';
+import { useRouter } from 'next/navigation';
 
 // Custom Home Icon with glow effect (matches fullscreen chat)
 function HomeIcon({ isDark }: { isDark: boolean }) {
@@ -80,10 +81,16 @@ interface HeaderProps {
 
 export function Header({ onAskAIClick }: HeaderProps) {
   const { isDark, toggleTheme } = useTheme();
+  const router = useRouter();
 
   // Scroll to top of dashboard
   const handleHomeClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Navigate to upload page
+  const handleUploadClick = () => {
+    router.push('/patient/dashboard-v3/upload');
   };
 
   return (
@@ -119,7 +126,10 @@ export function Header({ onAskAIClick }: HeaderProps) {
           >
             Ask AI
           </button>
-          <button className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
+          <button
+            onClick={handleUploadClick}
+            className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa] transition-colors"
+          >
             Upload
           </button>
         </nav>
