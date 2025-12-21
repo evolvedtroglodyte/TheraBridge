@@ -467,7 +467,7 @@ class PerformanceLogger:
         }
 
         # Add stage percentages
-        if summary["total_duration"] > 0:
+        if summary.get("total_duration") and summary["total_duration"] > 0:
             for stage_name, stage_data in summary["stages"].items():
                 stage_data["percentage"] = (stage_data["duration"] / summary["total_duration"]) * 100
 

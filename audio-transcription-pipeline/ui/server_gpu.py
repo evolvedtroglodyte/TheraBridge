@@ -484,13 +484,13 @@ echo "==> Installing dependencies with CUDA 12.4 + cuDNN 9 support..."
 echo "Purging pip cache..."
 pip cache purge 2>/dev/null || true
 
-# Install PyTorch with CUDA 12.4 support FIRST (critical for cuDNN 9 compatibility)
-echo "Installing PyTorch 2.5.1 + CUDA 12.4..."
-pip install --no-cache-dir torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu124
+# Install pyannote.audio 4.x first (will install PyTorch 2.8.0 as dependency)
+echo "Installing pyannote.audio 4.x with PyTorch 2.8.0..."
+pip install --no-cache-dir --upgrade "pyannote.audio>=4.0.0"
 
-# Install ctranslate2 (requires cuDNN 9, compatible with PyTorch 2.5.1)
-echo "Installing ctranslate2..."
-pip install --no-cache-dir ctranslate2>=4.6.1
+# Install faster-whisper (compatible with PyTorch 2.8.0)
+echo "Installing faster-whisper..."
+pip install --no-cache-dir faster-whisper>=1.2.0
 
 # Install NVIDIA CUDA libraries for cuDNN 9 (REQUIRED)
 echo "Installing CUDA libraries..."
@@ -498,21 +498,6 @@ pip install --no-cache-dir nvidia-cublas-cu12 nvidia-cudnn-cu12==9.*
 
 # Set library path for cuDNN 9
 export LD_LIBRARY_PATH=$(python3 -c 'import os; import nvidia.cublas.lib; import nvidia.cudnn.lib; print(os.path.dirname(nvidia.cublas.lib.__file__) + ":" + os.path.dirname(nvidia.cudnn.lib.__file__))')
-
-# Install faster-whisper (will use existing PyTorch and ctranslate2)
-echo "Installing faster-whisper..."
-pip install --no-cache-dir faster-whisper>=1.2.0
-
-# Install pyannote.audio 4.x (uses 'token=' parameter) - FORCE latest version
-echo "Installing pyannote.audio 4.x..."
-pip install --no-cache-dir --upgrade "pyannote.audio>=4.0.0"
-
-# Force reinstall PyTorch 2.5.1 (pyannote may have upgraded it to 2.8.0)
-# Uninstall first to avoid hash checking issues with --force-reinstall
-echo "Fixing PyTorch version (uninstalling conflicting versions)..."
-pip uninstall -y torch torchvision torchaudio 2>/dev/null || true
-echo "Reinstalling PyTorch 2.5.1..."
-pip install --no-cache-dir torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu124
 
 # Install additional dependencies
 echo "Installing additional dependencies..."
