@@ -410,22 +410,29 @@ async def run_vast_pipeline(job_id: str, audio_path: Path, num_speakers: int = 2
             env={**os.environ, "VAST_API_KEY": VAST_API_KEY}
         )
 
-        # Parse SSH connection details from API response
-        # API returns: ssh://root@ssh1.vast.ai:PORT or ssh://root@DIRECT_IP:PORT
-        # We always use the proxy hostname (ssh1.vast.ai) but extract the dynamic port
+        # Parse SSH connection details from Vast.ai API
+        # Note: vastai ssh-url returns direct IP, we need the proxy details instead
+        # Use Vast.ai REST API to get correct ssh_host and ssh_port
         ssh_host = None
         ssh_port = None
 
-        if result.returncode == 0 and result.stdout.strip():
-            ssh_url = result.stdout.strip()
-            if ssh_url.startswith("ssh://"):
-                import re
-                match = re.match(r'ssh://root@([^:]+):(\d+)', ssh_url)
-                if match:
-                    # Always use Vast.ai proxy hostname, but extract the dynamic port
-                    ssh_host = "ssh1.vast.ai"
-                    ssh_port = match.group(2)  # Extract port from API response
-                    print(f"[Vast.ai] Using proxy: {ssh_host}:{ssh_port}")
+        try:
+            import requests
+            api_url = f"https://console.vast.ai/api/v0/instances/{VAST_INSTANCE_ID}/"
+            headers = {"Authorization": f"Bearer {VAST_API_KEY}"}
+            response = requests.get(api_url, headers=headers, timeout=5)
+            if response.status_code == 200:
+                instance_data = response.json().get("instances", {})
+                ssh_host = instance_data.get("ssh_host", "ssh1.vast.ai")
+                api_port = instance_data.get("ssh_port")
+
+                # IMPORTANT: Vast.ai API returns port N, but working proxy port is N+1
+                # This appears to be a quirk of Vast.ai's proxy routing
+                if api_port:
+                    ssh_port = str(int(api_port) + 1)
+                    print(f"[Vast.ai] Using proxy: {ssh_host}:{ssh_port} (API returned {api_port}, using +1)")
+        except Exception as e:
+            print(f"[Vast.ai] API error: {e}, falling back to environment check")
 
         if not ssh_host or not ssh_port:
             jobs[job_id]["status"] = "failed"
