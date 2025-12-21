@@ -523,44 +523,71 @@ echo "Purging pip cache..."
 pip cache purge 2>/dev/null || true
 
 # Install NVIDIA CUDA libraries FIRST (required by PyTorch)
-echo "Installing CUDA libraries (cuDNN 9)..."
-pip install --no-cache-dir nvidia-cublas-cu12 nvidia-cudnn-cu12==9.* 2>&1 | grep -v "WARNING: Running pip as"
+echo "==> [STEP 1/5] Installing CUDA libraries (cuDNN 9)..."
+pip install --no-cache-dir nvidia-cublas-cu12 nvidia-cudnn-cu12==9.*
+echo "✓ CUDA libraries installed"
 
 # Set library path for cuDNN 9 (with error handling)
-echo "Setting CUDA library path..."
+echo "==> [STEP 2/5] Setting CUDA library path..."
 export LD_LIBRARY_PATH=$(python3 -c 'import os; import nvidia.cublas.lib; import nvidia.cudnn.lib; print(os.path.dirname(nvidia.cublas.lib.__file__) + ":" + os.path.dirname(nvidia.cudnn.lib.__file__))' 2>/dev/null || echo "/usr/local/lib/python3.12/dist-packages/nvidia/cudnn/lib:/usr/local/lib/python3.12/dist-packages/nvidia/cublas/lib")
+echo "✓ LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
 
 # Install pyannote.audio 4.x (will install PyTorch 2.8.0 as dependency)
-echo "Installing pyannote.audio 4.x with PyTorch 2.8.0..."
-pip install --no-cache-dir --upgrade "pyannote.audio>=4.0.0" 2>&1 | grep -v "WARNING: Running pip as"
+echo "==> [STEP 3/5] Installing pyannote.audio 4.x with PyTorch 2.8.0..."
+pip install --no-cache-dir --upgrade "pyannote.audio>=4.0.0"
+echo "✓ pyannote.audio installed"
 
 # Install faster-whisper (compatible with PyTorch 2.8.0)
-echo "Installing faster-whisper..."
-pip install --no-cache-dir faster-whisper>=1.2.0 2>&1 | grep -v "WARNING: Running pip as"
+echo "==> [STEP 4/5] Installing faster-whisper..."
+pip install --no-cache-dir faster-whisper>=1.2.0
+echo "✓ faster-whisper installed"
 
 # Install additional dependencies
-echo "Installing additional dependencies..."
-pip install --no-cache-dir pydub julius python-dotenv 2>&1 | grep -v "WARNING: Running pip as"
+echo "==> [STEP 5/5] Installing additional dependencies (pydub, julius, python-dotenv)..."
+pip install --no-cache-dir pydub julius python-dotenv
+echo "✓ All dependencies installed"
 
 # Verify CUDA setup
-echo "==> Verifying CUDA/cuDNN installation..."
-python3 -c "import torch; print(f'PyTorch: {{torch.__version__}}, CUDA: {{torch.cuda.is_available()}}, cuDNN: {{torch.backends.cudnn.version()}}')" || echo "Warning: Could not verify PyTorch"
-python3 -c "import ctranslate2; print(f'ctranslate2: {{ctranslate2.__version__}}, CUDA devices: {{ctranslate2.get_cuda_device_count()}}')" || echo "Warning: Could not verify ctranslate2"
+echo "==> [VERIFICATION] Checking CUDA/cuDNN installation..."
+python3 -c "import torch; print(f'✓ PyTorch: {{torch.__version__}}, CUDA: {{torch.cuda.is_available()}}, cuDNN: {{torch.backends.cudnn.version()}}')" || echo "❌ Warning: Could not verify PyTorch"
+python3 -c "import ctranslate2; print(f'✓ ctranslate2: {{ctranslate2.__version__}}, CUDA devices: {{ctranslate2.get_cuda_device_count()}}')" || echo "❌ Warning: Could not verify ctranslate2"
+echo ""
 
+echo "==> [ENVIRONMENT] Setting up HuggingFace token..."
 export HF_TOKEN={os.getenv('HF_TOKEN', '')}
+echo "✓ HF_TOKEN configured (length: ${{#HF_TOKEN}})"
+echo ""
 
-echo "==> Processing audio with GPU pipeline..."
+echo "============================================================"
+echo "==> [PIPELINE] Starting GPU transcription pipeline..."
+echo "============================================================"
 python3 << 'EOF'
 import os
 import json
 import sys
 from pathlib import Path
 
+# Enable detailed logging
+import logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+print("==> [INIT] Initializing pipeline modules...")
 sys.path.insert(0, 'src')
 
 from pipeline_gpu import GPUTranscriptionPipeline
 
+print("==> [INIT] Creating GPUTranscriptionPipeline (model: large-v3)...")
 with GPUTranscriptionPipeline(whisper_model="large-v3") as pipeline:
+    print("==> [PROCESSING] Starting audio processing...")
+    print("    - Input: /root/audio_input.mp3")
+    print("    - Speakers: {num_speakers}")
+    print("    - Language: en")
+    print("    - Diarization: enabled")
+    print("")
+
     results = pipeline.process(
         audio_path="/root/audio_input.mp3",
         num_speakers={num_speakers},
@@ -568,11 +595,20 @@ with GPUTranscriptionPipeline(whisper_model="large-v3") as pipeline:
         enable_diarization=True
     )
 
+    print("")
+    print("==> [OUTPUT] Writing results to /root/results.json...")
+
 with open('/root/results.json', 'w') as f:
     json.dump(results, f, indent=2, default=str)
 
-print("Processing complete!")
+print("✓ Processing complete!")
+print("✓ Results saved to /root/results.json")
 EOF
+
+echo ""
+echo "============================================================"
+echo "✓ GPU pipeline execution finished"
+echo "============================================================"
 """
 
         # Save script locally
@@ -663,13 +699,17 @@ EOF
                 jobs[job_id]["progress"] = 93
                 jobs[job_id]["step"] = "GPU processing complete, preparing results"
 
-        # Read stderr
+        # Read stderr (print ALL errors/warnings)
         stderr_lines = []
         while True:
             line = await process.stderr.readline()
             if not line:
                 break
-            stderr_lines.append(line.decode().strip())
+            line_str = line.decode().strip()
+            stderr_lines.append(line_str)
+            # Print ALL stderr output for maximum visibility
+            if line_str:
+                print(f"[Vast.ai STDERR] {line_str}")
 
         # Wait for process to complete
         await process.wait()
@@ -680,8 +720,10 @@ EOF
 
         if process.returncode != 0:
             jobs[job_id]["status"] = "failed"
-            jobs[job_id]["error"] = f"Remote execution failed: {stderr}"
-            print(f"[Vast.ai] Failed: {stderr}")
+            jobs[job_id]["error"] = f"Remote execution failed (exit code {process.returncode}): {stderr}"
+            print(f"[Vast.ai] ❌ FAILED (exit code {process.returncode})")
+            print(f"[Vast.ai] Full stderr output:")
+            print(stderr)
             return
 
         jobs[job_id]["progress"] = 95
@@ -698,23 +740,31 @@ EOF
             str(output_file)
         ]
 
+        print(f"[Vast.ai] Downloading results from {ssh_host}:{ssh_port}...")
         download_process = await asyncio.create_subprocess_exec(
             *download_cmd,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
 
-        await download_process.communicate()
+        download_stdout, download_stderr = await download_process.communicate()
+
+        if download_process.returncode != 0:
+            print(f"[Vast.ai] ❌ Download failed (exit code {download_process.returncode})")
+            print(f"[Vast.ai] Download stderr: {download_stderr.decode()}")
 
         if output_file.exists():
+            file_size = output_file.stat().st_size
             jobs[job_id]["status"] = "completed"
             jobs[job_id]["progress"] = 100
             jobs[job_id]["step"] = "Processing complete"
             jobs[job_id]["output_file"] = str(output_file)
-            print(f"[Vast.ai] Completed: {output_file}")
+            print(f"[Vast.ai] ✓ Completed successfully!")
+            print(f"[Vast.ai] Results saved: {output_file} ({file_size} bytes)")
         else:
             jobs[job_id]["status"] = "failed"
-            jobs[job_id]["error"] = "Could not download results from Vast.ai"
+            jobs[job_id]["error"] = f"Could not download results from Vast.ai (download exit code: {download_process.returncode})"
+            print(f"[Vast.ai] ❌ Results file not found after download: {output_file}")
 
         # Cleanup remote files
         cleanup_cmd = [
