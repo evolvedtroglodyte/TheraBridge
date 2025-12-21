@@ -430,6 +430,7 @@ async def run_vast_pipeline(job_id: str, audio_path: Path, num_speakers: int = 2
         # Upload audio file via SCP
         upload_cmd = [
             "scp",
+            "-i", os.path.expanduser("~/.ssh/id_ed25519"),
             "-o", "StrictHostKeyChecking=no",
             "-o", "UserKnownHostsFile=/dev/null",
             "-P", ssh_port,
@@ -557,6 +558,7 @@ EOF
         # Upload script
         script_upload_cmd = [
             "scp",
+            "-i", os.path.expanduser("~/.ssh/id_ed25519"),
             "-o", "StrictHostKeyChecking=no",
             "-o", "UserKnownHostsFile=/dev/null",
             "-P", ssh_port,
@@ -583,6 +585,7 @@ EOF
         # Execute script on remote
         ssh_cmd = [
             "ssh",
+            "-i", os.path.expanduser("~/.ssh/id_ed25519"),
             "-o", "StrictHostKeyChecking=no",
             "-o", "UserKnownHostsFile=/dev/null",
             "-p", ssh_port,
@@ -666,6 +669,7 @@ EOF
         output_file = RESULTS_DIR / f"{job_id}.json"
         download_cmd = [
             "scp",
+            "-i", os.path.expanduser("~/.ssh/id_ed25519"),
             "-o", "StrictHostKeyChecking=no",
             "-o", "UserKnownHostsFile=/dev/null",
             "-P", ssh_port,
@@ -694,6 +698,7 @@ EOF
         # Cleanup remote files
         cleanup_cmd = [
             "ssh",
+            "-i", os.path.expanduser("~/.ssh/id_ed25519"),
             "-o", "StrictHostKeyChecking=no",
             "-o", "UserKnownHostsFile=/dev/null",
             "-p", ssh_port,
