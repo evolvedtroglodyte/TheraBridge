@@ -1,3 +1,0 @@
-app/auth/router.py:@limiter.limit("5/minute")
-app/auth/router.py:@limiter.limit("3/hour")
-app/auth/router.py:@limiter.limit("10/minute")

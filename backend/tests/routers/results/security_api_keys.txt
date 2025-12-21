@@ -1,1 +1,0 @@
-app/services/note_extraction.py:        self.api_key = api_key or os.getenv("OPENAI_API_KEY")

@@ -1,8 +1,0 @@
-{
-  "status": "healthy",
-  "service": "TherapyBridge API",
-  "version": "1.0.0",
-  "status_code": 200,
-  "endpoint": "/",
-  "result": "SUCCESS"
-}

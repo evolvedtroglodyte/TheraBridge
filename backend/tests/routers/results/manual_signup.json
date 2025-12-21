@@ -1,7 +1,0 @@
-{
-  "error": "Database schema mismatch",
-  "status_code": 500,
-  "details": "column users.full_name does not exist",
-  "issue": "The User model expects a full_name column but the database schema doesn't have it",
-  "recommendation": "Need to run Alembic migrations or add full_name column to users table"
-}

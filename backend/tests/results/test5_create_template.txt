@@ -1,2 +1,0 @@
-{"error":{"code":"VALIDATION_ERROR","message":"Invalid request data. Please check the highlighted fields.","retriable":false,"request_id":"5270241b-9ff4-4a16-b9d6-3be6cd10f0c3","details":{"validation_errors":[{"field":"body -> structure","message":"Field required","type":"missing"}]}}}
-HTTP_STATUS:422

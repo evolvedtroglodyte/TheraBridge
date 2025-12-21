@@ -1,2 +1,0 @@
-{"error":{"code":"VALIDATION_ERROR","message":"Invalid request data. Please check the highlighted fields.","retriable":false,"request_id":"8dfca5e8-ad10-4fdf-8bcd-0b015007f7f3","details":{"validation_errors":[{"field":"path -> template_id","message":"Input should be a valid UUID, invalid character: expected an optional prefix of `urn:uuid:` followed by [0-9a-fA-F-], found `n` at 1","type":"uuid_parsing"}]}}}
-HTTP_STATUS:422

@@ -1,2 +1,0 @@
-[{"id":"f7e8a1b2-c3d4-4e5f-9a8b-1c2d3e4f5a6b","name":"SOAP Note","description":"Standard SOAP format for medical and therapy documentation","template_type":"soap","is_system":true,"is_shared":false,"section_count":4,"created_at":"2025-12-18T00:38:52.007087Z"}]
-HTTP_STATUS:200

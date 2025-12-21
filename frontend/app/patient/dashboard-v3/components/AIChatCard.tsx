@@ -436,16 +436,11 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
                     animate={{ opacity: 1, y: 0 }}
                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start items-start gap-2'}`}
                   >
-                    {/* Avatar for assistant messages - mode dependent */}
-                    {/* AI mode: DobbyLogoGeometric (no face), Therapist mode: HeartSpeechIcon (orange) */}
+                    {/* Avatar for assistant messages - always DobbyLogo with face */}
                     {/* Size: 32px (15% bigger than original 28px) */}
                     {msg.role === 'assistant' && (
                       <div className="flex-shrink-0 mt-1">
-                        {mode === 'ai' ? (
-                          <DobbyLogoGeometric size={32} />
-                        ) : (
-                          <HeartSpeechIcon size={32} />
-                        )}
+                        <DobbyLogo size={32} />
                       </div>
                     )}
 
@@ -477,11 +472,7 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
                 {isLoading && (
                   <div className="flex justify-start items-start gap-2">
                     <div className="flex-shrink-0 mt-1">
-                      {mode === 'ai' ? (
-                        <DobbyLogoGeometric size={32} />
-                      ) : (
-                        <HeartSpeechIcon size={32} />
-                      )}
+                      <DobbyLogo size={32} />
                     </div>
                     <div className={`px-3 py-2 rounded-2xl rounded-tl-sm ${
                       isDark ? 'bg-[#2a2535]' : 'bg-white shadow-sm border border-gray-100'
@@ -512,10 +503,10 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
                     : 'bg-white border border-[#E5E2DE]'
                 }`}
               >
-                {/* Input Field */}
+                {/* Input Field - placeholder changes based on mode */}
                 <input
                   type="text"
-                  placeholder="Ask Dobby anything..."
+                  placeholder={mode === 'ai' ? "Ask Dobby anything..." : "Send a message to your therapist..."}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value.slice(0, MAX_CHARS))}
                   onKeyPress={handleKeyPress}
@@ -556,12 +547,12 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
                         mode === 'therapist'
                           ? 'bg-gradient-to-br from-[#F4A69D] to-[#E88B7E] text-white'
                           : isDark
-                            ? 'bg-[#2a2535] text-[#F4A69D] hover:bg-[#3a3545]'
-                            : 'bg-[#F0EFEB] text-[#F4A69D] hover:bg-[#E5E2DE]'
+                            ? 'bg-[#2a2535] text-[#888] hover:bg-[#3a3545]'
+                            : 'bg-[#F0EFEB] text-[#666] hover:bg-[#E5E2DE]'
                       }`}
                     >
-                      {/* Heart speech icon for therapist mode - always orange */}
-                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="#F4A69D">
+                      {/* Heart speech icon for therapist mode - orange only when active */}
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill={mode === 'therapist' ? 'currentColor' : isDark ? '#888' : '#666'}>
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                       </svg>
                       THERAPIST

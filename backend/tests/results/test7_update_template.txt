@@ -1,2 +1,0 @@
-{"error":{"code":"HTTP_405","message":"This operation is not allowed.","retriable":false,"request_id":"04f36662-a6c3-460c-a727-5714239ba88b"}}
-HTTP_STATUS:405

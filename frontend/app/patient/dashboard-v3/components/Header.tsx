@@ -87,25 +87,26 @@ export function Header({ onAskAIClick }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[#F8F7F4] dark:bg-[#1a1625] border-b border-[#E0DDD8] dark:border-[#3d3548] h-[60px] flex items-center px-12 transition-colors duration-300">
-      <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between">
-        {/* Left section - Theme toggle + Home icon */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={toggleTheme}
-            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-[#3d3548] transition-colors"
-            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            <ThemeIcon isDark={isDark} />
-          </button>
-          <button
-            onClick={handleHomeClick}
-            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-[#3d3548] transition-colors"
-            aria-label="Scroll to top"
-          >
-            <HomeIcon isDark={isDark} />
-          </button>
-        </div>
+    <header className="sticky top-0 z-50 bg-[#F8F7F4] dark:bg-[#1a1625] border-b border-[#E0DDD8] dark:border-[#3d3548] h-[60px] flex items-center transition-colors duration-300">
+      {/* Theme toggle - flush to left edge of screen */}
+      <div className="flex items-center gap-2 pl-3">
+        <button
+          onClick={toggleTheme}
+          className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-[#3d3548] transition-colors"
+          aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+        >
+          <ThemeIcon isDark={isDark} />
+        </button>
+        <button
+          onClick={handleHomeClick}
+          className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-[#3d3548] transition-colors"
+          aria-label="Scroll to top"
+        >
+          <HomeIcon isDark={isDark} />
+        </button>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center">
 
         {/* Center section - Navigation */}
         <nav className="flex items-center gap-8">
@@ -122,10 +123,10 @@ export function Header({ onAskAIClick }: HeaderProps) {
             Upload
           </button>
         </nav>
-
-        {/* Right section - Empty for balance */}
-        <div className="w-[84px]" />
       </div>
+
+      {/* Right section - Empty spacer for balance */}
+      <div className="w-[84px] pr-3" />
     </header>
   );
 }
