@@ -217,8 +217,9 @@ class PipelineService:
 
                 combined_segments = self._combine_consecutive_speakers(aligned_segments)
 
-                # Update transcription with aligned and combined segments
-                transcription["segments"] = combined_segments
+                # Update transcription with both aligned (granular) and combined segments
+                transcription["aligned_segments"] = aligned_segments  # Pre-combined for highlighting
+                transcription["segments"] = combined_segments  # Combined for display
 
                 # Combining complete
                 if progress_callback:
@@ -291,8 +292,9 @@ class PipelineService:
 
         # Extract segments from transcription
         segments = transcription.get("segments", [])
+        aligned_segments = transcription.get("aligned_segments", [])
 
-        # Calculate speaker stats from aligned segments
+        # Calculate speaker stats from combined segments
         speakers = self._calculate_speaker_stats(segments)
 
         # Performance metrics with actual timing data
@@ -330,6 +332,7 @@ class PipelineService:
             "performance": performance,
             "speakers": speakers,
             "segments": segments,
+            "aligned_segments": aligned_segments,  # Granular segments for highlighting
             "quality": quality,
             "created_at": datetime.now().isoformat(),
             "completed_at": datetime.now().isoformat()
