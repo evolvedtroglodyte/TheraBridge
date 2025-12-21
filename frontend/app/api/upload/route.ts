@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     if (uploadError) {
       console.error('Upload error:', uploadError);
       return NextResponse.json(
-        { error: 'Failed to upload file' },
+        { error: `Failed to upload file: ${uploadError.message}` },
         { status: 500 }
       );
     }
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     if (sessionError) {
       console.error('Session creation error:', sessionError);
       return NextResponse.json(
-        { error: 'Failed to create session record' },
+        { error: `Failed to create session record: ${sessionError.message}` },
         { status: 500 }
       );
     }
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: `Internal server error: ${error instanceof Error ? error.message : 'Unknown error'}` },
       { status: 500 }
     );
   }
