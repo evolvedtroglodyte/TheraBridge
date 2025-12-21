@@ -1,8 +1,0 @@
-Speaker,Start Time,End Time,Duration,Text,Word Count
-"Therapist","00:00","00:03","2.70","Hello, how are you feeling today?","7"
-"Client","00:03","00:08","4.70","I've been feeling a bit anxious lately. There's a lot going on at work.","16"
-"Therapist","00:09","00:13","4.40","I understand. Can you tell me more about what's been happening at work?","14"
-"Client","00:14","00:20","6.50","Well, we have a big project deadline coming up, and I'm worried I won't be able to finish everything on time.","23"
-"Therapist","00:21","00:27","6.30","That sounds stressful. Have you tried breaking down the project into smaller, manageable tasks?","15"
-"Client","00:28","00:34","6.80","I have, but even the smaller tasks feel overwhelming. I think I might be taking on too much.","18"
-"Therapist","00:35","00:42","7.40","It's important to recognize your limits. Let's talk about some strategies for managing your workload and reducing anxiety.","19"
