@@ -23,6 +23,7 @@ export default function AudioPlayer({ audioUrl, filename, segments, duration: to
   const [volume, setVolume] = useState(0.7);
   const [isMuted, setIsMuted] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [hoveredSegmentIndex, setHoveredSegmentIndex] = useState<number | null>(null);
 
   // Initialize WaveSurfer
   useEffect(() => {
@@ -63,6 +64,8 @@ export default function AudioPlayer({ audioUrl, filename, segments, duration: to
       const time = wavesurfer.getCurrentTime();
       setCurrentTime(time);
       onTimeUpdate?.(time);
+      // Trigger scroll on waveform click (seek event)
+      onSeek?.(time, true);
     });
 
     wavesurferRef.current = wavesurfer;
@@ -197,15 +200,30 @@ export default function AudioPlayer({ audioUrl, filename, segments, duration: to
               const widthPercent = ((segment.end - segment.start) / totalDuration) * 100;
               const color = getSpeakerColor(segment.speaker_id || 'UNKNOWN');
 
+              // Determine if this segment is currently playing
+              const isPlaying = currentTime >= segment.start && currentTime < segment.end;
+              const isHovered = hoveredSegmentIndex === index;
+
+              // Calculate opacity: 30% normal, 55% for single state, 75% for both
+              let opacity = 0.3; // Normal
+              if (isHovered && isPlaying) {
+                opacity = 0.75; // Both hovered and playing (brightest)
+              } else if (isHovered || isPlaying) {
+                opacity = 0.55; // Either hovered or playing
+              }
+
               return (
                 <div
                   key={index}
-                  className="absolute h-full opacity-30"
+                  className="absolute h-full transition-opacity duration-200 cursor-pointer"
                   style={{
                     left: `${startPercent}%`,
                     width: `${widthPercent}%`,
                     backgroundColor: color,
+                    opacity: opacity,
                   }}
+                  onMouseEnter={() => setHoveredSegmentIndex(index)}
+                  onMouseLeave={() => setHoveredSegmentIndex(null)}
                 />
               );
             })}
