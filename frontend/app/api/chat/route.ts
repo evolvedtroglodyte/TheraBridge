@@ -94,30 +94,16 @@ export async function POST(req: NextRequest) {
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // STEP 1: Rate Limiting Check (50 messages/day)
+    // STEP 1: Usage Tracking (unlimited messages, tracking only)
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    const { data: usageData, error: usageError } = await supabase.rpc(
+    const { error: usageError } = await supabase.rpc(
       'increment_chat_usage',
       { p_user_id: userId }
     );
 
     if (usageError) {
-      console.error('Rate limiting error:', usageError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to check rate limit' }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const messageCount = usageData as number;
-    if (messageCount > 50) {
-      return new Response(
-        JSON.stringify({
-          error: 'Daily message limit reached',
-          description: "You've reached your daily limit of 50 messages. The limit resets at midnight.",
-        }),
-        { status: 429, headers: { 'Content-Type': 'application/json' } }
-      );
+      console.error('Usage tracking error:', usageError);
+      // Continue even if tracking fails - don't block user
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -6,7 +6,6 @@ import Badge from '@/components/ui/Badge';
 import Spinner from '@/components/ui/Spinner';
 import AudioPlayer from './AudioPlayer';
 import TranscriptViewer, { TranscriptViewerRef } from './TranscriptViewer';
-import SpeakerTimeline from './SpeakerTimeline';
 import ExportOptions from './ExportOptions';
 import { useTranscription } from '@/hooks/useTranscription';
 import { formatTime, formatFileSize } from '@/lib/utils';
@@ -67,14 +66,6 @@ export default function ResultsView({ jobId, uploadedFile, onReset }: ResultsVie
     if ((window as any).seekAudio) {
       (window as any).seekAudio(time);
     }
-  };
-
-  // Handle timeline segment click - scroll to transcript and seek audio
-  const handleTimelineSegmentClick = (time: number) => {
-    // Scroll transcript viewer to this segment
-    transcriptRef.current?.scrollToTime(time);
-    // Also seek audio player
-    handleTimestampClick(time);
   };
 
   // Handle audio seek (from buttons like +10s, -10s, prev/next segment)
@@ -215,33 +206,19 @@ export default function ResultsView({ jobId, uploadedFile, onReset }: ResultsVie
         </CardContent>
       </Card>
 
-      {/* Audio Player Card */}
+      {/* Audio Player with Integrated Timeline */}
       <Card>
         <CardHeader>
-          <CardTitle>Audio Playback</CardTitle>
+          <CardTitle>Audio Playback & Speaker Timeline</CardTitle>
         </CardHeader>
         <CardContent>
           <AudioPlayer
             audioUrl={audioUrl}
             segments={correctedSegments}
+            speakers={result.speakers}
             duration={duration}
             onTimeUpdate={handleAudioTimeUpdate}
             onSeek={handleAudioSeek}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Speaker Timeline Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Speaker Timeline</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <SpeakerTimeline
-            segments={correctedSegments}
-            speakers={result.speakers}
-            duration={duration}
-            onSegmentClick={handleTimelineSegmentClick}
           />
         </CardContent>
       </Card>

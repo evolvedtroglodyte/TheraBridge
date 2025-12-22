@@ -9,7 +9,8 @@
  * - Sticky DOBBY header with illuminating DobbyLogo (with face)
  * - Shared message state between collapsed and fullscreen
  * - Intro message with Dobby avatar
- * - Long-press (1.5 sec, animation starts at 0.7s) anywhere to expand
+ * - Long-press (7 sec, Dobby enlarges at 5s) anywhere to expand to fullscreen
+ * - Progress indicator shows hold duration, cancels if released early
  * - User messages: text only (no bubble), AI: bubble with geometric avatar
  * - Text selection detection prevents hold during copy/paste
  */
@@ -161,10 +162,10 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Long press to expand (1.5 seconds, animation after 0.7s)
+  // Long press to expand (7 seconds, Dobby enlarges at 5s)
   const { handlers: longPressHandlers, isHolding, showAnimation, progress } = useLongPress(() => {
     setIsFullscreen(true);
-  }, 1500, 700);
+  }, 7000, 5000);
 
   // Auto-scroll to latest message - use scrollTop instead of scrollIntoView to prevent page shift
   useEffect(() => {
@@ -267,14 +268,14 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
               opacity: 1,
               scale: isHolding ? 1.02 : 1,
               transition: {
-                duration: isHolding ? 1.5 : 0.3,
+                duration: isHolding ? 7 : 0.3,
                 ease: isHolding ? 'linear' : [0.23, 1, 0.32, 1]
               }
             }}
             exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
             {...longPressHandlers}
           >
-            {/* Hold indicator overlay with centered logo - appears after 0.7s */}
+            {/* Hold indicator overlay with centered logo - appears at 5s */}
             <AnimatePresence>
               {showAnimation && (
                 <motion.div
@@ -286,8 +287,15 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {/* Large centered logo with face */}
-                  <DobbyLogo size={120} />
+                  {/* Large centered logo with face - grows from 120px to 200px as hold progresses */}
+                  <motion.div
+                    animate={{
+                      scale: 1 + (progress / 100) * 0.67, // Scales from 1 (120px) to 1.67 (200px)
+                    }}
+                    transition={{ duration: 0.1, ease: 'easeOut' }}
+                  >
+                    <DobbyLogo size={120} />
+                  </motion.div>
 
                   {/* Progress Bar - Video game style loading bar */}
                   <motion.div

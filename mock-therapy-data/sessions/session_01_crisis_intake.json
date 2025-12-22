@@ -1,0 +1,1855 @@
+{
+  "id": "session_01_alex_chen",
+  "status": "completed",
+  "filename": "session_01_2025-01-10.mp3",
+  "metadata": {
+    "source_file": "uploads/audio/alex_chen/session_01_2025-01-10.mp3",
+    "file_size_mb": 45.2,
+    "duration": 3600.0,
+    "language": "english",
+    "timestamp": "20250110_140000",
+    "pipeline_type": "CPU_API"
+  },
+  "performance": {
+    "total_processing_time_seconds": 412.8,
+    "preprocessing_time_seconds": 6.2,
+    "transcription_time_seconds": 65.3,
+    "diarization_time_seconds": 340.1,
+    "alignment_time_seconds": 1.2
+  },
+  "speakers": [
+    {
+      "id": "SPEAKER_00",
+      "label": "SPEAKER_00",
+      "total_duration": 1260.0,
+      "segment_count": 89
+    },
+    {
+      "id": "SPEAKER_01",
+      "label": "SPEAKER_01",
+      "total_duration": 2340.0,
+      "segment_count": 124
+    }
+  ],
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 28.4,
+      "text": "Hi Alex, welcome. I'm Dr. Rodriguez. Thanks for coming in today. Before we start, I want to explain a bit about confidentiality and how therapy works. Everything we discuss here is private unless you're in danger of hurting yourself or someone else, or if there's child abuse involved. Does that make sense?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 28.4,
+      "end": 45.8,
+      "text": "Yeah, that makes sense. Um, I'm really nervous. I've never done therapy before. My roommate kind of pushed me to make this appointment.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 45.8,
+      "end": 72.3,
+      "text": "It's completely normal to feel nervous. Actually, it takes a lot of courage to reach out for help, especially if this is new for you. I'm glad your roommate encouraged you, and I'm glad you followed through. Why don't you tell me a bit about what's been going on? What brings you in today?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 72.3,
+      "end": 142.6,
+      "text": "Um, so... I don't really know where to start. I guess, like, everything feels really overwhelming right now. I broke up with my partner like two weeks ago, and it's been really hard. And school is a mess. I'm in my first year of my PhD and I feel like I'm drowning. And I've just been feeling really, really down. Like, more than usual.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 142.6,
+      "end": 158.9,
+      "text": "That sounds like a lot to be dealing with all at once. When you say feeling really down, more than usual, can you help me understand what that's been like for you?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 158.9,
+      "end": 247.5,
+      "text": "I just... I don't want to do anything. Like, I used to love coding and working on projects, but now I can't even bring myself to open my laptop. I'm sleeping like 12 hours a day or not sleeping at all. And I've been having these thoughts that are kind of scary. Like, I don't want to die, but I'm so tired of feeling like this. Like I'm drowning and everyone else is just fine.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 247.5,
+      "end": 283.2,
+      "text": "I really appreciate you being honest with me about those thoughts, Alex. That takes a lot of bravery. I want to make sure I understand - you mentioned you don't want to die, but you're tired of feeling this way. Have you had any thoughts about hurting yourself or ending your life?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 283.2,
+      "end": 342.1,
+      "text": "I mean, I think about it sometimes. Like, what if I just wasn't here? Would anyone even notice? But I'm not going to do anything. I don't have like a plan or anything. It's more like... I just don't want to feel this pain anymore, you know?",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 342.1,
+      "end": 389.7,
+      "text": "Okay, thank you for clarifying that. So you're having what we call passive suicidal ideation - thoughts about not being here, but no active plan or intent to harm yourself. That's important for me to know. Have you shared these thoughts with anyone else?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 389.7,
+      "end": 427.3,
+      "text": "No. God, no. My roommate knows I'm sad about the breakup, but I haven't told them about... the other stuff. And I definitely can't tell my parents. They would freak out.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 427.3,
+      "end": 478.9,
+      "text": "I understand. It can be really hard to share these feelings, especially with people close to you. I'm glad you're sharing them with me today. I want to work with you to create a safety plan - basically a list of things you can do and people you can reach out to if these thoughts get stronger. Does that sound okay?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 478.9,
+      "end": 492.6,
+      "text": "Yeah, that sounds good. I mean, I don't think I need it, but sure.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 492.6,
+      "end": 548.2,
+      "text": "It's good to have just in case. So, let's talk about your support system. You mentioned your roommate. Are there other people in your life you feel comfortable reaching out to when you're struggling? Friends, family members, anyone?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 548.2,
+      "end": 625.8,
+      "text": "Um, I have a couple close friends. Sarah and Marcus. They're both grad students too. We usually hang out and like, complain about our programs together. But I've been kind of avoiding them lately because I don't want to bring the mood down, you know?",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 625.8,
+      "end": 672.4,
+      "text": "Okay, so Sarah and Marcus are two people you trust. If you were having a really hard moment and needed someone to talk to or just be with, do you think you could reach out to one of them?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 672.4,
+      "end": 702.9,
+      "text": "Yeah, probably. They've both dealt with mental health stuff too, so they get it. Sarah's been texting me and I've been ignoring her. I feel bad about it.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 702.9,
+      "end": 758.3,
+      "text": "It's really common to withdraw when we're depressed, but I'm glad you recognize that Sarah is there for you. So here's what I want you to have - it's the crisis hotline number, 988. You can call or text them 24/7 if you're in crisis. And I also want you to have my emergency contact info. If things feel really urgent between our sessions, you can reach out. Okay?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 758.3,
+      "end": 772.1,
+      "text": "Okay. Thank you.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 772.1,
+      "end": 831.5,
+      "text": "Now I want to learn more about what's been going on for you. You mentioned the breakup was two weeks ago. Can you tell me a bit about that relationship and what happened?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 831.5,
+      "end": 952.8,
+      "text": "We dated for eight months. Their name is Jamie. They're... or they were my first serious relationship since coming out as non-binary. Things were really intense at first, like really good. But then they started pulling away. They'd take hours to text back, cancel plans. And then two weeks ago they just ended it over text. Said they needed space to figure themselves out.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 952.8,
+      "end": 978.2,
+      "text": "That must have been really painful, especially to have it end over text after eight months together. How have you been coping with that loss?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 978.2,
+      "end": 1067.4,
+      "text": "Not well, clearly. I've been stalking their social media, which I know is bad. I keep replaying everything in my head, like what did I do wrong? Was I too much? Too clingy? And the worst part is this has happened before. Like, every relationship I've had ends the same way. They get close, and then they leave.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1067.4,
+      "end": 1118.6,
+      "text": "It sounds like you're carrying a lot of pain from this breakup, and also maybe from a pattern you're noticing in your relationships. We'll definitely explore that more. Can I ask, when you say you're worried you were 'too much' or 'too clingy,' what does that mean to you?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1118.6,
+      "end": 1208.9,
+      "text": "I don't know, I just... I need a lot of reassurance, I guess. Like, I'd text Jamie multiple times if they didn't respond. Or I'd get really anxious if they were hanging out with other people without me. I know it's not healthy, but I can't help it. I just get so scared they're going to leave. And then they do. So maybe I'm the problem.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1208.9,
+      "end": 1272.3,
+      "text": "What I'm hearing is that you experience a lot of anxiety in relationships, especially around abandonment. And that makes a lot of sense given the pattern you're describing. I want to reassure you that you're not broken or fundamentally flawed. These are patterns we can work on understanding and changing together.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1272.3,
+      "end": 1298.7,
+      "text": "I hope so. I just feel like everyone I love leaves me eventually. Like I'm unlovable or something.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1298.7,
+      "end": 1367.2,
+      "text": "That's a really painful belief to carry - that you're unlovable. I want you to know that belief isn't true, even though it feels very real right now. We're going to work on challenging that together. Let me ask you about your family. Tell me a bit about your parents and growing up.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1367.2,
+      "end": 1489.3,
+      "text": "Um, okay. So my parents immigrated from Taiwan in the nineties. My dad's a software engineer, my mom's a pharmacist. They both work really hard. I have a younger sibling, they're 20, in undergrad doing pre-med. My parents are like, very focused on achievement and success. You know, the typical Asian parent thing.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1489.3,
+      "end": 1523.8,
+      "text": "What was it like growing up in that environment? How did your parents show love or support?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1523.8,
+      "end": 1642.7,
+      "text": "I mean, they provided for us. We always had what we needed. But it was very much about grades and accomplishments. Like, I remember getting a 95 on a test and my dad asking what happened to the other five points. And they don't really do emotions. We don't talk about feelings in my family. They show love through making sure we eat and have money, not through like, hugs or saying I love you.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1642.7,
+      "end": 1692.4,
+      "text": "So achievement was how you earned approval or recognition, and emotional expression wasn't really part of your family culture. Did you feel like you could go to your parents when you were upset or struggling?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1692.4,
+      "end": 1778.9,
+      "text": "No, not really. I learned pretty early on to just handle things myself. They were so busy, and they already had so much stress. I didn't want to add to it. Plus, in Chinese culture, mental health stuff is really stigmatized. My mom thinks therapy is for crazy people. That's why I told them I'm seeing a study skills counselor.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1778.9,
+      "end": 1845.6,
+      "text": "So you learned to be very independent with your emotions from a young age, and there's cultural stigma around seeking mental health support. That context is really helpful for me to understand. Do your parents know you're non-binary?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1845.6,
+      "end": 1934.2,
+      "text": "God, no. They still use my deadname and she/her pronouns. I came out to my friends in college, but I can't imagine telling my parents. They already think I'm like, too Americanized. Being queer would just... I don't think they could handle it. My mom's always asking when I'm going to find a nice girl to settle down with. It's ironic and painful at the same time.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1934.2,
+      "end": 2012.8,
+      "text": "So you're carrying this huge part of your identity that you can't share with your family. That's a significant burden. How does it feel to have to hide that part of yourself from them?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2012.8,
+      "end": 2108.5,
+      "text": "It's exhausting. Every time I talk to them I have to like, edit myself. Watch what I say. And it makes me feel really alone. Like, they don't actually know me. They love this version of me that doesn't really exist anymore. Sometimes I wonder if they'd even love the real me.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2108.5,
+      "end": 2178.3,
+      "text": "That sounds incredibly isolating - feeling like the people who raised you don't really know you. Let's shift gears a bit to school. You mentioned you're in your first year of a PhD in computer science. How's that been going?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2178.3,
+      "end": 2304.6,
+      "text": "It's been really hard. I thought I'd be good at this because I was good at undergrad, but it's so different. Everyone seems so smart and I feel like I barely understand what's going on half the time. I'm behind on my research, I missed a deadline for a project last week, and my GPA is not good. I think it's below a three point oh.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2304.6,
+      "end": 2342.1,
+      "text": "It sounds like you're experiencing a lot of self-doubt about your abilities. Have you always struggled with feeling like you don't measure up?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2342.1,
+      "end": 2456.8,
+      "text": "Yeah, definitely. I feel like an imposter constantly. Like, they made a mistake admitting me and everyone's going to figure it out eventually. And the ADHD doesn't help. I got diagnosed last year, like senior year of undergrad, but I never did anything about it. Never tried medication or anything.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2456.8,
+      "end": 2498.3,
+      "text": "Okay, so you were diagnosed with ADHD but haven't pursued treatment. What made you decide not to try medication or other interventions?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2498.3,
+      "end": 2587.9,
+      "text": "I don't know. I guess I thought I could just power through it. And also, my parents don't really believe in ADHD. They think it's an excuse for being lazy. So I just tried to work harder, but it's not working anymore. I can't focus in lectures, I lose things constantly, I procrastinate everything until the last minute.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2587.9,
+      "end": 2658.4,
+      "text": "So you've been trying to manage ADHD symptoms without support, while also dealing with depression and anxiety. That's incredibly difficult. Have you thought about trying medication or other ADHD treatments now?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2658.4,
+      "end": 2712.6,
+      "text": "Maybe. I don't know. Part of me wonders if it would actually help, or if I'm just making excuses for being lazy like my parents say.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2712.6,
+      "end": 2789.2,
+      "text": "I want to be really clear with you, Alex. ADHD is a real neurological condition. It's not laziness, and it's not an excuse. It's a difference in how your brain processes information and regulates attention. We can explore treatment options together if you're interested.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2789.2,
+      "end": 2815.7,
+      "text": "Yeah, okay. That would be good. I'm willing to try anything at this point.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2815.7,
+      "end": 2883.5,
+      "text": "Good. Let me ask you a few more questions about your mood and symptoms. How long have you been feeling depressed? You mentioned more than usual - has this been going on for a while?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2883.5,
+      "end": 2987.3,
+      "text": "I mean, I've been anxious and kind of depressed since like, junior year of undergrad. So like three years? But it's gotten way worse the past few months. Especially since starting the PhD. And the breakup just like, sent me over the edge.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2987.3,
+      "end": 3046.8,
+      "text": "So you've had symptoms of anxiety and depression for about three years, with a significant worsening recently. Are you able to enjoy things that you used to enjoy? Like coding or hobbies?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3046.8,
+      "end": 3134.2,
+      "text": "Not really. I used to love gaming and hiking and working on side projects. Now I can't bring myself to do any of it. It all feels pointless. I just sleep or scroll through my phone or stare at the wall.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3134.2,
+      "end": 3189.6,
+      "text": "Okay. And sleep - you mentioned sleeping 12 hours a day or not sleeping at all. What's that pattern like?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3189.6,
+      "end": 3276.4,
+      "text": "It's all over the place. Sometimes I sleep through my alarms and wake up at like 2 PM. Other nights I can't fall asleep because my brain won't shut up. It's just replaying everything I did wrong or worrying about everything I have to do. And then I'm exhausted the next day.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3276.4,
+      "end": 3327.8,
+      "text": "Racing thoughts at night, difficulty falling asleep, and then oversleeping other times. That's really disruptive. How's your appetite been?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3327.8,
+      "end": 3398.5,
+      "text": "I'm either not hungry at all or I'm eating everything in sight. I've lost like 10 pounds in the past month without trying. My roommate's been worried because I forget to eat.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3398.5,
+      "end": 3472.9,
+      "text": "That's significant weight loss. I'm glad your roommate is paying attention. Alex, based on what you're telling me, it sounds like you're dealing with moderate to severe depression, generalized anxiety, and ADHD. These are all very treatable conditions. Does that make sense to you?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3472.9,
+      "end": 3512.3,
+      "text": "Yeah, I guess so. It's kind of scary to hear it said out loud, but also kind of validating? Like, I'm not just being dramatic?",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3512.3,
+      "end": 3582.6,
+      "text": "You are absolutely not being dramatic. What you're experiencing is real, and it's serious, and you deserve support. I'm really glad you're here. So let's talk about next steps and treatment.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3582.6,
+      "end": 3600.0,
+      "text": "Okay. What do you recommend?",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    }
+  ],
+  "aligned_segments": [
+    {
+      "start": 0.0,
+      "end": 8.2,
+      "text": "Hi Alex, welcome. I'm Dr. Rodriguez.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 8.2,
+      "end": 12.5,
+      "text": "Thanks for coming in today.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 12.5,
+      "end": 28.4,
+      "text": "Before we start, I want to explain a bit about confidentiality and how therapy works. Everything we discuss here is private unless you're in danger of hurting yourself or someone else, or if there's child abuse involved. Does that make sense?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 28.4,
+      "end": 32.1,
+      "text": "Yeah, that makes sense.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 32.1,
+      "end": 35.6,
+      "text": "Um, I'm really nervous.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 35.6,
+      "end": 39.2,
+      "text": "I've never done therapy before.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 39.2,
+      "end": 45.8,
+      "text": "My roommate kind of pushed me to make this appointment.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 45.8,
+      "end": 50.3,
+      "text": "It's completely normal to feel nervous.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 50.3,
+      "end": 58.7,
+      "text": "Actually, it takes a lot of courage to reach out for help, especially if this is new for you.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 58.7,
+      "end": 64.1,
+      "text": "I'm glad your roommate encouraged you, and I'm glad you followed through.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 64.1,
+      "end": 72.3,
+      "text": "Why don't you tell me a bit about what's been going on? What brings you in today?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 72.3,
+      "end": 78.9,
+      "text": "Um, so... I don't really know where to start.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 78.9,
+      "end": 85.4,
+      "text": "I guess, like, everything feels really overwhelming right now.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 85.4,
+      "end": 96.7,
+      "text": "I broke up with my partner like two weeks ago, and it's been really hard.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 96.7,
+      "end": 104.3,
+      "text": "And school is a mess. I'm in my first year of my PhD and I feel like I'm drowning.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 104.3,
+      "end": 112.8,
+      "text": "And I've just been feeling really, really down. Like, more than usual.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 112.8,
+      "end": 142.6,
+      "text": "",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 142.6,
+      "end": 148.2,
+      "text": "That sounds like a lot to be dealing with all at once.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 148.2,
+      "end": 158.9,
+      "text": "When you say feeling really down, more than usual, can you help me understand what that's been like for you?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 158.9,
+      "end": 164.5,
+      "text": "I just... I don't want to do anything.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 164.5,
+      "end": 178.3,
+      "text": "Like, I used to love coding and working on projects, but now I can't even bring myself to open my laptop.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 178.3,
+      "end": 189.6,
+      "text": "I'm sleeping like 12 hours a day or not sleeping at all.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 189.6,
+      "end": 203.8,
+      "text": "And I've been having these thoughts that are kind of scary.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 203.8,
+      "end": 220.4,
+      "text": "Like, I don't want to die, but I'm so tired of feeling like this.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 220.4,
+      "end": 247.5,
+      "text": "Like I'm drowning and everyone else is just fine.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 247.5,
+      "end": 259.8,
+      "text": "I really appreciate you being honest with me about those thoughts, Alex. That takes a lot of bravery.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 259.8,
+      "end": 268.1,
+      "text": "I want to make sure I understand - you mentioned you don't want to die, but you're tired of feeling this way.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 268.1,
+      "end": 283.2,
+      "text": "Have you had any thoughts about hurting yourself or ending your life?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 283.2,
+      "end": 289.7,
+      "text": "I mean, I think about it sometimes.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 289.7,
+      "end": 297.3,
+      "text": "Like, what if I just wasn't here? Would anyone even notice?",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 297.3,
+      "end": 306.8,
+      "text": "But I'm not going to do anything. I don't have like a plan or anything.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 306.8,
+      "end": 342.1,
+      "text": "It's more like... I just don't want to feel this pain anymore, you know?",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 342.1,
+      "end": 348.5,
+      "text": "Okay, thank you for clarifying that.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 348.5,
+      "end": 363.2,
+      "text": "So you're having what we call passive suicidal ideation - thoughts about not being here, but no active plan or intent to harm yourself.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 363.2,
+      "end": 368.9,
+      "text": "That's important for me to know.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 368.9,
+      "end": 389.7,
+      "text": "Have you shared these thoughts with anyone else?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 389.7,
+      "end": 393.2,
+      "text": "No. God, no.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 393.2,
+      "end": 403.8,
+      "text": "My roommate knows I'm sad about the breakup, but I haven't told them about... the other stuff.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 403.8,
+      "end": 427.3,
+      "text": "And I definitely can't tell my parents. They would freak out.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 427.3,
+      "end": 437.6,
+      "text": "I understand. It can be really hard to share these feelings, especially with people close to you.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 437.6,
+      "end": 442.8,
+      "text": "I'm glad you're sharing them with me today.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 442.8,
+      "end": 468.1,
+      "text": "I want to work with you to create a safety plan - basically a list of things you can do and people you can reach out to if these thoughts get stronger.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 468.1,
+      "end": 478.9,
+      "text": "Does that sound okay?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 478.9,
+      "end": 492.6,
+      "text": "Yeah, that sounds good. I mean, I don't think I need it, but sure.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 492.6,
+      "end": 499.3,
+      "text": "It's good to have just in case.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 499.3,
+      "end": 507.8,
+      "text": "So, let's talk about your support system. You mentioned your roommate.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 507.8,
+      "end": 522.6,
+      "text": "Are there other people in your life you feel comfortable reaching out to when you're struggling?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 522.6,
+      "end": 548.2,
+      "text": "Friends, family members, anyone?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 548.2,
+      "end": 555.7,
+      "text": "Um, I have a couple close friends. Sarah and Marcus.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 555.7,
+      "end": 561.3,
+      "text": "They're both grad students too.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 561.3,
+      "end": 572.8,
+      "text": "We usually hang out and like, complain about our programs together.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 572.8,
+      "end": 625.8,
+      "text": "But I've been kind of avoiding them lately because I don't want to bring the mood down, you know?",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 625.8,
+      "end": 634.2,
+      "text": "Okay, so Sarah and Marcus are two people you trust.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 634.2,
+      "end": 652.1,
+      "text": "If you were having a really hard moment and needed someone to talk to or just be with, do you think you could reach out to one of them?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 652.1,
+      "end": 672.4,
+      "text": "",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 672.4,
+      "end": 676.8,
+      "text": "Yeah, probably.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 676.8,
+      "end": 686.3,
+      "text": "They've both dealt with mental health stuff too, so they get it.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 686.3,
+      "end": 702.9,
+      "text": "Sarah's been texting me and I've been ignoring her. I feel bad about it.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 702.9,
+      "end": 718.4,
+      "text": "It's really common to withdraw when we're depressed, but I'm glad you recognize that Sarah is there for you.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 718.4,
+      "end": 732.1,
+      "text": "So here's what I want you to have - it's the crisis hotline number, 988.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 732.1,
+      "end": 742.6,
+      "text": "You can call or text them 24/7 if you're in crisis.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 742.6,
+      "end": 752.8,
+      "text": "And I also want you to have my emergency contact info. If things feel really urgent between our sessions, you can reach out.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 752.8,
+      "end": 758.3,
+      "text": "Okay?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 758.3,
+      "end": 772.1,
+      "text": "Okay. Thank you.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 772.1,
+      "end": 780.4,
+      "text": "Now I want to learn more about what's been going on for you.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 780.4,
+      "end": 786.9,
+      "text": "You mentioned the breakup was two weeks ago.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 786.9,
+      "end": 831.5,
+      "text": "Can you tell me a bit about that relationship and what happened?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 831.5,
+      "end": 842.3,
+      "text": "We dated for eight months. Their name is Jamie.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 842.3,
+      "end": 858.7,
+      "text": "They're... or they were my first serious relationship since coming out as non-binary.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 858.7,
+      "end": 868.2,
+      "text": "Things were really intense at first, like really good.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 868.2,
+      "end": 879.4,
+      "text": "But then they started pulling away. They'd take hours to text back, cancel plans.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 879.4,
+      "end": 893.6,
+      "text": "And then two weeks ago they just ended it over text.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 893.6,
+      "end": 952.8,
+      "text": "Said they needed space to figure themselves out.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 952.8,
+      "end": 967.4,
+      "text": "That must have been really painful, especially to have it end over text after eight months together.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 967.4,
+      "end": 978.2,
+      "text": "How have you been coping with that loss?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 978.2,
+      "end": 985.7,
+      "text": "Not well, clearly.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 985.7,
+      "end": 1002.3,
+      "text": "I've been stalking their social media, which I know is bad.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1002.3,
+      "end": 1018.6,
+      "text": "I keep replaying everything in my head, like what did I do wrong? Was I too much? Too clingy?",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1018.6,
+      "end": 1032.7,
+      "text": "And the worst part is this has happened before.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1032.7,
+      "end": 1067.4,
+      "text": "Like, every relationship I've had ends the same way. They get close, and then they leave.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1067.4,
+      "end": 1088.3,
+      "text": "It sounds like you're carrying a lot of pain from this breakup, and also maybe from a pattern you're noticing in your relationships.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1088.3,
+      "end": 1094.7,
+      "text": "We'll definitely explore that more.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1094.7,
+      "end": 1118.6,
+      "text": "Can I ask, when you say you're worried you were 'too much' or 'too clingy,' what does that mean to you?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1118.6,
+      "end": 1132.8,
+      "text": "I don't know, I just... I need a lot of reassurance, I guess.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1132.8,
+      "end": 1148.2,
+      "text": "Like, I'd text Jamie multiple times if they didn't respond.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1148.2,
+      "end": 1168.5,
+      "text": "Or I'd get really anxious if they were hanging out with other people without me.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1168.5,
+      "end": 1184.7,
+      "text": "I know it's not healthy, but I can't help it. I just get so scared they're going to leave.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1184.7,
+      "end": 1208.9,
+      "text": "And then they do. So maybe I'm the problem.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1208.9,
+      "end": 1234.6,
+      "text": "What I'm hearing is that you experience a lot of anxiety in relationships, especially around abandonment.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1234.6,
+      "end": 1246.8,
+      "text": "And that makes a lot of sense given the pattern you're describing.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1246.8,
+      "end": 1272.3,
+      "text": "I want to reassure you that you're not broken or fundamentally flawed. These are patterns we can work on understanding and changing together.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1272.3,
+      "end": 1298.7,
+      "text": "I hope so. I just feel like everyone I love leaves me eventually. Like I'm unlovable or something.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1298.7,
+      "end": 1328.4,
+      "text": "That's a really painful belief to carry - that you're unlovable. I want you to know that belief isn't true, even though it feels very real right now.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1328.4,
+      "end": 1337.8,
+      "text": "We're going to work on challenging that together.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1337.8,
+      "end": 1367.2,
+      "text": "Let me ask you about your family. Tell me a bit about your parents and growing up.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1367.2,
+      "end": 1376.8,
+      "text": "Um, okay. So my parents immigrated from Taiwan in the nineties.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1376.8,
+      "end": 1391.2,
+      "text": "My dad's a software engineer, my mom's a pharmacist. They both work really hard.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1391.2,
+      "end": 1405.6,
+      "text": "I have a younger sibling, they're 20, in undergrad doing pre-med.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1405.6,
+      "end": 1426.3,
+      "text": "My parents are like, very focused on achievement and success.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1426.3,
+      "end": 1489.3,
+      "text": "You know, the typical Asian parent thing.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1489.3,
+      "end": 1498.7,
+      "text": "What was it like growing up in that environment?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1498.7,
+      "end": 1523.8,
+      "text": "How did your parents show love or support?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1523.8,
+      "end": 1538.2,
+      "text": "I mean, they provided for us. We always had what we needed.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1538.2,
+      "end": 1551.6,
+      "text": "But it was very much about grades and accomplishments.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1551.6,
+      "end": 1578.3,
+      "text": "Like, I remember getting a 95 on a test and my dad asking what happened to the other five points.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1578.3,
+      "end": 1592.7,
+      "text": "And they don't really do emotions. We don't talk about feelings in my family.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1592.7,
+      "end": 1642.7,
+      "text": "They show love through making sure we eat and have money, not through like, hugs or saying I love you.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1642.7,
+      "end": 1668.3,
+      "text": "So achievement was how you earned approval or recognition, and emotional expression wasn't really part of your family culture.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1668.3,
+      "end": 1692.4,
+      "text": "Did you feel like you could go to your parents when you were upset or struggling?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1692.4,
+      "end": 1699.8,
+      "text": "No, not really.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1699.8,
+      "end": 1714.2,
+      "text": "I learned pretty early on to just handle things myself.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1714.2,
+      "end": 1728.6,
+      "text": "They were so busy, and they already had so much stress. I didn't want to add to it.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1728.6,
+      "end": 1748.3,
+      "text": "Plus, in Chinese culture, mental health stuff is really stigmatized.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1748.3,
+      "end": 1762.7,
+      "text": "My mom thinks therapy is for crazy people.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1762.7,
+      "end": 1778.9,
+      "text": "That's why I told them I'm seeing a study skills counselor.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1778.9,
+      "end": 1808.4,
+      "text": "So you learned to be very independent with your emotions from a young age, and there's cultural stigma around seeking mental health support.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1808.4,
+      "end": 1819.8,
+      "text": "That context is really helpful for me to understand.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1819.8,
+      "end": 1845.6,
+      "text": "Do your parents know you're non-binary?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1845.6,
+      "end": 1853.2,
+      "text": "God, no.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1853.2,
+      "end": 1868.7,
+      "text": "They still use my deadname and she/her pronouns.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1868.7,
+      "end": 1884.3,
+      "text": "I came out to my friends in college, but I can't imagine telling my parents.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1884.3,
+      "end": 1902.6,
+      "text": "They already think I'm like, too Americanized. Being queer would just... I don't think they could handle it.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1902.6,
+      "end": 1920.8,
+      "text": "My mom's always asking when I'm going to find a nice girl to settle down with.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1920.8,
+      "end": 1934.2,
+      "text": "It's ironic and painful at the same time.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 1934.2,
+      "end": 1962.8,
+      "text": "So you're carrying this huge part of your identity that you can't share with your family. That's a significant burden.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 1962.8,
+      "end": 2012.8,
+      "text": "How does it feel to have to hide that part of yourself from them?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2012.8,
+      "end": 2021.3,
+      "text": "It's exhausting.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2021.3,
+      "end": 2037.6,
+      "text": "Every time I talk to them I have to like, edit myself. Watch what I say.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2037.6,
+      "end": 2052.8,
+      "text": "And it makes me feel really alone. Like, they don't actually know me.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2052.8,
+      "end": 2074.3,
+      "text": "They love this version of me that doesn't really exist anymore.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2074.3,
+      "end": 2108.5,
+      "text": "Sometimes I wonder if they'd even love the real me.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2108.5,
+      "end": 2135.2,
+      "text": "That sounds incredibly isolating - feeling like the people who raised you don't really know you.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2135.2,
+      "end": 2148.7,
+      "text": "Let's shift gears a bit to school.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2148.7,
+      "end": 2178.3,
+      "text": "You mentioned you're in your first year of a PhD in computer science. How's that been going?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2178.3,
+      "end": 2187.4,
+      "text": "It's been really hard.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2187.4,
+      "end": 2208.6,
+      "text": "I thought I'd be good at this because I was good at undergrad, but it's so different.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2208.6,
+      "end": 2234.7,
+      "text": "Everyone seems so smart and I feel like I barely understand what's going on half the time.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2234.7,
+      "end": 2267.3,
+      "text": "I'm behind on my research, I missed a deadline for a project last week, and my GPA is not good.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2267.3,
+      "end": 2304.6,
+      "text": "I think it's below a three point oh.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2304.6,
+      "end": 2327.8,
+      "text": "It sounds like you're experiencing a lot of self-doubt about your abilities.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2327.8,
+      "end": 2342.1,
+      "text": "Have you always struggled with feeling like you don't measure up?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2342.1,
+      "end": 2351.6,
+      "text": "Yeah, definitely. I feel like an imposter constantly.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2351.6,
+      "end": 2378.3,
+      "text": "Like, they made a mistake admitting me and everyone's going to figure it out eventually.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2378.3,
+      "end": 2392.8,
+      "text": "And the ADHD doesn't help.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2392.8,
+      "end": 2418.7,
+      "text": "I got diagnosed last year, like senior year of undergrad, but I never did anything about it.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2418.7,
+      "end": 2456.8,
+      "text": "Never tried medication or anything.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2456.8,
+      "end": 2478.2,
+      "text": "Okay, so you were diagnosed with ADHD but haven't pursued treatment.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2478.2,
+      "end": 2498.3,
+      "text": "What made you decide not to try medication or other interventions?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2498.3,
+      "end": 2514.7,
+      "text": "I don't know. I guess I thought I could just power through it.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2514.7,
+      "end": 2537.8,
+      "text": "And also, my parents don't really believe in ADHD. They think it's an excuse for being lazy.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2537.8,
+      "end": 2558.2,
+      "text": "So I just tried to work harder, but it's not working anymore.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2558.2,
+      "end": 2587.9,
+      "text": "I can't focus in lectures, I lose things constantly, I procrastinate everything until the last minute.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2587.9,
+      "end": 2623.4,
+      "text": "So you've been trying to manage ADHD symptoms without support, while also dealing with depression and anxiety.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2623.4,
+      "end": 2632.8,
+      "text": "That's incredibly difficult.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2632.8,
+      "end": 2658.4,
+      "text": "Have you thought about trying medication or other ADHD treatments now?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2658.4,
+      "end": 2668.3,
+      "text": "Maybe. I don't know.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2668.3,
+      "end": 2712.6,
+      "text": "Part of me wonders if it would actually help, or if I'm just making excuses for being lazy like my parents say.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2712.6,
+      "end": 2732.8,
+      "text": "I want to be really clear with you, Alex. ADHD is a real neurological condition.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2732.8,
+      "end": 2748.3,
+      "text": "It's not laziness, and it's not an excuse.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2748.3,
+      "end": 2772.6,
+      "text": "It's a difference in how your brain processes information and regulates attention.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2772.6,
+      "end": 2789.2,
+      "text": "We can explore treatment options together if you're interested.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2789.2,
+      "end": 2815.7,
+      "text": "Yeah, okay. That would be good. I'm willing to try anything at this point.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2815.7,
+      "end": 2824.6,
+      "text": "Good.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2824.6,
+      "end": 2848.3,
+      "text": "Let me ask you a few more questions about your mood and symptoms.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2848.3,
+      "end": 2863.7,
+      "text": "How long have you been feeling depressed?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2863.7,
+      "end": 2883.5,
+      "text": "You mentioned more than usual - has this been going on for a while?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 2883.5,
+      "end": 2912.7,
+      "text": "I mean, I've been anxious and kind of depressed since like, junior year of undergrad.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2912.7,
+      "end": 2924.8,
+      "text": "So like three years?",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2924.8,
+      "end": 2948.6,
+      "text": "But it's gotten way worse the past few months. Especially since starting the PhD.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2948.6,
+      "end": 2987.3,
+      "text": "And the breakup just like, sent me over the edge.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 2987.3,
+      "end": 3018.2,
+      "text": "So you've had symptoms of anxiety and depression for about three years, with a significant worsening recently.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3018.2,
+      "end": 3046.8,
+      "text": "Are you able to enjoy things that you used to enjoy? Like coding or hobbies?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3046.8,
+      "end": 3056.3,
+      "text": "Not really.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3056.3,
+      "end": 3087.6,
+      "text": "I used to love gaming and hiking and working on side projects. Now I can't bring myself to do any of it.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3087.6,
+      "end": 3098.4,
+      "text": "It all feels pointless.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3098.4,
+      "end": 3134.2,
+      "text": "I just sleep or scroll through my phone or stare at the wall.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3134.2,
+      "end": 3142.8,
+      "text": "Okay.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3142.8,
+      "end": 3172.3,
+      "text": "And sleep - you mentioned sleeping 12 hours a day or not sleeping at all. What's that pattern like?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3172.3,
+      "end": 3189.6,
+      "text": "",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3189.6,
+      "end": 3199.2,
+      "text": "It's all over the place.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3199.2,
+      "end": 3218.7,
+      "text": "Sometimes I sleep through my alarms and wake up at like 2 PM.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3218.7,
+      "end": 3242.8,
+      "text": "Other nights I can't fall asleep because my brain won't shut up.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3242.8,
+      "end": 3265.3,
+      "text": "It's just replaying everything I did wrong or worrying about everything I have to do.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3265.3,
+      "end": 3276.4,
+      "text": "And then I'm exhausted the next day.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3276.4,
+      "end": 3308.6,
+      "text": "Racing thoughts at night, difficulty falling asleep, and then oversleeping other times. That's really disruptive.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3308.6,
+      "end": 3327.8,
+      "text": "How's your appetite been?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3327.8,
+      "end": 3352.3,
+      "text": "I'm either not hungry at all or I'm eating everything in sight.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3352.3,
+      "end": 3378.6,
+      "text": "I've lost like 10 pounds in the past month without trying.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3378.6,
+      "end": 3398.5,
+      "text": "My roommate's been worried because I forget to eat.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3398.5,
+      "end": 3418.3,
+      "text": "That's significant weight loss. I'm glad your roommate is paying attention.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3418.3,
+      "end": 3456.8,
+      "text": "Alex, based on what you're telling me, it sounds like you're dealing with moderate to severe depression, generalized anxiety, and ADHD.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3456.8,
+      "end": 3472.9,
+      "text": "These are all very treatable conditions. Does that make sense to you?",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3472.9,
+      "end": 3482.6,
+      "text": "Yeah, I guess so.",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3482.6,
+      "end": 3502.8,
+      "text": "It's kind of scary to hear it said out loud, but also kind of validating?",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3502.8,
+      "end": 3512.3,
+      "text": "Like, I'm not just being dramatic?",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    },
+    {
+      "start": 3512.3,
+      "end": 3528.7,
+      "text": "You are absolutely not being dramatic.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3528.7,
+      "end": 3548.2,
+      "text": "What you're experiencing is real, and it's serious, and you deserve support.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3548.2,
+      "end": 3554.8,
+      "text": "I'm really glad you're here.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3554.8,
+      "end": 3582.6,
+      "text": "So let's talk about next steps and treatment.",
+      "speaker": "SPEAKER_00",
+      "speaker_id": "SPEAKER_00"
+    },
+    {
+      "start": 3582.6,
+      "end": 3600.0,
+      "text": "Okay. What do you recommend?",
+      "speaker": "SPEAKER_01",
+      "speaker_id": "SPEAKER_01"
+    }
+  ],
+  "quality": {
+    "total_segments": 213,
+    "speaker_segment_distribution": {
+      "SPEAKER_00": 89,
+      "SPEAKER_01": 124
+    },
+    "unknown_segments_count": 0,
+    "unknown_segments_percent": 0.0
+  },
+  "created_at": "2025-01-10T14:00:00Z",
+  "completed_at": "2025-01-10T15:06:53Z"
+}

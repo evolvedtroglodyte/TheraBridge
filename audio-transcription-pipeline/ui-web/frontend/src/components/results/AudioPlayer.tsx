@@ -9,12 +9,13 @@ interface AudioPlayerProps {
   audioUrl: string;
   filename?: string;
   segments?: Segment[];
+  speakers?: { id: string; label: string; segment_count: number; total_duration: number }[];
   duration?: number;
   onTimeUpdate?: (time: number) => void;
   onSeek?: (time: number, shouldScroll: boolean) => void;
 }
 
-export default function AudioPlayer({ audioUrl, segments, duration: totalDuration, onTimeUpdate, onSeek }: AudioPlayerProps) {
+export default function AudioPlayer({ audioUrl, segments, speakers, duration: totalDuration, onTimeUpdate, onSeek }: AudioPlayerProps) {
   const waveformRef = useRef<HTMLDivElement>(null);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -24,6 +25,7 @@ export default function AudioPlayer({ audioUrl, segments, duration: totalDuratio
   const [isMuted, setIsMuted] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [hoveredSegmentIndex, setHoveredSegmentIndex] = useState<number | null>(null);
+  const [hoveredSegment, setHoveredSegment] = useState<Segment | null>(null);
 
   // Initialize WaveSurfer
   useEffect(() => {
@@ -190,27 +192,34 @@ export default function AudioPlayer({ audioUrl, segments, duration: totalDuratio
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [isReady, isPlaying]);
 
+  // Get speaker label helper
+  const getSpeakerLabel = (speakerId?: string): string => {
+    if (!speakerId || !speakers) return 'Unknown';
+    const speaker = speakers.find((s) => s.id === speakerId);
+    return speaker?.label || speakerId;
+  };
+
   return (
     <div className="space-y-4">
-      {/* Waveform with Colored Speaker Bars */}
+      {/* Speaker Timeline with Waveform */}
       <div className="relative">
-        {/* Speaker Color Bars (behind waveform) */}
+        {/* Speaker Color Bars (behind waveform) - TALLER */}
         {segments && totalDuration && (
-          <div className="absolute inset-0 flex rounded-lg overflow-hidden" style={{ height: '80px' }}>
+          <div className="absolute inset-0 flex rounded-lg overflow-hidden" style={{ height: '120px' }}>
             {segments.map((segment, index) => {
               const startPercent = (segment.start / totalDuration) * 100;
               const widthPercent = ((segment.end - segment.start) / totalDuration) * 100;
               const color = getSpeakerColor(segment.speaker_id || 'UNKNOWN');
 
               // Determine if this segment is currently playing
-              const isPlaying = currentTime >= segment.start && currentTime < segment.end;
+              const isPlayingSegment = currentTime >= segment.start && currentTime < segment.end;
               const isHovered = hoveredSegmentIndex === index;
 
               // Calculate opacity: 30% normal, 55% for single state, 75% for both
               let opacity = 0.3; // Normal
-              if (isHovered && isPlaying) {
+              if (isHovered && isPlayingSegment) {
                 opacity = 0.75; // Both hovered and playing (brightest)
-              } else if (isHovered || isPlaying) {
+              } else if (isHovered || isPlayingSegment) {
                 opacity = 0.55; // Either hovered or playing
               }
 
@@ -224,28 +233,55 @@ export default function AudioPlayer({ audioUrl, segments, duration: totalDuratio
                     backgroundColor: color,
                     opacity: opacity,
                   }}
-                  onMouseEnter={() => setHoveredSegmentIndex(index)}
-                  onMouseLeave={() => setHoveredSegmentIndex(null)}
+                  onMouseEnter={() => {
+                    setHoveredSegmentIndex(index);
+                    setHoveredSegment(segment);
+                  }}
+                  onMouseLeave={() => {
+                    setHoveredSegmentIndex(null);
+                    setHoveredSegment(null);
+                  }}
                   onClick={() => {
                     // Seek to segment start and trigger scroll
                     const audioDuration = totalDuration || duration;
                     wavesurferRef.current?.seekTo(segment.start / audioDuration);
                     onSeek?.(segment.start, true);
                   }}
-                  title={`Jump to ${segment.speaker_id || 'UNKNOWN'} segment`}
+                  title={`${getSpeakerLabel(segment.speaker_id)}: ${segment.text.substring(0, 50)}...`}
                 />
               );
             })}
           </div>
         )}
 
-        {/* Waveform (on top of colored bars) */}
+        {/* Waveform (on top of colored bars) - TALLER */}
         <div
           ref={waveformRef}
           className="relative w-full bg-transparent rounded-lg"
-          style={{ minHeight: '80px' }}
+          style={{ minHeight: '120px' }}
         />
       </div>
+
+      {/* Hover Tooltip */}
+      {hoveredSegment && (
+        <div className="p-3 bg-gray-900 text-white rounded-lg text-sm">
+          <div className="flex items-center gap-2 mb-1">
+            <div
+              className="w-3 h-3 rounded-full"
+              style={{ backgroundColor: getSpeakerColor(hoveredSegment.speaker_id || 'UNKNOWN') }}
+            />
+            <span className="font-medium">
+              {getSpeakerLabel(hoveredSegment.speaker_id)}
+            </span>
+            <span className="text-gray-400 font-mono text-xs">
+              {formatTime(hoveredSegment.start)} - {formatTime(hoveredSegment.end)}
+            </span>
+          </div>
+          <p className="text-gray-200 line-clamp-2">
+            {hoveredSegment.text}
+          </p>
+        </div>
+      )}
 
       {/* Controls */}
       <div className="flex items-center gap-4">
@@ -346,6 +382,24 @@ export default function AudioPlayer({ audioUrl, segments, duration: totalDuratio
           />
         </div>
       </div>
+
+      {/* Speaker Legend */}
+      {speakers && speakers.length > 0 && (
+        <div className="flex flex-wrap gap-3 pt-2 border-t">
+          {speakers.map((speaker) => (
+            <div key={speaker.id} className="flex items-center gap-2">
+              <div
+                className="w-4 h-4 rounded-full"
+                style={{ backgroundColor: getSpeakerColor(speaker.id) }}
+              />
+              <span className="text-sm text-gray-700">{speaker.label}</span>
+              <span className="text-xs text-gray-500">
+                ({speaker.segment_count} segments, {formatTime(speaker.total_duration)})
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

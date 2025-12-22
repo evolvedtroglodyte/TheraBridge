@@ -415,7 +415,7 @@ export function formatContextForAI(context: ChatContext): string {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // RECENT SESSIONS
+  // RECENT SESSIONS WITH FULL TRANSCRIPTS
   // ═══════════════════════════════════════════════════════════════════════════
   if (context.sessions.recent.length > 0) {
     parts.push(`\n━━━ RECENT SESSIONS ━━━`);
@@ -429,9 +429,20 @@ export function formatContextForAI(context: ChatContext): string {
       const mood = session.mood ? ` | Mood: ${session.mood}` : '';
       parts.push(`  ${i + 1}. ${date} - ${topics}${mood}`);
 
-      // Include summary for most recent session
-      if (i === 0 && session.summary) {
-        parts.push(`     Summary: ${session.summary.slice(0, 150)}${session.summary.length > 150 ? '...' : ''}`);
+      // Include full transcript for recent sessions (most recent 3)
+      if (i < 3 && session.transcript && Array.isArray(session.transcript)) {
+        parts.push(`     ═══ FULL TRANSCRIPT ═══`);
+        session.transcript.forEach((segment: any) => {
+          const speaker = segment.speaker || 'Unknown';
+          const text = segment.text || '';
+          parts.push(`     ${speaker}: ${text}`);
+        });
+        parts.push(`     ═══ END TRANSCRIPT ═══`);
+      }
+
+      // Include summary for context
+      if (session.summary) {
+        parts.push(`     Summary: ${session.summary}`);
       }
 
       // Include action items for recent sessions
@@ -478,6 +489,17 @@ export function formatContextForAI(context: ChatContext): string {
       day: 'numeric',
     });
     parts.push(`${context.user.firstName} is reviewing their session from ${sessionDate}.`);
+
+    // Include full transcript of current session
+    if (context.currentSession.transcript && Array.isArray(context.currentSession.transcript)) {
+      parts.push(`\n═══ FULL SESSION TRANSCRIPT ═══`);
+      context.currentSession.transcript.forEach((segment: any) => {
+        const speaker = segment.speaker || 'Unknown';
+        const text = segment.text || '';
+        parts.push(`${speaker}: ${text}`);
+      });
+      parts.push(`═══ END TRANSCRIPT ═══\n`);
+    }
 
     if (context.currentSession.summary) {
       parts.push(`Session Summary: ${context.currentSession.summary}`);

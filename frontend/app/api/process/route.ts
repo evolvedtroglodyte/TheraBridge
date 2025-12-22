@@ -145,13 +145,25 @@ export async function POST(request: NextRequest) {
     const rawSegments: DiarizedSegment[] = backendResults.segments || [];
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // Speaker Role Detection: SPEAKER_XX → Therapist/Client
+    // Speaker Role Detection (FALLBACK ONLY)
+    // Primary detection happens in audio pipeline via separate AI
+    // This frontend logic only runs if backend hasn't provided role labels yet
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    const roleDetectionResult = detectSpeakerRoles(rawSegments);
-    const diarizedSegments = roleDetectionResult.segments;
+    let diarizedSegments = rawSegments;
+    let roleDetectionResult: ReturnType<typeof detectSpeakerRoles> | null = null;
+    const hasRoleLabels = rawSegments.some(seg =>
+      seg.speaker === 'Therapist' || seg.speaker === 'Client'
+    );
 
-    console.log('[Process] Speaker role detection:');
-    console.log(formatDetectionResult(roleDetectionResult));
+    if (!hasRoleLabels && rawSegments.length > 0) {
+      console.log('[Process] No role labels from backend - using fallback detection');
+      roleDetectionResult = detectSpeakerRoles(rawSegments);
+      diarizedSegments = roleDetectionResult.segments;
+      console.log('[Process] Fallback speaker role detection:');
+      console.log(formatDetectionResult(roleDetectionResult));
+    } else {
+      console.log('[Process] Using role labels from backend (primary detection)');
+    }
 
     // Update progress
     await supabase
@@ -194,8 +206,8 @@ Respond in JSON format:
     // Calculate duration from REAL backend results
     const durationMinutes = backendResults.duration_minutes || null;
 
-    // Build role detection metadata
-    const roleMetadata = {
+    // Build role detection metadata (only if fallback detection was used)
+    const roleMetadata = roleDetectionResult ? {
       method: roleDetectionResult.method,
       confidence: roleDetectionResult.overallConfidence,
       assignments: Object.fromEntries(
@@ -209,7 +221,7 @@ Respond in JSON format:
           },
         ])
       ),
-    };
+    } : null;
 
     // Update session with results
     console.log('[Process] Updating session with results:', {
