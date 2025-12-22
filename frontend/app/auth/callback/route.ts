@@ -58,7 +58,7 @@ export async function GET(request: Request) {
     }
 
     // Email/password user - go to dashboard
-    return NextResponse.redirect(new URL('/patient/dashboard-v3', requestUrl.origin));
+    return NextResponse.redirect(new URL('/patient', requestUrl.origin));
 
   } catch (err) {
     console.error('Callback error:', err);
