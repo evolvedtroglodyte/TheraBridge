@@ -114,7 +114,7 @@ export function Header({ onAskAIClick }: HeaderProps) {
 
     // Single/double click behavior: navigate to dashboard
     if (homeClickCountRef.current === 1) {
-      router.push('/patient/dashboard-v3');
+      router.push('/patient');
     }
 
     // Reset click count after 500ms
@@ -157,20 +157,20 @@ export function Header({ onAskAIClick }: HeaderProps) {
 
   // Navigate to upload page
   const handleUploadClick = () => {
-    router.push('/patient/dashboard-v3/upload');
+    router.push('/patient/upload');
   };
 
   // Navigate to sessions page
   const handleSessionsClick = () => {
-    router.push('/patient/dashboard-v3/sessions');
+    router.push('/patient/sessions');
   };
 
   // Navigate to dashboard
   const handleDashboardClick = () => {
-    router.push('/patient/dashboard-v3');
+    router.push('/patient');
   };
 
-  // Sessions page layout: Logo left, empty right (matching Dashboard structure)
+  // Sessions page layout: Logo left, Home/Theme right
   if (isSessionsPage) {
     return (
       <header className="sticky top-0 z-50 bg-[#F8F7F4] dark:bg-[#1a1625] border-b border-[#E0DDD8] dark:border-[#3d3548] h-[60px] flex items-center justify-between transition-colors duration-300">
@@ -218,8 +218,23 @@ export function Header({ onAskAIClick }: HeaderProps) {
           </button>
         </nav>
 
-        {/* Right section - Empty (fixed width matching left for centering) */}
-        <div className="w-[200px]"></div>
+        {/* Right section - Home + Theme toggle (fixed width matching left) */}
+        <div className="flex items-center justify-end gap-2 pr-3 w-[200px]">
+          <button
+            onClick={handleHomeClick}
+            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-[#3d3548] transition-colors"
+            aria-label="Go to dashboard"
+          >
+            <HomeIcon isDark={isDark} />
+          </button>
+          <button
+            onClick={handleThemeToggle}
+            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-[#3d3548] transition-colors"
+            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            <ThemeIcon isDark={isDark} />
+          </button>
+        </div>
       </header>
     );
   }

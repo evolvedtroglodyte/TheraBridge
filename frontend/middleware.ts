@@ -38,7 +38,7 @@ export async function middleware(req: NextRequest) {
   if (req.nextUrl.pathname.startsWith('/auth/login') || req.nextUrl.pathname.startsWith('/auth/signup')) {
     if (session) {
       // All users go to patient dashboard (no role check needed without database)
-      return NextResponse.redirect(new URL('/patient/dashboard-v3', req.url));
+      return NextResponse.redirect(new URL('/patient', req.url));
     }
   }
 

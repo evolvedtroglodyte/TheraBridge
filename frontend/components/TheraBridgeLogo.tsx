@@ -10,7 +10,7 @@
  * Colors: Teal (light mode) / Purple (dark mode) for accent
  */
 
-import { useTheme } from '@/app/patient/dashboard-v3/contexts/ThemeContext';
+import { useTheme } from '@/app/patient/contexts/ThemeContext';
 
 interface LogoProps {
   className?: string;

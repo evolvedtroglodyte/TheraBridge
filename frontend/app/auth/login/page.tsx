@@ -117,7 +117,7 @@ function AuthPageContent() {
           window.history.replaceState(null, '', window.location.pathname);
         } else {
           // User has password - go to dashboard
-          window.location.href = '/patient/dashboard-v3';
+          window.location.href = '/patient';
         }
       }
     };
@@ -253,7 +253,7 @@ function AuthPageContent() {
           }
 
           // OAuth user verified - go straight to dashboard
-          window.location.href = '/patient/dashboard-v3';
+          window.location.href = '/patient';
           return;
         }
 
@@ -1008,7 +1008,7 @@ function AuthPageContent() {
               ) : (
                 // Skip to Dashboard button - revealed after clicking DEMO
                 <button
-                  onClick={() => router.push('/patient/dashboard-v3')}
+                  onClick={() => router.push('/patient')}
                   style={{
                     padding: '10px 24px',
                     fontSize: '12px',

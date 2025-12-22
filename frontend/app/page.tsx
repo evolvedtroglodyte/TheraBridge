@@ -45,7 +45,7 @@ export default function Home() {
 
           const dashboardPath = userData?.role === 'therapist'
             ? '/therapist'
-            : '/patient/dashboard-v3';
+            : '/patient';
 
           console.log(`✅ User logged in - redirecting to ${dashboardPath}`);
           router.replace(dashboardPath);

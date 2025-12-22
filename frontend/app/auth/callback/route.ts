@@ -54,7 +54,7 @@ export async function GET(request: Request) {
       // OAuth users (Google, etc.) are pre-verified by their provider
       // Always redirect directly to dashboard - no additional verification needed
       console.log(`✅ OAuth login successful (${provider}):`, user.email);
-      return NextResponse.redirect(new URL('/patient/dashboard-v3', requestUrl.origin));
+      return NextResponse.redirect(new URL('/patient', requestUrl.origin));
     }
 
     // Email/password user - go to dashboard

@@ -207,9 +207,9 @@ export function SessionCardsGrid({
           </motion.div>
         </div>
 
-        {/* Pagination - Always at bottom, centered on full page (accounting for 60px sidebar) */}
+        {/* Pagination - Always at bottom, never shifts */}
         {totalPages > 1 && (
-          <nav aria-label="Session pages" className="flex justify-center items-center gap-3 h-12 flex-shrink-0" style={{ marginLeft: '-30px' }}>
+          <nav aria-label="Session pages" className="flex justify-center items-center gap-3 h-12 flex-shrink-0">
             {Array.from({ length: totalPages }).map((_, idx) => (
               <button
                 key={idx}
