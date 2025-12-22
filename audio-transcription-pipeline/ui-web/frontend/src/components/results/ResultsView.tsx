@@ -235,6 +235,7 @@ export default function ResultsView({ jobId, uploadedFile, onReset }: ResultsVie
             ref={transcriptRef}
             segments={result.segments}
             speakers={result.speakers}
+            alignedSegments={result.aligned_segments}
             currentTime={currentAudioTime}
             onTimestampClick={handleTimestampClick}
           />

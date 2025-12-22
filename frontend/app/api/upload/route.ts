@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const maxDuration = 300;
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,18 +32,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file type
-    const allowedTypes = ['audio/mp3', 'audio/mpeg', 'audio/wav', 'audio/m4a', 'audio/ogg', 'audio/flac'];
-    if (!allowedTypes.includes(file.type)) {
+    // Validate file type (check both MIME type and extension)
+    const allowedTypes = [
+      'audio/mp3', 'audio/mpeg', 'audio/wav', 'audio/x-wav',
+      'audio/m4a', 'audio/mp4', 'audio/x-m4a',
+      'audio/ogg', 'audio/flac', 'audio/webm',
+      'application/octet-stream', // fallback for some browsers
+    ];
+    const allowedExtensions = ['mp3', 'wav', 'm4a', 'ogg', 'flac', 'webm'];
+    const fileExt = file.name.split('.').pop()?.toLowerCase() || 'mp3';
+
+    const isValidType = allowedTypes.includes(file.type) || allowedExtensions.includes(fileExt);
+
+    if (!isValidType) {
+      console.error('Invalid file type:', file.type, 'Extension:', fileExt);
       return NextResponse.json(
-        { error: 'Invalid file type. Supported: MP3, WAV, M4A, OGG, FLAC' },
+        { error: `Invalid file type "${file.type}". Supported: MP3, WAV, M4A, OGG, FLAC, WEBM` },
         { status: 400 }
       );
     }
 
     // Generate unique filename
     const timestamp = Date.now();
-    const fileExt = file.name.split('.').pop();
     const fileName = `${patientId}/${timestamp}.${fileExt}`;
 
     // Upload to Supabase Storage

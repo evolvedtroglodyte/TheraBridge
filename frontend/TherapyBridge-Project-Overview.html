@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TherapyBridge - Project Overview & Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #5AB9B4;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        h2 {
+            color: #5AB9B4;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #5AB9B4;
+            padding-bottom: 10px;
+            font-weight: 300;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+
+        .status-complete {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .tech-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #5AB9B4;
+        }
+
+        .tech-card h4 {
+            color: #5AB9B4;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #5AB9B4;
+            font-weight: bold;
+        }
+
+        .feature-list li.pending:before {
+            content: "○";
+            color: #999;
+        }
+
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .component-item {
+            background: #f0f9f9;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85em;
+            border: 1px solid #e0f0f0;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #5AB9B4;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th {
+            background: #5AB9B4;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .highlight-box {
+            background: #e8f5f5;
+            border-left: 4px solid #5AB9B4;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .architecture-diagram {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.8;
+        }
+
+        .metric {
+            display: inline-block;
+            background: #f0f9f9;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌉 TherapyBridge</h1>
+        <p class="subtitle">AI-Powered Therapy Session Management & Note Extraction Platform</p>
+
+        <div class="highlight-box">
+            <strong>Project Status:</strong> Backend complete with AI extraction ✅ | Frontend Dashboard v3 in active development 🚧
+            <br><strong>Current Focus:</strong> Patient Dashboard with interactive components, timeline visualization, and real-time chat
+            <br><strong>Tech Stack:</strong> Next.js 16 + React 19 + FastAPI + PostgreSQL + GPT-4o
+        </div>
+
+        <h2>📊 Project Overview</h2>
+
+        <p><strong>Mission:</strong> Transform therapy practice management by automating session transcription, speaker diarization, and intelligent note extraction using AI, allowing therapists to focus on patient care rather than administrative tasks.</p>
+
+        <h3>Core Value Proposition</h3>
+        <ul class="feature-list">
+            <li>Upload audio recordings (MP3, WAV, M4A) from therapy sessions</li>
+            <li>Automatic transcription using OpenAI Whisper API (~5-7 min for 23 min audio)</li>
+            <li>Speaker diarization (identifies Therapist vs Patient using pyannote 3.1)</li>
+            <li>AI-powered note extraction with GPT-4o (~20 seconds per session)</li>
+            <li>Comprehensive patient journey timeline with milestones and progress tracking</li>
+            <li>Interactive dashboard for therapists and patients with distinct views</li>
+        </ul>
+
+        <h2>🏗️ System Architecture</h2>
+
+        <div class="architecture-diagram">
+<strong>Monorepo Structure (4 Independent Projects):</strong>
+
+peerbridge proj/
+├── <strong>frontend/</strong>                  ← Patient Dashboard v3 (Next.js 16 + React 19)
+│   ├── app/patient/dashboard-v3/   ← Active development
+│   ├── components/                 ← Shared UI components
+│   ├── lib/                        ← API client, utilities, mock data
+│   └── tests/                      ← Playwright E2E tests (42 tests)
+│
+├── <strong>backend/</strong>                   ← FastAPI Server (Python 3.13)
+│   ├── app/
+│   │   ├── routers/               ← API endpoints (sessions, patients, auth)
+│   │   ├── services/              ← AI extraction, timeline, processing
+│   │   ├── models/                ← SQLAlchemy ORM models
+│   │   └── auth/                  ← JWT authentication
+│   ├── alembic/                   ← Database migrations
+│   └── tests/                     ← Pytest test suite
+│
+├── <strong>audio-transcription-pipeline/</strong> ← Audio Processing (Python 3.13)
+│   ├── src/
+│   │   ├── pipeline.py            ← CPU/API pipeline
+│   │   └── pipeline_gpu.py        ← GPU/Vast.ai pipeline
+│   └── tests/                     ← Pipeline integration tests
+│
+└── <strong>Scrapping/</strong>                 ← Web Scraping Utility (Python 3.11)
+    └── src/scraper/               ← Competitive analysis tools
+        </div>
+
+        <h2>💻 Tech Stack</h2>
+
+        <div class="tech-stack">
+            <div class="tech-card">
+                <h4>Frontend</h4>
+                <ul>
+                    <li><strong>Framework:</strong> Next.js 16.0.10</li>
+                    <li><strong>UI Library:</strong> React 19.2.1</li>
+                    <li><strong>Styling:</strong> Tailwind CSS 3.4</li>
+                    <li><strong>Animation:</strong> Framer Motion 12.23</li>
+                    <li><strong>Charts:</strong> Recharts 3.6</li>
+                    <li><strong>Icons:</strong> Lucide React</li>
+                    <li><strong>Testing:</strong> Playwright 1.57</li>
+                    <li><strong>State:</strong> React Context + SWR</li>
+                </ul>
+            </div>
+
+            <div class="tech-card">
+                <h4>Backend</h4>
+                <ul>
+                    <li><strong>Framework:</strong> FastAPI</li>
+                    <li><strong>Database:</strong> Neon PostgreSQL + pgvector</li>
+                    <li><strong>ORM:</strong> SQLAlchemy</li>
+                    <li><strong>Migration:</strong> Alembic</li>
+                    <li><strong>Auth:</strong> JWT (access + refresh tokens)</li>
+                    <li><strong>Validation:</strong> Pydantic</li>
+                    <li><strong>Testing:</strong> Pytest</li>
+                    <li><strong>Security:</strong> Bcrypt, Rate Limiting</li>
+                </ul>
+            </div>
+
+            <div class="tech-card">
+                <h4>AI & Processing</h4>
+                <ul>
+                    <li><strong>Transcription:</strong> OpenAI Whisper API</li>
+                    <li><strong>Diarization:</strong> pyannote-audio 3.1</li>
+                    <li><strong>Note Extraction:</strong> GPT-4o</li>
+                    <li><strong>Audio Processing:</strong> pydub, FFmpeg</li>
+                    <li><strong>GPU Acceleration:</strong> faster-whisper (Vast.ai)</li>
+                </ul>
+            </div>
+
+            <div class="tech-card">
+                <h4>Infrastructure</h4>
+                <ul>
+                    <li><strong>Hosting (Frontend):</strong> Vercel (planned)</li>
+                    <li><strong>Hosting (Backend):</strong> AWS Lambda (planned)</li>
+                    <li><strong>Database:</strong> Neon PostgreSQL (deployed)</li>
+                    <li><strong>Storage:</strong> AWS S3 (planned)</li>
+                    <li><strong>GPU:</strong> Vast.ai instances</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>🎨 Frontend: Patient Dashboard v3</h2>
+
+        <h3>Dashboard Layout (7 Interactive Components)</h3>
+
+        <div class="highlight-box">
+            <strong>Design Philosophy:</strong> Warm, therapy-appropriate aesthetic with cream background (#ECEAE5), teal accents (#5AB9B4), and comprehensive dark mode support. All components feature smooth animations, modal expansions, and responsive design.
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Description</th>
+                    <th>Features</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Header</strong></td>
+                    <td>Navigation bar with theme toggle and AI assistant trigger</td>
+                    <td>• Dark/light mode toggle<br>• "Ask AI" button (opens fullscreen chat)<br>• Centered logo with geometric design</td>
+                </tr>
+                <tr>
+                    <td><strong>Notes & Goals Card</strong></td>
+                    <td>Session notes and therapy goals with modal expansion</td>
+                    <td>• Compact card with 2 items visible<br>• Expandable modal with full list<br>• Editable content with save functionality<br>• Font: system-ui, font-light 300</td>
+                </tr>
+                <tr>
+                    <td><strong>AI Chat Card</strong></td>
+                    <td>Interactive AI assistant for therapy insights</td>
+                    <td>• Fullscreen mode toggle<br>• Message history with streaming<br>• Suggested prompts ("Anxiety triggers", "Progress summary")<br>• Session context integration</td>
+                </tr>
+                <tr>
+                    <td><strong>To-Do Card</strong></td>
+                    <td>Action items and homework assignments</td>
+                    <td>• Checkbox completion tracking<br>• Priority indicators<br>• Due dates<br>• Modal for detailed view</td>
+                </tr>
+                <tr>
+                    <td><strong>Progress Patterns Card</strong></td>
+                    <td>Visualization of emotional trends and therapy patterns</td>
+                    <td>• Carousel with 4 pattern views<br>• Mood charts (Recharts)<br>• Trigger analysis<br>• Strategy effectiveness<br>• Entire card clickable for expansion</td>
+                </tr>
+                <tr>
+                    <td><strong>Therapist Bridge Card</strong></td>
+                    <td>Quick communication channel with therapist</td>
+                    <td>• Unread message count<br>• Last message preview<br>• Send message functionality<br>• Message history modal</td>
+                </tr>
+                <tr>
+                    <td><strong>Session Cards Grid</strong></td>
+                    <td>Chronological list of therapy sessions (80% width)</td>
+                    <td>• Session cards with mood indicators<br>• Topic, strategies, date metadata<br>• Click to expand with full transcript<br>• Milestone badges (breakthrough sessions)<br>• Text overflow fixed with min-w-0</td>
+                </tr>
+                <tr>
+                    <td><strong>Timeline Sidebar</strong></td>
+                    <td>Mixed patient journey timeline (20% width)</td>
+                    <td>• Sessions (mood-colored dots)<br>• Major life events (purple diamonds)<br>• Search & filter functionality<br>• Export to PDF + shareable link<br>• Reflection notes (add/edit)<br>• Modal expansion with full details</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Dashboard Components (19 files)</h3>
+        <div class="component-grid">
+            <div class="component-item">AIChatCard.tsx</div>
+            <div class="component-item">DashboardSkeleton.tsx</div>
+            <div class="component-item">DobbyLogo.tsx</div>
+            <div class="component-item">DobbyLogoGeometric.tsx</div>
+            <div class="component-item">ExportDropdown.tsx</div>
+            <div class="component-item">Header.tsx</div>
+            <div class="component-item">HeartSpeechIcon.tsx</div>
+            <div class="component-item">MajorEventModal.tsx</div>
+            <div class="component-item">NotesGoalsCard.tsx</div>
+            <div class="component-item">ProgressPatternsCard.tsx</div>
+            <div class="component-item">SessionCard.tsx</div>
+            <div class="component-item">SessionCardsGrid.tsx</div>
+            <div class="component-item">SessionDetail.tsx</div>
+            <div class="component-item">TherapistBridgeCard.tsx</div>
+            <div class="component-item">TimelineSidebar.tsx</div>
+            <div class="component-item">ToDoCard.tsx</div>
+            <div class="component-item">FullscreenChat/ (folder)</div>
+        </div>
+
+        <h3>Recent Enhancements (December 2025)</h3>
+
+        <ul class="feature-list">
+            <li><strong>Timeline Mixed Events:</strong> Unified timeline showing both sessions and major life events (job changes, relationships, health events)</li>
+            <li><strong>Search Functionality:</strong> Debounced search (300ms) across topics, strategies, titles, and summaries with results count</li>
+            <li><strong>Export Features:</strong> PDF export via print dialog + shareable link with clipboard copy</li>
+            <li><strong>Modal Positioning Fix:</strong> Resolved Framer Motion transform conflict - modals now properly centered</li>
+            <li><strong>Font Alignment:</strong> Unified typography (system-ui, font-light 300) across all cards matching Therapist Bridge design</li>
+            <li><strong>Text Overflow Fix:</strong> Added min-w-0 and break-words to session cards for proper text wrapping</li>
+        </ul>
+
+        <h3>Testing Coverage</h3>
+        <p><strong>42 E2E Tests</strong> using Playwright across 4 test files:</p>
+        <ul>
+            <li><code>timeline-mixed-events.spec.ts</code> - 8 tests (mixed timeline rendering, navigation)</li>
+            <li><code>timeline-major-event-modal.spec.ts</code> - 14 tests (modal behavior, reflections, navigation)</li>
+            <li><code>timeline-search.spec.ts</code> - 11 tests (search, filtering, debouncing)</li>
+            <li><code>timeline-export.spec.ts</code> - 9 tests (PDF export, shareable links)</li>
+        </ul>
+
+        <h2>⚙️ Backend API</h2>
+
+        <h3>Server Info</h3>
+        <ul>
+            <li><strong>URL:</strong> http://localhost:8000</li>
+            <li><strong>Docs:</strong> http://localhost:8000/docs (Swagger UI)</li>
+            <li><strong>Framework:</strong> FastAPI with async support</li>
+            <li><strong>Database:</strong> Neon PostgreSQL (deployed)</li>
+        </ul>
+
+        <h3>API Endpoints</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Endpoint</th>
+                    <th>Method</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="3" style="background: #f0f9f9; font-weight: bold;">Authentication</td>
+                </tr>
+                <tr>
+                    <td>/api/auth/signup</td>
+                    <td>POST</td>
+                    <td>User registration (therapist, patient, admin)</td>
+                </tr>
+                <tr>
+                    <td>/api/auth/login</td>
+                    <td>POST</td>
+                    <td>Login with JWT tokens (access + refresh)</td>
+                </tr>
+                <tr>
+                    <td>/api/auth/refresh</td>
+                    <td>POST</td>
+                    <td>Refresh access token (with token rotation)</td>
+                </tr>
+                <tr>
+                    <td>/api/auth/logout</td>
+                    <td>POST</td>
+                    <td>Revoke refresh token</td>
+                </tr>
+                <tr>
+                    <td>/api/auth/me</td>
+                    <td>GET</td>
+                    <td>Get current user info</td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="background: #f0f9f9; font-weight: bold;">Sessions</td>
+                </tr>
+                <tr>
+                    <td>/api/sessions/upload</td>
+                    <td>POST</td>
+                    <td>Upload audio, creates session (background processing)</td>
+                </tr>
+                <tr>
+                    <td>/api/sessions/{id}</td>
+                    <td>GET</td>
+                    <td>Get session details with extracted notes</td>
+                </tr>
+                <tr>
+                    <td>/api/sessions/{id}/notes</td>
+                    <td>GET</td>
+                    <td>Get extracted notes only</td>
+                </tr>
+                <tr>
+                    <td>/api/sessions/</td>
+                    <td>GET</td>
+                    <td>List all sessions (filterable by patient, status)</td>
+                </tr>
+                <tr>
+                    <td>/api/sessions/{id}/extract-notes</td>
+                    <td>POST</td>
+                    <td>Manually re-extract notes</td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="background: #f0f9f9; font-weight: bold;">Timeline</td>
+                </tr>
+                <tr>
+                    <td>/api/sessions/patients/{id}/timeline</td>
+                    <td>GET</td>
+                    <td>Paginated timeline with filters (event types, date range, importance)</td>
+                </tr>
+                <tr>
+                    <td>/api/sessions/patients/{id}/timeline/summary</td>
+                    <td>GET</td>
+                    <td>Timeline statistics (total events, milestones, highlights)</td>
+                </tr>
+                <tr>
+                    <td>/api/sessions/patients/{id}/timeline</td>
+                    <td>POST</td>
+                    <td>Create manual timeline event (therapists only)</td>
+                </tr>
+                <tr>
+                    <td>/api/sessions/patients/{id}/timeline/chart-data</td>
+                    <td>GET</td>
+                    <td>Visualization data (mood trends, session frequency)</td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="background: #f0f9f9; font-weight: bold;">Patients</td>
+                </tr>
+                <tr>
+                    <td>/api/patients/</td>
+                    <td>POST</td>
+                    <td>Create patient record</td>
+                </tr>
+                <tr>
+                    <td>/api/patients/{id}</td>
+                    <td>GET</td>
+                    <td>Get patient details</td>
+                </tr>
+                <tr>
+                    <td>/api/patients/</td>
+                    <td>GET</td>
+                    <td>List all patients</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Database Schema (6 Tables)</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Table</th>
+                    <th>Purpose</th>
+                    <th>Key Columns</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>users</strong></td>
+                    <td>Therapists and patients with authentication</td>
+                    <td>email, hashed_password, first_name, last_name, role (therapist/patient/admin), is_verified</td>
+                </tr>
+                <tr>
+                    <td><strong>auth_sessions</strong></td>
+                    <td>Refresh token management</td>
+                    <td>user_id, refresh_token, expires_at, is_revoked</td>
+                </tr>
+                <tr>
+                    <td><strong>therapist_patients</strong></td>
+                    <td>Many-to-many junction table</td>
+                    <td>therapist_id, patient_id, relationship_type, is_active, started_at, ended_at</td>
+                </tr>
+                <tr>
+                    <td><strong>therapy_sessions</strong></td>
+                    <td>Full session pipeline (audio → transcript → notes)</td>
+                    <td>patient_id, audio_url, transcript, status (uploading/transcribing/processed), extracted_notes (JSON)</td>
+                </tr>
+                <tr>
+                    <td><strong>timeline_events</strong></td>
+                    <td>Patient journey events and milestones</td>
+                    <td>patient_id, event_type (session/milestone/clinical/goal), title, description, event_date, importance, is_private</td>
+                </tr>
+                <tr>
+                    <td><strong>action_items</strong></td>
+                    <td>Homework and tasks assigned to patients</td>
+                    <td>session_id, patient_id, description, due_date, status (pending/completed)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>🤖 AI Note Extraction</h2>
+
+        <div class="highlight-box">
+            <strong>Powered by GPT-4o</strong> | Extraction time: ~20 seconds | Cost: $0.02-0.03 per session
+        </div>
+
+        <h3>Extracted Data Points (14 categories)</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Format</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Key Topics</td>
+                    <td>3-7 main discussion topics</td>
+                    <td>Array of strings</td>
+                </tr>
+                <tr>
+                    <td>Topic Summary</td>
+                    <td>2-3 sentence session overview</td>
+                    <td>String</td>
+                </tr>
+                <tr>
+                    <td>Strategies</td>
+                    <td>Coping strategies discussed (breathing, cognitive, behavioral)</td>
+                    <td>Array of strings</td>
+                </tr>
+                <tr>
+                    <td>Emotional Themes</td>
+                    <td>Recurring emotional patterns</td>
+                    <td>Array of strings</td>
+                </tr>
+                <tr>
+                    <td>Triggers</td>
+                    <td>Identified triggers with severity (low/medium/high)</td>
+                    <td>Array of {trigger, severity}</td>
+                </tr>
+                <tr>
+                    <td>Action Items</td>
+                    <td>Homework, tasks, exercises assigned</td>
+                    <td>Array of strings</td>
+                </tr>
+                <tr>
+                    <td>Significant Quotes</td>
+                    <td>Notable patient statements</td>
+                    <td>Array of strings</td>
+                </tr>
+                <tr>
+                    <td>Session Mood</td>
+                    <td>Overall emotional tone (very_low → very_positive)</td>
+                    <td>Enum (5 levels)</td>
+                </tr>
+                <tr>
+                    <td>Mood Trajectory</td>
+                    <td>How mood changed during session</td>
+                    <td>Enum (improving/declining/stable/fluctuating)</td>
+                </tr>
+                <tr>
+                    <td>Follow-up Topics</td>
+                    <td>Items to revisit in next session</td>
+                    <td>Array of strings</td>
+                </tr>
+                <tr>
+                    <td>Unresolved Concerns</td>
+                    <td>Issues needing continued attention</td>
+                    <td>Array of strings</td>
+                </tr>
+                <tr>
+                    <td>Risk Flags</td>
+                    <td>Safety concerns (self-harm, suicidal ideation, crisis)</td>
+                    <td>Object with boolean flags</td>
+                </tr>
+                <tr>
+                    <td>Therapist Summary</td>
+                    <td>Clinical summary (150-200 words)</td>
+                    <td>String (professional tone)</td>
+                </tr>
+                <tr>
+                    <td>Patient Summary</td>
+                    <td>Patient-facing summary (100-150 words)</td>
+                    <td>String (warm, supportive tone)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>🎙️ Audio Transcription Pipeline</h2>
+
+        <h3>Pipeline Stages</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Stage</th>
+                    <th>Technology</th>
+                    <th>Duration</th>
+                    <th>Output</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1. Audio Preprocessing</td>
+                    <td>pydub + FFmpeg</td>
+                    <td>~30 seconds</td>
+                    <td>64kbps MP3, normalized, silence trimmed</td>
+                </tr>
+                <tr>
+                    <td>2. Transcription</td>
+                    <td>OpenAI Whisper API</td>
+                    <td>~5-7 min (23 min audio)</td>
+                    <td>Timestamped text segments</td>
+                </tr>
+                <tr>
+                    <td>3. Speaker Diarization</td>
+                    <td>pyannote-audio 3.1</td>
+                    <td>~2-3 min</td>
+                    <td>Speaker labels (SPEAKER_00, SPEAKER_01)</td>
+                </tr>
+                <tr>
+                    <td>4. Role Labeling</td>
+                    <td>Custom heuristics</td>
+                    <td>~1 second</td>
+                    <td>Therapist vs Client labels</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Performance Metrics</h3>
+
+        <div class="metric">CPU/API Pipeline: 5-7 min for 23 min audio</div>
+        <div class="metric">GPU Pipeline (Vast.ai): 1.5 min for 23 min audio</div>
+        <div class="metric">Realtime Factor: 10-15x (GPU)</div>
+        <div class="metric">File Size: 11MB (23 min @ 64kbps)</div>
+
+        <h2>🔒 Security & Compliance</h2>
+
+        <h3>Security Features</h3>
+        <ul class="feature-list">
+            <li><strong>Authentication:</strong> JWT with access tokens (30 min) + refresh tokens (7 days)</li>
+            <li><strong>Token Rotation:</strong> Old refresh token revoked when new token issued</li>
+            <li><strong>Password Hashing:</strong> Bcrypt with 12 rounds</li>
+            <li><strong>Rate Limiting:</strong> 5 req/min on login, 100 req/min general</li>
+            <li><strong>SQL Injection Protection:</strong> SQLAlchemy ORM for all queries</li>
+            <li><strong>SSL Enforcement:</strong> Database connections use SSL</li>
+            <li><strong>SQL Echo Disabled:</strong> No query logging (PHI protection)</li>
+        </ul>
+
+        <h3>Compliance Standards</h3>
+        <ul class="feature-list">
+            <li>OWASP Top 10 protection</li>
+            <li>CWE-89 (SQL Injection) mitigation</li>
+            <li>HIPAA technical safeguards (encryption, access controls)</li>
+            <li>GDPR Article 32 (security of processing)</li>
+        </ul>
+
+        <h2>📈 Project Metrics</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Total Repository Files</td>
+                    <td>~400+ files (after cleanup from 450+)</td>
+                </tr>
+                <tr>
+                    <td>Frontend Components</td>
+                    <td>19 dashboard components + 30+ shared components</td>
+                </tr>
+                <tr>
+                    <td>Backend Endpoints</td>
+                    <td>20+ API endpoints across 4 routers</td>
+                </tr>
+                <tr>
+                    <td>Database Tables</td>
+                    <td>6 core tables with indexes and foreign keys</td>
+                </tr>
+                <tr>
+                    <td>Test Coverage</td>
+                    <td>42 E2E tests (Playwright) + pytest suite (backend)</td>
+                </tr>
+                <tr>
+                    <td>Code Quality</td>
+                    <td>TypeScript strict mode, ESLint, Prettier</td>
+                </tr>
+                <tr>
+                    <td>Development Time</td>
+                    <td>~3 months (audio pipeline → backend → frontend)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>💰 Cost Breakdown</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Free Tier</th>
+                    <th>Overage Cost</th>
+                    <th>MVP Estimate</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Vercel (Frontend Hosting)</td>
+                    <td>100GB bandwidth</td>
+                    <td>$20/100GB</td>
+                    <td>Free</td>
+                </tr>
+                <tr>
+                    <td>AWS Lambda (Backend)</td>
+                    <td>1M requests</td>
+                    <td>$0.20/1M</td>
+                    <td>$1-5/mo</td>
+                </tr>
+                <tr>
+                    <td>Neon PostgreSQL</td>
+                    <td>0.5GB storage</td>
+                    <td>$0.25/GB</td>
+                    <td>Free</td>
+                </tr>
+                <tr>
+                    <td>AWS S3 (Audio Storage)</td>
+                    <td>5GB (12mo)</td>
+                    <td>$0.023/GB</td>
+                    <td>$1-2/mo</td>
+                </tr>
+                <tr>
+                    <td>OpenAI Whisper API</td>
+                    <td>N/A</td>
+                    <td>$0.006/min</td>
+                    <td>$2-3/mo</td>
+                </tr>
+                <tr>
+                    <td>OpenAI GPT-4o</td>
+                    <td>N/A</td>
+                    <td>$0.02/session</td>
+                    <td>$1-2/mo</td>
+                </tr>
+                <tr>
+                    <td><strong>Total</strong></td>
+                    <td colspan="2"></td>
+                    <td><strong>$5-15/month</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><em>Based on 10 sessions/week usage</em></p>
+
+        <h2>🚀 Deployment Status</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Status</th>
+                    <th>Deployment Target</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Audio Transcription Pipeline</td>
+                    <td><span class="status-badge status-complete">✅ Complete</span></td>
+                    <td>Vast.ai GPU instances (on-demand)</td>
+                </tr>
+                <tr>
+                    <td>Backend API</td>
+                    <td><span class="status-badge status-complete">✅ Complete</span></td>
+                    <td>AWS Lambda (planned)</td>
+                </tr>
+                <tr>
+                    <td>Database</td>
+                    <td><span class="status-badge status-complete">✅ Deployed</span></td>
+                    <td>Neon PostgreSQL (live)</td>
+                </tr>
+                <tr>
+                    <td>Frontend Dashboard v3</td>
+                    <td><span class="status-badge status-pending">🚧 In Development</span></td>
+                    <td>Vercel (planned)</td>
+                </tr>
+                <tr>
+                    <td>Authentication System</td>
+                    <td><span class="status-badge status-complete">✅ Complete</span></td>
+                    <td>Integrated with backend</td>
+                </tr>
+                <tr>
+                    <td>Timeline Feature</td>
+                    <td><span class="status-badge status-complete">✅ Complete</span></td>
+                    <td>Backend + frontend ready</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>📋 Next Steps</h2>
+
+        <h3>Immediate Priorities</h3>
+        <ol>
+            <li>Test frontend with live backend (set <code>NEXT_PUBLIC_USE_REAL_API=true</code>)</li>
+            <li>Fix remaining ESLint errors in pre-existing components</li>
+            <li>Deploy backend to AWS Lambda</li>
+            <li>Implement Feature 2: Analytics Dashboard</li>
+            <li>Test Vast.ai GPU pipeline for production workloads</li>
+        </ol>
+
+        <h3>Post-MVP Features (Deferred)</h3>
+        <ul class="feature-list pending">
+            <li class="pending">Auto speaker diarization improvements</li>
+            <li class="pending">Background job processing (using Celery/Redis)</li>
+            <li class="pending">Real-time transcription during sessions</li>
+            <li class="pending">Advanced cross-session insights with semantic search</li>
+            <li class="pending">Crisis detection system with alerts</li>
+            <li class="pending">Mobile app (React Native)</li>
+        </ul>
+
+        <h2>📚 Key Technical Decisions</h2>
+
+        <h3>Why 64kbps MP3?</h3>
+        <p>Speech doesn't need high bitrate. Reduces 1-hour file from ~120MB to ~27MB while maintaining quality for Whisper's transcription sweet spot.</p>
+
+        <h3>Why pyannote over alternatives?</h3>
+        <p>Best open-source diarization accuracy, runs locally (no API costs), active development, and strong community support.</p>
+
+        <h3>Why Next.js 16 + React 19?</h3>
+        <p>Latest features (Server Components, Suspense, Turbopack), excellent developer experience, Vercel deployment integration, and React 19's improved concurrent rendering.</p>
+
+        <h3>Why FastAPI over Django/Flask?</h3>
+        <p>Async support for concurrent processing, automatic API documentation, Pydantic validation, modern Python type hints, and excellent performance.</p>
+
+        <h2>🔗 Quick Links</h2>
+
+        <ul>
+            <li><strong>Frontend Dev Server:</strong> http://localhost:3000/patient/dashboard-v3</li>
+            <li><strong>Backend API:</strong> http://localhost:8000</li>
+            <li><strong>API Documentation:</strong> http://localhost:8000/docs</li>
+            <li><strong>Database:</strong> Neon PostgreSQL (connection via .env)</li>
+        </ul>
+
+        <h2>📄 Repository Documentation</h2>
+
+        <ul>
+            <li><code>.claude/CLAUDE.md</code> - Repository organization rules and project state</li>
+            <li><code>Project MDs/TherapyBridge.md</code> - Master project documentation</li>
+            <li><code>backend/README.md</code> - Backend API documentation</li>
+            <li><code>audio-transcription-pipeline/README.md</code> - Pipeline documentation</li>
+        </ul>
+
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid #e0e0e0;">
+
+        <p style="text-align: center; color: #666; font-size: 0.9em;">
+            <strong>TherapyBridge</strong> | AI-Powered Therapy Session Management<br>
+            Generated: December 21, 2025 | For LLM Analysis
+        </p>
+    </div>
+</body>
+</html>

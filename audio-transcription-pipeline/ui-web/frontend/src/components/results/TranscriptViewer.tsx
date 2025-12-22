@@ -6,6 +6,7 @@ import { formatTime, getSpeakerColor } from '@/lib/utils';
 interface TranscriptViewerProps {
   segments: Segment[];
   speakers: Speaker[];
+  alignedSegments?: Segment[]; // Granular segments for highlighting
   currentTime?: number;
   onTimestampClick?: (time: number) => void;
 }
@@ -15,7 +16,7 @@ export interface TranscriptViewerRef {
 }
 
 const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
-  function TranscriptViewer({ segments, speakers, currentTime = 0, onTimestampClick }, ref) {
+  function TranscriptViewer({ segments, speakers, alignedSegments, currentTime = 0, onTimestampClick }, ref) {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedSpeaker, setSelectedSpeaker] = useState<string | null>(null);
     const segmentRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -117,7 +118,17 @@ const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
         ) : (
           filteredSegments.map((segment, index) => {
             const speakerColor = getSpeakerColor(segment.speaker_id || 'UNKNOWN');
-            const isActive = currentTime >= segment.start && currentTime <= segment.end;
+
+            // Use aligned_segments for highlighting if available, otherwise use combined segments
+            const highlightSegments = alignedSegments || segments;
+            // Find if any granular segment within this combined segment is currently playing
+            const isActive = highlightSegments.some(
+              (alignedSeg) =>
+                currentTime >= alignedSeg.start &&
+                currentTime < alignedSeg.end &&
+                alignedSeg.start >= segment.start &&
+                alignedSeg.end <= segment.end
+            );
 
             return (
               <div

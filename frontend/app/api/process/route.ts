@@ -57,10 +57,13 @@ export async function POST(request: NextRequest) {
       .eq('id', session_id);
 
     // Download audio file from Supabase Storage
-    const fileName = session.audio_file_url.split('/').pop();
+    // Extract the full path from the public URL
+    const urlParts = session.audio_file_url.split('/audio-sessions/');
+    const filePath = urlParts[1]; // e.g., "00000000-0000-0000-0000-000000000003/1766346127574.mp3"
+
     const { data: audioData, error: downloadError } = await supabase.storage
       .from('audio-sessions')
-      .download(fileName!);
+      .download(filePath);
 
     if (downloadError) {
       console.error('Download error:', downloadError);
@@ -74,40 +77,78 @@ export async function POST(request: NextRequest) {
     // Update progress
     await supabase
       .from('therapy_sessions')
-      .update({ processing_progress: 30 })
+      .update({ processing_progress: 20 })
       .eq('id', session_id);
 
-    // Transcribe using OpenAI Whisper API
-    const transcription = await openai.audio.transcriptions.create({
-      file: new File([audioData], fileName!, { type: 'audio/mpeg' }),
-      model: 'whisper-1',
-      response_format: 'verbose_json',
-      timestamp_granularities: ['segment'],
+    // Call your REAL audio-transcription-pipeline backend for transcription + pyannote diarization
+    console.log('[Process] Calling REAL backend with pyannote diarization...');
+
+    const actualFileName = filePath.split('/').pop() || 'audio.mp3';
+    const formData = new FormData();
+    formData.append('audio', new File([audioData], actualFileName, { type: 'audio/mpeg' }));
+
+    const backendResponse = await fetch('http://localhost:8000/api/transcribe', {
+      method: 'POST',
+      body: formData,
     });
 
+    if (!backendResponse.ok) {
+      throw new Error(`Backend transcription failed: ${backendResponse.statusText}`);
+    }
+
+    const backendData = await backendResponse.json();
+    console.log('[Process] Got backend job ID:', backendData.job_id);
+
+    // Poll backend for completion (REAL pyannote processing)
+    let processingComplete = false;
+    let backendResults: any = null;
+    let pollAttempts = 0;
+    const MAX_POLL_ATTEMPTS = 60; // 2 minutes max
+
+    while (!processingComplete && pollAttempts < MAX_POLL_ATTEMPTS) {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      pollAttempts++;
+
+      const statusResponse = await fetch(`http://localhost:8000/api/jobs/${backendData.job_id}/status`);
+      const statusData = await statusResponse.json();
+
+      console.log('[Process] Backend status:', statusData.status, `(${statusData.progress}%)`);
+
+      // Update our progress
+      await supabase
+        .from('therapy_sessions')
+        .update({ processing_progress: Math.min(80, 20 + statusData.progress * 0.6) })
+        .eq('id', session_id);
+
+      if (statusData.status === 'completed') {
+        processingComplete = true;
+        const resultsResponse = await fetch(`http://localhost:8000/api/jobs/${backendData.job_id}/result`);
+        backendResults = await resultsResponse.json();
+      } else if (statusData.status === 'failed') {
+        throw new Error('Backend processing failed');
+      }
+    }
+
+    if (!backendResults) {
+      throw new Error('Backend processing timed out');
+    }
+
+    console.log('[Process] Got REAL diarized transcription with', backendResults.segments?.length || 0, 'segments');
+
+    // Extract REAL pyannote diarized segments
+    const diarizedSegments = backendResults.segments || [];
+
     // Update progress
     await supabase
       .from('therapy_sessions')
-      .update({ processing_progress: 60 })
-      .eq('id', session_id);
-
-    // Simple speaker diarization (basic heuristic for demo)
-    // In production, use pyannote.audio or Assembly AI
-    const segments = (transcription as any).segments || [];
-    const diarizedSegments = segments.map((seg: any, idx: number) => ({
-      speaker: idx % 2 === 0 ? 'Therapist' : 'Client',
-      text: seg.text,
-      start: seg.start,
-      end: seg.end,
-    }));
-
-    // Update progress
-    await supabase
-      .from('therapy_sessions')
-      .update({ processing_progress: 80 })
+      .update({ processing_progress: 85 })
       .eq('id', session_id);
 
     // Extract key information using GPT-4
+    const fullTranscript = diarizedSegments.map((seg: any) =>
+      `${seg.speaker}: ${seg.text}`
+    ).join('\n');
+
     const analysisPrompt = `You are a therapy session analyst. Analyze this transcript and extract:
 1. Overall mood/tone of the session
 2. Main topics discussed (as array)
@@ -116,7 +157,7 @@ export async function POST(request: NextRequest) {
 5. Brief summary (2-3 sentences)
 
 Transcript:
-${transcription.text}
+${fullTranscript}
 
 Respond in JSON format:
 {
@@ -135,36 +176,43 @@ Respond in JSON format:
 
     const analysisResult = JSON.parse(analysis.choices[0].message.content || '{}');
 
-    // Calculate duration
-    const durationMinutes = segments.length > 0
-      ? Math.ceil(segments[segments.length - 1].end / 60)
-      : null;
+    // Calculate duration from REAL backend results
+    const durationMinutes = backendResults.duration_minutes || null;
 
     // Update session with results
-    const { error: updateError } = await supabase
+    console.log('[Process] Updating session with results:', {
+      session_id,
+      hasTranscript: !!diarizedSegments,
+      hasSummary: !!analysisResult.summary,
+      mood: analysisResult.mood,
+    });
+
+    const { data: updateData, error: updateError } = await supabase
       .from('therapy_sessions')
       .update({
         transcript: diarizedSegments,
         summary: analysisResult.summary,
         mood: analysisResult.mood,
-        topics: analysisResult.topics,
-        key_insights: analysisResult.key_insights,
-        action_items: analysisResult.action_items,
+        topics: analysisResult.topics || [],
+        key_insights: analysisResult.key_insights || [],
+        action_items: analysisResult.action_items || [],
         duration_minutes: durationMinutes,
         processing_status: 'completed',
         processing_progress: 100,
-        updated_at: new Date().toISOString(),
       })
-      .eq('id', session_id);
+      .eq('id', session_id)
+      .select();
 
     if (updateError) {
       console.error('Update error:', updateError);
-      await updateSessionError(session_id, 'Failed to save results');
+      await updateSessionError(session_id, `Failed to save results: ${updateError.message}`);
       return NextResponse.json(
-        { error: 'Failed to save results' },
+        { error: `Failed to save results: ${updateError.message}` },
         { status: 500 }
       );
     }
+
+    console.log('[Process] Update successful:', updateData);
 
     return NextResponse.json({
       success: true,

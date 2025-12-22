@@ -39,6 +39,7 @@ export interface TranscriptionResult {
   performance?: PerformanceMetrics;
   speakers: Speaker[];
   segments: Segment[];
+  aligned_segments?: Segment[]; // Granular pre-combined segments for highlighting
   quality?: Record<string, any>;
   error?: string;
   created_at: string;
