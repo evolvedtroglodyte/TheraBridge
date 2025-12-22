@@ -20,7 +20,7 @@ export default function Header() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">v1.1.0</span>
+            <span className="text-sm text-gray-500">v1.2.0</span>
           </div>
         </div>
       </div>
