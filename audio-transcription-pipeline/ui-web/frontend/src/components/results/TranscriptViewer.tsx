@@ -1,7 +1,8 @@
-import { useState, useMemo, useRef, useImperativeHandle, forwardRef } from 'react';
-import { Search, User } from 'lucide-react';
+import { useState, useMemo, useRef, useImperativeHandle, forwardRef, useEffect } from 'react';
+import { Search, User, MousePointerClick, MoveVertical } from 'lucide-react';
 import type { Segment, Speaker } from '@/types/transcription';
 import { formatTime, getSpeakerColor } from '@/lib/utils';
+import TranscriptTooltip from './TranscriptTooltip';
 
 interface TranscriptViewerProps {
   segments: Segment[];
@@ -22,6 +23,28 @@ const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
     const segmentRefs = useRef<(HTMLDivElement | null)[]>([]);
     const containerRef = useRef<HTMLDivElement>(null);
 
+    // Toggle states (persisted in localStorage)
+    const [autoScrollEnabled, setAutoScrollEnabled] = useState(() => {
+      const saved = localStorage.getItem('transcript-auto-scroll');
+      return saved !== null ? JSON.parse(saved) : true; // Default: enabled
+    });
+    const [clickScrollEnabled, setClickScrollEnabled] = useState(() => {
+      const saved = localStorage.getItem('transcript-click-scroll');
+      return saved !== null ? JSON.parse(saved) : true; // Default: enabled
+    });
+
+    // Tooltip state
+    const [tooltip, setTooltip] = useState<{
+      show: boolean;
+      message: string;
+      type: 'auto-scroll-enabled' | 'auto-scroll-disabled' | 'click-scroll-enabled' | 'click-scroll-disabled' | 'auto-scroll-paused';
+    }>({ show: false, message: '', type: 'auto-scroll-enabled' });
+
+    // Auto-scroll pause state
+    const [autoScrollPaused, setAutoScrollPaused] = useState(false);
+    const lastManualScrollTime = useRef<number>(0);
+    const autoScrollResumeTimer = useRef<NodeJS.Timeout | null>(null);
+
   // Filter segments based on search and speaker
   const filteredSegments = useMemo(() => {
     return segments.filter((segment) => {
@@ -37,9 +60,131 @@ const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
     });
   }, [segments, searchQuery, selectedSpeaker]);
 
+  // Persist toggle states to localStorage
+  useEffect(() => {
+    localStorage.setItem('transcript-auto-scroll', JSON.stringify(autoScrollEnabled));
+  }, [autoScrollEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem('transcript-click-scroll', JSON.stringify(clickScrollEnabled));
+  }, [clickScrollEnabled]);
+
+  // Toggle handlers
+  const handleAutoScrollToggle = () => {
+    const newValue = !autoScrollEnabled;
+    setAutoScrollEnabled(newValue);
+
+    // Auto-scroll enables click-to-scroll
+    if (newValue && !clickScrollEnabled) {
+      setClickScrollEnabled(true);
+      showTooltip('Click scrolling enabled', 'click-scroll-enabled');
+      setTimeout(() => {
+        showTooltip(newValue ? 'Auto-scroll enabled' : 'Auto-scroll disabled', newValue ? 'auto-scroll-enabled' : 'auto-scroll-disabled');
+      }, 100);
+    } else {
+      showTooltip(newValue ? 'Auto-scroll enabled' : 'Auto-scroll disabled', newValue ? 'auto-scroll-enabled' : 'auto-scroll-disabled');
+    }
+  };
+
+  const handleClickScrollToggle = () => {
+    const newValue = !clickScrollEnabled;
+    setClickScrollEnabled(newValue);
+
+    // Disabling click-to-scroll disables auto-scroll
+    if (!newValue && autoScrollEnabled) {
+      setAutoScrollEnabled(false);
+      showTooltip('Auto-scroll disabled', 'auto-scroll-disabled');
+      setTimeout(() => {
+        showTooltip('Click scrolling disabled', 'click-scroll-disabled');
+      }, 100);
+    } else {
+      showTooltip(newValue ? 'Click scrolling enabled' : 'Click scrolling disabled', newValue ? 'click-scroll-enabled' : 'click-scroll-disabled');
+    }
+  };
+
+  const showTooltip = (message: string, type: typeof tooltip.type) => {
+    setTooltip({ show: true, message, type });
+  };
+
+  const hideTooltip = () => {
+    setTooltip((prev) => ({ ...prev, show: false }));
+  };
+
+  // Auto-scroll functionality: scroll to center active segment
+  useEffect(() => {
+    if (!autoScrollEnabled || autoScrollPaused || !containerRef.current) return;
+
+    // Find the currently playing segment
+    const activeIndex = filteredSegments.findIndex(
+      (seg) => currentTime >= seg.start && currentTime < seg.end
+    );
+
+    if (activeIndex !== -1 && segmentRefs.current[activeIndex]) {
+      const segmentElement = segmentRefs.current[activeIndex];
+      const container = containerRef.current;
+
+      // Calculate scroll position to center the segment
+      const segmentTop = segmentElement!.offsetTop;
+      const segmentHeight = segmentElement!.offsetHeight;
+      const containerHeight = container.offsetHeight;
+      const scrollTop = segmentTop - (containerHeight / 2) + (segmentHeight / 2);
+
+      // Smooth scroll to center the active segment
+      container.scrollTo({
+        top: scrollTop,
+        behavior: 'smooth',
+      });
+    }
+  }, [currentTime, filteredSegments, autoScrollEnabled, autoScrollPaused]);
+
+  // Detect manual scrolling and pause auto-scroll
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !autoScrollEnabled) return;
+
+    const handleScroll = () => {
+      const now = Date.now();
+      const timeSinceLastManualScroll = now - lastManualScrollTime.current;
+
+      // Only treat as manual scroll if it's been more than 500ms since last auto-scroll
+      // (This prevents auto-scroll from triggering the pause logic)
+      if (timeSinceLastManualScroll > 500) {
+        lastManualScrollTime.current = now;
+
+        // Pause auto-scroll
+        if (!autoScrollPaused) {
+          setAutoScrollPaused(true);
+          showTooltip('Auto-scroll paused (resumes in 5s)', 'auto-scroll-paused');
+        }
+
+        // Clear existing timer
+        if (autoScrollResumeTimer.current) {
+          clearTimeout(autoScrollResumeTimer.current);
+        }
+
+        // Resume auto-scroll after 5 seconds
+        autoScrollResumeTimer.current = setTimeout(() => {
+          setAutoScrollPaused(false);
+          autoScrollResumeTimer.current = null;
+        }, 5000);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      if (autoScrollResumeTimer.current) {
+        clearTimeout(autoScrollResumeTimer.current);
+      }
+    };
+  }, [autoScrollEnabled, autoScrollPaused]);
+
   // Expose scrollToTime method to parent
   useImperativeHandle(ref, () => ({
     scrollToTime: (time: number) => {
+      // Respect click-to-scroll toggle
+      if (!clickScrollEnabled) return;
+
       // Find the segment that contains this time
       const segmentIndex = filteredSegments.findIndex(
         (seg) => time >= seg.start && time <= seg.end
@@ -54,6 +199,9 @@ const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
         const segmentHeight = segmentElement!.offsetHeight;
         const containerHeight = container.offsetHeight;
         const scrollTop = segmentTop - (containerHeight / 2) + (segmentHeight / 2);
+
+        // Update last manual scroll time to prevent pause detection
+        lastManualScrollTime.current = Date.now();
 
         // Smooth scroll within container only (doesn't scroll the page)
         container.scrollTo({
@@ -100,6 +248,48 @@ const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
             </option>
           ))}
         </select>
+
+        {/* Toggle Controls */}
+        <div className="flex items-center gap-2">
+          {/* Auto-scroll Toggle */}
+          <button
+            onClick={handleAutoScrollToggle}
+            onMouseEnter={(e) => {
+              const btn = e.currentTarget;
+              const pulse = btn.querySelector('.pulse-animation');
+              if (pulse) (pulse as HTMLElement).style.animationPlayState = 'paused';
+            }}
+            onMouseLeave={(e) => {
+              const btn = e.currentTarget;
+              const pulse = btn.querySelector('.pulse-animation');
+              if (pulse && autoScrollEnabled) (pulse as HTMLElement).style.animationPlayState = 'running';
+            }}
+            className={`relative p-2 rounded-lg border transition-all ${
+              autoScrollEnabled
+                ? 'bg-green-100 border-green-300 text-green-700'
+                : 'bg-gray-100 border-gray-300 text-gray-600'
+            }`}
+            title={autoScrollEnabled ? 'Auto-scroll enabled' : 'Auto-scroll disabled'}
+          >
+            <MoveVertical className="h-4 w-4" />
+            {autoScrollEnabled && (
+              <span className="pulse-animation absolute inset-0 rounded-lg bg-green-500 opacity-20 animate-ping" />
+            )}
+          </button>
+
+          {/* Click-to-scroll Toggle */}
+          <button
+            onClick={handleClickScrollToggle}
+            className={`p-2 rounded-lg border transition-all ${
+              clickScrollEnabled
+                ? 'bg-blue-100 border-blue-300 text-blue-700'
+                : 'bg-gray-100 border-gray-300 text-gray-600'
+            }`}
+            title={clickScrollEnabled ? 'Click scrolling enabled' : 'Click scrolling disabled'}
+          >
+            <MousePointerClick className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {/* Results Count */}
@@ -177,6 +367,14 @@ const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
           })
         )}
       </div>
+
+      {/* Tooltip */}
+      <TranscriptTooltip
+        message={tooltip.message}
+        type={tooltip.type}
+        show={tooltip.show}
+        onHide={hideTooltip}
+      />
     </div>
   );
 });
