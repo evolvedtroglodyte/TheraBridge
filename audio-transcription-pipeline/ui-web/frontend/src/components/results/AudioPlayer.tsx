@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import WaveSurfer from 'wavesurfer.js';
-import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, SkipBack, SkipForward } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { formatTime, getSpeakerColor } from '@/lib/utils';
 import type { Segment } from '@/types/transcription';
@@ -11,9 +11,10 @@ interface AudioPlayerProps {
   segments?: Segment[];
   duration?: number;
   onTimeUpdate?: (time: number) => void;
+  onSeek?: (time: number, shouldScroll: boolean) => void;
 }
 
-export default function AudioPlayer({ audioUrl, filename, segments, duration: totalDuration, onTimeUpdate }: AudioPlayerProps) {
+export default function AudioPlayer({ audioUrl, filename, segments, duration: totalDuration, onTimeUpdate, onSeek }: AudioPlayerProps) {
   const waveformRef = useRef<HTMLDivElement>(null);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -87,17 +88,70 @@ export default function AudioPlayer({ audioUrl, filename, segments, duration: to
   const handleSkipBackward = () => {
     if (wavesurferRef.current) {
       wavesurferRef.current.skip(-10);
+      const newTime = wavesurferRef.current.getCurrentTime();
+      onSeek?.(newTime, true); // Scroll to new position
     }
   };
 
   const handleSkipForward = () => {
     if (wavesurferRef.current) {
       wavesurferRef.current.skip(10);
+      const newTime = wavesurferRef.current.getCurrentTime();
+      onSeek?.(newTime, true); // Scroll to new position
     }
   };
 
   const handleMuteToggle = () => {
     setIsMuted(!isMuted);
+  };
+
+  // Helper to find current segment index
+  const getCurrentSegmentIndex = () => {
+    if (!segments || segments.length === 0) return -1;
+    return segments.findIndex(
+      (seg) => currentTime >= seg.start && currentTime < seg.end
+    );
+  };
+
+  // Navigate to previous segment
+  const handlePrevSegment = () => {
+    if (!segments || segments.length === 0 || !wavesurferRef.current) return;
+    const currentIndex = getCurrentSegmentIndex();
+
+    if (currentIndex === -1) {
+      // Not in any segment, go to first segment
+      const seekTime = segments[0].start;
+      wavesurferRef.current.seekTo(seekTime / duration);
+      onSeek?.(seekTime, true);
+    } else if (currentIndex > 0) {
+      // Go to previous segment
+      const seekTime = segments[currentIndex - 1].start;
+      wavesurferRef.current.seekTo(seekTime / duration);
+      onSeek?.(seekTime, true);
+    } else {
+      // Already at first segment, go to its start
+      const seekTime = segments[0].start;
+      wavesurferRef.current.seekTo(seekTime / duration);
+      onSeek?.(seekTime, true);
+    }
+  };
+
+  // Navigate to next segment
+  const handleNextSegment = () => {
+    if (!segments || segments.length === 0 || !wavesurferRef.current) return;
+    const currentIndex = getCurrentSegmentIndex();
+
+    if (currentIndex === -1 || currentIndex >= segments.length - 1) {
+      // Not in any segment or at last segment, go to last segment start
+      const seekTime = segments[segments.length - 1].start;
+      wavesurferRef.current.seekTo(seekTime / duration);
+      onSeek?.(seekTime, true);
+    } else {
+      // Go to next segment
+      const seekTime = segments[currentIndex + 1].start;
+      wavesurferRef.current.seekTo(seekTime / duration);
+      onSeek?.(seekTime, true);
+    }
   };
 
   // Expose seek method for external use (e.g., transcript timestamp clicks)
@@ -173,6 +227,16 @@ export default function AudioPlayer({ audioUrl, filename, segments, duration: to
           <Button
             variant="outline"
             size="sm"
+            onClick={handlePrevSegment}
+            disabled={!isReady || !segments || segments.length === 0}
+            title="Previous segment"
+          >
+            <SkipBack className="h-4 w-4" />
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handleSkipBackward}
             disabled={!isReady}
             title="Skip backward 10 seconds"
@@ -204,6 +268,16 @@ export default function AudioPlayer({ audioUrl, filename, segments, duration: to
             className="font-mono text-xs"
           >
             +10s
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleNextSegment}
+            disabled={!isReady || !segments || segments.length === 0}
+            title="Next segment"
+          >
+            <SkipForward className="h-4 w-4" />
           </Button>
         </div>
 

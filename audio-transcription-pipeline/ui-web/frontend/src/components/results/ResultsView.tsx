@@ -48,6 +48,13 @@ export default function ResultsView({ jobId, uploadedFile, onReset }: ResultsVie
     handleTimestampClick(time);
   };
 
+  // Handle audio seek (from buttons like +10s, -10s, prev/next segment)
+  const handleAudioSeek = (time: number, shouldScroll: boolean) => {
+    if (shouldScroll) {
+      transcriptRef.current?.scrollToTime(time);
+    }
+  };
+
   // Handle audio time updates (for highlighting AND scrolling)
   const handleAudioTimeUpdate = (time: number) => {
     console.log('[ResultsView] Audio time update:', time);
@@ -196,6 +203,7 @@ export default function ResultsView({ jobId, uploadedFile, onReset }: ResultsVie
             segments={result.segments}
             duration={duration}
             onTimeUpdate={handleAudioTimeUpdate}
+            onSeek={handleAudioSeek}
           />
         </CardContent>
       </Card>
