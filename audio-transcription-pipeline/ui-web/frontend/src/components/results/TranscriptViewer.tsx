@@ -45,6 +45,9 @@ const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
     const lastManualScrollTime = useRef<number>(0);
     const autoScrollResumeTimer = useRef<NodeJS.Timeout | null>(null);
 
+    // Flash animation state for double-click
+    const [flashingSegmentIndex, setFlashingSegmentIndex] = useState<number | null>(null);
+
   // Filter segments based on search and speaker
   const filteredSegments = useMemo(() => {
     return segments.filter((segment) => {
@@ -108,6 +111,23 @@ const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
 
   const hideTooltip = () => {
     setTooltip((prev) => ({ ...prev, show: false }));
+  };
+
+  // Handle double-click on transcript text for granular navigation
+  const handleTextDoubleClick = (segment: Segment, segmentIndex: number) => {
+    // For now, just jump to the start of the current combined segment
+    // In a full implementation, we would calculate which aligned segment was clicked
+    // based on text position, but this requires more complex logic
+
+    // Jump audio to segment start
+    onTimestampClick?.(segment.start);
+
+    // Flash animation
+    setFlashingSegmentIndex(segmentIndex);
+    setTimeout(() => setFlashingSegmentIndex(null), 600);
+
+    // Note: We don't pause auto-scroll for double-click navigation
+    // Auto-scroll will continue as normal
   };
 
   // Auto-scroll functionality: scroll to center active segment
@@ -320,6 +340,9 @@ const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
                 alignedSeg.end <= segment.end
             );
 
+            // Check if this segment is flashing
+            const isFlashing = flashingSegmentIndex === index;
+
             return (
               <div
                 key={index}
@@ -328,6 +351,10 @@ const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
                   isActive
                     ? 'bg-primary/10 border-primary ring-2 ring-primary/30 shadow-md'
                     : 'bg-white border-gray-200 hover:border-gray-300'
+                } ${
+                  isFlashing
+                    ? 'animate-pulse bg-yellow-100 border-yellow-400'
+                    : ''
                 }`}
               >
                 {/* Speaker Avatar */}
@@ -358,7 +385,11 @@ const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
                   </div>
 
                   {/* Text */}
-                  <p className="text-gray-800 leading-relaxed">
+                  <p
+                    className="text-gray-800 leading-relaxed cursor-text select-text"
+                    onDoubleClick={() => handleTextDoubleClick(segment, index)}
+                    title="Double-click to jump to this segment"
+                  >
                     {highlightSearchQuery(segment.text, searchQuery)}
                   </p>
                 </div>
