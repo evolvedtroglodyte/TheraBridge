@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Download, FileText, FileJson, FileType } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import type { TranscriptionResult, Segment } from '@/types/transcription';
-import { downloadAsFile, formatTime } from '@/lib/utils';
+import { downloadAsFile } from '@/lib/utils';
 
 interface ExportOptionsProps {
   result: TranscriptionResult;

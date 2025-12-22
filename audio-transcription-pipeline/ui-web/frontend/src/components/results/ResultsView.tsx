@@ -62,11 +62,6 @@ export default function ResultsView({ jobId, uploadedFile, onReset }: ResultsVie
     // Only scroll on waveform click, not continuous updates
   };
 
-  // Handle waveform click - scroll transcript to current time
-  const handleWaveformClick = (time: number) => {
-    console.log('[ResultsView] Waveform clicked at time:', time);
-    transcriptRef.current?.scrollToTime(time);
-  };
 
   if (loading) {
     return (

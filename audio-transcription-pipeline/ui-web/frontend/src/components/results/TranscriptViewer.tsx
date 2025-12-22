@@ -42,8 +42,8 @@ const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
 
     // Auto-scroll pause state
     const [autoScrollPaused, setAutoScrollPaused] = useState(false);
-    const lastManualScrollTime = useRef<number>(0);
-    const autoScrollResumeTimer = useRef<NodeJS.Timeout | null>(null);
+    const lastProgrammaticScrollTime = useRef<number>(0);
+    const autoScrollResumeTimer = useRef<number | null>(null);
 
     // Flash animation state for double-click
     const [flashingSegmentIndex, setFlashingSegmentIndex] = useState<number | null>(null);
@@ -149,6 +149,9 @@ const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
       const containerHeight = container.offsetHeight;
       const scrollTop = segmentTop - (containerHeight / 2) + (segmentHeight / 2);
 
+      // Mark this as programmatic scroll
+      lastProgrammaticScrollTime.current = Date.now();
+
       // Smooth scroll to center the active segment
       container.scrollTo({
         top: scrollTop,
@@ -164,13 +167,11 @@ const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
 
     const handleScroll = () => {
       const now = Date.now();
-      const timeSinceLastManualScroll = now - lastManualScrollTime.current;
+      const timeSinceProgrammaticScroll = now - lastProgrammaticScrollTime.current;
 
-      // Only treat as manual scroll if it's been more than 500ms since last auto-scroll
-      // (This prevents auto-scroll from triggering the pause logic)
-      if (timeSinceLastManualScroll > 500) {
-        lastManualScrollTime.current = now;
-
+      // Only treat as manual scroll if it's been more than 300ms since last programmatic scroll
+      // This prevents auto-scroll and button clicks from triggering the pause logic
+      if (timeSinceProgrammaticScroll > 300) {
         // Pause auto-scroll
         if (!autoScrollPaused) {
           setAutoScrollPaused(true);
@@ -183,7 +184,7 @@ const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
         }
 
         // Resume auto-scroll after 5 seconds
-        autoScrollResumeTimer.current = setTimeout(() => {
+        autoScrollResumeTimer.current = window.setTimeout(() => {
           setAutoScrollPaused(false);
           autoScrollResumeTimer.current = null;
         }, 5000);
@@ -220,8 +221,8 @@ const TranscriptViewer = forwardRef<TranscriptViewerRef, TranscriptViewerProps>(
         const containerHeight = container.offsetHeight;
         const scrollTop = segmentTop - (containerHeight / 2) + (segmentHeight / 2);
 
-        // Update last manual scroll time to prevent pause detection
-        lastManualScrollTime.current = Date.now();
+        // Mark as programmatic scroll to prevent pause detection
+        lastProgrammaticScrollTime.current = Date.now();
 
         // Smooth scroll within container only (doesn't scroll the page)
         container.scrollTo({

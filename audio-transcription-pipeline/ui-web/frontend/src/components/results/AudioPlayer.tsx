@@ -14,7 +14,7 @@ interface AudioPlayerProps {
   onSeek?: (time: number, shouldScroll: boolean) => void;
 }
 
-export default function AudioPlayer({ audioUrl, filename, segments, duration: totalDuration, onTimeUpdate, onSeek }: AudioPlayerProps) {
+export default function AudioPlayer({ audioUrl, segments, duration: totalDuration, onTimeUpdate, onSeek }: AudioPlayerProps) {
   const waveformRef = useRef<HTMLDivElement>(null);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -60,11 +60,11 @@ export default function AudioPlayer({ audioUrl, filename, segments, duration: to
       onTimeUpdate?.(time);
     });
 
-    wavesurfer.on('seek', () => {
+    wavesurfer.on('interaction', () => {
       const time = wavesurfer.getCurrentTime();
       setCurrentTime(time);
       onTimeUpdate?.(time);
-      // Trigger scroll on waveform click (seek event)
+      // Trigger scroll on waveform click (interaction event)
       onSeek?.(time, true);
     });
 
