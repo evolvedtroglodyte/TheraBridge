@@ -323,10 +323,10 @@ export function ProgressPatternsCard({ patientId, useRealData = false }: Progres
         <div className="relative z-10 p-5 flex flex-col h-full">
           {/* Header */}
           <div className="flex flex-col mb-3 flex-shrink-0 text-center">
-            <h3 style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-800 dark:text-gray-200 tracking-wide uppercase opacity-80">
+            <h3 style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} className="text-gray-800 dark:text-gray-200 opacity-80">
               {currentMetric.title}
             </h3>
-            <p style={{ fontFamily: fontSans }} className="text-xs text-gray-500 dark:text-gray-400">
+            <p style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500 }} className="text-gray-500 dark:text-gray-400">
               {currentMetric.description}
             </p>
           </div>
@@ -357,7 +357,7 @@ export function ProgressPatternsCard({ patientId, useRealData = false }: Progres
             >
               <div className="flex items-center gap-2">
                 <span className="text-base">{currentMetric.emoji}</span>
-                <p style={{ fontFamily: fontSerif }} className="text-xs font-light text-gray-700 dark:text-gray-300 leading-snug">
+                <p style={{ fontFamily: fontSerif, fontSize: '13px', fontWeight: 300, lineHeight: 1.5 }} className="text-gray-700 dark:text-gray-300">
                   {currentMetric.insight}
                 </p>
               </div>
@@ -438,7 +438,7 @@ export function ProgressPatternsCard({ patientId, useRealData = false }: Progres
               </button>
 
               {/* Dynamic title based on current page */}
-              <h2 id="progress-patterns-title" style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-800 dark:text-gray-200 tracking-wide uppercase opacity-80 mb-6 text-center">
+              <h2 id="progress-patterns-title" style={{ fontFamily: fontSerif, fontSize: '24px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200 mb-6 text-center">
                 {mergedMetrics[modalPageIndex]?.title || 'Progress Patterns'}
               </h2>
 
@@ -464,7 +464,7 @@ export function ProgressPatternsCard({ patientId, useRealData = false }: Progres
                           <Icon size={24} />
                         </div>
                         <div>
-                          <p style={{ fontFamily: fontSans }} className="text-sm font-light text-gray-500 dark:text-gray-400">
+                          <p style={{ fontFamily: fontSans, fontSize: '13px', fontWeight: 500 }} className="text-gray-500 dark:text-gray-400">
                             {currentMetric.description}
                           </p>
                         </div>
@@ -477,10 +477,10 @@ export function ProgressPatternsCard({ patientId, useRealData = false }: Progres
 
                       {/* Insight Box */}
                       <div className="bg-gradient-to-br from-[#5AB9B4]/10 to-[#B8A5D6]/10 dark:from-[#a78bfa]/20 dark:to-[#c084fc]/20 rounded-xl p-5 border border-[#5AB9B4]/20 dark:border-[#a78bfa]/30">
-                        <h4 style={{ fontFamily: fontSans }} className="text-[#5AB9B4] dark:text-[#a78bfa] font-semibold uppercase tracking-wider text-xs mb-2">
+                        <h4 style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} className="text-[#5AB9B4] dark:text-[#a78bfa] mb-2">
                           Key Insight
                         </h4>
-                        <p style={{ fontFamily: fontSerif }} className="text-gray-700 dark:text-gray-300 text-sm font-light">
+                        <p style={{ fontFamily: fontSerif, fontSize: '14px', fontWeight: 400, lineHeight: 1.6 }} className="text-gray-700 dark:text-gray-300">
                           {currentMetric.insight}
                         </p>
                       </div>

@@ -31,6 +31,10 @@ export type ChatMode = 'ai' | 'therapist';
 
 const MAX_CHARS = 500;
 
+// Font families - matching SessionCard
+const fontSerif = '"Crimson Pro", Georgia, serif';
+const fontSans = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
 // Dobby intro message (no "Welcome back" text, just the helpful intro)
 const DOBBY_INTRO = "Hi! I'm Dobby, your AI therapy companion. I can help you prepare for sessions, answer questions about techniques, or forward messages to your therapist. Everything is confidential and designed to support your therapy journey. How can I help you today?";
 
@@ -391,14 +395,17 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
                     </div>
                     {/* Percentage text */}
                     <span
-                      className={`text-xs font-medium min-w-[32px] text-right ${
-                        isDark ? 'text-[#8B6AAE]' : 'text-[#5AB9B4]'
-                      }`}
                       style={{
+                        fontFamily: fontSans,
+                        fontSize: '11px',
+                        fontWeight: 500,
                         textShadow: isDark
                           ? '0 0 6px rgba(139, 106, 174, 0.4)'
                           : '0 0 6px rgba(90, 185, 180, 0.4)',
                       }}
+                      className={`min-w-[32px] text-right ${
+                        isDark ? 'text-[#8B6AAE]' : 'text-[#5AB9B4]'
+                      }`}
                     >
                       {Math.round(progress)}%
                     </span>
@@ -449,9 +456,8 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
                 <DobbyLogo size={50} />
                 {/* DOBBY text - always visible, clickable for scroll to top */}
                 <span
-                  className={`font-mono text-lg font-medium tracking-[4px] uppercase ${
-                    isDark ? 'text-[#9B7AC4]' : 'text-[#5AB9B4]'
-                  }`}
+                  style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600, letterSpacing: '4px', textTransform: 'uppercase' }}
+                  className={isDark ? 'text-[#9B7AC4]' : 'text-[#5AB9B4]'}
                 >
                   DOBBY
                 </span>
@@ -476,7 +482,8 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
                   </div>
                   {/* Intro bubble */}
                   <div
-                    className={`max-w-[85%] px-3 py-2 rounded-2xl rounded-tl-sm text-[13px] font-dm ${
+                    style={{ fontFamily: fontSerif, fontSize: '13px', fontWeight: 300, lineHeight: 1.5 }}
+                    className={`max-w-[85%] px-3 py-2 rounded-2xl rounded-tl-sm ${
                       isDark
                         ? 'bg-[#2a2535] text-gray-300'
                         : 'bg-white text-gray-700 shadow-sm border border-gray-100'
@@ -505,7 +512,8 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
                     {msg.role === 'user' ? (
                       // User message - solid color box
                       <div
-                        className={`max-w-[85%] px-3 py-2 rounded-2xl rounded-tr-sm text-[13px] font-dm text-white ${
+                        style={{ fontFamily: fontSerif, fontSize: '13px', fontWeight: 300, lineHeight: 1.5 }}
+                        className={`max-w-[85%] px-3 py-2 rounded-2xl rounded-tr-sm text-white ${
                           isDark ? 'bg-[#7882E7]' : 'bg-[#4ECDC4]'
                         }`}
                       >
@@ -514,7 +522,8 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
                     ) : msg.content ? (
                       // AI message with content - bubble style with markdown rendering
                       <div
-                        className={`max-w-[85%] px-3 py-2 rounded-2xl rounded-tl-sm text-[13px] font-dm ${
+                        style={{ fontFamily: fontSerif, fontSize: '13px', fontWeight: 300, lineHeight: 1.5 }}
+                        className={`max-w-[85%] px-3 py-2 rounded-2xl rounded-tl-sm ${
                           isDark
                             ? 'bg-[#2a2535] text-gray-300'
                             : 'bg-white text-gray-700 shadow-sm border border-gray-100'
@@ -557,7 +566,8 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value.slice(0, MAX_CHARS))}
                   onKeyPress={handleKeyPress}
-                  className={`w-full bg-transparent outline-none font-dm text-[15px] ${
+                  style={{ fontFamily: fontSerif, fontSize: '14px', fontWeight: 400 }}
+                  className={`w-full bg-transparent outline-none ${
                     isDark
                       ? 'text-[#E5E5E5] placeholder:text-[#666]'
                       : 'text-[#1a1a1a] placeholder:text-[#999]'
@@ -570,7 +580,8 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
                   <div className="flex gap-2">
                     <button
                       onClick={() => setMode('ai')}
-                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold transition-all ${
+                      style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500 }}
+                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full transition-all ${
                         mode === 'ai'
                           ? isDark
                             ? 'bg-[#8B6AAE] text-white'
@@ -590,7 +601,8 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
                     </button>
                     <button
                       onClick={() => setMode('therapist')}
-                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold transition-all ${
+                      style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500 }}
+                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full transition-all ${
                         mode === 'therapist'
                           ? 'bg-gradient-to-br from-[#F4A69D] to-[#E88B7E] text-white'
                           : isDark
@@ -608,7 +620,7 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
 
                   {/* Actions */}
                   <div className="flex items-center gap-3">
-                    <span className={`text-xs ${isDark ? 'text-[#666]' : 'text-[#999]'}`}>
+                    <span style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500 }} className={isDark ? 'text-[#666]' : 'text-[#999]'}>
                       {inputValue.length}/{MAX_CHARS}
                     </span>
                     <button

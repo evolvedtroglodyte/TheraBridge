@@ -1,0 +1,129 @@
+ a {
+  "demo_info": {
+    "timestamp": "2025-12-23T23:42:17.657717",
+    "sessions_analyzed": [
+      10,
+      11,
+      12
+    ],
+    "pipeline_version": "Wave 1 + Wave 2 (Full Orchestration)"
+  },
+  "sessions": [
+    {
+      "session_num": 10,
+      "session_id": "session_10_alex_chen",
+      "wave1": {
+        "session_id": "session_10",
+        "session_num": 10,
+        "mood_score": 5.5,
+        "mood_confidence": 0.85,
+        "mood_rationale": "The patient shows significant distress with complex, conflicting emotions: profound grief and sense of loss regarding the anticipated parental relationship, anger and guilt about consequences for the family, and fear/uncertainty about whether parents will come around. At the same time, there are hopeful signals: relief at living authentically and strong support from Jordan. They are engaged in the session and able to articulate experiences, though they report physical symptoms (chest tightness, fatigue) and sleep is variable. No active suicidal ideation is reported, but the outlook is emotionally heavy with ambivalence about the future, placing the overall mood in a mid-range distress level with protective factors.",
+        "mood_indicators": [
+          "Grief over potential loss of relationship with parents",
+          "Anger and guilt about hurting family and breaking expectations",
+          "Relief at authenticity and support from Jordan",
+          "Fear of ongoing parental rejection and uncertainty about acceptance",
+          "Physical distress (chest tightness, fatigue) with sleep largely manageable"
+        ],
+        "emotional_tone": "grieving, conflicted, with intermittent hope",
+        "topics": [
+          "Coming out disclosure and parental rejection",
+          "Ambiguous loss/grief and identity-related distress"
+        ],
+        "action_items": [
+          "Respect parents' request for space (no contact for now); revisit contact plan in next session",
+          "Prioritize basic self-care: accept partner's help to eat, track appetite/sleep and chest tightness, and report changes next session"
+        ],
+        "technique": "Other - Validation",
+        "summary": "Client experienced parental rejection after coming out; grieving ambiguous loss, feels anger, guilt, chest tightness, relying on partner support.",
+        "extraction_confidence": 0.9,
+        "has_breakthrough": false,
+        "breakthrough_data": null
+      },
+      "wave2": {
+        "session_id": "session_10",
+        "deep_error": "'coroutine' object is not an iterator"
+      }
+    },
+    {
+      "session_num": 11,
+      "session_id": "session_11_alex_chen",
+      "wave1": {
+        "session_id": "session_11",
+        "session_num": 11,
+        "mood_score": 7.0,
+        "mood_confidence": 0.84,
+        "mood_rationale": "The patient demonstrates a meaningful shift toward hope, improved functioning, and active coping, though with ongoing vulnerability. Positive signals include: improved sleep (6\u20137 hours per night) and appetite, increased engagement in adaptive activities (attending an LGBTQ+ support group, plans for Jordan to attend), and concrete use of coping strategies (daily meditation, cognitive defusion by noting thoughts, nightly gratitude list). They describe \u201cfeels like freedom\u201d and that they can observe grief without being overwhelmed, indicating better emotional regulation. They acknowledge ongoing fears and some days are hard, and they still seek to manage expectations about parental acceptance, but frame progress as real and achievable: \u201cI survived,\u201d \u201cI\u2019m making choices,\u201d and \u201cI have some control here.\u201d Importantly, there is no active suicidal ideation or self-harm intention reported. The overall trajectory is hopeful with realistic pacing, suggesting a solid yet cautious improvement in mood and functioning.",
+        "mood_indicators": [
+          "Sleep improvement to 6-7 hours per night",
+          "Regular engagement in coping strategies (daily meditation, cognitive defusion, gratitude practice)",
+          "Active social/therapeutic engagement (LGBTQ+ support group; Jordan attending)",
+          "Positive reframing and sense of autonomy (feeling of 'freedom', 'I'm making choices', 'I have some control')",
+          "No active suicidal ideation or self-harm; future orientation remains hopeful but realistic"
+        ],
+        "emotional_tone": "hopeful and determined, with underlying anxiety",
+        "topics": [
+          "Parental acceptance and family response to coming out",
+          "Grief processing and emotion regulation using mindfulness"
+        ],
+        "action_items": [
+          "Continue daily 10-minute morning mindfulness/meditation practice",
+          "Maintain nightly gratitude journal listing three things before bed"
+        ],
+        "technique": "ACT - Cognitive Defusion",
+        "summary": "Alex processing parental responses to coming out; practicing daily 10-min mindfulness and nightly gratitude; joining Tuesday support group",
+        "extraction_confidence": 0.9,
+        "has_breakthrough": true,
+        "breakthrough_data": {
+          "type": "Positive Discovery",
+          "label": "Self-Validation Insight",
+          "description": "Alex realizes their identity and self-worth do not depend on parental understanding or approval. They shift from seeking validation from their parents to affirming, \"I know who I am,\" recognizing that their parents\u2019 learning process is separate from their own truth. This reframes long-held self-doubt into grounded self-validation, opening space for relief, stability, and autonomous growth.",
+          "evidence": "Therapist: \"You mentioned... 'I don't need them to understand me to know who I am.' Can we talk about that?\" [42:03]\nAlex: \"That's like, the biggest thing I've realized... For so long I thought I needed my parents' approval to be valid... But I know who I am. Their journey to understanding is separate from my truth.\" [43:18]\nAlex: \"[Jordan said] 'Your parents' confusion doesn't make you less real.' And it just clicked. Like, the sky is still blue even if someone is colorblind.\" [46:09]",
+          "confidence": 0.9,
+          "timestamp_start": 2523.0,
+          "timestamp_end": 2769.0
+        }
+      },
+      "wave2": {
+        "session_id": "session_11",
+        "deep_error": "'coroutine' object is not an iterator"
+      }
+    },
+    {
+      "session_num": 12,
+      "session_id": "session_12_alex_chen",
+      "wave1": {
+        "session_id": "session_12",
+        "session_num": 12,
+        "mood_score": 8.0,
+        "mood_confidence": 0.85,
+        "mood_rationale": "The patient demonstrates sustained, high-level positive mood with clear functional gains across multiple domains. Notable signals include: acceptance of a paper with first-author credit and elation about achievement, reduced pervasive anxiety in relationships (able to use grounding techniques and rely less on compulsive messaging), and medication optimization linked to improved focus and reduced forgetfulness. There is strong evidence of improved sleep, regular exercise, and adherence to sleep hygiene, all contributing to energy and mood. Social engagement has increased (mentoring queer students, more time with friends), and relational dynamics with Jordan and family have become more positive, including meaningful parental acknowledgment. They describe a sense of meaning and purpose from mentoring and identity integration. Importantly, they acknowledge vulnerability to relapse and still experience some anxiety about maintaining gains, but they also demonstrate proactive coping plans (reaching out to supports, continuing medications, keeping therapy appointments, and maintaining routines). Overall, mood is elevated with hopeful, energized functioning, tempered by realism about potential setbacks.",
+        "mood_indicators": [
+          "First-author acceptance of conference paper and sense of achievement",
+          "Significant reduction in anxiety with use of grounding techniques and improved emotion regulation (Adderall aiding focus and regulation)",
+          "Strong improvement in sleep, regular sleep-wake schedule, no late-night phone scrolling, and resumed exercise",
+          "Increased functioning and engagement: better work/class productivity, mentoring role, sustained social connections (Jordan, Sarah, Marcus) and perceived positive relationship changes",
+          "Remission discussion with cautious optimism and concrete relapse-prevention plan (seek support, monitor symptoms, continue meds, schedule therapy)"
+        ],
+        "emotional_tone": "ecstatic and energized with cautious optimism",
+        "topics": [
+          "Relapse prevention for depression and anxiety",
+          "Improved functioning and self-efficacy with ADHD medication and coping skills"
+        ],
+        "action_items": [
+          "Create a wellness action plan before the next session listing warning signs and specific action steps",
+          "Continue peer-mentoring meetings and maintain routines: Adderall 15 mg as prescribed, box breathing, consistent sleep schedule, and running twice weekly"
+        ],
+        "technique": "CBT - Safety Planning",
+        "summary": "Patient in remission; created relapse-prevention plan, maintaining Adderall 15 mg, sleep hygiene, box breathing, exercise, and mentoring.",
+        "extraction_confidence": 0.9,
+        "has_breakthrough": false,
+        "breakthrough_data": null
+      },
+      "wave2": {
+        "session_id": "session_12",
+        "deep_error": "'coroutine' object is not an iterator"
+      }
+    }
+  ]
+}

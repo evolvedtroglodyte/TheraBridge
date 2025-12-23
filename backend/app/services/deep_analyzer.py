@@ -132,7 +132,7 @@ class DeepAnalyzer:
 
         openai.api_key = self.api_key
         self.model = get_model_name("deep_analysis", override_model=override_model)
-        self.db = db or next(get_db())
+        self.db = db  # Will be None if not provided (for testing/mocking)
 
     async def analyze_session(
         self,

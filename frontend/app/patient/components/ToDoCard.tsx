@@ -61,9 +61,9 @@ export function ToDoCard() {
         }}
         transition={{ duration: 0.2 }}
       >
-        <h2 style={{ fontFamily: fontSans }} className="text-lg font-light text-gray-800 dark:text-gray-200 mb-3 text-center">To-Do</h2>
+        <h2 style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200 mb-3 text-center">To-Do</h2>
         <div className="flex items-center justify-center mb-2">
-          <span style={{ fontFamily: fontSans }} className="text-sm font-light text-gray-600 dark:text-gray-400">
+          <span style={{ fontFamily: fontSans, fontSize: '13px', fontWeight: 500 }} className="text-gray-600 dark:text-gray-400">
             {progressPercent}% ({completedCount}/{totalCount})
           </span>
         </div>
@@ -102,12 +102,10 @@ export function ToDoCard() {
                 )}
               </div>
               <span
-                style={{ fontFamily: fontSerif }}
-                className={`text-sm font-medium ${
-                  task.completed
+                style={{ fontFamily: fontSerif, fontSize: '13px', fontWeight: 300, lineHeight: 1.5 }}
+                className={task.completed
                     ? 'line-through text-gray-400 dark:text-gray-600'
-                    : 'text-gray-700 dark:text-gray-300'
-                }`}
+                    : 'text-gray-700 dark:text-gray-300'}
               >
                 {task.text}
               </span>
@@ -115,7 +113,7 @@ export function ToDoCard() {
           ))}
 
           {tasks.length > 3 && (
-            <p style={{ fontFamily: fontSans }} className="text-xs text-gray-500 dark:text-gray-500 pt-2">
+            <p style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500 }} className="text-gray-500 dark:text-gray-500 pt-2">
               +{tasks.length - 3} more tasks
             </p>
           )}
@@ -159,8 +157,8 @@ export function ToDoCard() {
               </button>
 
               <div className="mb-6 pr-12 text-center">
-                <h2 style={{ fontFamily: fontSans }} className="text-2xl font-medium text-gray-800 dark:text-gray-200 mb-1">To-Do</h2>
-                <p style={{ fontFamily: fontSans }} className="text-sm font-light text-gray-600 dark:text-gray-400">
+                <h2 style={{ fontFamily: fontSerif, fontSize: '24px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200 mb-1">To-Do</h2>
+                <p style={{ fontFamily: fontSans, fontSize: '13px', fontWeight: 500 }} className="text-gray-600 dark:text-gray-400">
                   {progressPercent}% complete ({completedCount}/{totalCount} tasks)
                 </p>
               </div>
@@ -177,7 +175,7 @@ export function ToDoCard() {
               {/* Active Tasks */}
               {activeTasks.length > 0 && (
                 <div className="mb-8">
-                  <h3 style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-4">
+                  <h3 style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} className="text-gray-600 dark:text-gray-400 mb-4">
                     Active Tasks
                   </h3>
                   <div className="space-y-4">
@@ -188,8 +186,8 @@ export function ToDoCard() {
                           className="w-5 h-5 rounded-full border-2 border-[#5AB9B4] dark:border-[#a78bfa] flex-shrink-0 mt-0.5 hover:bg-[#5AB9B4]/10 dark:hover:bg-[#a78bfa]/10 transition-colors"
                         />
                         <div className="flex-1">
-                          <p style={{ fontFamily: fontSerif }} className="text-sm font-light text-gray-700 dark:text-gray-300">{task.text}</p>
-                          <p style={{ fontFamily: fontSans }} className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                          <p style={{ fontFamily: fontSerif, fontSize: '14px', fontWeight: 400, lineHeight: 1.6 }} className="text-gray-700 dark:text-gray-300">{task.text}</p>
+                          <p style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500 }} className="text-gray-500 dark:text-gray-500 mt-1">
                             From: Session {task.sessionId.replace('s', '')} ({task.sessionDate})
                           </p>
                         </div>
@@ -203,7 +201,7 @@ export function ToDoCard() {
               {completedTasks.length > 0 && (
                 <div>
                   <div className="h-px bg-gray-200 dark:bg-[#3d3548] mb-6" />
-                  <h3 style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-4">
+                  <h3 style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} className="text-gray-600 dark:text-gray-400 mb-4">
                     Completed Tasks
                   </h3>
                   <div className="space-y-4">
@@ -224,8 +222,8 @@ export function ToDoCard() {
                           </svg>
                         </button>
                         <div className="flex-1">
-                          <p style={{ fontFamily: fontSerif }} className="text-sm font-light text-gray-700 dark:text-gray-400 line-through">{task.text}</p>
-                          <p style={{ fontFamily: fontSans }} className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                          <p style={{ fontFamily: fontSerif, fontSize: '14px', fontWeight: 400, lineHeight: 1.6 }} className="text-gray-700 dark:text-gray-400 line-through">{task.text}</p>
+                          <p style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500 }} className="text-gray-500 dark:text-gray-500 mt-1">
                             From: Session {task.sessionId.replace('s', '')} ({task.sessionDate})
                           </p>
                         </div>

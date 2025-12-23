@@ -10,6 +10,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
+        'inter': ['var(--font-inter)', 'sans-serif'],
         'crimson': ['var(--font-crimson-pro)', 'serif'],
         'jakarta': ['var(--font-plus-jakarta)', 'sans-serif'],
         'dm': ['var(--font-dm-sans)', 'sans-serif'],

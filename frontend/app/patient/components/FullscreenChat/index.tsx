@@ -376,7 +376,7 @@ export function FullscreenChat({
           isDark={isDark}
           onHomeClick={() => {
             onClose();
-            router.push('/patient');
+            router.push('/dashboard');
           }}
           onThemeToggle={toggleTheme}
         />

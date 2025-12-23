@@ -51,13 +51,13 @@ export function NotesGoalsCard() {
         whileHover={{ scale: 1.01, boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}
         transition={{ duration: 0.2 }}
       >
-        <h2 style={{ fontFamily: fontSans }} className="text-lg font-light text-gray-800 dark:text-gray-200 mb-6 text-center">Your Journey</h2>
+        <h2 style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600, color: 'var(--text-gray-800)' }} className="dark:text-gray-200 mb-6 text-center">Your Journey</h2>
 
-        <p style={{ fontFamily: fontSerif }} className="text-sm text-gray-600 dark:text-gray-400 mb-5">{notesGoalsContent.summary}</p>
+        <p style={{ fontFamily: fontSerif, fontSize: '14px', fontWeight: 400, lineHeight: 1.6, color: 'var(--text-gray-600)' }} className="dark:text-gray-400 mb-5">{notesGoalsContent.summary}</p>
 
         <ul className="space-y-2">
           {notesGoalsContent.achievements.slice(0, 3).map((achievement, idx) => (
-            <li key={idx} style={{ fontFamily: fontSerif }} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+            <li key={idx} style={{ fontFamily: fontSerif, fontSize: '13px', fontWeight: 300, lineHeight: 1.5 }} className="flex items-start gap-2 text-gray-700 dark:text-gray-300">
               <span className="w-1.5 h-1.5 rounded-full bg-[#5AB9B4] dark:bg-[#a78bfa] mt-1.5 flex-shrink-0" />
               <span>{achievement}</span>
             </li>
@@ -65,8 +65,8 @@ export function NotesGoalsCard() {
         </ul>
 
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-[#3d3548]">
-          <p style={{ fontFamily: fontSans }} className="text-xs text-gray-500 dark:text-gray-500 font-semibold">Current focus:</p>
-          <p style={{ fontFamily: fontSerif }} className="text-sm text-gray-700 dark:text-gray-300 mt-1">{notesGoalsContent.currentFocus.join(', ')}</p>
+          <p style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} className="text-gray-500 dark:text-gray-500">Current focus:</p>
+          <p style={{ fontFamily: fontSerif, fontSize: '13px', fontWeight: 300, lineHeight: 1.5 }} className="text-gray-700 dark:text-gray-300 mt-1">{notesGoalsContent.currentFocus.join(', ')}</p>
         </div>
       </motion.div>
 
@@ -110,21 +110,21 @@ export function NotesGoalsCard() {
               </button>
 
               {/* Content */}
-              <h2 style={{ fontFamily: fontSans }} className="text-2xl font-medium text-gray-800 dark:text-gray-200 mb-6 pr-12 text-center">
+              <h2 style={{ fontFamily: fontSerif, fontSize: '24px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200 mb-6 pr-12 text-center">
                 Your Journey
               </h2>
 
-              <p style={{ fontFamily: fontSerif }} className="text-base text-gray-700 dark:text-gray-300 mb-8 leading-relaxed">
+              <p style={{ fontFamily: fontSerif, fontSize: '14px', fontWeight: 400, lineHeight: 1.6 }} className="text-gray-700 dark:text-gray-300 mb-8">
                 {notesGoalsContent.summary}
               </p>
 
               <div className="mb-6">
-                <h3 style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-3">
+                <h3 style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} className="text-gray-600 dark:text-gray-400 mb-3">
                   Key Achievements
                 </h3>
                 <ul className="space-y-2">
                   {notesGoalsContent.achievements.map((achievement, idx) => (
-                    <li key={idx} style={{ fontFamily: fontSerif }} className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300">
+                    <li key={idx} style={{ fontFamily: fontSerif, fontSize: '13px', fontWeight: 300, lineHeight: 1.5 }} className="flex items-start gap-3 text-gray-700 dark:text-gray-300">
                       <span className="w-2 h-2 rounded-full bg-[#5AB9B4] dark:bg-[#a78bfa] mt-1.5 flex-shrink-0" />
                       <span>{achievement}</span>
                     </li>
@@ -133,12 +133,12 @@ export function NotesGoalsCard() {
               </div>
 
               <div className="mb-6">
-                <h3 style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-3">
+                <h3 style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} className="text-gray-600 dark:text-gray-400 mb-3">
                   Current Focus Areas
                 </h3>
                 <ul className="space-y-2">
                   {notesGoalsContent.currentFocus.map((focus, idx) => (
-                    <li key={idx} style={{ fontFamily: fontSerif }} className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300">
+                    <li key={idx} style={{ fontFamily: fontSerif, fontSize: '13px', fontWeight: 300, lineHeight: 1.5 }} className="flex items-start gap-3 text-gray-700 dark:text-gray-300">
                       <span className="w-2 h-2 rounded-full bg-[#B8A5D6] dark:bg-[#c084fc] mt-1.5 flex-shrink-0" />
                       <span>{focus}</span>
                     </li>
@@ -154,7 +154,7 @@ export function NotesGoalsCard() {
                       onClick={() => toggleSection(idx)}
                       className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-[#1a1625] hover:bg-gray-100 dark:hover:bg-[#3d3548] transition-colors"
                     >
-                      <span style={{ fontFamily: fontSans }} className="text-sm font-medium text-gray-800 dark:text-gray-200">{section.title}</span>
+                      <span style={{ fontFamily: fontSans, fontSize: '13px', fontWeight: 500 }} className="text-gray-800 dark:text-gray-200">{section.title}</span>
                       <ChevronDown
                         className={`w-5 h-5 text-gray-600 dark:text-gray-400 transition-transform ${
                           openSections.has(idx) ? 'rotate-180' : ''
@@ -163,7 +163,7 @@ export function NotesGoalsCard() {
                     </button>
                     {openSections.has(idx) && (
                       <div className="p-4 bg-white dark:bg-[#2a2435]">
-                        <p style={{ fontFamily: fontSerif }} className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{section.content}</p>
+                        <p style={{ fontFamily: fontSerif, fontSize: '14px', fontWeight: 400, lineHeight: 1.6 }} className="text-gray-700 dark:text-gray-300">{section.content}</p>
                       </div>
                     )}
                   </div>
