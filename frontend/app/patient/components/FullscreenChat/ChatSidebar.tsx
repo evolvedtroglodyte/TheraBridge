@@ -61,7 +61,22 @@ export function ChatSidebar({
             <TextLogo fontSize={16} />
           </div>
         ) : (
-          <div className={isDark ? 'text-[#8B6AAE]' : 'text-[#5AB9B4]'}>
+          <div
+            onClick={onHomeClick}
+            style={{
+              cursor: 'pointer',
+              transition: 'transform 0.2s ease, filter 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.filter = 'brightness(1.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.filter = 'brightness(1)';
+            }}
+            className={isDark ? 'text-[#8B6AAE]' : 'text-[#5AB9B4]'}
+          >
             <BridgeIcon size={28} />
           </div>
         )}
@@ -119,89 +134,6 @@ export function ChatSidebar({
           )}
         </button>
 
-        {/* Home Button */}
-        <button
-          onClick={onHomeClick}
-          className={`relative flex items-center gap-3 rounded-lg transition-colors ${hoverBg} ${
-            isExpanded ? 'px-3 py-2 w-full' : 'w-10 h-10 justify-center'
-          } group`}
-        >
-          <svg
-            className={`w-5 h-5`}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke={isDark ? '#8B6AAE' : '#5AB9B4'}
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M4 10.5V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.5" />
-            <path d="M2.5 12L12 3l9.5 9" />
-            <rect x="9" y="14" width="6" height="7" rx="1" />
-          </svg>
-          {isExpanded && (
-            <span className={`font-nunito text-sm font-medium ${textColor}`}>Home</span>
-          )}
-          {/* Tooltip */}
-          {!isExpanded && (
-            <span
-              className={`absolute left-[calc(100%+16px)] top-1/2 -translate-y-1/2 font-nunito text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none ${tooltipColor}`}
-            >
-              Home
-            </span>
-          )}
-        </button>
-
-        {/* Theme Toggle Button (Sun/Moon) */}
-        <button
-          onClick={onThemeToggle}
-          className={`relative flex items-center gap-3 rounded-lg transition-colors ${hoverBg} ${
-            isExpanded ? 'px-3 py-2 w-full' : 'w-10 h-10 justify-center'
-          } group`}
-        >
-          {isDark ? (
-            // Moon icon for dark mode
-            <svg
-              className="w-5 h-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#8B6AAE"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
-          ) : (
-            // Sun icon for light mode
-            <svg
-              className="w-5 h-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#5AB9B4"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="12" r="4" />
-              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-            </svg>
-          )}
-          {isExpanded && (
-            <span className={`font-nunito text-sm font-medium ${textColor}`}>
-              {isDark ? 'Dark Mode' : 'Light Mode'}
-            </span>
-          )}
-          {/* Tooltip */}
-          {!isExpanded && (
-            <span
-              className={`absolute left-[calc(100%+16px)] top-1/2 -translate-y-1/2 font-nunito text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none ${tooltipColor}`}
-            >
-              {isDark ? 'Dark Mode' : 'Light Mode'}
-            </span>
-          )}
-        </button>
-
         {/* Chats Button */}
         <button
           className={`relative flex items-center gap-3 rounded-lg transition-colors ${hoverBg} ${
@@ -245,30 +177,6 @@ export function ChatSidebar({
             </div>
           </div>
         )}
-      </div>
-
-      {/* User Section */}
-      <div className={`px-2 py-3 border-t ${borderColor}`}>
-        <div className={`flex items-center gap-3 ${isExpanded ? 'px-2' : 'justify-center'}`}>
-          {/* User Avatar - Dobby logo style */}
-          <div className="w-8 h-8 flex-shrink-0">
-            <svg width="32" height="32" viewBox="0 0 120 120" fill="none">
-              <polygon points="15,55 35,35 35,65" fill={accentColor}/>
-              <polygon points="105,55 85,35 85,65" fill={accentColor}/>
-              <rect x="30" y="30" width="60" height="60" rx="14" fill={accentColor}/>
-              <circle cx="45" cy="55" r="8" fill="white"/>
-              <circle cx="45" cy="57" r="4" fill={isDark ? '#1a1625' : '#1a1a1a'}/>
-              <circle cx="75" cy="55" r="8" fill="white"/>
-              <circle cx="75" cy="57" r="4" fill={isDark ? '#1a1625' : '#1a1a1a'}/>
-              <path d="M48 74 Q60 82 72 74" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
-            </svg>
-          </div>
-          {isExpanded && (
-            <span className={`font-nunito text-sm font-medium ${textColor}`}>
-              {userName}
-            </span>
-          )}
-        </div>
       </div>
     </div>
   );

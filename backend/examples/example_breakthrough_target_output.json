@@ -1,0 +1,76 @@
+{
+  "session_id": "session_example_001",
+  "has_breakthrough": true,
+  "breakthrough_count": 2,
+  "primary_breakthrough": {
+    "type": "cognitive_insight",
+    "description": "Patient recognized connection between childhood abandonment experiences (father's unpredictable business trips) and current anxious attachment pattern in romantic relationship",
+    "evidence": "Patient verbalized 'Oh my god. I'm that little kid watching out the window' with visible emotional recognition and relief. Made explicit connection between checking phone 50 times and childhood behavior of watching for father's return.",
+    "confidence": 0.92,
+    "timestamp": "01:08 - 01:38",
+    "dialogue_excerpt": [
+      {
+        "speaker": "Therapist",
+        "text": "And when you check your phone 50 times waiting for your partner to text back..."
+      },
+      {
+        "speaker": "Patient",
+        "text": "Oh my god. I'm that little kid watching out the window. I'm doing the exact same thing. It's not really about my boyfriend at all, is it? It's about my dad leaving."
+      },
+      {
+        "speaker": "Therapist",
+        "text": "That's a really profound connection you just made. How does it feel to recognize that?"
+      },
+      {
+        "speaker": "Patient",
+        "text": "It's... it's actually a relief? Like, I'm not crazy. This makes sense. My boyfriend isn't my dad. He's not abandoning me when he doesn't text back immediately."
+      }
+    ]
+  },
+  "all_breakthroughs": [
+    {
+      "type": "cognitive_insight",
+      "description": "Patient recognized connection between childhood abandonment and current relationship anxiety",
+      "evidence": "Explicit verbal connection made between past (watching window for dad) and present (checking phone compulsively)",
+      "confidence": 0.92,
+      "timestamp": "01:08"
+    },
+    {
+      "type": "behavioral_commitment",
+      "description": "Patient developed coping strategy to differentiate past trauma from present reality",
+      "evidence": "Patient articulated specific plan: 'I can remind myself - this is old fear, not current reality'",
+      "confidence": 0.78,
+      "timestamp": "01:44"
+    }
+  ],
+  "session_summary": "Session showed 2 significant breakthrough moments. Primary insight: Patient connected childhood abandonment experiences to current anxious attachment patterns. This led to development of new coping strategy for managing relationship anxiety.",
+  "emotional_trajectory": "anxious → exploratory → resistant → reflective → insight → relief → empowered",
+  "_metadata": {
+    "timestamp_generated": "2025-12-22T12:34:56Z",
+    "algorithm_version": "1.0.0",
+    "model_used": "gpt-4o",
+    "total_transcript_duration_seconds": 115.0,
+    "note": "This is an example target output showing the expected structure and level of detail"
+  },
+  "_breakthrough_type_definitions": {
+    "cognitive_insight": "Patient gains new understanding of their patterns, beliefs, or behaviors (e.g., connecting past to present, recognizing distortions)",
+    "emotional_shift": "Genuine emotional processing or release (e.g., moving from resistance to acceptance, expressing suppressed emotions)",
+    "behavioral_commitment": "Concrete decision to change behavior (e.g., first successful application of coping skill, boundary-setting)",
+    "relational_realization": "New understanding of relationship patterns (e.g., recognizing attachment patterns, understanding childhood impact)",
+    "self_compassion": "Shift from self-criticism to self-kindness (e.g., challenging internalized shame, recognizing worth)"
+  },
+  "_confidence_score_guide": {
+    "0.9_1.0": "Very high confidence - Clear, dramatic breakthrough with strong emotional component and explicit verbalization",
+    "0.75_0.89": "High confidence - Clear breakthrough with good evidence, may be more subtle or gradual",
+    "0.6_0.74": "Medium confidence - Breakthrough present but with some ambiguity or less dramatic presentation",
+    "0.5_0.59": "Low confidence - Possible breakthrough but requires therapist review to confirm",
+    "below_0.5": "Not reported as breakthrough - insufficient evidence or clarity"
+  },
+  "_example_use_cases": {
+    "frontend_display": "Show primary_breakthrough.description and dialogue_excerpt in patient dashboard timeline",
+    "therapist_review": "Flag all breakthroughs above 0.6 confidence for therapist validation",
+    "progress_tracking": "Count breakthrough_count across sessions to measure therapeutic progress",
+    "ai_chat_context": "Inject primary_breakthrough.description into AI companion's context for informed responses",
+    "analytics": "Track breakthrough_type distribution to understand patient's growth areas"
+  }
+}

@@ -3,7 +3,7 @@
 /**
  * SessionCard - Two card variants for therapy sessions
  * 1. Normal Session Card - with mood emoji (happy/neutral/sad)
- * 2. Breakthrough Session Card - with gold star and breakthrough section
+ * 2. Breakthrough Session Card - with illuminated gold star + hover tooltip
  *
  * Dimensions: 329.3px × 290.5px
  * Colors:
@@ -11,7 +11,9 @@
  * - Dark mode: Purple accent (#7882E7), Gold (#FFE066), White emoji
  */
 
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { createPortal } from 'react-dom';
 import { Session } from '../lib/types';
 import { useTheme } from '../contexts/ThemeContext';
 import { BreakthroughStar, renderMoodEmoji } from './SessionIcons';
@@ -60,49 +62,86 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
   // Extract summary from patientSummary (first 200 chars)
   const summary = session.patientSummary || 'Session summary not available.';
 
-  // Extract techniques/actions (limit to 2)
-  const techniquesAndActions = session.actions.slice(0, 2);
+  // Extract 1 strategy + 1 action (show both types)
+  const techniquesAndActions = [
+    session.strategy,
+    ...(session.actions.slice(0, 1))
+  ].filter(Boolean);
 
   if (isBreakthrough) {
     // ============ BREAKTHROUGH CARD ============
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [isStarHovered, setIsStarHovered] = useState(false);
+
     return (
-      <motion.div
-        id={id}
-        onClick={onClick}
-        style={{
-          width: `${cardWidth}px`,
-          height: `${cardHeight}px`,
-          backgroundColor: cardBg,
-          border: `1px solid ${cardBorder}`,
-          borderRadius: '16px',
-          padding: '16px 20px 20px 20px',
-          position: 'relative',
-          overflow: 'hidden',
-          boxSizing: 'border-box',
-          display: 'flex',
-          flexDirection: 'column',
-          cursor: 'pointer',
-          transform: `scale(${scale})`,
-          transformOrigin: 'center center',
-        }}
-        whileHover={{ scale: scale * 1.01, boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}
-        transition={{ duration: 0.2 }}
-        role="button"
-        tabIndex={0}
-        aria-label={`Breakthrough session on ${session.date}`}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onClick();
-          }
-        }}
-      >
+      <>
+        {/* Full-screen overlay when star is hovered - rendered via portal */}
+        {typeof window !== 'undefined' && isStarHovered && createPortal(
+          <AnimatePresence>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: isDark ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.4)',
+                zIndex: 998,
+                pointerEvents: 'none',
+              }}
+            />
+          </AnimatePresence>,
+          document.body
+        )}
+
+        <motion.div
+          id={id}
+          onClick={onClick}
+          style={{
+            width: `${cardWidth}px`,
+            height: `${cardHeight}px`,
+            backgroundColor: cardBg,
+            border: isStarHovered
+              ? (isDark ? `2px solid ${goldColor}` : `2px solid white`)
+              : `1px solid ${cardBorder}`,
+            borderRadius: '16px',
+            padding: isStarHovered ? '15px 19px 19px 19px' : '16px 20px 20px 20px', // Adjust for thicker border
+            position: 'relative',
+            overflow: 'visible', // Changed to visible for tooltip
+            boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'column',
+            cursor: 'pointer',
+            transform: `scale(${scale})`,
+            transformOrigin: 'center center',
+            zIndex: isStarHovered ? 999 : 'auto', // Elevate above overlay
+            boxShadow: isStarHovered
+              ? (isDark ? `0 8px 32px rgba(0,0,0,0.5), 0 0 0 4px ${goldColor}40` : '0 8px 32px rgba(0,0,0,0.3), 0 0 0 4px rgba(255,255,255,0.8)')
+              : 'none',
+          }}
+          whileHover={{ scale: scale * 1.01, boxShadow: isStarHovered ? undefined : '0 4px 16px rgba(0,0,0,0.12)' }}
+          transition={{ duration: 0.2 }}
+          role="button"
+          tabIndex={0}
+          aria-label={`Breakthrough session on ${session.date}`}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onClick();
+            }
+          }}
+        >
+
         {/* Header Row */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: '12px',
+          marginBottom: '16px',
           width: '100%',
           flexShrink: 0,
         }}>
@@ -124,46 +163,97 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
           }}>
             {session.date}
           </span>
-          <div style={{ flexShrink: 0 }}>
-            <BreakthroughStar size={24} isDark={isDark} />
+
+          {/* Illuminated Star with Hover Tooltip */}
+          <div
+            style={{
+              position: 'relative',
+              flexShrink: 0,
+              zIndex: 2,
+              width: '24px', // Explicit width matching star size
+              height: '24px', // Explicit height matching star size
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onMouseEnter={(e) => {
+              e.stopPropagation();
+              setIsStarHovered(true);
+            }}
+            onMouseLeave={(e) => {
+              e.stopPropagation();
+              setIsStarHovered(false);
+            }}
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent card click when clicking star area
+            }}
+          >
+            {/* Tooltip above star */}
+            <AnimatePresence>
+              {isStarHovered && (
+                <motion.div
+                  initial={{ opacity: 0, y: 5, x: '-50%' }}
+                  animate={{ opacity: 1, y: 0, x: '-50%' }}
+                  exit={{ opacity: 0, y: 5, x: '-50%' }}
+                  transition={{ duration: 0.2 }}
+                  style={{
+                    position: 'absolute',
+                    bottom: 'calc(100% + 6px)', // 6px above the star
+                    left: '50%',
+                    backgroundColor: isDark ? 'rgba(0, 0, 0, 0.95)' : 'rgba(0, 0, 0, 0.9)',
+                    padding: '10px 16px',
+                    borderRadius: '8px',
+                    whiteSpace: 'nowrap',
+                    pointerEvents: 'none',
+                    boxShadow: `0 4px 20px ${goldColor}80, 0 0 40px ${goldColor}40`,
+                    border: `1px solid ${goldColor}60`,
+                    zIndex: 1000,
+                  }}
+                >
+                  <p style={{
+                    fontFamily: fontSerif,
+                    color: goldColor,
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    lineHeight: 1.4,
+                    margin: 0,
+                    filter: `drop-shadow(0 0 8px ${goldColor}90)`,
+                    textShadow: `0 0 10px ${goldColor}80`,
+                  }}>
+                    {session.milestone?.title}
+                  </p>
+                  {/* Tooltip arrow */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: 0,
+                    height: 0,
+                    borderLeft: '6px solid transparent',
+                    borderRight: '6px solid transparent',
+                    borderTop: `6px solid ${isDark ? 'rgba(0, 0, 0, 0.95)' : 'rgba(0, 0, 0, 0.9)'}`,
+                  }} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Illuminated Star - subtle glow, clearer outline */}
+            <motion.div
+              animate={{
+                filter: isStarHovered
+                  ? `drop-shadow(0 0 4px ${goldColor}60) drop-shadow(0 0 8px ${goldColor}40) brightness(1.1)`
+                  : `drop-shadow(0 0 2px ${goldColor}50) drop-shadow(0 0 4px ${goldColor}30) brightness(1.0)`,
+              }}
+              transition={{ duration: 0.2 }}
+            >
+              <BreakthroughStar size={24} isDark={isDark} />
+            </motion.div>
           </div>
         </div>
 
-        {/* Breakthrough Section */}
-        <div style={{ marginBottom: '12px', flexShrink: 0 }}>
-          <h3 style={{
-            fontFamily: fontSans,
-            color: goldColor,
-            fontSize: '11px',
-            fontWeight: 500,
-            textTransform: 'uppercase',
-            letterSpacing: '1px',
-            margin: '0 0 6px 0',
-            filter: `drop-shadow(0 0 6px ${goldColor}90)`,
-          }}>
-            Breakthrough
-          </h3>
-          <p style={{
-            fontFamily: fontSerif,
-            color: goldColor,
-            fontSize: '13px',
-            fontWeight: 400,
-            lineHeight: 1.5,
-            margin: 0,
-            filter: `drop-shadow(0 0 4px ${goldColor}70)`,
-            wordWrap: 'break-word',
-            overflowWrap: 'break-word',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-          }}>
-            {session.milestone?.title}
-          </p>
-        </div>
-
-        {/* Session Summary */}
-        <div style={{ marginBottom: '12px', flex: 1, overflow: 'hidden' }}>
+        {/* Session Summary - same position as normal cards */}
+        <div style={{ marginBottom: '16px', flex: 1, overflow: 'hidden' }}>
           <h3 style={{
             fontFamily: fontSans,
             color: mutedText,
@@ -171,21 +261,21 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
             fontWeight: 500,
             textTransform: 'uppercase',
             letterSpacing: '1px',
-            margin: '0 0 6px 0',
+            margin: '0 0 8px 0',
           }}>
             Session Summary
           </h3>
           <p style={{
             fontFamily: fontSerif,
             color: text,
-            fontSize: '13px',
+            fontSize: '14px',
             fontWeight: 400,
-            lineHeight: 1.5,
+            lineHeight: 1.6,
             margin: 0,
             wordWrap: 'break-word',
             overflowWrap: 'break-word',
             display: '-webkit-box',
-            WebkitLineClamp: 2,
+            WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
           }}>
@@ -197,12 +287,12 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
         <div style={{
           height: '1px',
           backgroundColor: cardBorder,
-          margin: '0 0 10px 0',
+          margin: '0 0 12px 0',
           width: '100%',
           flexShrink: 0,
         }} />
 
-        {/* Techniques / Action Items */}
+        {/* Strategies / Action Items - same position as normal cards */}
         <div style={{ flexShrink: 0 }}>
           <h3 style={{
             fontFamily: fontSans,
@@ -211,9 +301,9 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
             fontWeight: 500,
             textTransform: 'uppercase',
             letterSpacing: '1px',
-            margin: '0 0 6px 0',
+            margin: '0 0 8px 0',
           }}>
-            Techniques / Action Items
+            Strategies / Action Items
           </h3>
           <ul style={{
             margin: 0,
@@ -224,10 +314,10 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
               <li key={i} style={{
                 fontFamily: fontSerif,
                 color: accent,
-                fontSize: '12px',
+                fontSize: '13px',
                 fontWeight: 300,
-                lineHeight: 1.4,
-                marginBottom: '4px',
+                lineHeight: 1.5,
+                marginBottom: '6px',
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: '8px',
@@ -247,6 +337,7 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
           </ul>
         </div>
       </motion.div>
+      </>
     );
   }
 
@@ -355,7 +446,7 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
         flexShrink: 0,
       }} />
 
-      {/* Techniques / Action Items */}
+      {/* Strategies / Action Items */}
       <div style={{ flexShrink: 0 }}>
         <h3 style={{
           fontFamily: fontSans,
@@ -366,7 +457,7 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
           letterSpacing: '1px',
           margin: '0 0 8px 0',
         }}>
-          Techniques / Action Items
+          Strategies / Action Items
         </h3>
         <ul style={{
           margin: 0,

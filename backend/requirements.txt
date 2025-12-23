@@ -1,0 +1,26 @@
+# FastAPI and Web Framework
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+python-multipart==0.0.12
+
+# Supabase Client
+supabase==2.9.0
+
+# OpenAI for Breakthrough Detection
+openai==1.54.4
+
+# Pydantic Settings
+pydantic==2.10.2
+pydantic-settings==2.6.1
+
+# Authentication
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-dotenv==1.0.1
+
+# Background Jobs (optional)
+celery==5.4.0
+redis==5.2.0
+
+# Utilities
+python-dateutil==2.9.0

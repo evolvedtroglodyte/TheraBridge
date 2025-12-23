@@ -51,13 +51,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if using dev bypass mode
-    const isDevBypass = userId === 'dev-bypass-user-id';
-    console.log('[Chat API] Dev bypass mode:', isDevBypass);
+    // STATELESS MODE: Skip database operations, keep chat working with in-memory state only
+    // Enable database mode by setting ENABLE_CHAT_DB_PERSISTENCE=true in .env
+    const isStatelessMode = process.env.ENABLE_CHAT_DB_PERSISTENCE !== 'true';
+    console.log('[Chat API] Stateless mode (no DB):', isStatelessMode);
 
-    if (isDevBypass) {
-      // In dev bypass mode, skip all database operations and just stream GPT-4o response
-      console.log('🔓 Dev bypass mode: Skipping database operations, streaming only');
+    if (isStatelessMode) {
+      // Stateless mode: No DB persistence, just OpenAI streaming
+      // Chat history is managed client-side (lost on refresh)
+      console.log('🔓 Stateless mode: Skipping database, streaming only');
 
       try {
         const stream = await openai.chat.completions.create({

@@ -1,0 +1,59 @@
+{
+  "session_id": "session_03_alex_chen",
+  "session_metadata": {
+    "source_file": "uploads/audio/alex_chen/session_03_2025-01-31.mp3",
+    "file_size_mb": 38.4,
+    "duration": 3000.0,
+    "language": "english",
+    "timestamp": "20250131_140000",
+    "pipeline_type": "CPU_API"
+  },
+  "analyzed_at": "2025-12-23T15:35:00Z",
+  "mood_analysis": {
+    "session_id": "session_03_alex_chen",
+    "mood_score": 4.5,
+    "confidence": 0.92,
+    "emotional_tone": "overwhelmed transitioning to hopeful",
+    "rationale": "Patient presents with moderate distress at session start, expressing feelings of drowning and frustration with executive function challenges. However, the session shows significant emotional shift as therapist reframes ADHD symptoms from character flaws to treatable medical condition. Patient moves from self-blame ('I'm lazy', 'bad at life') to relief and cautious hope ('maybe I'm not fundamentally broken'). The breakthrough realization that untreated ADHD contributes to depression represents a major cognitive shift, evidenced by emotional response ('literally about to cry', 'it's relief'). Despite ongoing struggles, the session ends with concrete treatment planning and renewed hope.",
+    "key_indicators": [
+      "Initial overwhelm and exhaustion from compensatory strategies breaking down",
+      "Chronic self-blame and shame about ADHD symptoms (lateness, forgetfulness)",
+      "Significant emotional release when validated ('this is the first time anyone said it's not my fault')",
+      "Shift from hopelessness to cautious optimism about treatment",
+      "Active engagement in treatment planning (asking questions, expressing willingness to try medication)"
+    ],
+    "analyzed_at": "2025-12-23T15:35:01Z"
+  },
+  "topic_extraction": {
+    "session_id": "session_03_alex_chen",
+    "topics": [
+      "ADHD symptom recognition and acceptance",
+      "Impact of untreated ADHD on depression and anxiety"
+    ],
+    "action_items": [
+      "Keep ADHD symptom journal tracking attention, impulsivity, time management, forgetfulness, and emotional regulation",
+      "Schedule psychiatric evaluation for ADHD medication assessment"
+    ],
+    "technique": "Psychoeducation",
+    "summary": "Patient realized untreated ADHD causes depression symptoms, not laziness. Therapist reframed executive dysfunction as neurological condition.",
+    "confidence": 0.95,
+    "raw_meta_summary": "{\"topics\": [\"ADHD symptom recognition and acceptance\", \"Impact of untreated ADHD on depression and anxiety\"], \"action_items\": [\"Keep ADHD symptom journal tracking attention, impulsivity, time management, forgetfulness, and emotional regulation\", \"Schedule psychiatric evaluation for ADHD medication assessment\"], \"technique\": \"Psychoeducation\", \"summary\": \"Patient realized untreated ADHD causes depression symptoms, not laziness. Therapist reframed executive dysfunction as neurological condition.\", \"confidence\": 0.95}",
+    "extracted_at": "2025-12-23T15:35:02Z"
+  },
+  "breakthrough_detection": {
+    "session_id": "session_03_alex_chen",
+    "has_breakthrough": true,
+    "breakthrough_count": 1,
+    "primary_breakthrough": {
+      "label": "ADHD Discovery",
+      "type": "Positive Discovery",
+      "confidence": 0.98,
+      "timestamp_start": 892.4,
+      "timestamp_end": 1187.4,
+      "description": "Patient experiences profound realization that ADHD is the root cause of their depression and executive function struggles, not personal failure or laziness. This represents a fundamental identity shift from 'I'm bad at life' to 'I have a treatable neurological condition.' The therapist's psychoeducation about untreated ADHD causing depression symptoms triggers an emotional breakthrough, with patient recognizing years of misdirected self-blame and shame. Patient moves from minimizing ADHD ('it's whatever') to understanding it as central to their mental health challenges. This cognitive reframing opens the door to treatment and self-compassion.",
+      "evidence": "Patient's statements: 'Wait, really? Like this isn't just me being bad at life?' followed by 'Oh my god. That's... I never connected those things. Like I always thought the depression was making me unable to focus, not the other way around.' and emotional response: 'I'm literally about to cry right now. Like this is the first time anyone has said it's not my fault.' The breakthrough culminates in: 'Like maybe I'm not fundamentally broken. Maybe there's actually something that can help.' Patient shifts from resistance to ADHD treatment to active engagement in psychiatric referral planning."
+    },
+    "session_summary": "Session showed 1 significant breakthrough moment. Primary insight: Patient experiences profound realization that ADHD is the root cause of their depression and executive function struggles, not personal failure or laziness.",
+    "emotional_trajectory": "overwhelmed → defensive minimization → confusion → recognition → emotional release → relief → hope"
+  }
+}

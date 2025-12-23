@@ -14,6 +14,11 @@ import { X, ArrowLeft, Star } from 'lucide-react';
 import { Session } from '../lib/types';
 import { getMoodEmoji, fullscreenVariants } from '../lib/utils';
 import { useModalAccessibility } from '../hooks/useModalAccessibility';
+import { DeepAnalysisSection } from './DeepAnalysisSection';
+
+// Font families - matching SessionCard
+const fontSerif = '"Crimson Pro", Georgia, serif';
+const fontSans = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 interface SessionDetailProps {
   session: Session | null;
@@ -84,7 +89,7 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
         <div className="flex-1 grid grid-cols-2 overflow-hidden">
           {/* Left Column - Transcript */}
           <div className="border-r border-[#E0DDD8] dark:border-[#3d3548] overflow-y-auto p-8 bg-[#F8F7F4] dark:bg-[#1a1625]">
-            <h3 className="text-xl font-serif font-semibold text-gray-800 dark:text-gray-200 mb-6">
+            <h3 style={{ fontFamily: fontSans }} className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">
               Session Transcript
             </h3>
 
@@ -92,17 +97,17 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
               <div className="space-y-6">
                 {session.transcript.map((entry, idx) => (
                   <div key={idx}>
-                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    <p style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                       {entry.speaker}:
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed pl-4 border-l-2 border-gray-200 dark:border-[#3d3548]">
+                    <p style={{ fontFamily: fontSerif }} className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed pl-4 border-l-2 border-gray-200 dark:border-[#3d3548]">
                       {entry.text}
                     </p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-500 dark:text-gray-500 italic">
+              <p style={{ fontFamily: fontSerif }} className="text-sm text-gray-500 dark:text-gray-500 italic">
                 Transcript not available for this session.
               </p>
             )}
@@ -110,7 +115,7 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
 
           {/* Right Column - Analysis */}
           <div className="overflow-y-auto p-8 bg-gray-50 dark:bg-[#2a2435]">
-            <h3 className="text-xl font-serif font-semibold text-gray-800 dark:text-gray-200 mb-6">
+            <h3 style={{ fontFamily: fontSans }} className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">
               Session Analysis
             </h3>
 
@@ -118,12 +123,12 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
             <div className="mb-6 p-4 bg-[#ECEAE5] dark:bg-[#1a1625] rounded-xl border border-[#E0DDD8] dark:border-[#3d3548]">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-gray-500 dark:text-gray-500 mb-1">Duration</p>
-                  <p className="text-gray-800 dark:text-gray-200 font-medium">{session.duration}</p>
+                  <p style={{ fontFamily: fontSans }} className="text-gray-500 dark:text-gray-500 mb-1">Duration</p>
+                  <p style={{ fontFamily: fontSerif }} className="text-gray-800 dark:text-gray-200 font-medium">{session.duration}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500 dark:text-gray-500 mb-1">Session Mood</p>
-                  <p className="text-gray-800 dark:text-gray-200 font-medium flex items-center gap-2">
+                  <p style={{ fontFamily: fontSans }} className="text-gray-500 dark:text-gray-500 mb-1">Session Mood</p>
+                  <p style={{ fontFamily: fontSerif }} className="text-gray-800 dark:text-gray-200 font-medium flex items-center gap-2">
                     <span className="text-lg">{moodEmoji}</span>
                     <span className="capitalize">{session.mood}</span>
                   </p>
@@ -133,12 +138,12 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
 
             {/* Topics Discussed */}
             <div className="mb-6">
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">
+              <h4 style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">
                 Topics Discussed
               </h4>
               <ul className="space-y-2">
                 {session.topics.map((topic, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                  <li key={idx} style={{ fontFamily: fontSerif }} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#5AB9B4] dark:bg-[#a78bfa] mt-2 flex-shrink-0" />
                     <span>{topic}</span>
                   </li>
@@ -148,23 +153,23 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
 
             {/* Strategy Used */}
             <div className="mb-6">
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">
+              <h4 style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">
                 Strategy Used
               </h4>
-              <p className="text-base font-semibold text-[#5AB9B4] dark:text-[#a78bfa] mb-2">{session.strategy}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p style={{ fontFamily: fontSerif }} className="text-base font-semibold text-[#5AB9B4] dark:text-[#a78bfa] mb-2">{session.strategy}</p>
+              <p style={{ fontFamily: fontSerif }} className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                 This therapeutic approach was applied during the session to address the identified concerns.
               </p>
             </div>
 
             {/* Action Items */}
             <div className="mb-6">
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">
+              <h4 style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">
                 Action Items
               </h4>
               <ul className="space-y-2">
                 {session.actions.map((action, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                  <li key={idx} style={{ fontFamily: fontSerif }} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#B8A5D6] dark:bg-[#c084fc] mt-2 flex-shrink-0" />
                     <span>{action}</span>
                   </li>
@@ -175,10 +180,10 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
             {/* Patient Summary */}
             {session.patientSummary && (
               <div className="p-4 bg-[#5AB9B4]/5 dark:bg-[#a78bfa]/10 rounded-xl border border-[#5AB9B4]/20 dark:border-[#a78bfa]/30">
-                <h4 className="text-sm font-semibold text-[#5AB9B4] dark:text-[#a78bfa] uppercase tracking-wide mb-3">
+                <h4 style={{ fontFamily: fontSans }} className="text-sm font-semibold text-[#5AB9B4] dark:text-[#a78bfa] uppercase tracking-wide mb-3">
                   Patient Summary
                 </h4>
-                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                <p style={{ fontFamily: fontSerif }} className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                   {session.patientSummary}
                 </p>
               </div>
@@ -190,14 +195,24 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
                 <div className="flex items-start gap-3">
                   <Star className="w-5 h-5 text-amber-600 fill-amber-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="text-sm font-semibold text-amber-900 dark:text-amber-400 mb-2">
+                    <h4 style={{ fontFamily: fontSans }} className="text-sm font-semibold text-amber-900 dark:text-amber-400 mb-2">
                       {session.milestone.title}
                     </h4>
-                    <p className="text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
+                    <p style={{ fontFamily: fontSerif }} className="text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
                       {session.milestone.description}
                     </p>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Deep Clinical Analysis */}
+            {session.deep_analysis && (
+              <div className="mt-6">
+                <DeepAnalysisSection
+                  analysis={session.deep_analysis}
+                  confidence={session.analysis_confidence || 0.8}
+                />
               </div>
             )}
           </div>

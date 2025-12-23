@@ -11,11 +11,12 @@
 
 import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useSessionData } from '../contexts/SessionDataContext';
-import { SessionCard } from './SessionCard';
-import { SessionDetail } from './SessionDetail';
-import { Session } from '../lib/types';
-import { CardSkeleton } from './DashboardSkeleton';
+import { useSessionData } from '@/app/patient/contexts/SessionDataContext';
+import { SessionCard } from '@/app/patient/components/SessionCard';
+import { AddSessionCard } from '@/app/patient/components/AddSessionCard';
+import { SessionDetail } from '@/app/patient/components/SessionDetail';
+import { Session } from '@/app/patient/lib/types';
+import { CardSkeleton } from '@/app/patient/components/DashboardSkeleton';
 
 interface SessionCardsGridProps {
   /** Session ID to open in fullscreen (controlled externally, e.g., from Timeline) */
@@ -36,12 +37,25 @@ export function SessionCardsGrid({
   // Use real data from context instead of mock imports
   const { sessions, isLoading, isError, isEmpty } = useSessionData();
 
-  const cardsPerPage = 6;
-  const totalPages = Math.ceil(sessions.length / cardsPerPage);
-  const currentSessions = sessions.slice(
-    currentPage * cardsPerPage,
-    (currentPage + 1) * cardsPerPage
-  );
+  // Page 1: AddSessionCard + 5 sessions (6 cards total)
+  // Page 2+: 6 sessions only (no AddSessionCard)
+  const isFirstPage = currentPage === 0;
+  const firstPageSessionCount = 5;
+  const otherPageSessionCount = 6;
+
+  // Calculate total pages
+  // First page takes 5 sessions, remaining pages take 6 each
+  const totalPages = sessions.length === 0
+    ? 1
+    : Math.ceil((sessions.length - firstPageSessionCount) / otherPageSessionCount) + 1;
+
+  // Get current page sessions
+  const currentSessions = isFirstPage
+    ? sessions.slice(0, firstPageSessionCount)
+    : sessions.slice(
+        firstPageSessionCount + (currentPage - 1) * otherPageSessionCount,
+        firstPageSessionCount + currentPage * otherPageSessionCount
+      );
 
   // ALL HOOKS MUST BE BEFORE ANY CONDITIONAL RETURNS (Rules of Hooks)
 
@@ -52,7 +66,7 @@ export function SessionCardsGrid({
 
       const containerWidth = containerRef.current.offsetWidth;
       const cardWidth = 329.3;
-      const gap = 21;
+      const gap = 20; // Spacing between cards
       const cols = 3;
 
       // Available width per card: (totalWidth - (gaps between cards)) / cols
@@ -78,7 +92,14 @@ export function SessionCardsGrid({
         // Navigate to the page containing this session
         const sessionIndex = sessions.findIndex(s => s.id === externalSelectedSessionId);
         if (sessionIndex !== -1) {
-          setCurrentPage(Math.floor(sessionIndex / cardsPerPage));
+          // Page 1 has sessions 0-4 (5 sessions)
+          // Page 2+ have 6 sessions each
+          if (sessionIndex < firstPageSessionCount) {
+            setCurrentPage(0);
+          } else {
+            const remainingIndex = sessionIndex - firstPageSessionCount;
+            setCurrentPage(Math.floor(remainingIndex / otherPageSessionCount) + 1);
+          }
         }
       }
     }
@@ -159,16 +180,26 @@ export function SessionCardsGrid({
     );
   }
 
-  // Show empty state
+  // Show empty state: just the AddSessionCard
   if (isEmpty) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center p-8">
-        <div className="text-gray-400 dark:text-gray-500 text-lg font-medium mb-2">
-          No sessions yet
+      <div className="h-full flex flex-col">
+        <div className="flex-1 min-h-0 flex items-center justify-center">
+          <div
+            ref={containerRef}
+            className="inline-grid grid-cols-3 grid-rows-2 gap-[20px]"
+          >
+            {/* Single AddSessionCard in position 1 */}
+            <AddSessionCard
+              id="add-session-card"
+              scale={cardScale}
+            />
+            {/* Invisible placeholders for remaining 5 cells */}
+            {Array.from({ length: 5 }).map((_, idx) => (
+              <div key={`placeholder-${idx}`} className="invisible" />
+            ))}
+          </div>
         </div>
-        <p className="text-gray-500 dark:text-gray-400 text-sm">
-          Your therapy sessions will appear here after they are processed.
-        </p>
       </div>
     );
   }
@@ -177,19 +208,32 @@ export function SessionCardsGrid({
     <>
       {/* Container uses full height with flex layout - overflow-anchor:none prevents scroll jumping */}
       <div ref={swipeRef} className="h-full flex flex-col" style={{ overflowAnchor: 'none' }}>
-        {/* Grid area - fixed 3x2 grid with invisible placeholders for empty cells */}
-        <div ref={containerRef} className="flex-1 min-h-0">
+        {/* Grid area - fixed 3x2 grid with tighter spacing */}
+        <div ref={containerRef} className="flex-1 min-h-0 flex items-center justify-center">
           <motion.div
             key={currentPage}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
-            style={{ gap: '21px' }}
-            className="grid grid-cols-3 grid-rows-2 h-full"
+            className="inline-grid grid-cols-3 grid-rows-2 gap-[20px]"
           >
-            {/* Always render 6 cells - real cards + invisible placeholders */}
-            {Array.from({ length: cardsPerPage }).map((_, idx) => {
-              const session = currentSessions[idx];
+            {/* Page 1: AddSessionCard + 5 sessions, Page 2+: 6 sessions only */}
+            {Array.from({ length: 6 }).map((_, idx) => {
+              // Position 0 on page 1 ONLY: AddSessionCard
+              if (idx === 0 && isFirstPage) {
+                return (
+                  <AddSessionCard
+                    key="add-session-card"
+                    id="add-session-card"
+                    scale={cardScale}
+                  />
+                );
+              }
+
+              // Session cards: offset by 1 on page 1, no offset on page 2+
+              const sessionIndex = isFirstPage ? idx - 1 : idx;
+              const session = currentSessions[sessionIndex];
+
               if (session) {
                 return (
                   <SessionCard
@@ -201,36 +245,42 @@ export function SessionCardsGrid({
                   />
                 );
               }
+
               // Invisible placeholder to maintain grid structure
               return <div key={`placeholder-${idx}`} className="invisible" />;
             })}
           </motion.div>
         </div>
 
-        {/* Pagination - Always at bottom, centered on full page (accounting for 60px sidebar) */}
+        {/* Pagination - Centered on viewport */}
         {totalPages > 1 && (
-          <nav aria-label="Session pages" className="flex justify-center items-center gap-3 h-12 flex-shrink-0" style={{ marginLeft: '-30px' }}>
-            {Array.from({ length: totalPages }).map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => {
-                  // Save scroll position before page change to restore after render
-                  savedScrollY.current = window.scrollY;
-                  setCurrentPage(idx);
-                }}
-                aria-label={`Go to page ${idx + 1}`}
-                aria-current={idx === currentPage ? 'page' : undefined}
-                className="w-6 h-2 flex items-center justify-center"
-              >
-                <span
-                  className={`transition-all duration-300 rounded-full h-2 ${
-                    idx === currentPage
-                      ? 'bg-[#5AB9B4] dark:bg-[#a78bfa] w-6'
-                      : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 w-2'
-                  }`}
-                />
-              </button>
-            ))}
+          <nav
+            aria-label="Session pages"
+            className="flex justify-center items-center gap-3 h-16 flex-shrink-0 relative"
+          >
+            <div className="flex items-center gap-3">
+              {Array.from({ length: totalPages }).map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    // Save scroll position before page change to restore after render
+                    savedScrollY.current = window.scrollY;
+                    setCurrentPage(idx);
+                  }}
+                  aria-label={`Go to page ${idx + 1}`}
+                  aria-current={idx === currentPage ? 'page' : undefined}
+                  className="w-6 h-2 flex items-center justify-center"
+                >
+                  <span
+                    className={`transition-all duration-300 rounded-full h-2 ${
+                      idx === currentPage
+                        ? 'bg-[#5AB9B4] dark:bg-[#a78bfa] w-6'
+                        : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 w-2'
+                    }`}
+                  />
+                </button>
+              ))}
+            </div>
           </nav>
         )}
       </div>

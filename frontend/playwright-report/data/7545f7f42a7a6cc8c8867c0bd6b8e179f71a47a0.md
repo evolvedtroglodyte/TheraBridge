@@ -1,0 +1,139 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - region "Notifications alt+T"
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - img [ref=e5]
+      - navigation [ref=e7]:
+        - button "Dashboard" [ref=e8] [cursor=pointer]
+        - button "Sessions" [ref=e9] [cursor=pointer]
+        - button "Ask AI" [ref=e10] [cursor=pointer]
+        - button "Upload" [ref=e11] [cursor=pointer]
+      - generic [ref=e13]:
+        - img [ref=e14]
+        - generic [ref=e16]:
+          - generic [ref=e17]: THERA
+          - generic [ref=e18]: BRIDGE
+    - generic [ref=e19]:
+      - generic [ref=e21]:
+        - button "Home" [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+          - generic: Home
+        - button "Light Mode" [ref=e27] [cursor=pointer]:
+          - img [ref=e28]
+          - generic: Light Mode
+      - main [ref=e31]:
+        - generic [ref=e32]:
+          - generic [ref=e34]:
+            - button "Session on Dec 17, mood positive" [ref=e35] [cursor=pointer]:
+              - generic [ref=e36]:
+                - generic [ref=e37]: 50m
+                - generic [ref=e38]: Dec 17
+                - img [ref=e40]
+              - generic [ref=e45]:
+                - heading "Session Summary" [level=3] [ref=e46]
+                - paragraph [ref=e47]: Made breakthrough progress on setting boundaries with family. Successfully practiced assertiveness techniques learned in previous sessions.
+              - generic [ref=e49]:
+                - heading "Strategies / Action Items" [level=3] [ref=e50]
+                - list [ref=e51]:
+                  - listitem [ref=e52]:
+                    - generic [ref=e53]: •
+                    - generic [ref=e54]: Assertiveness training
+                  - listitem [ref=e55]:
+                    - generic [ref=e56]: •
+                    - generic [ref=e57]: Set clear boundaries
+            - button "Breakthrough session on Dec 10" [ref=e58] [cursor=pointer]:
+              - generic [ref=e59]:
+                - generic [ref=e60]: 45m
+                - generic [ref=e61]: Dec 10
+                - img [ref=e64]
+              - generic [ref=e66]:
+                - heading "Session Summary" [level=3] [ref=e67]
+                - paragraph [ref=e68]: Breakthrough session with emotional release. Patient connected childhood neglect to adult self-worth issues and demonstrated genuine self-compassion.
+              - generic [ref=e70]:
+                - heading "Strategies / Action Items" [level=3] [ref=e71]
+                - list [ref=e72]:
+                  - listitem [ref=e73]:
+                    - generic [ref=e74]: •
+                    - generic [ref=e75]: Laddering technique
+                  - listitem [ref=e76]:
+                    - generic [ref=e77]: •
+                    - generic [ref=e78]: Self-compassion practice
+            - button "Session on Dec 3, mood neutral" [ref=e79] [cursor=pointer]:
+              - generic [ref=e80]:
+                - generic [ref=e81]: 48m
+                - generic [ref=e82]: Dec 3
+                - img [ref=e84]
+              - generic [ref=e88]:
+                - heading "Session Summary" [level=3] [ref=e89]
+                - paragraph [ref=e90]: Identified perfectionism pattern at work. Began recognizing cognitive distortions around performance standards.
+              - generic [ref=e92]:
+                - heading "Strategies / Action Items" [level=3] [ref=e93]
+                - list [ref=e94]:
+                  - listitem [ref=e95]:
+                    - generic [ref=e96]: •
+                    - generic [ref=e97]: Cognitive restructuring
+                  - listitem [ref=e98]:
+                    - generic [ref=e99]: •
+                    - generic [ref=e100]: Challenge catastrophizing
+            - button "Breakthrough session on Nov 26" [ref=e101] [cursor=pointer]:
+              - generic [ref=e102]:
+                - generic [ref=e103]: 45m
+                - generic [ref=e104]: Nov 26
+                - img [ref=e107]
+              - generic [ref=e109]:
+                - heading "Session Summary" [level=3] [ref=e110]
+                - paragraph [ref=e111]: Completed three-week sleep improvement plan. Reporting better rest quality and reduced morning anxiety.
+              - generic [ref=e113]:
+                - heading "Strategies / Action Items" [level=3] [ref=e114]
+                - list [ref=e115]:
+                  - listitem [ref=e116]:
+                    - generic [ref=e117]: •
+                    - generic [ref=e118]: Sleep hygiene protocol
+                  - listitem [ref=e119]:
+                    - generic [ref=e120]: •
+                    - generic [ref=e121]: Create bedtime routine
+            - button "Session on Nov 19, mood low" [ref=e122] [cursor=pointer]:
+              - generic [ref=e123]:
+                - generic [ref=e124]: 50m
+                - generic [ref=e125]: Nov 19
+                - img [ref=e127]
+              - generic [ref=e132]:
+                - heading "Session Summary" [level=3] [ref=e133]
+                - paragraph [ref=e134]: Experiencing depressive episode. Developed behavioral activation plan starting with minimal achievable goals.
+              - generic [ref=e136]:
+                - heading "Strategies / Action Items" [level=3] [ref=e137]
+                - list [ref=e138]:
+                  - listitem [ref=e139]:
+                    - generic [ref=e140]: •
+                    - generic [ref=e141]: Behavioral activation
+                  - listitem [ref=e142]:
+                    - generic [ref=e143]: •
+                    - generic [ref=e144]: Daily walk commitment
+            - button "Breakthrough session on Nov 12" [ref=e145] [cursor=pointer]:
+              - generic [ref=e146]:
+                - generic [ref=e147]: 45m
+                - generic [ref=e148]: Nov 12
+                - img [ref=e151]
+              - generic [ref=e153]:
+                - heading "Session Summary" [level=3] [ref=e154]
+                - paragraph [ref=e155]: Applied communication strategies with partner. First successful conflict resolution without escalation.
+              - generic [ref=e157]:
+                - heading "Strategies / Action Items" [level=3] [ref=e158]
+                - list [ref=e159]:
+                  - listitem [ref=e160]:
+                    - generic [ref=e161]: •
+                    - generic [ref=e162]: Active listening skills
+                  - listitem [ref=e163]:
+                    - generic [ref=e164]: •
+                    - generic [ref=e165]: Practice I-statements
+          - navigation "Session pages" [ref=e166]:
+            - generic [ref=e167]:
+              - button "Go to page 1" [ref=e168] [cursor=pointer]
+              - button "Go to page 2" [ref=e170] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=e177] [cursor=pointer]:
+    - img [ref=e178]
+  - alert [ref=e181]
+```

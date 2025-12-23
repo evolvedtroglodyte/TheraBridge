@@ -1,0 +1,173 @@
+	
+================================================================================
+CLINICAL TECHNIQUE VALIDATION TEST SUITE
+================================================================================
+
+================================================================================
+EXACT MATCHING TESTS
+================================================================================
+✓ 'Cognitive Restructuring' → 'CBT - Cognitive Restructuring' (expected: 'CBT - Cognitive Restructuring')
+✓ 'TIPP Skills' → 'DBT - TIPP Skills' (expected: 'DBT - TIPP Skills')
+✓ 'Radical Acceptance' → 'DBT - Radical Acceptance' (expected: 'DBT - Radical Acceptance')
+✓ 'cognitive defusion' → 'ACT - Cognitive Defusion' (expected: 'ACT - Cognitive Defusion')
+✓ 'CBT - Behavioral Activation' → 'CBT - Behavioral Activation' (expected: 'CBT - Behavioral Activation')
+
+Passed: 5/5
+
+================================================================================
+FUZZY MATCHING TESTS
+================================================================================
+✓ 'cognitive reframing' → 'CBT - Cognitive Restructuring' (confidence: 1.00, expected: 'CBT - Cognitive Restructuring')
+✓ 'thought challenging' → 'CBT - Cognitive Restructuring' (confidence: 1.00, expected: 'CBT - Cognitive Restructuring')
+✓ 'TIP skills' → 'DBT - TIPP Skills' (confidence: 1.00, expected: 'DBT - TIPP Skills')
+✓ 'opposite action' → 'DBT - Opposite Action' (confidence: 1.00, expected: 'DBT - Opposite Action')
+✓ 'defusion' → 'ACT - Cognitive Defusion' (confidence: 1.00, expected: 'ACT - Cognitive Defusion')
+✓ 'mindfulness meditation' → 'Mindfulness-Based - Mindfulness Meditation' (confidence: 1.00, expected: 'Mindfulness-Based - Mindfulness Meditation')
+
+Passed: 6/6
+
+================================================================================
+REJECTION TESTS (Non-Clinical Terms)
+================================================================================
+✓ 'crisis intervention' → 'None' (should be None)
+✓ 'supportive counseling' → 'None' (should be None)
+✗ 'active listening' → 'Motivational Interviewing - Reflective Listening' (should be None)
+✓ 'building rapport' → 'None' (should be None)
+✓ 'general therapy' → 'None' (should be None)
+
+Passed: 4/5
+
+================================================================================
+RE-PROCESSING ALL SESSIONS WITH VALIDATION
+================================================================================
+
+Processing: session_01_alex_chen
+Technique validation for session_01_alex_chen:
+  Raw: 'Safety Planning'
+  Standardized: 'CBT - Safety Planning'
+  Confidence: 1.00
+  Match type: exact
+  Old: Cognitive Behavioral Therapy (CBT) for addressing negative thought patterns
+  New: CBT - Safety Planning
+  Changed: YES
+
+Processing: session_02_alex_chen
+Technique validation for session_02_alex_chen:
+  Raw: 'TIPP Skills'
+  Standardized: 'DBT - TIPP Skills'
+  Confidence: 1.00
+  Match type: exact
+  Old: DBT emotion regulation skills (TIPP)
+  New: DBT - TIPP Skills
+  Changed: YES
+
+Processing: session_03_alex_chen
+Technique validation for session_03_alex_chen:
+  Raw: 'Psychoeducation'
+  Standardized: 'Other - Psychoeducation'
+  Confidence: 1.00
+  Match type: exact
+  Old: Psychoeducation regarding ADHD and its treatment
+  New: Other - Psychoeducation
+  Changed: YES
+
+Processing: session_04_alex_chen
+Technique validation for session_04_alex_chen:
+  Raw: 'Cognitive Restructuring'
+  Standardized: 'CBT - Cognitive Restructuring'
+  Confidence: 1.00
+  Match type: exact
+  Old: CBT cognitive reframing
+  New: CBT - Cognitive Restructuring
+  Changed: YES
+
+Processing: session_05_alex_chen
+Technique validation for session_05_alex_chen:
+  Raw: 'Cognitive Defusion'
+  Standardized: 'ACT - Cognitive Defusion'
+  Confidence: 1.00
+  Match type: exact
+  Old: Acceptance and Commitment Therapy (ACT) cognitive defusion
+  New: ACT - Cognitive Defusion
+  Changed: YES
+
+Processing: session_06_alex_chen
+Technique validation for session_06_alex_chen:
+  Raw: 'Mindfulness Meditation'
+  Standardized: 'Mindfulness-Based - Mindfulness Meditation'
+  Confidence: 1.00
+  Match type: exact
+  Old: Mindfulness-based cognitive therapy
+  New: Mindfulness-Based - Mindfulness Meditation
+  Changed: YES
+
+Processing: session_07_alex_chen
+Technique validation for session_07_alex_chen:
+  Raw: 'Acceptance'
+  Standardized: 'ACT - Acceptance'
+  Confidence: 1.00
+  Match type: exact
+  Old: Acceptance and Commitment Therapy (ACT) and Cognitive Behavioral Therapy (CBT)
+  New: ACT - Acceptance
+  Changed: YES
+
+Processing: session_08_alex_chen
+Technique validation for session_08_alex_chen:
+  Raw: 'DEAR MAN'
+  Standardized: 'DBT - DEAR MAN'
+  Confidence: 1.00
+  Match type: exact
+  Old: DBT interpersonal effectiveness (DEAR MAN)
+  New: DBT - DEAR MAN
+  Changed: YES
+
+Processing: session_09_alex_chen
+Technique validation for session_09_alex_chen:
+  Raw: 'Values Clarification'
+  Standardized: 'ACT - Values Clarification'
+  Confidence: 1.00
+  Match type: exact
+  Old: Acceptance and Commitment Therapy (ACT) values clarification
+  New: ACT - Values Clarification
+  Changed: YES
+
+Processing: session_10_alex_chen
+Technique validation for session_10_alex_chen:
+  Raw: 'Validation'
+  Standardized: 'Other - Validation'
+  Confidence: 1.00
+  Match type: exact
+  Old: DBT emotion regulation skills
+  New: Other - Validation
+  Changed: YES
+
+Processing: session_11_alex_chen
+Technique validation for session_11_alex_chen:
+  Raw: 'Cognitive Defusion'
+  Standardized: 'ACT - Cognitive Defusion'
+  Confidence: 1.00
+  Match type: exact
+  Old: Acceptance and Commitment Therapy (ACT)
+  New: ACT - Cognitive Defusion
+  Changed: YES
+
+Processing: session_12_alex_chen
+Technique validation for session_12_alex_chen:
+  Raw: 'Cognitive Restructuring'
+  Standardized: 'CBT - Cognitive Restructuring'
+  Confidence: 1.00
+  Match type: exact
+  Old: Cognitive Behavioral Therapy (CBT) with a focus on emotion regulation
+  New: CBT - Cognitive Restructuring
+  Changed: YES
+
+✓ JSON report saved: /Users/newdldewdl/Global Domination 2/peerbridge proj/mock-therapy-data/technique_validation_results.json
+✓ Markdown report saved: /Users/newdldewdl/Global Domination 2/peerbridge proj/mock-therapy-data/TECHNIQUE_VALIDATION_REPORT.md
+
+================================================================================
+✨ ALL TESTS COMPLETE
+================================================================================
+Exact matching: ✓ PASS
+Fuzzy matching: ✓ PASS
+Rejection tests: ✓ PASS
+Sessions processed: 12

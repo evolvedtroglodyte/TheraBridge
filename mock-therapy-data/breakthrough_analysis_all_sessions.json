@@ -1,0 +1,213 @@
+{
+  "summary": {
+    "total_sessions": 12,
+    "breakthrough_count": 7,
+    "breakthrough_rate": "58.3%"
+  },
+  "results": [
+    {
+      "session_num": 1,
+      "session_id": "session_01_alex_chen",
+      "has_breakthrough": false,
+      "breakthrough_count": 0,
+      "primary_breakthrough": null,
+      "all_breakthroughs": [],
+      "session_summary": "Session focused on exploration and rapport-building without major breakthroughs.",
+      "emotional_trajectory": "exploratory \u2192 engaged \u2192 reflective"
+    },
+    {
+      "session_num": 2,
+      "session_id": "session_02_alex_chen",
+      "has_breakthrough": false,
+      "breakthrough_count": 0,
+      "primary_breakthrough": null,
+      "all_breakthroughs": [],
+      "session_summary": "Session focused on exploration and rapport-building without major breakthroughs.",
+      "emotional_trajectory": "exploratory \u2192 engaged \u2192 reflective"
+    },
+    {
+      "session_num": 3,
+      "session_id": "session_03_alex_chen",
+      "has_breakthrough": true,
+      "breakthrough_count": 1,
+      "primary_breakthrough": {
+        "type": "Positive Discovery",
+        "description": "Alex realizes that many of their struggles (inattention, time blindness, missed deadlines, overwhelm) are core ADHD symptoms rather than laziness, and newly connects untreated ADHD as a major driver of their depression and anxiety. This reframes self-blame into self-understanding, reduces shame, and opens hopeful possibilities for targeted treatment and support.",
+        "confidence": 0.9,
+        "evidence": "\u201cOh my god. I never connected those things\u2026 But you're saying the ADHD could be causing some of the depression?\u201d [16:18]\n\u201cThis is kind of blowing my mind\u2026 I'm realizing how much energy I've been spending hating myself for things that might actually be symptoms.\u201d [24:04]\n\u201cIt's just... it's relief, you know? Like maybe I'm not fundamentally broken.\u201d [32:04]\n\u201cIf my brain literally works differently, then of course normal strategies don't work the same way.\u201d [40:12]"
+      },
+      "all_breakthroughs": [
+        {
+          "type": "Positive Discovery",
+          "description": "Alex realizes that many of their struggles (inattention, time blindness, missed deadlines, overwhelm) are core ADHD symptoms rather than laziness, and newly connects untreated ADHD as a major driver of their depression and anxiety. This reframes self-blame into self-understanding, reduces shame, and opens hopeful possibilities for targeted treatment and support.",
+          "confidence": 0.9,
+          "evidence": "\u201cOh my god. I never connected those things\u2026 But you're saying the ADHD could be causing some of the depression?\u201d [16:18]\n\u201cThis is kind of blowing my mind\u2026 I'm realizing how much energy I've been spending hating myself for things that might actually be symptoms.\u201d [24:04]\n\u201cIt's just... it's relief, you know? Like maybe I'm not fundamentally broken.\u201d [32:04]\n\u201cIf my brain literally works differently, then of course normal strategies don't work the same way.\u201d [40:12]"
+        }
+      ],
+      "session_summary": "Session showed 1 significant breakthrough moment(s). Primary insight: Alex realizes that many of their struggles (inattention, time blindness, missed deadlines, overwhelm) are core ADHD symptoms rather than laziness, and newly connects untreated ADHD as a major driver of their depression and anxiety. This reframes self-blame into self-understanding, reduces shame, and opens hopeful possibilities for targeted treatment and support.",
+      "emotional_trajectory": "exploratory \u2192 engaged \u2192 reflective"
+    },
+    {
+      "session_num": 4,
+      "session_id": "session_04_alex_chen",
+      "has_breakthrough": true,
+      "breakthrough_count": 1,
+      "primary_breakthrough": {
+        "type": "Positive Discovery",
+        "description": "Alex, after starting ADHD medication, experiences a quiet mind and sustained focus for the first time and realizes he hadn\u2019t recognized how exhausting his constant mental noise had been. This new awareness reframes his past struggles with focus and fatigue as ADHD-related symptoms rather than personal failure, leading to emotional relief and renewed hope about his capacity to function and succeed.",
+        "confidence": 0.86,
+        "evidence": "\u201cI can like... focus\u2026 I actually stayed focused for two hours straight.\u201d \u201cIt\u2019s honestly kind of emotional\u2026 It\u2019s quieter in my head. The constant mental noise is just\u2026 turned down. I didn\u2019t realize how exhausting it was until it stopped.\u201d"
+      },
+      "all_breakthroughs": [
+        {
+          "type": "Positive Discovery",
+          "description": "Alex, after starting ADHD medication, experiences a quiet mind and sustained focus for the first time and realizes he hadn\u2019t recognized how exhausting his constant mental noise had been. This new awareness reframes his past struggles with focus and fatigue as ADHD-related symptoms rather than personal failure, leading to emotional relief and renewed hope about his capacity to function and succeed.",
+          "confidence": 0.86,
+          "evidence": "\u201cI can like... focus\u2026 I actually stayed focused for two hours straight.\u201d \u201cIt\u2019s honestly kind of emotional\u2026 It\u2019s quieter in my head. The constant mental noise is just\u2026 turned down. I didn\u2019t realize how exhausting it was until it stopped.\u201d"
+        }
+      ],
+      "session_summary": "Session showed 1 significant breakthrough moment(s). Primary insight: Alex, after starting ADHD medication, experiences a quiet mind and sustained focus for the first time and realizes he hadn\u2019t recognized how exhausting his constant mental noise had been. This new awareness reframes his past struggles with focus and fatigue as ADHD-related symptoms rather than personal failure, leading to emotional relief and renewed hope about his capacity to function and succeed.",
+      "emotional_trajectory": "exploratory \u2192 engaged \u2192 reflective"
+    },
+    {
+      "session_num": 5,
+      "session_id": "session_05_alex_chen",
+      "has_breakthrough": true,
+      "breakthrough_count": 1,
+      "primary_breakthrough": {
+        "type": "Positive Discovery",
+        "description": "Alex reframes their self-view from being 'weak and broken' for needing therapy to recognizing, for the first time, that pursuing therapy is an act of courage and alignment with their core values (authenticity, wholeness). They explicitly note they've never thought of it this way and identify that they are 'choosing myself,' which reduces shame and empowers them to continue self-care despite parental disapproval.",
+        "confidence": 0.88,
+        "evidence": "Patient: \"Yeah. Yeah, it does. Like, therapy is how I'm working toward being whole. It's how I'm learning to be more authentic.\" [31:58]\nTherapist: \"You're living in alignment with your deepest values. That takes tremendous courage.\" [32:48]\nPatient: \"I never thought about it like that... But you're right. Like, I'm choosing myself, even though it's really hard.\" [33:44]"
+      },
+      "all_breakthroughs": [
+        {
+          "type": "Positive Discovery",
+          "description": "Alex reframes their self-view from being 'weak and broken' for needing therapy to recognizing, for the first time, that pursuing therapy is an act of courage and alignment with their core values (authenticity, wholeness). They explicitly note they've never thought of it this way and identify that they are 'choosing myself,' which reduces shame and empowers them to continue self-care despite parental disapproval.",
+          "confidence": 0.88,
+          "evidence": "Patient: \"Yeah. Yeah, it does. Like, therapy is how I'm working toward being whole. It's how I'm learning to be more authentic.\" [31:58]\nTherapist: \"You're living in alignment with your deepest values. That takes tremendous courage.\" [32:48]\nPatient: \"I never thought about it like that... But you're right. Like, I'm choosing myself, even though it's really hard.\" [33:44]"
+        }
+      ],
+      "session_summary": "Session showed 1 significant breakthrough moment(s). Primary insight: Alex reframes their self-view from being 'weak and broken' for needing therapy to recognizing, for the first time, that pursuing therapy is an act of courage and alignment with their core values (authenticity, wholeness). They explicitly note they've never thought of it this way and identify that they are 'choosing myself,' which reduces shame and empowers them to continue self-care despite parental disapproval.",
+      "emotional_trajectory": "exploratory \u2192 engaged \u2192 reflective"
+    },
+    {
+      "session_num": 6,
+      "session_id": "session_06_alex_chen",
+      "has_breakthrough": true,
+      "breakthrough_count": 1,
+      "primary_breakthrough": {
+        "type": "Positive Discovery",
+        "description": "Alex reframes their long-held core belief of being unlovable by recognizing the breakup as incompatibility rather than proof of personal deficiency. This shifts their self-view from shame and rejection to a more compassionate, balanced understanding of themselves, opening space for self-worth and healthier relationship expectations.",
+        "confidence": 0.9,
+        "evidence": "\u201cMaybe the relationship ending wasn't about me being unlovable. Maybe it just wasn't the right fit, you know? Like, that's allowed to be true.\u201d [13:46] Therapist: \u201cYou're challenging that core belief we identified - that you're unlovable. You're reframing the breakup as incompatibility rather than evidence of your worth.\u201d [15:13] Alex: \u201cWhen I think back on it, Jamie and I weren't that compatible... We liked each other, but we didn't actually have that much in common.\u201d [16:11]"
+      },
+      "all_breakthroughs": [
+        {
+          "type": "Positive Discovery",
+          "description": "Alex reframes their long-held core belief of being unlovable by recognizing the breakup as incompatibility rather than proof of personal deficiency. This shifts their self-view from shame and rejection to a more compassionate, balanced understanding of themselves, opening space for self-worth and healthier relationship expectations.",
+          "confidence": 0.9,
+          "evidence": "\u201cMaybe the relationship ending wasn't about me being unlovable. Maybe it just wasn't the right fit, you know? Like, that's allowed to be true.\u201d [13:46] Therapist: \u201cYou're challenging that core belief we identified - that you're unlovable. You're reframing the breakup as incompatibility rather than evidence of your worth.\u201d [15:13] Alex: \u201cWhen I think back on it, Jamie and I weren't that compatible... We liked each other, but we didn't actually have that much in common.\u201d [16:11]"
+        }
+      ],
+      "session_summary": "Session showed 1 significant breakthrough moment(s). Primary insight: Alex reframes their long-held core belief of being unlovable by recognizing the breakup as incompatibility rather than proof of personal deficiency. This shifts their self-view from shame and rejection to a more compassionate, balanced understanding of themselves, opening space for self-worth and healthier relationship expectations.",
+      "emotional_trajectory": "exploratory \u2192 engaged \u2192 reflective"
+    },
+    {
+      "session_num": 7,
+      "session_id": "session_07_alex_chen",
+      "has_breakthrough": true,
+      "breakthrough_count": 1,
+      "primary_breakthrough": {
+        "type": "Positive Discovery",
+        "description": "Alex newly recognizes that their intense anxiety and reassurance-seeking in relationships is an anxious attachment pattern rooted in childhood experiences of conditional love and needing to perform for approval. This reframes their behavior from being 'too much' to a learned survival strategy, opening a path toward self-compassion and targeted healing.",
+        "confidence": 0.9,
+        "evidence": "\u201cI didn\u2019t know there was a name for it.\u201d (21:52) and \u201cOh my god. That makes so much sense. Like, I\u2019m doing the same thing in relationships that I did with my parents. Trying to be perfect so they won\u2019t leave.\u201d (25:23)"
+      },
+      "all_breakthroughs": [
+        {
+          "type": "Positive Discovery",
+          "description": "Alex newly recognizes that their intense anxiety and reassurance-seeking in relationships is an anxious attachment pattern rooted in childhood experiences of conditional love and needing to perform for approval. This reframes their behavior from being 'too much' to a learned survival strategy, opening a path toward self-compassion and targeted healing.",
+          "confidence": 0.9,
+          "evidence": "\u201cI didn\u2019t know there was a name for it.\u201d (21:52) and \u201cOh my god. That makes so much sense. Like, I\u2019m doing the same thing in relationships that I did with my parents. Trying to be perfect so they won\u2019t leave.\u201d (25:23)"
+        }
+      ],
+      "session_summary": "Session showed 1 significant breakthrough moment(s). Primary insight: Alex newly recognizes that their intense anxiety and reassurance-seeking in relationships is an anxious attachment pattern rooted in childhood experiences of conditional love and needing to perform for approval. This reframes their behavior from being 'too much' to a learned survival strategy, opening a path toward self-compassion and targeted healing.",
+      "emotional_trajectory": "exploratory \u2192 engaged \u2192 reflective"
+    },
+    {
+      "session_num": 8,
+      "session_id": "session_08_alex_chen",
+      "has_breakthrough": false,
+      "breakthrough_count": 0,
+      "primary_breakthrough": null,
+      "all_breakthroughs": [],
+      "session_summary": "Session focused on exploration and rapport-building without major breakthroughs.",
+      "emotional_trajectory": "exploratory \u2192 engaged \u2192 reflective"
+    },
+    {
+      "session_num": 9,
+      "session_id": "session_09_alex_chen",
+      "has_breakthrough": false,
+      "breakthrough_count": 0,
+      "primary_breakthrough": null,
+      "all_breakthroughs": [],
+      "session_summary": "Session focused on exploration and rapport-building without major breakthroughs.",
+      "emotional_trajectory": "exploratory \u2192 engaged \u2192 reflective"
+    },
+    {
+      "session_num": 10,
+      "session_id": "session_10_alex_chen",
+      "has_breakthrough": false,
+      "breakthrough_count": 0,
+      "primary_breakthrough": null,
+      "all_breakthroughs": [],
+      "session_summary": "Session focused on exploration and rapport-building without major breakthroughs.",
+      "emotional_trajectory": "exploratory \u2192 engaged \u2192 reflective"
+    },
+    {
+      "session_num": 11,
+      "session_id": "session_11_alex_chen",
+      "has_breakthrough": true,
+      "breakthrough_count": 1,
+      "primary_breakthrough": {
+        "type": "Positive Discovery",
+        "description": "Alex realizes their identity and validity are independent of their parents\u2019 understanding. They differentiate their own truth from their parents\u2019 journey, shifting from seeking external approval to self-defined identity and agency. This reframing reduces shame and increases hope and control.",
+        "confidence": 0.95,
+        "evidence": "\u201cThat\u2019s like, the biggest thing I\u2019ve realized. For so long I thought I needed my parents\u2019 approval to be valid... But I know who I am. Their journey to understanding is separate from my truth.\u201d (43:18)\n\u201cWhoa... I guess I\u2019m realizing that I\u2019m not just a victim of circumstances. I\u2019m making choices. I\u2019m showing up. I have some control here, even when things feel out of control.\u201d (40:34)"
+      },
+      "all_breakthroughs": [
+        {
+          "type": "Positive Discovery",
+          "description": "Alex realizes their identity and validity are independent of their parents\u2019 understanding. They differentiate their own truth from their parents\u2019 journey, shifting from seeking external approval to self-defined identity and agency. This reframing reduces shame and increases hope and control.",
+          "confidence": 0.95,
+          "evidence": "\u201cThat\u2019s like, the biggest thing I\u2019ve realized. For so long I thought I needed my parents\u2019 approval to be valid... But I know who I am. Their journey to understanding is separate from my truth.\u201d (43:18)\n\u201cWhoa... I guess I\u2019m realizing that I\u2019m not just a victim of circumstances. I\u2019m making choices. I\u2019m showing up. I have some control here, even when things feel out of control.\u201d (40:34)"
+        }
+      ],
+      "session_summary": "Session showed 1 significant breakthrough moment(s). Primary insight: Alex realizes their identity and validity are independent of their parents\u2019 understanding. They differentiate their own truth from their parents\u2019 journey, shifting from seeking external approval to self-defined identity and agency. This reframing reduces shame and increases hope and control.",
+      "emotional_trajectory": "exploratory \u2192 engaged \u2192 reflective"
+    },
+    {
+      "session_num": 12,
+      "session_id": "session_12_alex_chen",
+      "has_breakthrough": true,
+      "breakthrough_count": 1,
+      "primary_breakthrough": {
+        "type": "Positive Discovery",
+        "description": "Alex recognizes a new, internalized capacity for self-reliance, explicitly realizing they can trust themselves to manage without weekly therapy. This marks a shift from prior dependence and fear to a self-trusting identity, opening space for greater autonomy and sustained growth.",
+        "confidence": 0.9,
+        "evidence": "\u201cIt\u2019s kind of empowering, actually. Like, I can trust myself to handle things for two weeks at a time. That would have been unthinkable five months ago.\u201d"
+      },
+      "all_breakthroughs": [
+        {
+          "type": "Positive Discovery",
+          "description": "Alex recognizes a new, internalized capacity for self-reliance, explicitly realizing they can trust themselves to manage without weekly therapy. This marks a shift from prior dependence and fear to a self-trusting identity, opening space for greater autonomy and sustained growth.",
+          "confidence": 0.9,
+          "evidence": "\u201cIt\u2019s kind of empowering, actually. Like, I can trust myself to handle things for two weeks at a time. That would have been unthinkable five months ago.\u201d"
+        }
+      ],
+      "session_summary": "Session showed 1 significant breakthrough moment(s). Primary insight: Alex recognizes a new, internalized capacity for self-reliance, explicitly realizing they can trust themselves to manage without weekly therapy. This marks a shift from prior dependence and fear to a self-trusting identity, opening space for greater autonomy and sustained growth.",
+      "emotional_trajectory": "exploratory \u2192 engaged \u2192 reflective"
+    }
+  ]
+}

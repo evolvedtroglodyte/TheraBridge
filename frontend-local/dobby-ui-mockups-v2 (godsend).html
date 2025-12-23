@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dobby AI — UI Mockups</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #1a1a1a;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    /* ============================================
+       MOCKUP SELECTOR
+       ============================================ */
+    .mockup-selector {
+      max-width: 1400px;
+      margin: 0 auto 32px;
+      background: #2a2a2a;
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .mockup-selector h1 {
+      color: white;
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    .mockup-selector p {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .selector-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .selector-btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .selector-btn.active {
+      background: linear-gradient(135deg, #5AB9B4, #8B6AAE);
+      color: white;
+      box-shadow: 0 4px 20px rgba(90,185,180,0.3);
+    }
+
+    .selector-btn:not(.active) {
+      background: #3a3a3a;
+      color: #aaa;
+    }
+
+    .selector-btn:not(.active):hover {
+      background: #4a4a4a;
+      color: white;
+    }
+
+    /* ============================================
+       MOCKUP CONTAINER
+       ============================================ */
+    .mockup-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    .mockup-frame {
+      display: none;
+      height: 800px;
+    }
+
+    .mockup-frame.active {
+      display: flex;
+    }
+
+    /* ============================================
+       LIGHT MODE STYLES
+       ============================================ */
+    .light-mode {
+      background: #FAF8F5;
+      color: #1a1a1a;
+    }
+
+    .light-mode .sidebar {
+      background: #FAF8F5;
+      border-right: 1px solid #E5E2DE;
+    }
+
+    .light-mode .sidebar-header {
+      color: #1a1a1a;
+    }
+
+    .light-mode .sidebar-icon {
+      color: #666;
+    }
+
+    .light-mode .sidebar-icon:hover {
+      background: rgba(0,0,0,0.05);
+    }
+
+    .light-mode .new-chat-btn {
+      background: #5AB9B4;
+      color: white;
+    }
+
+    .light-mode .new-chat-btn:hover {
+      background: #4AA9A4;
+    }
+
+    .light-mode .nav-item {
+      color: #444;
+    }
+
+    .light-mode .nav-item:hover {
+      background: rgba(0,0,0,0.04);
+    }
+
+    .light-mode .section-label {
+      color: #888;
+    }
+
+    .light-mode .recent-item {
+      color: #333;
+    }
+
+    .light-mode .recent-item:hover {
+      background: rgba(0,0,0,0.04);
+    }
+
+    .light-mode .user-section {
+      border-top: 1px solid #E5E2DE;
+    }
+
+    .light-mode .user-name {
+      color: #1a1a1a;
+    }
+
+    .light-mode .main-content {
+      background: #FAF8F5;
+    }
+
+    .light-mode .header-bar {
+      border-bottom: 1px solid #E5E2DE;
+    }
+
+    .light-mode .brand-name {
+      color: #1a1a1a;
+    }
+
+    .light-mode .share-btn {
+      color: #666;
+    }
+
+    .light-mode .share-btn:hover {
+      background: rgba(0,0,0,0.05);
+    }
+
+    .light-mode .greeting {
+      color: #1a1a1a;
+    }
+
+    .light-mode .input-section {
+      border-top: 1px solid #E5E2DE;
+    }
+
+    .light-mode .suggested-prompt {
+      background: white;
+      border: 1px solid #E5E2DE;
+      color: #333;
+    }
+
+    .light-mode .suggested-prompt:hover {
+      border-color: #5AB9B4;
+      background: #F5FAFA;
+    }
+
+    .light-mode .input-container {
+      background: white;
+      border: 1px solid #E5E2DE;
+    }
+
+    .light-mode .input-container:focus-within {
+      border-color: #5AB9B4;
+      box-shadow: 0 0 0 3px rgba(90,185,180,0.1);
+    }
+
+    .light-mode .input-field {
+      color: #1a1a1a;
+    }
+
+    .light-mode .input-field::placeholder {
+      color: #999;
+    }
+
+    .light-mode .toggle-btn {
+      background: #F0F0F0;
+      color: #666;
+    }
+
+    .light-mode .toggle-btn.active {
+      background: #5AB9B4;
+      color: white;
+    }
+
+    .light-mode .char-count {
+      color: #999;
+    }
+
+    .light-mode .send-btn {
+      background: #5AB9B4;
+      color: white;
+    }
+
+    .light-mode .send-btn:hover {
+      background: #4AA9A4;
+    }
+
+    /* ============================================
+       DARK MODE STYLES
+       ============================================ */
+    .dark-mode {
+      background: #1a1625;
+      color: #E5E5E5;
+    }
+
+    .dark-mode .sidebar {
+      background: #1a1625;
+      border-right: 1px solid #2a2535;
+    }
+
+    .dark-mode .sidebar-header {
+      color: #E5E5E5;
+    }
+
+    .dark-mode .sidebar-icon {
+      color: #888;
+    }
+
+    .dark-mode .sidebar-icon:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .dark-mode .new-chat-btn {
+      background: #8B6AAE;
+      color: white;
+    }
+
+    .dark-mode .new-chat-btn:hover {
+      background: #9B7ABE;
+    }
+
+    .dark-mode .nav-item {
+      color: #aaa;
+    }
+
+    .dark-mode .nav-item:hover {
+      background: rgba(255,255,255,0.04);
+    }
+
+    .dark-mode .section-label {
+      color: #666;
+    }
+
+    .dark-mode .recent-item {
+      color: #ccc;
+    }
+
+    .dark-mode .recent-item:hover {
+      background: rgba(255,255,255,0.04);
+    }
+
+    .dark-mode .user-section {
+      border-top: 1px solid #2a2535;
+    }
+
+    .dark-mode .user-name {
+      color: #E5E5E5;
+    }
+
+    .dark-mode .main-content {
+      background: #1a1625;
+    }
+
+    .dark-mode .header-bar {
+      border-bottom: 1px solid #2a2535;
+    }
+
+    .dark-mode .brand-name {
+      color: #E5E5E5;
+    }
+
+    .dark-mode .share-btn {
+      color: #888;
+    }
+
+    .dark-mode .share-btn:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .dark-mode .greeting {
+      color: #E5E5E5;
+    }
+
+    .dark-mode .input-section {
+      border-top: 1px solid #2a2535;
+    }
+
+    .dark-mode .suggested-prompt {
+      background: #252030;
+      border: 1px solid #3a3545;
+      color: #ccc;
+    }
+
+    .dark-mode .suggested-prompt:hover {
+      border-color: #8B6AAE;
+      background: #2a2535;
+    }
+
+    .dark-mode .input-container {
+      background: #252030;
+      border: 1px solid #3a3545;
+    }
+
+    .dark-mode .input-container:focus-within {
+      border-color: #8B6AAE;
+      box-shadow: 0 0 0 3px rgba(139,106,174,0.15);
+    }
+
+    .dark-mode .input-field {
+      color: #E5E5E5;
+    }
+
+    .dark-mode .input-field::placeholder {
+      color: #666;
+    }
+
+    .dark-mode .toggle-btn {
+      background: #2a2535;
+      color: #888;
+    }
+
+    .dark-mode .toggle-btn.active {
+      background: #8B6AAE;
+      color: white;
+    }
+
+    .dark-mode .char-count {
+      color: #666;
+    }
+
+    .dark-mode .send-btn {
+      background: #8B6AAE;
+      color: white;
+    }
+
+    .dark-mode .send-btn:hover {
+      background: #9B7ABE;
+    }
+
+    /* ============================================
+       SIDEBAR STRUCTURE
+       ============================================ */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      transition: width 0.3s ease;
+    }
+
+    .sidebar.collapsed {
+      width: 60px;
+    }
+
+    .sidebar.expanded {
+      width: 260px;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      height: 56px;
+    }
+
+    .sidebar.collapsed .sidebar-header {
+      justify-content: center;
+    }
+
+    .brand-text {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .sidebar.collapsed .brand-text {
+      display: none;
+    }
+
+    .sidebar-toggle {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 8px;
+      overflow-y: auto;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.15s ease;
+    }
+
+    .sidebar.collapsed .nav-item {
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .sidebar.collapsed .nav-label {
+      display: none;
+    }
+
+    .new-chat-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      margin: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .sidebar.collapsed .new-chat-btn {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      margin: 8px auto;
+      border-radius: 10px;
+    }
+
+    .sidebar.collapsed .new-chat-label {
+      display: none;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 16px 12px 8px;
+    }
+
+    .sidebar.collapsed .section-label {
+      display: none;
+    }
+
+    .recent-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.15s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar.collapsed .recents-section {
+      display: none;
+    }
+
+    .user-section {
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sidebar.collapsed .user-section {
+      justify-content: center;
+    }
+
+    .sidebar.collapsed .user-info {
+      display: none;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .user-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* ============================================
+       MAIN CONTENT
+       ============================================ */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 12px 20px;
+      height: 56px;
+    }
+
+    .share-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease;
+    }
+
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+    }
+
+    .greeting {
+      font-size: 36px;
+      font-weight: 600;
+      margin-bottom: 48px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .greeting-icon {
+      font-size: 32px;
+    }
+
+    .input-section {
+      width: 100%;
+      max-width: 720px;
+      padding: 24px;
+      margin: auto auto 0 auto;
+    }
+
+    .suggested-prompts {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .suggested-prompt {
+      padding: 10px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .input-container {
+      border-radius: 16px;
+      padding: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .input-field {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      resize: none;
+      min-height: 24px;
+      margin-bottom: 12px;
+    }
+
+    .input-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .toggle-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 20px;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .input-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .char-count {
+      font-size: 12px;
+    }
+
+    .send-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    /* ============================================
+       SHARE MODAL
+       ============================================ */
+    .modal-frame {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      height: 800px;
+    }
+
+    .modal-frame.active {
+      display: flex;
+    }
+
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+    }
+
+    .modal-content {
+      position: relative;
+      width: 480px;
+      border-radius: 20px;
+      padding: 28px;
+      z-index: 10;
+    }
+
+    .light-mode .modal-content {
+      background: white;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    .dark-mode .modal-content {
+      background: #252030;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .modal-title {
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .light-mode .modal-title {
+      color: #1a1a1a;
+    }
+
+    .dark-mode .modal-title {
+      color: #E5E5E5;
+    }
+
+    .modal-subtitle {
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .light-mode .modal-subtitle {
+      color: #666;
+    }
+
+    .dark-mode .modal-subtitle {
+      color: #888;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .light-mode .modal-close {
+      color: #666;
+    }
+
+    .light-mode .modal-close:hover {
+      background: rgba(0,0,0,0.05);
+    }
+
+    .dark-mode .modal-close {
+      color: #888;
+    }
+
+    .dark-mode .modal-close:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .modal-options {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 28px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .light-mode .modal-options {
+      background: #F5F5F5;
+    }
+
+    .dark-mode .modal-options {
+      background: #1a1625;
+    }
+
+    .modal-option {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .light-mode .modal-option:hover {
+      background: #EBEBEB;
+    }
+
+    .dark-mode .modal-option:hover {
+      background: #2a2535;
+    }
+
+    .option-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .light-mode .option-icon {
+      background: white;
+      color: #666;
+    }
+
+    .dark-mode .option-icon {
+      background: #2a2535;
+      color: #888;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .option-title {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .light-mode .option-title {
+      color: #1a1a1a;
+    }
+
+    .dark-mode .option-title {
+      color: #E5E5E5;
+    }
+
+    .option-desc {
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .light-mode .option-desc {
+      color: #888;
+    }
+
+    .dark-mode .option-desc {
+      color: #666;
+    }
+
+    .option-check {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .light-mode .option-check {
+      color: #5AB9B4;
+    }
+
+    .dark-mode .option-check {
+      color: #8B6AAE;
+    }
+
+    .modal-action {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .create-link-btn {
+      padding: 14px 24px;
+      border-radius: 12px;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .light-mode .create-link-btn {
+      background: #1a1a1a;
+      color: white;
+    }
+
+    .light-mode .create-link-btn:hover {
+      background: #333;
+    }
+
+    .dark-mode .create-link-btn {
+      background: #FAF8F5;
+      color: #1a1a1a;
+    }
+
+    .dark-mode .create-link-btn:hover {
+      background: #E5E5E5;
+    }
+
+    /* ============================================
+       SVG ICONS
+       ============================================ */
+    .icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .icon-sm {
+      width: 16px;
+      height: 16px;
+    }
+
+    .icon-lg {
+      width: 24px;
+      height: 24px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Mockup Selector -->
+  <div class="mockup-selector">
+    <h1>Dobby AI — UI Mockups</h1>
+    <p>Toggle between different views to preview the chatbot interface</p>
+    <div class="selector-grid">
+      <button class="selector-btn active" onclick="showMockup('light-collapsed')">Light + Collapsed</button>
+      <button class="selector-btn" onclick="showMockup('light-expanded')">Light + Expanded</button>
+      <button class="selector-btn" onclick="showMockup('dark-collapsed')">Dark + Collapsed</button>
+      <button class="selector-btn" onclick="showMockup('dark-expanded')">Dark + Expanded</button>
+      <button class="selector-btn" onclick="showMockup('share-light')">Share Modal (Light)</button>
+      <button class="selector-btn" onclick="showMockup('share-dark')">Share Modal (Dark)</button>
+    </div>
+  </div>
+
+  <!-- Mockup Container -->
+  <div class="mockup-container">
+    
+    <!-- ============================================
+         1. LIGHT MODE + COLLAPSED SIDEBAR
+         ============================================ -->
+    <div id="light-collapsed" class="mockup-frame light-mode active">
+      <!-- Collapsed Sidebar -->
+      <div class="sidebar collapsed">
+        <div class="sidebar-header">
+          <button class="sidebar-toggle sidebar-icon">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <line x1="9" y1="3" x2="9" y2="21"/>
+            </svg>
+          </button>
+        </div>
+        <div class="sidebar-nav">
+          <button class="new-chat-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+          <div class="nav-item sidebar-icon">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="user-section">
+          <div class="user-avatar">
+            <svg width="32" height="32" viewBox="0 0 120 120" fill="none">
+              <polygon points="15,55 35,35 35,65" fill="#5AB9B4"/>
+              <polygon points="105,55 85,35 85,65" fill="#5AB9B4"/>
+              <rect x="30" y="30" width="60" height="60" rx="14" fill="#5AB9B4"/>
+              <circle cx="45" cy="55" r="8" fill="white"/>
+              <circle cx="45" cy="57" r="4" fill="#1a1a1a"/>
+              <circle cx="75" cy="55" r="8" fill="white"/>
+              <circle cx="75" cy="57" r="4" fill="#1a1a1a"/>
+              <path d="M48 74 Q60 82 72 74" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <div class="header-bar">
+          <button class="share-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <path d="M8 13h8M8 17h8M8 9h2"/>
+            </svg>
+          </button>
+        </div>
+        <div class="content-area">
+          <div class="greeting">
+            <span class="greeting-icon">🌿</span>
+            <span>Hello, welcome back</span>
+          </div>
+        </div>
+        <div class="input-section">
+          <div class="suggested-prompts">
+            <div class="suggested-prompt">Why does my mood drop after family visits?</div>
+            <div class="suggested-prompt">Help me prep to discuss boundaries with my partner</div>
+          </div>
+          <div class="input-container">
+            <textarea class="input-field" placeholder="Ask Dobby anything..." rows="1"></textarea>
+            <div class="input-controls">
+              <div class="toggle-group">
+                <button class="toggle-btn active">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                  </svg>
+                  AI
+                </button>
+                <button class="toggle-btn">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  THERAPIST
+                </button>
+              </div>
+              <div class="input-actions">
+                <span class="char-count">0/500</span>
+                <button class="send-btn">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="19" x2="12" y2="5"/>
+                    <polyline points="5 12 12 5 19 12"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================
+         2. LIGHT MODE + EXPANDED SIDEBAR
+         ============================================ -->
+    <div id="light-expanded" class="mockup-frame light-mode">
+      <!-- Expanded Sidebar -->
+      <div class="sidebar expanded">
+        <div class="sidebar-header">
+          <span class="brand-text">Dobby</span>
+          <button class="sidebar-toggle sidebar-icon">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <line x1="9" y1="3" x2="9" y2="21"/>
+            </svg>
+          </button>
+        </div>
+        <div class="sidebar-nav">
+          <button class="new-chat-btn">
+            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            <span class="new-chat-label">New chat</span>
+          </button>
+          
+          <div class="recents-section">
+            <div class="section-label">Recents</div>
+            <div class="recent-item">Preparing for next session</div>
+            <div class="recent-item">Breathing techniques help</div>
+            <div class="recent-item">Mood tracking question</div>
+            <div class="recent-item">Setting boundaries at work</div>
+            <div class="recent-item">Sleep improvement tips</div>
+          </div>
+        </div>
+        <div class="user-section">
+          <div class="user-avatar">
+            <svg width="32" height="32" viewBox="0 0 120 120" fill="none">
+              <polygon points="15,55 35,35 35,65" fill="#5AB9B4"/>
+              <polygon points="105,55 85,35 85,65" fill="#5AB9B4"/>
+              <rect x="30" y="30" width="60" height="60" rx="14" fill="#5AB9B4"/>
+              <circle cx="45" cy="55" r="8" fill="white"/>
+              <circle cx="45" cy="57" r="4" fill="#1a1a1a"/>
+              <circle cx="75" cy="55" r="8" fill="white"/>
+              <circle cx="75" cy="57" r="4" fill="#1a1a1a"/>
+              <path d="M48 74 Q60 82 72 74" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+          <div class="user-info">
+            <div class="user-name">Sarah Mitchell</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <div class="header-bar">
+          <button class="share-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <path d="M8 13h8M8 17h8M8 9h2"/>
+            </svg>
+          </button>
+        </div>
+        <div class="content-area">
+          <div class="greeting">
+            <span class="greeting-icon">🌿</span>
+            <span>Hello, welcome back</span>
+          </div>
+        </div>
+        <div class="input-section">
+          <div class="suggested-prompts">
+            <div class="suggested-prompt">Why does my mood drop after family visits?</div>
+            <div class="suggested-prompt">Help me prep to discuss boundaries with my partner</div>
+          </div>
+          <div class="input-container">
+            <textarea class="input-field" placeholder="Ask Dobby anything..." rows="1"></textarea>
+            <div class="input-controls">
+              <div class="toggle-group">
+                <button class="toggle-btn active">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                  </svg>
+                  AI
+                </button>
+                <button class="toggle-btn">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  THERAPIST
+                </button>
+              </div>
+              <div class="input-actions">
+                <span class="char-count">0/500</span>
+                <button class="send-btn">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="19" x2="12" y2="5"/>
+                    <polyline points="5 12 12 5 19 12"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================
+         3. DARK MODE + COLLAPSED SIDEBAR
+         ============================================ -->
+    <div id="dark-collapsed" class="mockup-frame dark-mode">
+      <!-- Collapsed Sidebar -->
+      <div class="sidebar collapsed">
+        <div class="sidebar-header">
+          <button class="sidebar-toggle sidebar-icon">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <line x1="9" y1="3" x2="9" y2="21"/>
+            </svg>
+          </button>
+        </div>
+        <div class="sidebar-nav">
+          <button class="new-chat-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+          <div class="nav-item sidebar-icon">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="user-section">
+          <div class="user-avatar">
+            <svg width="32" height="32" viewBox="0 0 120 120" fill="none">
+              <polygon points="15,55 35,35 35,65" fill="#8B6AAE"/>
+              <polygon points="105,55 85,35 85,65" fill="#8B6AAE"/>
+              <rect x="30" y="30" width="60" height="60" rx="14" fill="#8B6AAE"/>
+              <circle cx="45" cy="55" r="8" fill="white"/>
+              <circle cx="45" cy="57" r="4" fill="#1a1625"/>
+              <circle cx="75" cy="55" r="8" fill="white"/>
+              <circle cx="75" cy="57" r="4" fill="#1a1625"/>
+              <path d="M48 74 Q60 82 72 74" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <div class="header-bar">
+          <button class="share-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <path d="M8 13h8M8 17h8M8 9h2"/>
+            </svg>
+          </button>
+        </div>
+        <div class="content-area">
+          <div class="greeting">
+            <span class="greeting-icon">🌙</span>
+            <span>Hello, night owl</span>
+          </div>
+        </div>
+        <div class="input-section">
+          <div class="suggested-prompts">
+            <div class="suggested-prompt">Why does my mood drop after family visits?</div>
+            <div class="suggested-prompt">Help me prep to discuss boundaries with my partner</div>
+          </div>
+          <div class="input-container">
+            <textarea class="input-field" placeholder="Ask Dobby anything..." rows="1"></textarea>
+            <div class="input-controls">
+              <div class="toggle-group">
+                <button class="toggle-btn active">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                  </svg>
+                  AI
+                </button>
+                <button class="toggle-btn">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  THERAPIST
+                </button>
+              </div>
+              <div class="input-actions">
+                <span class="char-count">0/500</span>
+                <button class="send-btn">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="19" x2="12" y2="5"/>
+                    <polyline points="5 12 12 5 19 12"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================
+         4. DARK MODE + EXPANDED SIDEBAR
+         ============================================ -->
+    <div id="dark-expanded" class="mockup-frame dark-mode">
+      <!-- Expanded Sidebar -->
+      <div class="sidebar expanded">
+        <div class="sidebar-header">
+          <span class="brand-text">Dobby</span>
+          <button class="sidebar-toggle sidebar-icon">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <line x1="9" y1="3" x2="9" y2="21"/>
+            </svg>
+          </button>
+        </div>
+        <div class="sidebar-nav">
+          <button class="new-chat-btn">
+            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            <span class="new-chat-label">New chat</span>
+          </button>
+          
+          <div class="recents-section">
+            <div class="section-label">Recents</div>
+            <div class="recent-item">Preparing for next session</div>
+            <div class="recent-item">Breathing techniques help</div>
+            <div class="recent-item">Mood tracking question</div>
+            <div class="recent-item">Setting boundaries at work</div>
+            <div class="recent-item">Sleep improvement tips</div>
+          </div>
+        </div>
+        <div class="user-section">
+          <div class="user-avatar">
+            <svg width="32" height="32" viewBox="0 0 120 120" fill="none">
+              <polygon points="15,55 35,35 35,65" fill="#8B6AAE"/>
+              <polygon points="105,55 85,35 85,65" fill="#8B6AAE"/>
+              <rect x="30" y="30" width="60" height="60" rx="14" fill="#8B6AAE"/>
+              <circle cx="45" cy="55" r="8" fill="white"/>
+              <circle cx="45" cy="57" r="4" fill="#1a1625"/>
+              <circle cx="75" cy="55" r="8" fill="white"/>
+              <circle cx="75" cy="57" r="4" fill="#1a1625"/>
+              <path d="M48 74 Q60 82 72 74" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+          <div class="user-info">
+            <div class="user-name">Sarah Mitchell</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <div class="header-bar">
+          <button class="share-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <path d="M8 13h8M8 17h8M8 9h2"/>
+            </svg>
+          </button>
+        </div>
+        <div class="content-area">
+          <div class="greeting">
+            <span class="greeting-icon">🌙</span>
+            <span>Hello, night owl</span>
+          </div>
+        </div>
+        <div class="input-section">
+          <div class="suggested-prompts">
+            <div class="suggested-prompt">Why does my mood drop after family visits?</div>
+            <div class="suggested-prompt">Help me prep to discuss boundaries with my partner</div>
+          </div>
+          <div class="input-container">
+            <textarea class="input-field" placeholder="Ask Dobby anything..." rows="1"></textarea>
+            <div class="input-controls">
+              <div class="toggle-group">
+                <button class="toggle-btn active">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                  </svg>
+                  AI
+                </button>
+                <button class="toggle-btn">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  THERAPIST
+                </button>
+              </div>
+              <div class="input-actions">
+                <span class="char-count">0/500</span>
+                <button class="send-btn">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="19" x2="12" y2="5"/>
+                    <polyline points="5 12 12 5 19 12"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================
+         5. SHARE MODAL - LIGHT MODE
+         ============================================ -->
+    <div id="share-light" class="modal-frame light-mode" style="position: relative; background: #FAF8F5;">
+      <div class="modal-backdrop" style="background: rgba(90,90,80,0.25);"></div>
+      <div class="modal-content" style="background: white; box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title" style="color: #5AB9B4;">Share chat</div>
+            <div class="modal-subtitle" style="color: #777;">Only messages up until now will be shared</div>
+          </div>
+          <button class="modal-close" style="color: #888;">
+            <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-options" style="background: #F5F3F0; border: 1px solid #E8E5E0;">
+          <div class="modal-option" style="background: white;">
+            <div class="option-icon" style="background: #F5F3F0; color: #5AB9B4;">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+            <div class="option-text">
+              <div class="option-title" style="color: #5AB9B4; font-weight: 600;">Private</div>
+              <div class="option-desc" style="color: #888;">Only you have access</div>
+            </div>
+            <div class="option-check" style="color: #5AB9B4;">
+              <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+          </div>
+          <div class="modal-option" style="background: transparent;">
+            <div class="option-icon" style="background: white; color: #5AB9B4;">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+            </div>
+            <div class="option-text">
+              <div class="option-title" style="color: #5AB9B4; font-weight: 600;">Public access</div>
+              <div class="option-desc" style="color: #888;">Anyone with the link can view</div>
+            </div>
+            <div class="option-check" style="opacity: 0;">
+              <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="modal-action">
+          <button class="create-link-btn" style="background: #FAF8F5; color: #5AB9B4; border: 1px solid #E5E2DE; font-weight: 600;">Create share link</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================
+         6. SHARE MODAL - DARK MODE
+         ============================================ -->
+    <div id="share-dark" class="modal-frame dark-mode" style="position: relative;">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Share chat</div>
+            <div class="modal-subtitle">Only messages up until now will be shared</div>
+          </div>
+          <button class="modal-close">
+            <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-options">
+          <div class="modal-option">
+            <div class="option-icon">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+            <div class="option-text">
+              <div class="option-title">Private</div>
+              <div class="option-desc">Only you have access</div>
+            </div>
+            <div class="option-check">
+              <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+          </div>
+          <div class="modal-option">
+            <div class="option-icon">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+            </div>
+            <div class="option-text">
+              <div class="option-title">Public access</div>
+              <div class="option-desc">Anyone with the link can view</div>
+            </div>
+            <div class="option-check" style="opacity: 0;">
+              <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="modal-action">
+          <button class="create-link-btn" style="background: #8B6AAE; color: white; border: none;">Create share link</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function showMockup(id) {
+      // Hide all mockups
+      document.querySelectorAll('.mockup-frame, .modal-frame').forEach(frame => {
+        frame.classList.remove('active');
+      });
+      
+      // Show selected mockup
+      document.getElementById(id).classList.add('active');
+      
+      // Update button states
+      document.querySelectorAll('.selector-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>

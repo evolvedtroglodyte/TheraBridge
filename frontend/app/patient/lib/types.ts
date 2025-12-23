@@ -7,6 +7,64 @@
 
 export type MoodType = 'positive' | 'neutral' | 'low';
 
+// Deep Analysis Types (matching backend structure)
+export interface ProgressIndicator {
+  symptom_reduction?: {
+    detected: boolean;
+    description: string;
+    confidence: number;
+  };
+  skill_development?: Array<{
+    skill: string;
+    proficiency: 'beginner' | 'developing' | 'proficient';
+    evidence: string;
+  }>;
+  goal_progress?: Array<{
+    goal: string;
+    status: 'on_track' | 'needs_attention' | 'achieved';
+    evidence: string;
+  }>;
+  behavioral_changes?: string[];
+}
+
+export interface TherapeuticInsights {
+  key_realizations: string[];
+  patterns: string[];
+  growth_areas: string[];
+  strengths: string[];
+}
+
+export interface CopingSkills {
+  learned: string[];
+  proficiency: Record<string, 'beginner' | 'developing' | 'proficient'>;
+  practice_recommendations: string[];
+}
+
+export interface TherapeuticRelationship {
+  engagement_level: 'low' | 'moderate' | 'high';
+  engagement_evidence: string;
+  openness: 'guarded' | 'somewhat_open' | 'very_open';
+  openness_evidence: string;
+  alliance_strength: 'weak' | 'developing' | 'strong';
+  alliance_evidence: string;
+}
+
+export interface Recommendations {
+  practices: string[];
+  resources: string[];
+  reflection_prompts: string[];
+}
+
+export interface DeepAnalysis {
+  progress_indicators: ProgressIndicator;
+  therapeutic_insights: TherapeuticInsights;
+  coping_skills: CopingSkills;
+  therapeutic_relationship: TherapeuticRelationship;
+  recommendations: Recommendations;
+  confidence_score: number;
+  analyzed_at: string;
+}
+
 export interface Session {
   id: string;
   date: string;
@@ -19,6 +77,8 @@ export interface Session {
   milestone?: Milestone;
   transcript?: TranscriptEntry[];
   patientSummary?: string;
+  deep_analysis?: DeepAnalysis;
+  analysis_confidence?: number;
 }
 
 export interface Milestone {

@@ -1,0 +1,1215 @@
+"""
+Therapy Sessions API Router
+Handles session management, transcript upload, and breakthrough detection
+"""
+
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, BackgroundTasks
+from typing import List, Optional
+from pydantic import BaseModel, field_validator
+from datetime import datetime
+import json
+import logging
+
+from app.database import get_db, get_session_with_breakthrough, store_breakthrough_analysis
+from app.services.breakthrough_detector import BreakthroughDetector
+from app.services.mood_analyzer import MoodAnalyzer
+from app.services.topic_extractor import TopicExtractor
+from app.services.analysis_orchestrator import AnalysisOrchestrator, analyze_session_full_pipeline
+from app.services.technique_library import get_technique_library
+from app.config import settings
+from supabase import Client
+
+router = APIRouter(prefix="/api/sessions", tags=["sessions"])
+logger = logging.getLogger(__name__)
+
+
+# ============================================================================
+# Request/Response Models
+# ============================================================================
+
+class SessionCreate(BaseModel):
+    """Request model for creating a new session"""
+    patient_id: str
+    therapist_id: str
+    session_date: datetime
+    duration_minutes: Optional[int] = None
+
+
+class TranscriptUpload(BaseModel):
+    """Request model for uploading a transcript"""
+    transcript: List[dict]  # [{start, end, speaker, text}]
+    audio_file_url: Optional[str] = None
+
+
+class BreakthroughResponse(BaseModel):
+    """Response model for breakthrough detection"""
+    session_id: str
+    has_breakthrough: bool
+    primary_breakthrough: Optional[dict] = None
+    breakthrough_count: int
+    confidence_threshold: float
+    analyzed_at: datetime
+
+
+class MoodAnalysisResponse(BaseModel):
+    """Response model for mood analysis"""
+    session_id: str
+    mood_score: float  # 0.0 to 10.0 (0.5 increments)
+    confidence: float  # 0.0 to 1.0
+    rationale: str
+    key_indicators: List[str]
+    emotional_tone: str
+    analyzed_at: datetime
+
+
+class TopicExtractionResponse(BaseModel):
+    """Response model for topic extraction"""
+    session_id: str
+    topics: List[str]  # 1-2 main topics
+    action_items: List[str]  # 2 action items
+    technique: str  # Primary therapeutic technique
+    summary: str  # Ultra-brief summary (max 150 characters)
+    confidence: float  # 0.0 to 1.0
+    extracted_at: datetime
+
+    @field_validator('summary')
+    @classmethod
+    def validate_summary_length(cls, v: str) -> str:
+        """Ensure summary is within 150-character limit"""
+        if len(v) > 150:
+            raise ValueError(f"Summary exceeds 150 characters: {len(v)} chars")
+        return v
+
+
+class DeepAnalysisResponse(BaseModel):
+    """Response model for deep clinical analysis"""
+    session_id: str
+    analysis: dict  # Complete JSONB analysis structure
+    confidence: float  # 0.0 to 1.0
+    analyzed_at: datetime
+
+
+class PipelineStatusResponse(BaseModel):
+    """Response model for analysis pipeline status"""
+    session_id: str
+    analysis_status: str
+    mood_complete: bool
+    topics_complete: bool
+    breakthrough_complete: bool
+    wave1_complete: bool
+    deep_complete: bool
+    wave1_completed_at: Optional[datetime] = None
+    deep_analyzed_at: Optional[datetime] = None
+
+
+class TechniqueDefinitionResponse(BaseModel):
+    """Response model for technique definition lookup"""
+    technique: str  # Formatted name: "MODALITY - TECHNIQUE"
+    definition: str  # Clinical definition
+
+
+# ============================================================================
+# Session CRUD Endpoints
+# ============================================================================
+
+@router.get("/{session_id}")
+async def get_session(
+    session_id: str,
+    db: Client = Depends(get_db)
+):
+    """
+    Get session by ID with breakthrough details
+
+    Returns:
+        Session object with breakthrough data and history
+    """
+    session = await get_session_with_breakthrough(session_id)
+
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    return session
+
+
+@router.get("/patient/{patient_id}")
+async def get_patient_sessions(
+    patient_id: str,
+    limit: int = 50,
+    include_breakthroughs: bool = True,
+    db: Client = Depends(get_db)
+):
+    """
+    Get all sessions for a patient
+
+    Args:
+        patient_id: Patient UUID
+        limit: Maximum number of sessions to return
+        include_breakthroughs: Include breakthrough details
+
+    Returns:
+        List of sessions
+    """
+    response = (
+        db.table("therapy_sessions")
+        .select("*")
+        .eq("patient_id", patient_id)
+        .order("session_date", desc=True)
+        .limit(limit)
+        .execute()
+    )
+
+    sessions = response.data
+
+    # Optionally fetch breakthrough history for each session
+    if include_breakthroughs:
+        for session in sessions:
+            if session.get("has_breakthrough"):
+                bt_response = (
+                    db.table("breakthrough_history")
+                    .select("*")
+                    .eq("session_id", session["id"])
+                    .order("confidence_score", desc=True)
+                    .execute()
+                )
+                session["all_breakthroughs"] = bt_response.data
+
+    return sessions
+
+
+@router.post("/")
+async def create_session(
+    session: SessionCreate,
+    db: Client = Depends(get_db)
+):
+    """
+    Create a new therapy session
+
+    Returns:
+        Created session object
+    """
+    session_data = {
+        "patient_id": session.patient_id,
+        "therapist_id": session.therapist_id,
+        "session_date": session.session_date.isoformat(),
+        "duration_minutes": session.duration_minutes,
+        "processing_status": "pending",
+    }
+
+    response = db.table("therapy_sessions").insert(session_data).execute()
+
+    if not response.data:
+        raise HTTPException(status_code=500, detail="Failed to create session")
+
+    return response.data[0]
+
+
+# ============================================================================
+# Transcript Upload & Processing
+# ============================================================================
+
+@router.post("/{session_id}/upload-transcript")
+async def upload_transcript(
+    session_id: str,
+    data: TranscriptUpload,
+    background_tasks: BackgroundTasks,
+    db: Client = Depends(get_db)
+):
+    """
+    Upload transcript and trigger breakthrough detection
+
+    This endpoint:
+    1. Stores the transcript in the session
+    2. Triggers breakthrough detection (async if enabled)
+    3. Returns immediately with processing status
+
+    Args:
+        session_id: Session UUID
+        data: Transcript data
+        background_tasks: FastAPI background tasks
+
+    Returns:
+        Session with processing status
+    """
+    # Verify session exists
+    session_response = (
+        db.table("therapy_sessions")
+        .select("id, patient_id")
+        .eq("id", session_id)
+        .single()
+        .execute()
+    )
+
+    if not session_response.data:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    # Update session with transcript
+    update_data = {
+        "transcript": data.transcript,
+        "processing_status": "completed",
+        "updated_at": "now()",
+    }
+
+    if data.audio_file_url:
+        update_data["audio_file_url"] = data.audio_file_url
+
+    db.table("therapy_sessions").update(update_data).eq("id", session_id).execute()
+
+    # Trigger breakthrough detection
+    if settings.breakthrough_auto_analyze:
+        logger.info(f"🔍 Triggering breakthrough detection for session {session_id}")
+
+        # Add to background tasks for async processing
+        background_tasks.add_task(
+            analyze_breakthrough_background,
+            session_id,
+            data.transcript
+        )
+
+        return {
+            "session_id": session_id,
+            "status": "processing",
+            "message": "Transcript uploaded. Breakthrough detection in progress.",
+        }
+    else:
+        return {
+            "session_id": session_id,
+            "status": "completed",
+            "message": "Transcript uploaded successfully.",
+        }
+
+
+@router.post("/{session_id}/upload-audio")
+async def upload_audio_file(
+    session_id: str,
+    audio_file: UploadFile = File(...),
+    background_tasks: BackgroundTasks = None,
+    db: Client = Depends(get_db)
+):
+    """
+    Upload audio file to Supabase Storage
+
+    This endpoint:
+    1. Uploads audio to Supabase storage bucket
+    2. Updates session with audio URL
+    3. Triggers audio transcription pipeline (if configured)
+
+    Args:
+        session_id: Session UUID
+        audio_file: Audio file (mp3, wav, m4a)
+
+    Returns:
+        Session with audio URL
+    """
+    # Validate file type
+    allowed_types = ["audio/mpeg", "audio/wav", "audio/mp4", "audio/x-m4a"]
+    if audio_file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file type. Allowed: {', '.join(allowed_types)}"
+        )
+
+    # Generate unique filename
+    file_extension = audio_file.filename.split(".")[-1]
+    storage_path = f"{session_id}.{file_extension}"
+
+    try:
+        # Read file content
+        file_content = await audio_file.read()
+
+        # Upload to Supabase Storage
+        storage_response = db.storage.from_("audio-sessions").upload(
+            path=storage_path,
+            file=file_content,
+            file_options={"content-type": audio_file.content_type}
+        )
+
+        # Get public URL
+        audio_url = db.storage.from_("audio-sessions").get_public_url(storage_path)
+
+        # Update session
+        db.table("therapy_sessions").update({
+            "audio_file_url": audio_url,
+            "processing_status": "processing",
+            "updated_at": "now()",
+        }).eq("id", session_id).execute()
+
+        logger.info(f"✓ Audio uploaded for session {session_id}")
+
+        return {
+            "session_id": session_id,
+            "audio_url": audio_url,
+            "status": "processing",
+            "message": "Audio uploaded. Transcription in progress.",
+        }
+
+    except Exception as e:
+        logger.error(f"Audio upload failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Audio upload failed: {str(e)}")
+
+
+# ============================================================================
+# Breakthrough Detection Endpoints
+# ============================================================================
+
+@router.post("/{session_id}/analyze-breakthrough")
+async def analyze_breakthrough(
+    session_id: str,
+    force: bool = False,
+    db: Client = Depends(get_db)
+):
+    """
+    Manually trigger breakthrough detection for a session
+
+    Args:
+        session_id: Session UUID
+        force: Force re-analysis even if already analyzed
+
+    Returns:
+        Breakthrough analysis results
+    """
+    # Get session
+    session_response = (
+        db.table("therapy_sessions")
+        .select("*")
+        .eq("id", session_id)
+        .single()
+        .execute()
+    )
+
+    if not session_response.data:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    session = session_response.data
+
+    # Check if already analyzed
+    if session.get("breakthrough_analyzed_at") and not force:
+        return {
+            "session_id": session_id,
+            "status": "already_analyzed",
+            "has_breakthrough": session.get("has_breakthrough", False),
+            "analyzed_at": session.get("breakthrough_analyzed_at"),
+            "breakthrough_data": session.get("breakthrough_data"),
+        }
+
+    # Check transcript exists
+    transcript = session.get("transcript")
+    if not transcript:
+        raise HTTPException(status_code=400, detail="Session has no transcript to analyze")
+
+    # Run breakthrough detection
+    try:
+        logger.info(f"🔍 Analyzing breakthrough for session {session_id}")
+
+        detector = BreakthroughDetector()
+        analysis = detector.analyze_session(
+            transcript=transcript,
+            session_metadata={"session_id": session_id}
+        )
+
+        # Prepare breakthrough data
+        primary_breakthrough = None
+        all_breakthroughs = []
+
+        if analysis.primary_breakthrough:
+            bt = analysis.primary_breakthrough
+            primary_breakthrough = {
+                "type": bt.breakthrough_type,
+                "description": bt.description,
+                "evidence": bt.evidence,
+                "confidence": float(bt.confidence_score),
+                "timestamp_start": float(bt.timestamp_start),
+                "timestamp_end": float(bt.timestamp_end),
+                "dialogue_excerpt": bt.speaker_sequence,
+            }
+
+        for bt in analysis.breakthrough_candidates:
+            all_breakthroughs.append({
+                "type": bt.breakthrough_type,
+                "description": bt.description,
+                "evidence": bt.evidence,
+                "confidence": float(bt.confidence_score),
+                "timestamp_start": float(bt.timestamp_start),
+                "timestamp_end": float(bt.timestamp_end),
+                "dialogue_excerpt": bt.speaker_sequence,
+            })
+
+        # Store results
+        await store_breakthrough_analysis(
+            session_id=session_id,
+            has_breakthrough=analysis.has_breakthrough,
+            primary_breakthrough=primary_breakthrough,
+            all_breakthroughs=all_breakthroughs
+        )
+
+        logger.info(f"✓ Breakthrough analysis complete for session {session_id}")
+
+        return BreakthroughResponse(
+            session_id=session_id,
+            has_breakthrough=analysis.has_breakthrough,
+            primary_breakthrough=primary_breakthrough,
+            breakthrough_count=len(all_breakthroughs),
+            confidence_threshold=settings.breakthrough_min_confidence,
+            analyzed_at=datetime.now()
+        )
+
+    except Exception as e:
+        logger.error(f"Breakthrough detection failed: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Breakthrough detection failed: {str(e)}"
+        )
+
+
+@router.get("/patient/{patient_id}/breakthroughs")
+async def get_patient_breakthroughs(
+    patient_id: str,
+    min_confidence: Optional[float] = None,
+    breakthrough_type: Optional[str] = None,
+    db: Client = Depends(get_db)
+):
+    """
+    Get all breakthroughs for a patient across all sessions
+
+    Args:
+        patient_id: Patient UUID
+        min_confidence: Minimum confidence score filter
+        breakthrough_type: Filter by type (cognitive_insight, etc.)
+
+    Returns:
+        List of breakthroughs with session context
+    """
+    # Build query
+    query = (
+        db.table("breakthrough_history")
+        .select("*, therapy_sessions(session_date, duration_minutes)")
+        .in_("session_id",
+            db.table("therapy_sessions")
+            .select("id")
+            .eq("patient_id", patient_id)
+        )
+    )
+
+    if min_confidence:
+        query = query.gte("confidence_score", min_confidence)
+
+    if breakthrough_type:
+        query = query.eq("breakthrough_type", breakthrough_type)
+
+    response = query.order("created_at", desc=True).execute()
+
+    return response.data
+
+
+@router.get("/patient/{patient_id}/consistency")
+async def get_patient_consistency(
+    patient_id: str,
+    days: int = 90,
+    db: Client = Depends(get_db)
+):
+    """
+    Calculate patient session consistency metrics
+
+    Analyzes session attendance patterns to measure consistency.
+    Assumes weekly sessions (every 7 days) as the "regular" pattern.
+
+    Args:
+        patient_id: Patient UUID
+        days: Number of days to analyze (default: 90)
+
+    Returns:
+        {
+            "consistency_score": 0-100 score,
+            "attendance_rate": percentage of expected weekly sessions attended,
+            "average_gap_days": average days between sessions,
+            "longest_streak_weeks": consecutive weeks with sessions,
+            "missed_weeks": number of weeks without sessions,
+            "weekly_data": chart data for visualization,
+            "total_sessions": count of sessions in period,
+            "period_start": ISO date,
+            "period_end": ISO date
+        }
+    """
+    from datetime import datetime, timedelta
+
+    # Calculate date range
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=days)
+
+    # Fetch sessions in the period
+    response = (
+        db.table("therapy_sessions")
+        .select("id, session_date")
+        .eq("patient_id", patient_id)
+        .gte("session_date", start_date.isoformat())
+        .lte("session_date", end_date.isoformat())
+        .order("session_date", desc=False)
+        .execute()
+    )
+
+    sessions = response.data
+
+    if not sessions:
+        return {
+            "consistency_score": 0,
+            "attendance_rate": 0,
+            "average_gap_days": 0,
+            "longest_streak_weeks": 0,
+            "missed_weeks": 0,
+            "weekly_data": [],
+            "total_sessions": 0,
+            "period_start": start_date.isoformat(),
+            "period_end": end_date.isoformat(),
+        }
+
+    # Parse session dates
+    session_dates = [datetime.fromisoformat(s["session_date"].replace("Z", "+00:00")) for s in sessions]
+
+    # Calculate gaps between sessions
+    gaps = []
+    for i in range(1, len(session_dates)):
+        gap_days = (session_dates[i] - session_dates[i-1]).days
+        gaps.append(gap_days)
+
+    average_gap = sum(gaps) / len(gaps) if gaps else 0
+
+    # Calculate expected weekly sessions
+    weeks_in_period = days / 7
+    expected_sessions = int(weeks_in_period)
+    actual_sessions = len(sessions)
+    attendance_rate = min(100, (actual_sessions / expected_sessions * 100)) if expected_sessions > 0 else 0
+
+    # Calculate weekly attendance for chart (group sessions by week)
+    weekly_data = []
+    current_week_start = start_date
+    week_num = 1
+
+    while current_week_start < end_date:
+        week_end = current_week_start + timedelta(days=7)
+
+        # Count sessions in this week
+        sessions_in_week = sum(
+            1 for date in session_dates
+            if current_week_start <= date < week_end
+        )
+
+        weekly_data.append({
+            "week": f"W{week_num}",
+            "attended": 1 if sessions_in_week > 0 else 0,
+            "session_count": sessions_in_week,
+            "week_start": current_week_start.strftime("%Y-%m-%d"),
+        })
+
+        current_week_start = week_end
+        week_num += 1
+
+    # Calculate longest streak (consecutive weeks with sessions)
+    current_streak = 0
+    longest_streak = 0
+
+    for week in weekly_data:
+        if week["attended"] == 1:
+            current_streak += 1
+            longest_streak = max(longest_streak, current_streak)
+        else:
+            current_streak = 0
+
+    # Count missed weeks
+    missed_weeks = sum(1 for week in weekly_data if week["attended"] == 0)
+
+    # Calculate regularity score (how close gaps are to 7 days)
+    # Tolerance: ±3 days from ideal 7-day interval
+    regularity_scores = []
+    for gap in gaps:
+        deviation = abs(gap - 7)
+        if deviation <= 3:
+            regularity_scores.append(100)  # Perfect
+        elif deviation <= 7:
+            regularity_scores.append(70)   # Good
+        elif deviation <= 14:
+            regularity_scores.append(40)   # Fair
+        else:
+            regularity_scores.append(10)   # Poor
+
+    regularity_score = sum(regularity_scores) / len(regularity_scores) if regularity_scores else 0
+
+    # Calculate overall consistency score (weighted combination)
+    # 40% attendance rate, 40% regularity, 20% streak bonus
+    streak_bonus = min(20, (longest_streak / weeks_in_period) * 20) if weeks_in_period > 0 else 0
+    consistency_score = (
+        (attendance_rate * 0.4) +
+        (regularity_score * 0.4) +
+        streak_bonus
+    )
+    consistency_score = round(min(100, consistency_score), 1)
+
+    return {
+        "consistency_score": consistency_score,
+        "attendance_rate": round(attendance_rate, 1),
+        "average_gap_days": round(average_gap, 1),
+        "longest_streak_weeks": longest_streak,
+        "missed_weeks": missed_weeks,
+        "weekly_data": weekly_data,
+        "total_sessions": actual_sessions,
+        "expected_sessions": expected_sessions,
+        "period_start": start_date.isoformat(),
+        "period_end": end_date.isoformat(),
+    }
+
+
+# ============================================================================
+# Mood Analysis Endpoints
+# ============================================================================
+
+@router.post("/{session_id}/analyze-mood")
+async def analyze_mood(
+    session_id: str,
+    force: bool = False,
+    patient_speaker_id: str = "SPEAKER_01",
+    db: Client = Depends(get_db)
+):
+    """
+    Analyze patient mood from session transcript using AI
+
+    This endpoint:
+    1. Extracts patient dialogue from transcript
+    2. Uses GPT-4o-mini to analyze emotional state
+    3. Returns mood score (0.0-10.0) with rationale and indicators
+    4. Stores mood score in session record
+
+    Args:
+        session_id: Session UUID
+        force: Force re-analysis even if already analyzed
+        patient_speaker_id: Speaker ID for patient (default: SPEAKER_01)
+
+    Returns:
+        MoodAnalysisResponse with mood score and analysis details
+    """
+    # Get session
+    session_response = (
+        db.table("therapy_sessions")
+        .select("*")
+        .eq("id", session_id)
+        .single()
+        .execute()
+    )
+
+    if not session_response.data:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    session = session_response.data
+
+    # Check if already analyzed
+    if session.get("mood_analyzed_at") and not force:
+        return {
+            "session_id": session_id,
+            "status": "already_analyzed",
+            "mood_score": session.get("mood_score"),
+            "analyzed_at": session.get("mood_analyzed_at"),
+            "rationale": session.get("mood_rationale", "Previously analyzed"),
+            "key_indicators": session.get("mood_indicators", []),
+            "emotional_tone": session.get("emotional_tone", ""),
+            "confidence": session.get("mood_confidence", 0.8),
+        }
+
+    # Check transcript exists
+    transcript = session.get("transcript")
+    if not transcript:
+        raise HTTPException(status_code=400, detail="Session has no transcript to analyze")
+
+    # Run mood analysis
+    try:
+        logger.info(f"🎭 Analyzing mood for session {session_id}")
+
+        analyzer = MoodAnalyzer()
+        analysis = analyzer.analyze_session_mood(
+            session_id=session_id,
+            segments=transcript,
+            patient_speaker_id=patient_speaker_id
+        )
+
+        # Update session with mood data
+        db.table("therapy_sessions").update({
+            "mood_score": analysis.mood_score,
+            "mood_confidence": analysis.confidence,
+            "mood_rationale": analysis.rationale,
+            "mood_indicators": analysis.key_indicators,
+            "emotional_tone": analysis.emotional_tone,
+            "mood_analyzed_at": datetime.now().isoformat(),
+            "updated_at": "now()",
+        }).eq("id", session_id).execute()
+
+        logger.info(f"✓ Mood analysis complete for session {session_id}: {analysis.mood_score}/10.0")
+
+        return MoodAnalysisResponse(
+            session_id=session_id,
+            mood_score=analysis.mood_score,
+            confidence=analysis.confidence,
+            rationale=analysis.rationale,
+            key_indicators=analysis.key_indicators,
+            emotional_tone=analysis.emotional_tone,
+            analyzed_at=analysis.analyzed_at
+        )
+
+    except Exception as e:
+        logger.error(f"Mood analysis failed: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Mood analysis failed: {str(e)}"
+        )
+
+
+@router.get("/patient/{patient_id}/mood-history")
+async def get_patient_mood_history(
+    patient_id: str,
+    limit: int = 50,
+    db: Client = Depends(get_db)
+):
+    """
+    Get mood history for a patient across all sessions
+
+    Returns sessions with mood scores for visualization in ProgressPatternsCard
+
+    Args:
+        patient_id: Patient UUID
+        limit: Maximum number of sessions to return
+
+    Returns:
+        List of sessions with mood data sorted by date
+    """
+    response = (
+        db.table("therapy_sessions")
+        .select("id, session_date, mood_score, mood_confidence, emotional_tone")
+        .eq("patient_id", patient_id)
+        .not_.is_("mood_score", "null")  # Only sessions with mood analysis
+        .order("session_date", desc=False)  # Chronological order
+        .limit(limit)
+        .execute()
+    )
+
+    return response.data
+
+
+# ============================================================================
+# Background Task Functions
+# ============================================================================
+
+async def analyze_breakthrough_background(session_id: str, transcript: list):
+    """
+    Background task for breakthrough detection
+    Runs asynchronously without blocking the API response
+    """
+    try:
+        logger.info(f"📊 Background: Starting breakthrough detection for {session_id}")
+
+        detector = BreakthroughDetector()
+        analysis = detector.analyze_session(
+            transcript=transcript,
+            session_metadata={"session_id": session_id}
+        )
+
+        # Prepare data
+        primary_breakthrough = None
+        all_breakthroughs = []
+
+        if analysis.primary_breakthrough:
+            bt = analysis.primary_breakthrough
+            primary_breakthrough = {
+                "type": bt.breakthrough_type,
+                "description": bt.description,
+                "evidence": bt.evidence,
+                "confidence": float(bt.confidence_score),
+                "timestamp_start": float(bt.timestamp_start),
+                "timestamp_end": float(bt.timestamp_end),
+            }
+
+        for bt in analysis.breakthrough_candidates:
+            all_breakthroughs.append({
+                "type": bt.breakthrough_type,
+                "description": bt.description,
+                "evidence": bt.evidence,
+                "confidence": float(bt.confidence_score),
+                "timestamp_start": float(bt.timestamp_start),
+                "timestamp_end": float(bt.timestamp_end),
+                "dialogue_excerpt": bt.speaker_sequence,
+            })
+
+        # Store results
+        await store_breakthrough_analysis(
+            session_id=session_id,
+            has_breakthrough=analysis.has_breakthrough,
+            primary_breakthrough=primary_breakthrough,
+            all_breakthroughs=all_breakthroughs
+        )
+
+        logger.info(f"✓ Background: Breakthrough detection complete for {session_id}")
+
+    except Exception as e:
+        logger.error(f"Background breakthrough detection failed: {e}")
+        # Don't raise - just log the error
+
+
+# ============================================================================
+# Topic Extraction Endpoints
+# ============================================================================
+
+@router.post("/{session_id}/extract-topics")
+async def extract_topics(
+    session_id: str,
+    force: bool = False,
+    db: Client = Depends(get_db)
+):
+    """
+    Extract topics, action items, technique, and summary from session transcript using AI
+
+    This endpoint:
+    1. Analyzes full conversation (both therapist and client)
+    2. Uses GPT-4o-mini to extract structured metadata
+    3. Returns 1-2 topics, 2 action items, primary technique, and 2-sentence summary
+    4. Stores extracted metadata in session record
+
+    Args:
+        session_id: Session UUID
+        force: Force re-extraction even if already extracted
+
+    Returns:
+        TopicExtractionResponse with topics, action items, technique, and summary
+    """
+    # Get session
+    session_response = (
+        db.table("therapy_sessions")
+        .select("*")
+        .eq("id", session_id)
+        .single()
+        .execute()
+    )
+
+    if not session_response.data:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    session = session_response.data
+
+    # Check if already extracted
+    if session.get("topics_extracted_at") and not force:
+        return {
+            "session_id": session_id,
+            "status": "already_extracted",
+            "topics": session.get("topics", []),
+            "action_items": session.get("action_items", []),
+            "technique": session.get("technique", ""),
+            "summary": session.get("summary", ""),
+            "confidence": session.get("extraction_confidence", 0.8),
+            "extracted_at": session.get("topics_extracted_at"),
+        }
+
+    # Check transcript exists
+    transcript = session.get("transcript")
+    if not transcript:
+        raise HTTPException(status_code=400, detail="Session has no transcript to analyze")
+
+    # Run topic extraction
+    try:
+        logger.info(f"📝 Extracting topics for session {session_id}")
+
+        extractor = TopicExtractor()
+        metadata = extractor.extract_metadata(
+            session_id=session_id,
+            segments=transcript
+        )
+
+        # Update session with extracted metadata
+        db.table("therapy_sessions").update({
+            "topics": metadata.topics,
+            "action_items": metadata.action_items,
+            "technique": metadata.technique,
+            "summary": metadata.summary,
+            "extraction_confidence": metadata.confidence,
+            "raw_meta_summary": metadata.raw_meta_summary,
+            "topics_extracted_at": datetime.now().isoformat(),
+            "updated_at": "now()",
+        }).eq("id", session_id).execute()
+
+        logger.info(f"✓ Topic extraction complete for session {session_id}: {len(metadata.topics)} topics")
+
+        return TopicExtractionResponse(
+            session_id=session_id,
+            topics=metadata.topics,
+            action_items=metadata.action_items,
+            technique=metadata.technique,
+            summary=metadata.summary,
+            confidence=metadata.confidence,
+            extracted_at=metadata.extracted_at
+        )
+
+    except Exception as e:
+        logger.error(f"Topic extraction failed: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Topic extraction failed: {str(e)}"
+        )
+
+
+# ============================================================================
+# Deep Analysis & Pipeline Orchestration Endpoints
+# ============================================================================
+
+@router.post("/{session_id}/analyze-full-pipeline")
+async def analyze_full_pipeline(
+    session_id: str,
+    force: bool = False,
+    background_tasks: BackgroundTasks = None,
+    db: Client = Depends(get_db)
+):
+    """
+    Run complete analysis pipeline: Wave 1 (mood, topics, breakthrough) → Wave 2 (deep analysis)
+
+    This endpoint orchestrates the entire analysis process with proper dependency management.
+
+    Args:
+        session_id: Session UUID
+        force: Force re-analysis even if already completed
+        background_tasks: FastAPI background tasks for async processing
+
+    Returns:
+        PipelineStatusResponse with current status
+    """
+    # Verify session exists
+    session_response = (
+        db.table("therapy_sessions")
+        .select("id, transcript")
+        .eq("id", session_id)
+        .single()
+        .execute()
+    )
+
+    if not session_response.data:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    session = session_response.data
+
+    # Check if transcript exists
+    if not session.get("transcript"):
+        raise HTTPException(status_code=400, detail="Session has no transcript to analyze")
+
+    # Add to background tasks for async processing
+    if background_tasks:
+        background_tasks.add_task(
+            run_full_pipeline_background,
+            session_id,
+            force
+        )
+
+        return {
+            "session_id": session_id,
+            "status": "processing",
+            "message": "Full analysis pipeline started. Check status with GET /api/sessions/{id}/analysis-status",
+        }
+    else:
+        # Run synchronously (blocking)
+        try:
+            orchestrator = AnalysisOrchestrator(db=db)
+            status = await orchestrator.process_session_full_pipeline(session_id, force)
+
+            return PipelineStatusResponse(
+                session_id=status.session_id,
+                analysis_status=status.analysis_status,
+                mood_complete=status.mood_complete,
+                topics_complete=status.topics_complete,
+                breakthrough_complete=status.breakthrough_complete,
+                wave1_complete=status.wave1_complete,
+                deep_complete=status.deep_complete,
+                wave1_completed_at=status.wave1_completed_at,
+                deep_analyzed_at=status.deep_analyzed_at
+            )
+
+        except Exception as e:
+            logger.error(f"Full pipeline failed: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Analysis pipeline failed: {str(e)}"
+            )
+
+
+@router.get("/{session_id}/analysis-status")
+async def get_analysis_status(
+    session_id: str,
+    db: Client = Depends(get_db)
+):
+    """
+    Get current status of analysis pipeline for a session
+
+    Returns detailed status including which analyses have completed and any errors.
+
+    Args:
+        session_id: Session UUID
+
+    Returns:
+        Detailed pipeline status with recent logs
+    """
+    try:
+        response = db.rpc("get_analysis_pipeline_status", {"p_session_id": session_id}).execute()
+
+        if not response.data or len(response.data) == 0:
+            raise HTTPException(status_code=404, detail="Session not found")
+
+        return response.data[0]
+
+    except Exception as e:
+        logger.error(f"Failed to get analysis status: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get analysis status: {str(e)}"
+        )
+
+
+@router.post("/{session_id}/analyze-deep")
+async def analyze_deep(
+    session_id: str,
+    force: bool = False,
+    db: Client = Depends(get_db)
+):
+    """
+    Run deep clinical analysis for a session (Wave 2 only)
+
+    **Prerequisites:** All Wave 1 analyses must be complete (mood, topics, breakthrough)
+
+    This endpoint:
+    1. Verifies Wave 1 is complete
+    2. Gathers patient history and context
+    3. Uses GPT-4o to synthesize comprehensive insights
+    4. Returns patient-facing analysis with progress, insights, skills, and recommendations
+
+    Args:
+        session_id: Session UUID
+        force: Force re-analysis even if already analyzed
+
+    Returns:
+        DeepAnalysisResponse with comprehensive clinical insights
+    """
+    # Get session
+    session_response = (
+        db.table("therapy_sessions")
+        .select("*")
+        .eq("id", session_id)
+        .single()
+        .execute()
+    )
+
+    if not session_response.data:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    session = session_response.data
+
+    # Check if already analyzed
+    if session.get("deep_analyzed_at") and not force:
+        return {
+            "session_id": session_id,
+            "status": "already_analyzed",
+            "analysis": session.get("deep_analysis"),
+            "confidence": session.get("analysis_confidence"),
+            "analyzed_at": session.get("deep_analyzed_at"),
+        }
+
+    # Verify Wave 1 is complete
+    orchestrator = AnalysisOrchestrator(db=db)
+    wave1_complete = await orchestrator._is_wave1_complete(session_id)
+
+    if not wave1_complete:
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot run deep analysis: Wave 1 not complete. Run /analyze-full-pipeline first."
+        )
+
+    # Run deep analysis
+    try:
+        logger.info(f"🧠 Running deep analysis for session {session_id}")
+
+        await orchestrator._analyze_deep(session_id, force)
+
+        # Get updated session
+        updated_session = (
+            db.table("therapy_sessions")
+            .select("deep_analysis, analysis_confidence, deep_analyzed_at")
+            .eq("id", session_id)
+            .single()
+            .execute()
+        ).data
+
+        logger.info(f"✓ Deep analysis complete for session {session_id}")
+
+        return DeepAnalysisResponse(
+            session_id=session_id,
+            analysis=updated_session["deep_analysis"],
+            confidence=updated_session["analysis_confidence"],
+            analyzed_at=datetime.fromisoformat(updated_session["deep_analyzed_at"].replace("Z", "+00:00"))
+        )
+
+    except Exception as e:
+        logger.error(f"Deep analysis failed: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Deep analysis failed: {str(e)}"
+        )
+
+
+# ============================================================================
+# Background Task Functions
+# ============================================================================
+
+async def run_full_pipeline_background(session_id: str, force: bool = False):
+    """
+    Background task for full analysis pipeline
+    Runs asynchronously without blocking the API response
+    """
+    try:
+        logger.info(f"📊 Background: Starting full analysis pipeline for {session_id}")
+
+        await analyze_session_full_pipeline(session_id, force)
+
+        logger.info(f"✓ Background: Full pipeline complete for {session_id}")
+
+    except Exception as e:
+        logger.error(f"Background pipeline failed for {session_id}: {e}")
+        # Don't raise - just log the error
+
+
+# ============================================================================
+# Technique Library Endpoints
+# ============================================================================
+
+@router.get("/techniques/{technique_name}/definition", response_model=TechniqueDefinitionResponse)
+async def get_technique_definition(technique_name: str):
+    """
+    Get definition for a clinical technique.
+
+    **Args:**
+    - technique_name: Formatted technique name (e.g., "CBT - Cognitive Restructuring")
+      URL encoding required for special characters (e.g., "CBT%20-%20Cognitive%20Restructuring")
+
+    **Returns:**
+    - JSON with technique name and definition
+
+    **Example:**
+    ```
+    GET /api/sessions/techniques/CBT%20-%20Cognitive%20Restructuring/definition
+    {
+      "technique": "CBT - Cognitive Restructuring",
+      "definition": "The therapeutic process of identifying and challenging..."
+    }
+    ```
+
+    **Errors:**
+    - 404: Technique not found in library
+    """
+    library = get_technique_library()
+    definition = library.get_technique_definition(technique_name)
+
+    if not definition:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Technique '{technique_name}' not found in library"
+        )
+
+    return TechniqueDefinitionResponse(
+        technique=technique_name,
+        definition=definition
+    )

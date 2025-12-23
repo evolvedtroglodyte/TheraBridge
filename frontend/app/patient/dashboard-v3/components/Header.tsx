@@ -11,7 +11,7 @@
  */
 
 import { useState, useRef } from 'react';
-import { useTheme } from '../contexts/ThemeContext';
+import { useTheme } from '@/app/patient/contexts/ThemeContext';
 import { useRouter, usePathname } from 'next/navigation';
 import { CombinedLogo } from '@/components/TheraBridgeLogo';
 
@@ -89,7 +89,7 @@ export function Header({ onAskAIClick }: HeaderProps) {
 
   // Determine active page
   const isSessionsPage = pathname?.includes('/sessions');
-  const isDashboardPage = pathname === '/patient/dashboard-v3';
+  const isDashboardPage = pathname === '/patient';
 
   // Triple-click detection for home icon (dev testing feature) - Sessions page only
   const homeClickCountRef = useRef(0);
@@ -114,7 +114,7 @@ export function Header({ onAskAIClick }: HeaderProps) {
 
     // Single/double click behavior: navigate to dashboard
     if (homeClickCountRef.current === 1) {
-      router.push('/patient/dashboard-v3');
+      router.push('/patient');
     }
 
     // Reset click count after 500ms
@@ -157,7 +157,7 @@ export function Header({ onAskAIClick }: HeaderProps) {
 
   // Navigate to upload page
   const handleUploadClick = () => {
-    router.push('/patient/dashboard-v3/upload');
+    router.push('/patient/upload');
   };
 
   // Navigate to sessions page
@@ -167,14 +167,14 @@ export function Header({ onAskAIClick }: HeaderProps) {
 
   // Navigate to dashboard
   const handleDashboardClick = () => {
-    router.push('/patient/dashboard-v3');
+    router.push('/patient');
   };
 
-  // Sessions page layout: Logo left, empty right (matching Dashboard structure)
+  // Sessions page layout: TheraBridge logo left, Navigation center, Empty right
   if (isSessionsPage) {
     return (
       <header className="sticky top-0 z-50 bg-[#F8F7F4] dark:bg-[#1a1625] border-b border-[#E0DDD8] dark:border-[#3d3548] h-[60px] flex items-center justify-between transition-colors duration-300">
-        {/* Left section - TheraBridge logo */}
+        {/* Left section - TheraBridge logo (fixed width for centering) */}
         <div className="flex items-center pl-6 w-[200px]">
           <CombinedLogo
             iconSize={28}

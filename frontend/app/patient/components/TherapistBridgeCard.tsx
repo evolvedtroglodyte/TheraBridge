@@ -15,6 +15,10 @@ import { therapistBridgeContent } from '../lib/mockData';
 import { modalVariants, backdropVariants } from '../lib/utils';
 import { useModalAccessibility } from '../hooks/useModalAccessibility';
 
+// Font families - matching SessionCard
+const fontSerif = '"Crimson Pro", Georgia, serif';
+const fontSans = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
 export function TherapistBridgeCard() {
   const [isExpanded, setIsExpanded] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -41,17 +45,17 @@ export function TherapistBridgeCard() {
         }}
         transition={{ duration: 0.2 }}
       >
-        <h2 className="text-lg font-light text-gray-800 dark:text-gray-200 mb-6">Therapist Bridge</h2>
+        <h2 style={{ fontFamily: fontSans }} className="text-lg font-light text-gray-800 dark:text-gray-200 mb-6 text-center">Session Bridge</h2>
 
         <div className="space-y-5 flex-1 overflow-hidden">
           {/* Next Session Topics */}
           <div>
-            <h3 className="text-sm font-medium text-[#5AB9B4] dark:text-[#a78bfa] mb-2">Next Session Topics</h3>
+            <h3 style={{ fontFamily: fontSans }} className="text-sm font-medium text-[#5AB9B4] dark:text-[#a78bfa] mb-2">Next Session Topics</h3>
             <ul className="space-y-1">
               {therapistBridgeContent.nextSessionTopics.slice(0, 2).map((topic, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-sm font-light text-gray-700 dark:text-gray-300">
                   <span className="text-[#5AB9B4] dark:text-[#a78bfa] mt-0.5">•</span>
-                  <span>{topic}</span>
+                  <span style={{ fontFamily: fontSerif }}>{topic}</span>
                 </li>
               ))}
             </ul>
@@ -59,12 +63,12 @@ export function TherapistBridgeCard() {
 
           {/* Share Progress */}
           <div>
-            <h3 className="text-sm font-medium text-[#5AB9B4] dark:text-[#a78bfa] mb-2">Share Progress</h3>
+            <h3 style={{ fontFamily: fontSans }} className="text-sm font-medium text-[#5AB9B4] dark:text-[#a78bfa] mb-2">Share Progress</h3>
             <ul className="space-y-1">
               {therapistBridgeContent.shareProgress.slice(0, 2).map((item, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-sm font-light text-gray-700 dark:text-gray-300">
                   <span className="text-[#5AB9B4] dark:text-[#a78bfa] mt-0.5">•</span>
-                  <span>{item}</span>
+                  <span style={{ fontFamily: fontSerif }}>{item}</span>
                 </li>
               ))}
             </ul>
@@ -72,12 +76,12 @@ export function TherapistBridgeCard() {
 
           {/* Session Prep */}
           <div>
-            <h3 className="text-sm font-medium text-[#5AB9B4] dark:text-[#a78bfa] mb-2">Session Prep</h3>
+            <h3 style={{ fontFamily: fontSans }} className="text-sm font-medium text-[#5AB9B4] dark:text-[#a78bfa] mb-2">Session Prep</h3>
             <ul className="space-y-1">
               {therapistBridgeContent.sessionPrep.slice(0, 2).map((item, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-sm font-light text-gray-700 dark:text-gray-300">
                   <span className="text-[#5AB9B4] dark:text-[#a78bfa] mt-0.5">•</span>
-                  <span>{item}</span>
+                  <span style={{ fontFamily: fontSerif }}>{item}</span>
                 </li>
               ))}
             </ul>
@@ -104,7 +108,7 @@ export function TherapistBridgeCard() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="fixed w-[700px] max-h-[80vh] bg-gradient-to-br from-[#FFF5F0] to-[#FFF8F3] dark:from-[#2a2435] dark:to-[#1a1625] rounded-3xl shadow-2xl p-8 z-[1001] overflow-y-auto border-2 border-[#E0DDD8] dark:border-gray-600"
+              className="fixed w-[800px] max-h-[85vh] bg-gradient-to-br from-[#FFF5F0] to-[#FFF8F3] dark:from-[#2a2435] dark:to-[#1a1625] rounded-3xl shadow-2xl p-8 z-[1001] overflow-y-auto border-2 border-[#E0DDD8] dark:border-gray-600"
               role="dialog"
               aria-modal="true"
               aria-labelledby="therapist-bridge-title"
@@ -121,18 +125,23 @@ export function TherapistBridgeCard() {
                 <X className="w-6 h-6 text-gray-600 dark:text-gray-400" />
               </button>
 
-              <h2 className="text-2xl font-light text-gray-800 dark:text-gray-200 mb-6 pr-12">
-                Preparing for Your Next Session
-              </h2>
+              <div className="mb-6 pr-12 text-center">
+                <h2 style={{ fontFamily: fontSans }} className="text-2xl font-medium text-gray-800 dark:text-gray-200 mb-1">
+                  Session Bridge
+                </h2>
+                <p style={{ fontFamily: fontSans }} className="text-sm font-light text-gray-600 dark:text-gray-400">
+                  Preparing for your next session
+                </p>
+              </div>
 
               {/* Next Session Topics */}
               <div className="mb-8">
-                <h3 className="text-base font-semibold text-[#5AB9B4] dark:text-[#a78bfa] mb-4">Conversation Starters</h3>
+                <h3 style={{ fontFamily: fontSans }} className="text-base font-semibold text-[#5AB9B4] dark:text-[#a78bfa] mb-4">Conversation Starters</h3>
                 <ul className="space-y-3">
                   {therapistBridgeContent.nextSessionTopics.map((topic, idx) => (
                     <li key={idx} className="flex items-start gap-3">
                       <span className="w-2 h-2 rounded-full bg-[#5AB9B4] dark:bg-[#a78bfa] mt-2 flex-shrink-0" />
-                      <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{topic}</p>
+                      <p style={{ fontFamily: fontSerif }} className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{topic}</p>
                     </li>
                   ))}
                 </ul>
@@ -140,12 +149,12 @@ export function TherapistBridgeCard() {
 
               {/* Share Progress */}
               <div className="mb-8">
-                <h3 className="text-base font-semibold text-[#5AB9B4] dark:text-[#a78bfa] mb-4">Share Progress with Therapist</h3>
+                <h3 style={{ fontFamily: fontSans }} className="text-base font-semibold text-[#5AB9B4] dark:text-[#a78bfa] mb-4">Share Progress with Therapist</h3>
                 <ul className="space-y-3">
                   {therapistBridgeContent.shareProgress.map((item, idx) => (
                     <li key={idx} className="flex items-start gap-3">
                       <span className="w-2 h-2 rounded-full bg-[#B8A5D6] dark:bg-[#c084fc] mt-2 flex-shrink-0" />
-                      <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{item}</p>
+                      <p style={{ fontFamily: fontSerif }} className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{item}</p>
                     </li>
                   ))}
                 </ul>
@@ -153,12 +162,12 @@ export function TherapistBridgeCard() {
 
               {/* Session Prep */}
               <div>
-                <h3 className="text-base font-semibold text-[#5AB9B4] dark:text-[#a78bfa] mb-4">Session Preparation</h3>
+                <h3 style={{ fontFamily: fontSans }} className="text-base font-semibold text-[#5AB9B4] dark:text-[#a78bfa] mb-4">Session Preparation</h3>
                 <ul className="space-y-3">
                   {therapistBridgeContent.sessionPrep.map((item, idx) => (
                     <li key={idx} className="flex items-start gap-3">
                       <span className="w-2 h-2 rounded-full bg-[#F4A69D] dark:bg-[#f4a69d] mt-2 flex-shrink-0" />
-                      <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{item}</p>
+                      <p style={{ fontFamily: fontSerif }} className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{item}</p>
                     </li>
                   ))}
                 </ul>

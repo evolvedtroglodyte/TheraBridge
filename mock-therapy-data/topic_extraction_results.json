@@ -1,0 +1,211 @@
+{
+  "test_run_at": "2025-12-23T04:37:24.670043",
+  "total_sessions": 12,
+  "successful_extractions": 12,
+  "results": [
+    {
+      "session_id": "session_01_alex_chen",
+      "session_file": "session_01_crisis_intake.json",
+      "topics": [
+        "Moderate to severe depression and anxiety",
+        "Relationship patterns and fear of abandonment"
+      ],
+      "action_items": [
+        "Create a safety plan for managing suicidal thoughts",
+        "Consider scheduling an appointment for ADHD medication evaluation"
+      ],
+      "technique": "CBT - Safety Planning",
+      "summary": "Patient reports severe depression and anxiety, struggling with relationship issues and ADHD symptoms. Safety plan created.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T10:37:01.182691",
+      "raw_meta_summary": "{\n  \"topics\": [\"Moderate to severe depression and anxiety\", \"Relationship patterns and fear of abandonment\"],\n  \"action_items\": [\"Create a safety plan for managing suicidal thoughts\", \"Consider scheduling an appointment for ADHD medication evaluation\"],\n  \"technique\": \"Safety Planning\",\n  \"summary\": \"Patient reports severe depression and anxiety, struggling with relationship issues and ADHD symptoms. Safety plan created.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_02_alex_chen",
+      "session_file": "session_02_emotional_regulation.json",
+      "topics": [
+        "Passive suicidal thoughts and safety planning",
+        "Emotion regulation and distress tolerance using DBT"
+      ],
+      "action_items": [
+        "Practice TIPP skills during emotional distress",
+        "Consider taking a break from social media to avoid triggers"
+      ],
+      "technique": "DBT - TIPP Skills",
+      "summary": "Client managing passive suicidal thoughts. Introduced TIPP skills for emotional regulation during distress.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T10:37:03.111780",
+      "raw_meta_summary": "{\n  \"topics\": [\"Passive suicidal thoughts and safety planning\", \"Emotion regulation and distress tolerance using DBT\"],\n  \"action_items\": [\"Practice TIPP skills during emotional distress\", \"Consider taking a break from social media to avoid triggers\"],\n  \"technique\": \"TIPP Skills\",\n  \"summary\": \"Client managing passive suicidal thoughts. Introduced TIPP skills for emotional regulation during distress.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_03_alex_chen",
+      "session_file": "session_03_adhd_discovery.json",
+      "topics": [
+        "ADHD symptoms and executive function challenges",
+        "Impact of untreated ADHD on depression and anxiety"
+      ],
+      "action_items": [
+        "Schedule psychiatric evaluation for ADHD medication",
+        "Keep an ADHD symptom journal tracking attention and impulsivity"
+      ],
+      "technique": "Other - Psychoeducation",
+      "summary": "Client realizes ADHD impacts depression. Assigned symptom journal and referral for medication evaluation.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T10:37:05.593413",
+      "raw_meta_summary": "{\n  \"topics\": [\"ADHD symptoms and executive function challenges\", \"Impact of untreated ADHD on depression and anxiety\"],\n  \"action_items\": [\"Schedule psychiatric evaluation for ADHD medication\", \"Keep an ADHD symptom journal tracking attention and impulsivity\"],\n  \"technique\": \"Psychoeducation\",\n  \"summary\": \"Client realizes ADHD impacts depression. Assigned symptom journal and referral for medication evaluation.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_04_alex_chen",
+      "session_file": "session_04_medication_start.json",
+      "topics": [
+        "ADHD medication effects and side effects",
+        "Grief over recent breakup and feelings of loneliness"
+      ],
+      "action_items": [
+        "Continue setting alarms to remind self to eat",
+        "Practice reframing negative beliefs about self-worth"
+      ],
+      "technique": "CBT - Cognitive Restructuring",
+      "summary": "Client reports improved focus from medication but struggles with loneliness and grief over breakup. Discussed reframing thoughts.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T10:37:07.284161",
+      "raw_meta_summary": "{\n  \"topics\": [\"ADHD medication effects and side effects\", \"Grief over recent breakup and feelings of loneliness\"],\n  \"action_items\": [\"Continue setting alarms to remind self to eat\", \"Practice reframing negative beliefs about self-worth\"],\n  \"technique\": \"Cognitive Restructuring\",\n  \"summary\": \"Client reports improved focus from medication but struggles with loneliness and grief over breakup. Discussed reframing thoughts.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_05_alex_chen",
+      "session_file": "session_05_family_conflict.json",
+      "topics": [
+        "Family conflict and cultural expectations regarding mental health",
+        "Internalized beliefs about self-worth and authenticity"
+      ],
+      "action_items": [
+        "Practice loving-kindness meditation for self and family",
+        "Reflect on thoughts of being weak and broken to promote cognitive defusion"
+      ],
+      "technique": "ACT - Cognitive Defusion",
+      "summary": "Client struggles with family conflict over therapy. Explored cognitive defusion and self-acceptance strategies.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T10:37:09.846681",
+      "raw_meta_summary": "{\n  \"topics\": [\"Family conflict and cultural expectations regarding mental health\", \"Internalized beliefs about self-worth and authenticity\"],\n  \"action_items\": [\"Practice loving-kindness meditation for self and family\", \"Reflect on thoughts of being weak and broken to promote cognitive defusion\"],\n  \"technique\": \"Cognitive Defusion\",\n  \"summary\": \"Client struggles with family conflict over therapy. Explored cognitive defusion and self-acceptance strategies.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_06_alex_chen",
+      "session_file": "session_06_spring_break_hope.json",
+      "topics": [
+        "ADHD medication adjustment",
+        "Mindfulness and emotional regulation"
+      ],
+      "action_items": [
+        "Continue daily meditation practice",
+        "Try one new social activity in Portland"
+      ],
+      "technique": "Mindfulness-Based - Mindfulness Meditation",
+      "summary": "Client reports improved focus and emotional regulation. Assigned meditation and social engagement tasks.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T10:37:11.627439",
+      "raw_meta_summary": "{\n  \"topics\": [\"ADHD medication adjustment\", \"Mindfulness and emotional regulation\"],\n  \"action_items\": [\"Continue daily meditation practice\", \"Try one new social activity in Portland\"],\n  \"technique\": \"Mindfulness Meditation\",\n  \"summary\": \"Client reports improved focus and emotional regulation. Assigned meditation and social engagement tasks.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_07_alex_chen",
+      "session_file": "session_07_dating_anxiety.json",
+      "topics": [
+        "Anxious attachment patterns in relationships",
+        "Managing anxiety related to dating"
+      ],
+      "action_items": [
+        "Practice sitting with anxiety without acting on it",
+        "Keep a journal about attachment patterns and triggers"
+      ],
+      "technique": "ACT - Acceptance",
+      "summary": "Client explores anxious attachment and coping with dating anxiety. Assigned journaling and anxiety acceptance practice.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T10:37:13.593179",
+      "raw_meta_summary": "{\n  \"topics\": [\"Anxious attachment patterns in relationships\", \"Managing anxiety related to dating\"],\n  \"action_items\": [\"Practice sitting with anxiety without acting on it\", \"Keep a journal about attachment patterns and triggers\"],\n  \"technique\": \"Acceptance\",\n  \"summary\": \"Client explores anxious attachment and coping with dating anxiety. Assigned journaling and anxiety acceptance practice.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_08_alex_chen",
+      "session_file": "session_08_relationship_boundaries.json",
+      "topics": [
+        "Anxious attachment patterns in romantic relationships",
+        "DBT interpersonal effectiveness skills"
+      ],
+      "action_items": [
+        "Practice DEAR MAN with Jordan about needing research time",
+        "Continue using TIPP skills for anxiety management"
+      ],
+      "technique": "DBT - DEAR MAN",
+      "summary": "Client navigates anxious attachment and practices boundary-setting with DEAR MAN framework for relationship balance.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T10:37:15.990804",
+      "raw_meta_summary": "{\n  \"topics\": [\"Anxious attachment patterns in romantic relationships\", \"DBT interpersonal effectiveness skills\"],\n  \"action_items\": [\"Practice DEAR MAN with Jordan about needing research time\", \"Continue using TIPP skills for anxiety management\"],\n  \"technique\": \"DEAR MAN\",\n  \"summary\": \"Client navigates anxious attachment and practices boundary-setting with DEAR MAN framework for relationship balance.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_09_alex_chen",
+      "session_file": "session_09_coming_out_preparation.json",
+      "topics": [
+        "Coming out to parents and identity acceptance",
+        "Relationship stability and secure attachment"
+      ],
+      "action_items": [
+        "Write a letter to parents to organize thoughts",
+        "Practice coming out with a friend in a role play"
+      ],
+      "technique": "ACT - Values Clarification",
+      "summary": "Client exploring coming out to parents, aligning actions with values of authenticity and connection.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T10:37:17.765864",
+      "raw_meta_summary": "{\n  \"topics\": [\"Coming out to parents and identity acceptance\", \"Relationship stability and secure attachment\"],\n  \"action_items\": [\"Write a letter to parents to organize thoughts\", \"Practice coming out with a friend in a role play\"],\n  \"technique\": \"Values Clarification\",\n  \"summary\": \"Client exploring coming out to parents, aligning actions with values of authenticity and connection.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_10_alex_chen",
+      "session_file": "session_10_coming_out_aftermath.json",
+      "topics": [
+        "Coming out to parents and their negative reaction",
+        "Grief and identity struggle related to family acceptance"
+      ],
+      "action_items": [
+        "Reflect on feelings of anger and guilt towards parents",
+        "Practice self-care strategies to manage grief and physical symptoms"
+      ],
+      "technique": "Other - Validation",
+      "summary": "Client expressed grief and anger after coming out to unsupportive parents. Explored feelings and coping strategies.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T10:37:20.336513",
+      "raw_meta_summary": "{\n  \"topics\": [\"Coming out to parents and their negative reaction\", \"Grief and identity struggle related to family acceptance\"],\n  \"action_items\": [\"Reflect on feelings of anger and guilt towards parents\", \"Practice self-care strategies to manage grief and physical symptoms\"],\n  \"technique\": \"Validation\",\n  \"summary\": \"Client expressed grief and anger after coming out to unsupportive parents. Explored feelings and coping strategies.\" ,\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_11_alex_chen",
+      "session_file": "session_11_rebuilding.json",
+      "topics": [
+        "Parental acceptance and identity validation",
+        "Mindfulness and cognitive defusion"
+      ],
+      "action_items": [
+        "Continue attending the LGBTQ+ support group weekly",
+        "Maintain daily gratitude journal with three entries each night"
+      ],
+      "technique": "ACT - Cognitive Defusion",
+      "summary": "Client processing parental acceptance. Practicing mindfulness and gratitude, experiencing emotional growth and agency.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T10:37:23.001976",
+      "raw_meta_summary": "{\n  \"topics\": [\"Parental acceptance and identity validation\", \"Mindfulness and cognitive defusion\"],\n  \"action_items\": [\"Continue attending the LGBTQ+ support group weekly\", \"Maintain daily gratitude journal with three entries each night\"],\n  \"technique\": \"Cognitive Defusion\",\n  \"summary\": \"Client processing parental acceptance. Practicing mindfulness and gratitude, experiencing emotional growth and agency.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_12_alex_chen",
+      "session_file": "session_12_thriving.json",
+      "topics": [
+        "Imposter syndrome and self-acceptance",
+        "Relationship dynamics and emotional regulation"
+      ],
+      "action_items": [
+        "Create a wellness action plan detailing coping strategies and warning signs",
+        "Continue mentoring LGBTQ+ students"
+      ],
+      "technique": "CBT - Cognitive Restructuring",
+      "summary": "Patient celebrates publication acceptance, manages anxiety, and discusses family dynamics. Progress evident in coping skills.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T10:37:24.669495",
+      "raw_meta_summary": "{\n  \"topics\": [\"Imposter syndrome and self-acceptance\", \"Relationship dynamics and emotional regulation\"],\n  \"action_items\": [\"Create a wellness action plan detailing coping strategies and warning signs\", \"Continue mentoring LGBTQ+ students\"],\n  \"technique\": \"Cognitive Restructuring\",\n  \"summary\": \"Patient celebrates publication acceptance, manages anxiety, and discusses family dynamics. Progress evident in coping skills.\",\n  \"confidence\": 0.9\n}"
+    }
+  ]
+}

@@ -25,18 +25,11 @@ export function SessionsSidebar() {
 
   return (
     <div className={`${bgColor} border-r ${borderColor} flex flex-col w-[60px] flex-shrink-0`}>
-      {/* Header - TheraBridge Logo */}
-      <div className="flex items-center h-14 px-4 justify-center">
-        <div className={isDark ? 'text-[#8B6AAE]' : 'text-[#5AB9B4]'}>
-          <BridgeIcon size={28} />
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <div className="flex-1 px-2 flex flex-col gap-2 overflow-visible items-center">
+      {/* Navigation - starts below header with vertical spacing */}
+      <div className="flex-1 px-2 pt-8 flex flex-col gap-8 overflow-visible items-center">
         {/* Home Button */}
         <button
-          onClick={() => router.push('/patient/dashboard-v3')}
+          onClick={() => router.push('/patient')}
           className={`relative flex items-center gap-3 rounded-lg transition-colors ${hoverBg} w-10 h-10 justify-center group`}
         >
           <svg

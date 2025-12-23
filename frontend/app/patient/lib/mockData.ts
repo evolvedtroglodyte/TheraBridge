@@ -192,7 +192,7 @@ export const tasks: Task[] = [
 
 export const progressMetrics: ProgressMetric[] = [
   {
-    title: 'Mood Trend',
+    title: 'Mood Trends',
     description: 'Session-by-session mood tracking',
     emoji: '📈',
     insight: '+30% mood improvement over 10 sessions',

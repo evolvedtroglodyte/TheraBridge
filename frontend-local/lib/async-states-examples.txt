@@ -1,0 +1,136 @@
+ASYNC-STATES.TS - USAGE EXAMPLES
+=================================
+
+This file contains discriminated union types and helper functions for managing async loading states.
+
+CORE TYPES:
+-----------
+AsyncState<T, E = Error> - A discriminated union with 4 possible states:
+  - { status: 'idle' }                    // Initial/unstarted state
+  - { status: 'loading' }                 // Request in progress
+  - { status: 'success'; data: T }        // Successful completion with data
+  - { status: 'error'; error: E }         // Failed with error
+
+BASIC USAGE:
+------------
+
+1. Creating states:
+   const state1 = idle<User>();
+   const state2 = loading<User>();
+   const state3 = success({ id: '1', name: 'John' });
+   const state4 = error(new Error('Failed to fetch'));
+
+2. Type guards (automatic TypeScript narrowing):
+   if (isLoading(state)) { /* state is { status: 'loading' } */ }
+   if (isSuccess(state)) { /* state.data is available */ }
+   if (isError(state)) { /* state.error is available */ }
+   if (isPending(state)) { /* idle or loading */ }
+   if (isSettled(state)) { /* success or error (final state) */ }
+
+3. Extracting data:
+   const data = getData(state);              // Returns T | undefined
+   const error = getError(state);            // Returns E | undefined
+   const message = getErrorMessage(state);   // Returns string error message
+
+REACT HOOK PATTERN:
+-------------------
+
+Custom hook example:
+  function useUser(userId: string) {
+    const [state, setState] = useState<AsyncState<User>>(() => idle());
+
+    useEffect(() => {
+      setState(loading());
+      fetchUser(userId)
+        .then(data => setState(success(data)))
+        .catch(err => setState(error(err)));
+    }, [userId]);
+
+    return state;
+  }
+
+  // Usage in component:
+  const userState = useUser('123');
+
+  return match(userState, {
+    idle: () => <p>Enter a user ID</p>,
+    loading: () => <Spinner />,
+    success: (user) => <UserCard user={user} />,
+    error: (err) => <ErrorAlert message={err.message} />,
+  });
+
+COMBINING MULTIPLE STATES:
+---------------------------
+
+  const userState = useUser('123');
+  const postsState = usePosts('123');
+  const commentsState = useComments('123');
+
+  // Combine all states
+  const combined = combine([userState, postsState, commentsState]);
+
+  if (isSuccess(combined)) {
+    const [user, posts, comments] = combined.data;
+    // All data is available
+  }
+
+TRANSFORMING DATA:
+------------------
+
+  // Map success data
+  const userNames = map(userState, user => user.name);
+
+  // Chain transformations
+  const userEmails = flatMap(userState, user =>
+    success(user.email)
+  );
+
+RETRY LOGIC:
+------------
+
+  async function handleRetry() {
+    const newState = await retryAsync(state, () =>
+      fetchUser(userId)
+    );
+    setState(newState);
+  }
+
+PRESERVING DATA DURING REFETCH:
+-------------------------------
+
+  // Keep old data visible while refetching
+  const cachedState = preserveData(
+    previousState,
+    { status: 'loading' }
+  );
+
+  // Later, get data (uses cache if available)
+  const dataToDisplay = getDataOrCached(cachedState);
+
+ADVANCED EXECUTOR PATTERN:
+--------------------------
+
+  const { execute } = createAsyncExecutor(fetchUser);
+
+  async function loadUser(id: string) {
+    const state = await execute(id);
+    setState(state);
+  }
+
+KEY BENEFITS:
+-------------
+1. Type-safe: TypeScript narrows types in each case
+2. Exhaustive: match() forces handling all cases
+3. Composable: combine(), map(), flatMap() for complex scenarios
+4. UX-friendly: preserveData() for optimistic updates
+5. Testable: Pure functions, no side effects
+6. Performance: Discriminated unions prevent invalid state combinations
+
+FILES THAT MIGHT USE THIS:
+--------------------------
+- Custom React hooks for API calls
+- Components using useAsync or useReducer
+- State management (Redux, Zustand, etc.)
+- API client wrappers
+- Form submission handlers
+- Data fetching components

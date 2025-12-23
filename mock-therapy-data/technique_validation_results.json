@@ -1,0 +1,285 @@
+{
+  "test_run_at": "2025-12-22T22:26:55.446571",
+  "total_sessions": 12,
+  "validation_enabled": true,
+  "results": [
+    {
+      "session_id": "session_01_alex_chen",
+      "session_file": "session_01_crisis_intake.json",
+      "topics": [
+        "Moderate to severe depression and generalized anxiety",
+        "ADHD management and treatment options"
+      ],
+      "action_items": [
+        "Create a safety plan with a list of supportive contacts",
+        "Consider scheduling an appointment for ADHD medication evaluation"
+      ],
+      "technique": "CBT - Safety Planning",
+      "summary": "Patient is experiencing moderate to severe depression and generalized anxiety, exacerbated by a recent breakup and academic pressures. Therapist emphasized the importance of a safety plan and discussed potential ADHD treatment options to help manage symptoms.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T04:26:19.376446",
+      "raw_meta_summary": "{\n  \"topics\": [\"Moderate to severe depression and generalized anxiety\", \"ADHD management and treatment options\"],\n  \"action_items\": [\"Create a safety plan with a list of supportive contacts\", \"Consider scheduling an appointment for ADHD medication evaluation\"],\n  \"technique\": \"Safety Planning\",\n  \"summary\": \"Patient is experiencing moderate to severe depression and generalized anxiety, exacerbated by a recent breakup and academic pressures. Therapist emphasized the importance of a safety plan and discussed potential ADHD treatment options to help manage symptoms.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_02_alex_chen",
+      "session_file": "session_02_emotional_regulation.json",
+      "topics": [
+        "Passive suicidal thoughts and safety planning",
+        "Emotional regulation and coping strategies for grief"
+      ],
+      "action_items": [
+        "Practice TIPP skills during moments of emotional distress",
+        "Consider taking a break from social media to avoid triggers"
+      ],
+      "technique": "DBT - TIPP Skills",
+      "summary": "Client continues to experience passive suicidal thoughts but feels somewhat reassured by the safety plan discussed. Therapist introduced TIPP skills to help manage acute emotional distress and encouraged the client to consider avoiding social media triggers related to their recent breakup.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T04:26:22.153983",
+      "raw_meta_summary": "{\n  \"topics\": [\"Passive suicidal thoughts and safety planning\", \"Emotional regulation and coping strategies for grief\"],\n  \"action_items\": [\"Practice TIPP skills during moments of emotional distress\", \"Consider taking a break from social media to avoid triggers\"],\n  \"technique\": \"TIPP Skills\",\n  \"summary\": \"Client continues to experience passive suicidal thoughts but feels somewhat reassured by the safety plan discussed. Therapist introduced TIPP skills to help manage acute emotional distress and encouraged the client to consider avoiding social media triggers related to their recent breakup.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_03_alex_chen",
+      "session_file": "session_03_adhd_discovery.json",
+      "topics": [
+        "ADHD symptoms and management",
+        "Impact of untreated ADHD on depression and anxiety"
+      ],
+      "action_items": [
+        "Schedule a psychiatric evaluation for medication options",
+        "Keep an ADHD symptom journal tracking attention issues and emotional regulation"
+      ],
+      "technique": "Other - Psychoeducation",
+      "summary": "Client is experiencing significant challenges related to untreated ADHD, which is exacerbating feelings of depression and anxiety. The therapist provided education on ADHD's impact and discussed treatment options, including medication and behavioral strategies.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T04:26:25.744178",
+      "raw_meta_summary": "{\n  \"topics\": [\"ADHD symptoms and management\", \"Impact of untreated ADHD on depression and anxiety\"],\n  \"action_items\": [\"Schedule a psychiatric evaluation for medication options\", \"Keep an ADHD symptom journal tracking attention issues and emotional regulation\"],\n  \"technique\": \"Psychoeducation\",\n  \"summary\": \"Client is experiencing significant challenges related to untreated ADHD, which is exacerbating feelings of depression and anxiety. The therapist provided education on ADHD's impact and discussed treatment options, including medication and behavioral strategies.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_04_alex_chen",
+      "session_file": "session_04_medication_start.json",
+      "topics": [
+        "ADHD medication effects and side effects",
+        "Grief and loneliness related to recent breakup"
+      ],
+      "action_items": [
+        "Continue setting alarms to remind self to eat",
+        "Reflect on what self-love looks like and practice self-compassion"
+      ],
+      "technique": "CBT - Cognitive Restructuring",
+      "summary": "Client reports positive effects from ADHD medication, including improved focus, but struggles with emotional side effects and feelings of loneliness on Valentine's Day. Therapist encourages reframing negative beliefs about being unlovable and exploring self-compassion practices.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T04:26:29.828800",
+      "raw_meta_summary": "{\n  \"topics\": [\"ADHD medication effects and side effects\", \"Grief and loneliness related to recent breakup\"],\n  \"action_items\": [\"Continue setting alarms to remind self to eat\", \"Reflect on what self-love looks like and practice self-compassion\"],\n  \"technique\": \"Cognitive Restructuring\",\n  \"summary\": \"Client reports positive effects from ADHD medication, including improved focus, but struggles with emotional side effects and feelings of loneliness on Valentine's Day. Therapist encourages reframing negative beliefs about being unlovable and exploring self-compassion practices.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_05_alex_chen",
+      "session_file": "session_05_family_conflict.json",
+      "topics": [
+        "Family conflict regarding mental health and therapy",
+        "Cognitive fusion and self-identity issues"
+      ],
+      "action_items": [
+        "Practice a loving-kindness meditation for self and family",
+        "Engage in cognitive defusion exercises to distance from negative self-thoughts"
+      ],
+      "technique": "ACT - Cognitive Defusion",
+      "summary": "Client is struggling with family conflict surrounding their mental health treatment, feeling invalidated and burdened by their parents' reactions. The therapist introduced cognitive defusion to help the client distance themselves from negative self-perceptions and encouraged practicing loving-kindness meditation as a form of self-compassion.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T04:26:34.238836",
+      "raw_meta_summary": "{\n  \"topics\": [\"Family conflict regarding mental health and therapy\", \"Cognitive fusion and self-identity issues\"],\n  \"action_items\": [\"Practice a loving-kindness meditation for self and family\", \"Engage in cognitive defusion exercises to distance from negative self-thoughts\"],\n  \"technique\": \"Cognitive Defusion\",\n  \"summary\": \"Client is struggling with family conflict surrounding their mental health treatment, feeling invalidated and burdened by their parents' reactions. The therapist introduced cognitive defusion to help the client distance themselves from negative self-perceptions and encouraged practicing loving-kindness meditation as a form of self-compassion.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_06_alex_chen",
+      "session_file": "session_06_spring_break_hope.json",
+      "topics": [
+        "ADHD medication adjustment and its impact on focus",
+        "Mindfulness practice and emotional regulation"
+      ],
+      "action_items": [
+        "Continue daily meditation practice",
+        "Try one new social activity while in Portland"
+      ],
+      "technique": "Mindfulness-Based - Mindfulness Meditation",
+      "summary": "Patient reports significant improvement in focus and academic performance following an adjustment in ADHD medication. The therapist reinforces the patient's progress in mindfulness practices and emotional regulation, encouraging continued engagement in social activities.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T04:26:36.695326",
+      "raw_meta_summary": "{\n  \"topics\": [\"ADHD medication adjustment and its impact on focus\", \"Mindfulness practice and emotional regulation\"],\n  \"action_items\": [\"Continue daily meditation practice\", \"Try one new social activity while in Portland\"],\n  \"technique\": \"Mindfulness Meditation\",\n  \"summary\": \"Patient reports significant improvement in focus and academic performance following an adjustment in ADHD medication. The therapist reinforces the patient's progress in mindfulness practices and emotional regulation, encouraging continued engagement in social activities.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_07_alex_chen",
+      "session_file": "session_07_dating_anxiety.json",
+      "topics": [
+        "Anxious attachment patterns and fear of abandonment",
+        "Impact of anxiety on relationship dynamics"
+      ],
+      "action_items": [
+        "Practice sitting with anxiety without acting on it",
+        "Keep a journal about attachment patterns and triggers"
+      ],
+      "technique": "ACT - Acceptance",
+      "summary": "Client is experiencing anxiety related to a new romantic interest, triggering old patterns of anxious attachment and fear of abandonment. The therapist introduced the concept of acceptance and strategies to manage anxiety while also suggesting journaling to track triggers and responses.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T04:26:39.323319",
+      "raw_meta_summary": "{\n  \"topics\": [\"Anxious attachment patterns and fear of abandonment\", \"Impact of anxiety on relationship dynamics\"],\n  \"action_items\": [\"Practice sitting with anxiety without acting on it\", \"Keep a journal about attachment patterns and triggers\"],\n  \"technique\": \"Acceptance\",\n  \"summary\": \"Client is experiencing anxiety related to a new romantic interest, triggering old patterns of anxious attachment and fear of abandonment. The therapist introduced the concept of acceptance and strategies to manage anxiety while also suggesting journaling to track triggers and responses.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_08_alex_chen",
+      "session_file": "session_08_relationship_boundaries.json",
+      "topics": [
+        "Anxious attachment patterns in romantic relationships",
+        "DBT skills for interpersonal effectiveness"
+      ],
+      "action_items": [
+        "Practice having a boundary conversation with Jordan using DEAR MAN",
+        "Schedule time for research on Tuesday and Thursday nights"
+      ],
+      "technique": "DBT - DEAR MAN",
+      "summary": "Client is navigating anxious attachment patterns in their new relationship with Jordan, expressing fears of vulnerability and abandonment. They practiced using the DEAR MAN technique to communicate their need for personal space while maintaining the relationship's health.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T04:26:42.791766",
+      "raw_meta_summary": "{\n  \"topics\": [\"Anxious attachment patterns in romantic relationships\", \"DBT skills for interpersonal effectiveness\"],\n  \"action_items\": [\"Practice having a boundary conversation with Jordan using DEAR MAN\", \"Schedule time for research on Tuesday and Thursday nights\"],\n  \"technique\": \"DEAR MAN\",\n  \"summary\": \"Client is navigating anxious attachment patterns in their new relationship with Jordan, expressing fears of vulnerability and abandonment. They practiced using the DEAR MAN technique to communicate their need for personal space while maintaining the relationship's health.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_09_alex_chen",
+      "session_file": "session_09_coming_out_preparation.json",
+      "topics": [
+        "Coming out to parents about non-binary identity",
+        "Navigating relationship dynamics with Jordan"
+      ],
+      "action_items": [
+        "Write a letter to parents to organize thoughts",
+        "Practice coming out with a friend through role play"
+      ],
+      "technique": "ACT - Values Clarification",
+      "summary": "Client is preparing to come out to their parents about their non-binary identity and relationship with Jordan, expressing fears of rejection and cultural implications. Therapist utilizes values clarification to help the client align their decision with their core values of authenticity and connection, while also providing practical strategies for the conversation.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T04:26:46.241333",
+      "raw_meta_summary": "{\n  \"topics\": [\"Coming out to parents about non-binary identity\", \"Navigating relationship dynamics with Jordan\"],\n  \"action_items\": [\"Write a letter to parents to organize thoughts\", \"Practice coming out with a friend through role play\"],\n  \"technique\": \"Values Clarification\",\n  \"summary\": \"Client is preparing to come out to their parents about their non-binary identity and relationship with Jordan, expressing fears of rejection and cultural implications. Therapist utilizes values clarification to help the client align their decision with their core values of authenticity and connection, while also providing practical strategies for the conversation.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_10_alex_chen",
+      "session_file": "session_10_coming_out_aftermath.json",
+      "topics": [
+        "Coming out to parents and familial rejection",
+        "Grief and identity validation"
+      ],
+      "action_items": [
+        "Practice self-care routines to manage grief",
+        "Reflect on feelings of anger and guilt in a journal"
+      ],
+      "technique": "Other - Validation",
+      "summary": "Client is experiencing significant grief and anger following a painful coming out experience with their parents, who have reacted with rejection. Therapist emphasizes the importance of self-care and validates the client's feelings while encouraging reflection on their emotions.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T04:26:49.452208",
+      "raw_meta_summary": "{\n  \"topics\": [\"Coming out to parents and familial rejection\", \"Grief and identity validation\"],\n  \"action_items\": [\"Practice self-care routines to manage grief\", \"Reflect on feelings of anger and guilt in a journal\"],\n  \"technique\": \"Validation\",\n  \"summary\": \"Client is experiencing significant grief and anger following a painful coming out experience with their parents, who have reacted with rejection. Therapist emphasizes the importance of self-care and validates the client's feelings while encouraging reflection on their emotions.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_11_alex_chen",
+      "session_file": "session_11_rebuilding.json",
+      "topics": [
+        "Family acceptance and identity exploration",
+        "Mindfulness and emotional regulation"
+      ],
+      "action_items": [
+        "Continue attending the LGBTQ+ support group every Tuesday",
+        "Maintain the gratitude journal by listing three things each night"
+      ],
+      "technique": "ACT - Cognitive Defusion",
+      "summary": "Client is processing their parents' gradual acceptance of their identity while recognizing the importance of community support. Mindfulness practices are helping the client observe their thoughts without being overwhelmed, fostering a sense of agency and resilience.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T04:26:52.172276",
+      "raw_meta_summary": "{\n  \"topics\": [\"Family acceptance and identity exploration\", \"Mindfulness and emotional regulation\"],\n  \"action_items\": [\"Continue attending the LGBTQ+ support group every Tuesday\", \"Maintain the gratitude journal by listing three things each night\"],\n  \"technique\": \"Cognitive Defusion\",\n  \"summary\": \"Client is processing their parents' gradual acceptance of their identity while recognizing the importance of community support. Mindfulness practices are helping the client observe their thoughts without being overwhelmed, fostering a sense of agency and resilience.\",\n  \"confidence\": 0.9\n}"
+    },
+    {
+      "session_id": "session_12_alex_chen",
+      "session_file": "session_12_thriving.json",
+      "topics": [
+        "Imposter syndrome and academic achievement",
+        "Relationship dynamics and emotional regulation"
+      ],
+      "action_items": [
+        "Create a wellness action plan outlining healthy practices and warning signs",
+        "Continue mentoring LGBTQ+ students to reinforce personal growth"
+      ],
+      "technique": "CBT - Cognitive Restructuring",
+      "summary": "Client demonstrates significant progress in managing imposter syndrome and anxiety, evidenced by a first-author publication and improved relationship dynamics. Therapist encourages the client to create a wellness action plan and maintain coping strategies to prevent relapse.",
+      "confidence": 0.9,
+      "extracted_at": "2025-12-23T04:26:55.446256",
+      "raw_meta_summary": "{\n  \"topics\": [\"Imposter syndrome and academic achievement\", \"Relationship dynamics and emotional regulation\"],\n  \"action_items\": [\"Create a wellness action plan outlining healthy practices and warning signs\", \"Continue mentoring LGBTQ+ students to reinforce personal growth\"],\n  \"technique\": \"Cognitive Restructuring\",\n  \"summary\": \"Client demonstrates significant progress in managing imposter syndrome and anxiety, evidenced by a first-author publication and improved relationship dynamics. Therapist encourages the client to create a wellness action plan and maintain coping strategies to prevent relapse.\",\n  \"confidence\": 0.9\n}"
+    }
+  ],
+  "comparison": [
+    {
+      "session_id": "session_01_alex_chen",
+      "old_technique": "Cognitive Behavioral Therapy (CBT) for addressing negative thought patterns",
+      "new_technique": "CBT - Safety Planning",
+      "changed": true
+    },
+    {
+      "session_id": "session_02_alex_chen",
+      "old_technique": "DBT emotion regulation skills (TIPP)",
+      "new_technique": "DBT - TIPP Skills",
+      "changed": true
+    },
+    {
+      "session_id": "session_03_alex_chen",
+      "old_technique": "Psychoeducation regarding ADHD and its treatment",
+      "new_technique": "Other - Psychoeducation",
+      "changed": true
+    },
+    {
+      "session_id": "session_04_alex_chen",
+      "old_technique": "CBT cognitive reframing",
+      "new_technique": "CBT - Cognitive Restructuring",
+      "changed": true
+    },
+    {
+      "session_id": "session_05_alex_chen",
+      "old_technique": "Acceptance and Commitment Therapy (ACT) cognitive defusion",
+      "new_technique": "ACT - Cognitive Defusion",
+      "changed": true
+    },
+    {
+      "session_id": "session_06_alex_chen",
+      "old_technique": "Mindfulness-based cognitive therapy",
+      "new_technique": "Mindfulness-Based - Mindfulness Meditation",
+      "changed": true
+    },
+    {
+      "session_id": "session_07_alex_chen",
+      "old_technique": "Acceptance and Commitment Therapy (ACT) and Cognitive Behavioral Therapy (CBT)",
+      "new_technique": "ACT - Acceptance",
+      "changed": true
+    },
+    {
+      "session_id": "session_08_alex_chen",
+      "old_technique": "DBT interpersonal effectiveness (DEAR MAN)",
+      "new_technique": "DBT - DEAR MAN",
+      "changed": true
+    },
+    {
+      "session_id": "session_09_alex_chen",
+      "old_technique": "Acceptance and Commitment Therapy (ACT) values clarification",
+      "new_technique": "ACT - Values Clarification",
+      "changed": true
+    },
+    {
+      "session_id": "session_10_alex_chen",
+      "old_technique": "DBT emotion regulation skills",
+      "new_technique": "Other - Validation",
+      "changed": true
+    },
+    {
+      "session_id": "session_11_alex_chen",
+      "old_technique": "Acceptance and Commitment Therapy (ACT)",
+      "new_technique": "ACT - Cognitive Defusion",
+      "changed": true
+    },
+    {
+      "session_id": "session_12_alex_chen",
+      "old_technique": "Cognitive Behavioral Therapy (CBT) with a focus on emotion regulation",
+      "new_technique": "CBT - Cognitive Restructuring",
+      "changed": true
+    }
+  ]
+}

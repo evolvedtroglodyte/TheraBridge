@@ -1,0 +1,745 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "last_updated": "2025-12-22",
+    "total_techniques": 107,
+    "total_modalities": 9,
+    "description": "Comprehensive library of evidence-based psychotherapy techniques for standardized clinical terminology"
+  },
+  "modalities": {
+    "CBT": {
+      "full_name": "Cognitive Behavioral Therapy",
+      "description": "Evidence-based therapy focusing on the relationship between thoughts, feelings, and behaviors",
+      "techniques": [
+        {
+          "name": "Cognitive Restructuring",
+          "definition": "The therapeutic process of identifying and challenging negative and irrational thoughts, then replacing them with more balanced, realistic alternatives. Involves examining evidence for and against thoughts, considering alternative explanations, and developing more adaptive thinking patterns.",
+          "aliases": [
+            "cognitive reframing",
+            "thought challenging",
+            "cognitive modification",
+            "cognitive reframe",
+            "thought reframing"
+          ]
+        },
+        {
+          "name": "Behavioral Activation",
+          "definition": "Scheduling and engaging in meaningful, value-aligned activities to counter avoidance and increase positive reinforcement, particularly effective for depression. Focuses on increasing engagement with rewarding activities to improve mood and reduce withdrawal.",
+          "aliases": [
+            "activity scheduling",
+            "behavioral scheduling",
+            "pleasant events scheduling",
+            "activity activation"
+          ]
+        },
+        {
+          "name": "Exposure Therapy",
+          "definition": "Systematic, gradual confrontation with feared situations or stimuli in a controlled manner to reduce fear and anxiety through habituation. Includes imaginal exposure (visualizing feared scenarios) and in vivo exposure (real-life confrontation).",
+          "aliases": [
+            "in vivo exposure",
+            "imaginal exposure",
+            "prolonged exposure",
+            "systematic desensitization",
+            "graduated exposure"
+          ]
+        },
+        {
+          "name": "Thought Records",
+          "definition": "A structured worksheet for recording experiences along with accompanying thoughts, feelings, and behaviors to identify patterns and cognitive distortions. Helps clients develop awareness of automatic thoughts and their impact on emotions.",
+          "aliases": [
+            "dysfunctional thought record",
+            "thought logs",
+            "cognitive diary",
+            "thought monitoring",
+            "DTR"
+          ]
+        },
+        {
+          "name": "Behavioral Experiments",
+          "definition": "Planned activities based on experimentation designed to test the validity of beliefs and predictions through real-world testing. Clients form hypotheses about outcomes and gather evidence to challenge maladaptive beliefs.",
+          "aliases": [
+            "hypothesis testing",
+            "behavioral tests",
+            "reality testing",
+            "belief testing"
+          ]
+        },
+        {
+          "name": "Grounding Techniques",
+          "definition": "Sensory awareness exercises (like 5-4-3-2-1) involving identifying things you see, touch, hear, smell, and taste to anchor in the present moment and interrupt anxiety or panic. Redirects attention away from distressing thoughts to immediate sensory experience.",
+          "aliases": [
+            "5-4-3-2-1 technique",
+            "sensory grounding",
+            "grounding exercises",
+            "anchoring techniques",
+            "54321"
+          ]
+        },
+        {
+          "name": "Socratic Questioning",
+          "definition": "A systematic questioning technique where therapists guide clients to examine their beliefs through open-ended questions, encouraging self-discovery rather than direct instruction. Promotes critical thinking and exploration of evidence for beliefs.",
+          "aliases": [
+            "guided discovery",
+            "socratic dialogue",
+            "questioning techniques",
+            "socratic method"
+          ]
+        },
+        {
+          "name": "Relaxation Training",
+          "definition": "Teaching specific techniques to reduce physiological arousal and promote calm, including progressive muscle relaxation, diaphragmatic breathing, and guided imagery. Helps manage physical symptoms of anxiety and stress.",
+          "aliases": [
+            "progressive muscle relaxation",
+            "PMR",
+            "deep breathing",
+            "box breathing",
+            "diaphragmatic breathing"
+          ]
+        },
+        {
+          "name": "Problem-Solving Therapy",
+          "definition": "Structured approach to identifying problems, generating solutions, evaluating alternatives, and implementing action plans. Teaches systematic problem-solving skills to address life stressors and challenges.",
+          "aliases": [
+            "problem-solving training",
+            "PST",
+            "solution generation",
+            "structured problem-solving"
+          ]
+        },
+        {
+          "name": "Activity Monitoring",
+          "definition": "Tracking daily activities and associated moods to identify patterns between behavior and emotional states. Helps clients understand what activities improve or worsen their mood.",
+          "aliases": [
+            "mood monitoring",
+            "activity logs",
+            "behavioral tracking",
+            "mood and activity log"
+          ]
+        },
+        {
+          "name": "Cognitive Distortion Identification",
+          "definition": "Learning to recognize patterns of distorted thinking such as all-or-nothing thinking, catastrophizing, overgeneralization, and mind reading. First step in cognitive restructuring process.",
+          "aliases": [
+            "identifying thinking errors",
+            "recognizing cognitive biases",
+            "thought pattern awareness",
+            "distortion recognition"
+          ]
+        },
+        {
+          "name": "Safety Planning",
+          "definition": "Collaborative development of a written plan identifying warning signs, coping strategies, support contacts, and steps to take during a crisis or suicidal ideation. Creates structured response to high-risk situations.",
+          "aliases": [
+            "crisis plan",
+            "suicide safety plan",
+            "emergency plan",
+            "safety protocol"
+          ]
+        }
+      ]
+    },
+    "DBT": {
+      "full_name": "Dialectical Behavior Therapy",
+      "description": "Comprehensive treatment combining CBT with mindfulness, focusing on emotion regulation and interpersonal effectiveness",
+      "techniques": [
+        {
+          "name": "TIPP Skills",
+          "definition": "Crisis survival skill using physiological interventions (Temperature change, Intense exercise, Paced breathing, Progressive muscle relaxation) to rapidly reduce intense emotional arousal. Uses body-based techniques to interrupt emotional escalation.",
+          "aliases": [
+            "TIPP",
+            "TIP skills",
+            "crisis survival skills",
+            "temperature exercise paced breathing"
+          ]
+        },
+        {
+          "name": "DEAR MAN",
+          "definition": "Interpersonal effectiveness skill for assertively asking for what you want or saying no (Describe, Express, Assert, Reinforce, stay Mindful, Appear confident, Negotiate). Balances getting needs met with maintaining relationships.",
+          "aliases": [
+            "DEARMAN",
+            "assertiveness skills",
+            "effective requests",
+            "interpersonal effectiveness"
+          ]
+        },
+        {
+          "name": "Radical Acceptance",
+          "definition": "Completely accepting reality as it is, without fighting or resisting it, acknowledging that fighting reality creates suffering. Involves accepting what cannot be changed while working to change what can be.",
+          "aliases": [
+            "acceptance of reality",
+            "turning the mind",
+            "radical acceptance practice",
+            "reality acceptance"
+          ]
+        },
+        {
+          "name": "Opposite Action",
+          "definition": "Acting contrary to emotional urges when the emotion doesn't fit the facts or isn't effective, to change the emotion itself. Based on the principle that actions can influence emotions.",
+          "aliases": [
+            "opposite to emotion action",
+            "acting opposite",
+            "emotion opposite",
+            "opposite action skill"
+          ]
+        },
+        {
+          "name": "Wise Mind",
+          "definition": "The integration of emotional mind and rational mind; a state of balanced awareness where both emotion and logic are honored in decision-making. Represents intuitive knowing and balanced thinking.",
+          "aliases": [
+            "balanced mind",
+            "intuitive wisdom",
+            "wise mind practice",
+            "integration of emotion and reason"
+          ]
+        },
+        {
+          "name": "ACCEPTS",
+          "definition": "Distraction techniques (Activities, Contributing, Comparisons, Emotions, Pushing away, Thoughts, Sensations) to manage distress when problems cannot be solved immediately. Short-term coping for crisis moments.",
+          "aliases": [
+            "distract with wise mind",
+            "distraction skills",
+            "ACCEPTS distraction",
+            "crisis distraction"
+          ]
+        },
+        {
+          "name": "GIVE",
+          "definition": "Relationship effectiveness skill (be Gentle, act Interested, Validate, use an Easy manner) for maintaining relationships during conflict. Prioritizes preserving the relationship over getting needs met.",
+          "aliases": [
+            "relationship maintenance skills",
+            "GIVE skills",
+            "relationship preservation"
+          ]
+        },
+        {
+          "name": "FAST",
+          "definition": "Self-respect effectiveness skill (be Fair, no unnecessary Apologies, Stick to values, be Truthful) for maintaining integrity in interactions. Prioritizes self-respect over getting needs met or maintaining relationships.",
+          "aliases": [
+            "self-respect skills",
+            "boundary maintenance",
+            "FAST skills",
+            "self-integrity"
+          ]
+        },
+        {
+          "name": "Check the Facts",
+          "definition": "Examining whether emotional reactions match the objective facts of a situation to determine if emotions fit reality or are driven by interpretations. Helps distinguish between emotion-driven and fact-based perceptions.",
+          "aliases": [
+            "fact-checking emotions",
+            "reality testing",
+            "emotion justification",
+            "fact checking"
+          ]
+        },
+        {
+          "name": "ABC PLEASE",
+          "definition": "Skills for reducing vulnerability to negative emotions by maintaining physical and emotional well-being (Accumulate positive, Build mastery, Cope ahead, treat PhysicaL illness, balance Eating, avoid Altering substances, balance Sleep, Exercise).",
+          "aliases": [
+            "PLEASE Master",
+            "self-care skills",
+            "emotion vulnerability reduction",
+            "ABC PLEASE skills"
+          ]
+        },
+        {
+          "name": "Mindfulness of Current Emotion",
+          "definition": "Observing and experiencing emotions without trying to change them, allowing them to naturally rise and fall. Non-judgmental awareness of emotional states.",
+          "aliases": [
+            "emotion observation",
+            "emotion mindfulness",
+            "observing emotions",
+            "emotional awareness"
+          ]
+        },
+        {
+          "name": "Self-Soothe",
+          "definition": "Using the five senses (sight, sound, smell, taste, touch) to comfort oneself and reduce distress through pleasant sensory experiences.",
+          "aliases": [
+            "sensory soothing",
+            "self-comfort",
+            "five senses soothing",
+            "sensory self-care"
+          ]
+        },
+        {
+          "name": "IMPROVE the Moment",
+          "definition": "Skills to make the present moment more tolerable (Imagery, Meaning, Prayer, Relaxation, One thing at a time, Vacation, Encouragement). Short-term distress tolerance for crisis moments.",
+          "aliases": [
+            "IMPROVE skills",
+            "moment improvement",
+            "crisis tolerance"
+          ]
+        },
+        {
+          "name": "Pros and Cons",
+          "definition": "Systematically evaluating the advantages and disadvantages of tolerating distress versus acting on crisis urges. Decision-making tool for crisis situations.",
+          "aliases": [
+            "cost-benefit analysis",
+            "weighing options",
+            "decision analysis",
+            "pros cons analysis"
+          ]
+        }
+      ]
+    },
+    "ACT": {
+      "full_name": "Acceptance and Commitment Therapy",
+      "description": "Mindfulness-based therapy focused on psychological flexibility and values-based living",
+      "techniques": [
+        {
+          "name": "Cognitive Defusion",
+          "definition": "Creating psychological distance from thoughts by viewing them as mental events rather than facts, without attempting to change their content or frequency. Uses metaphors and experiential exercises to reduce thought believability.",
+          "aliases": [
+            "defusion",
+            "deliteralization",
+            "thought distancing",
+            "cognitive distancing",
+            "defusion techniques"
+          ]
+        },
+        {
+          "name": "Acceptance",
+          "definition": "Actively embracing unwanted private experiences (thoughts, feelings, sensations) without attempting to change them, when doing so supports valued living. Willingness to experience discomfort in service of values.",
+          "aliases": [
+            "willingness",
+            "experiential acceptance",
+            "opening up",
+            "psychological acceptance"
+          ]
+        },
+        {
+          "name": "Values Clarification",
+          "definition": "Identifying chosen qualities of purposive action that provide meaningful life direction across domains like relationships, work, health, and personal growth. Discovering what truly matters to the individual.",
+          "aliases": [
+            "values identification",
+            "values work",
+            "clarifying what matters",
+            "value exploration",
+            "values discovery"
+          ]
+        },
+        {
+          "name": "Present Moment Awareness",
+          "definition": "Non-judgmental, flexible attention to psychological and environmental events as they occur, experiencing the world directly. Contact with the here and now rather than being caught in thoughts about past or future.",
+          "aliases": [
+            "contact with present moment",
+            "being present",
+            "mindful awareness",
+            "present focus",
+            "here and now"
+          ]
+        },
+        {
+          "name": "Committed Action",
+          "definition": "Taking concrete, flexible steps toward value-based goals despite barriers, unwanted thoughts, or difficult emotions. Action aligned with values rather than controlled by emotions.",
+          "aliases": [
+            "values-based action",
+            "committed behavior change",
+            "value-driven action",
+            "committed behavior"
+          ]
+        },
+        {
+          "name": "Self as Context",
+          "definition": "Developing a transcendent sense of self that observes experiences from a perspective-taking stance without attachment to content. The observing self that is distinct from thoughts, feelings, and experiences.",
+          "aliases": [
+            "observer self",
+            "transcendent self",
+            "observing self",
+            "perspective taking"
+          ]
+        },
+        {
+          "name": "Creative Hopelessness",
+          "definition": "Exploring how control strategies have failed to eliminate suffering, creating motivation for alternative approaches like acceptance. Recognizing that efforts to control internal experiences often increase suffering.",
+          "aliases": [
+            "exploring ineffective control",
+            "hopelessness exercise",
+            "control agenda exploration"
+          ]
+        },
+        {
+          "name": "Metaphor Work",
+          "definition": "Using stories and metaphors to communicate ACT concepts and create experiential understanding. Bypasses logical mind to facilitate insight.",
+          "aliases": [
+            "ACT metaphors",
+            "metaphorical teaching",
+            "story-based learning"
+          ]
+        }
+      ]
+    },
+    "Mindfulness-Based": {
+      "full_name": "Mindfulness-Based Interventions",
+      "description": "Techniques derived from mindfulness meditation practices, including MBSR and MBCT",
+      "techniques": [
+        {
+          "name": "Mindfulness Meditation",
+          "definition": "Formal practice of sustained attention to breath, body sensations, or thoughts while maintaining present-moment awareness without judgment. Cultivates non-reactive awareness of internal and external experience.",
+          "aliases": [
+            "sitting meditation",
+            "breath meditation",
+            "awareness meditation",
+            "formal mindfulness practice",
+            "meditation practice"
+          ]
+        },
+        {
+          "name": "Body Scan",
+          "definition": "Systematically directing attention through different body parts to enhance awareness of physical sensations and emotional states without judgment. Promotes mind-body connection and somatic awareness.",
+          "aliases": [
+            "body scan meditation",
+            "progressive body awareness",
+            "somatic mindfulness",
+            "body awareness scan"
+          ]
+        },
+        {
+          "name": "Loving-Kindness Meditation",
+          "definition": "Meditation practice cultivating compassion and goodwill toward oneself and others through repeated phrases of kindness and well-wishes. Develops self-compassion and reduces self-criticism.",
+          "aliases": [
+            "metta meditation",
+            "compassion meditation",
+            "loving kindness practice",
+            "metta practice",
+            "self-compassion meditation"
+          ]
+        },
+        {
+          "name": "Mindful Walking",
+          "definition": "Bringing full awareness to the physical sensations and movements involved in walking, using it as an anchor for present-moment attention.",
+          "aliases": [
+            "walking meditation",
+            "mindful movement",
+            "awareness walking"
+          ]
+        },
+        {
+          "name": "Three-Minute Breathing Space",
+          "definition": "Brief structured meditation practice involving awareness of current experience, focusing on breath, and expanding awareness to the whole body. Quick intervention for stress or difficult moments.",
+          "aliases": [
+            "breathing space",
+            "3-minute meditation",
+            "mini meditation",
+            "brief breathing practice"
+          ]
+        },
+        {
+          "name": "Mindful Eating",
+          "definition": "Bringing full sensory awareness to the experience of eating, noticing tastes, textures, smells, and internal hunger/fullness cues without judgment.",
+          "aliases": [
+            "conscious eating",
+            "aware eating",
+            "eating meditation"
+          ]
+        }
+      ]
+    },
+    "Motivational Interviewing": {
+      "full_name": "Motivational Interviewing",
+      "description": "Client-centered counseling style for eliciting behavior change by exploring and resolving ambivalence",
+      "techniques": [
+        {
+          "name": "Reflective Listening",
+          "definition": "Carefully listening and responding by reflecting back what the client communicates to express empathy and deepen understanding. Includes simple reflections (repeating) and complex reflections (adding meaning).",
+          "aliases": [
+            "simple reflections",
+            "complex reflections",
+            "reflections",
+            "empathic listening"
+          ]
+        },
+        {
+          "name": "Eliciting Change Talk",
+          "definition": "Using questions and reflections to evoke client statements favoring change, including desire, ability, reasons, need, and commitment language (DARN-C). Strengthens motivation by having client articulate reasons for change.",
+          "aliases": [
+            "evoking change language",
+            "DARN-C",
+            "change talk",
+            "eliciting commitment"
+          ]
+        },
+        {
+          "name": "Rolling with Resistance",
+          "definition": "Avoiding argumentation and instead accepting client ambivalence, using it as information to explore rather than confronting directly. Reduces defensiveness and maintains collaboration.",
+          "aliases": [
+            "non-confrontational approach",
+            "strategic ambivalence work",
+            "accepting resistance"
+          ]
+        },
+        {
+          "name": "Developing Discrepancy",
+          "definition": "Highlighting the gap between current behavior and important values or goals to create motivation for change without direct confrontation.",
+          "aliases": [
+            "value-behavior discrepancy",
+            "creating awareness",
+            "discrepancy exploration"
+          ]
+        },
+        {
+          "name": "Affirming",
+          "definition": "Recognizing and commenting on client strengths, efforts, and past successes to build self-efficacy and rapport.",
+          "aliases": [
+            "affirmations",
+            "strength recognition",
+            "positive reinforcement"
+          ]
+        },
+        {
+          "name": "Asking Open Questions",
+          "definition": "Using open-ended questions that invite elaboration and exploration rather than yes/no answers, encouraging client to think deeply about their situation.",
+          "aliases": [
+            "open-ended questions",
+            "exploratory questions",
+            "open questioning"
+          ]
+        }
+      ]
+    },
+    "EMDR": {
+      "full_name": "Eye Movement Desensitization and Reprocessing",
+      "description": "Trauma-focused therapy using bilateral stimulation to facilitate adaptive information processing",
+      "techniques": [
+        {
+          "name": "Bilateral Stimulation",
+          "definition": "Alternating left-right sensory input (eye movements, tapping, tones) used during trauma processing to facilitate adaptive information processing. Helps reprocess traumatic memories by activating both brain hemispheres.",
+          "aliases": [
+            "BLS",
+            "dual attention stimulation",
+            "eye movements",
+            "bilateral eye movements"
+          ]
+        },
+        {
+          "name": "Resource Development and Installation",
+          "definition": "Using bilateral stimulation to strengthen positive internal resources (safe place, nurturing figures, protective figures) before trauma processing. Builds emotional stability for trauma work.",
+          "aliases": [
+            "RDI",
+            "resource installation",
+            "safe place development",
+            "positive resource building"
+          ]
+        },
+        {
+          "name": "Target Sequencing",
+          "definition": "Systematic identification and ordering of traumatic memories and triggers to be processed, typically starting with earliest memories.",
+          "aliases": [
+            "memory sequencing",
+            "trauma timeline",
+            "treatment planning"
+          ]
+        },
+        {
+          "name": "Container Technique",
+          "definition": "Visualization exercise where client imagines placing distressing material into a secure container for temporary storage, allowing session closure while processing continues.",
+          "aliases": [
+            "containment",
+            "safe storage",
+            "mental container"
+          ]
+        }
+      ]
+    },
+    "Psychodynamic": {
+      "full_name": "Psychodynamic Therapy",
+      "description": "Insight-oriented therapy exploring unconscious processes and past experiences",
+      "techniques": [
+        {
+          "name": "Interpretation",
+          "definition": "The therapist offering explanations of unconscious processes, patterns, or symbolic meanings to help clients gain insight into hidden factors influencing thoughts, feelings, and behaviors.",
+          "aliases": [
+            "dynamic interpretation",
+            "pattern recognition",
+            "making the unconscious conscious",
+            "insight development"
+          ]
+        },
+        {
+          "name": "Transference Analysis",
+          "definition": "Examining how clients unconsciously redirect feelings from past relationships onto the therapist to gain insight into relational patterns. Uses therapeutic relationship as window into internal world.",
+          "aliases": [
+            "transference work",
+            "analyzing therapeutic relationship",
+            "examining transference"
+          ]
+        },
+        {
+          "name": "Free Association",
+          "definition": "Encouraging clients to share thoughts, feelings, and memories without censorship or filtering to access unconscious material.",
+          "aliases": [
+            "uncensored expression",
+            "stream of consciousness",
+            "associative exploration"
+          ]
+        },
+        {
+          "name": "Dream Analysis",
+          "definition": "Exploring symbolic meaning in dreams to understand unconscious wishes, conflicts, and emotions. Dreams viewed as \"royal road to the unconscious.\"",
+          "aliases": [
+            "dream interpretation",
+            "dream work",
+            "analyzing dreams"
+          ]
+        },
+        {
+          "name": "Countertransference Awareness",
+          "definition": "Therapist's use of their own emotional reactions to understand client's impact on others and illuminate unconscious dynamics.",
+          "aliases": [
+            "therapist reactions",
+            "countertransference use",
+            "self-awareness"
+          ]
+        }
+      ]
+    },
+    "Solution-Focused": {
+      "full_name": "Solution-Focused Brief Therapy",
+      "description": "Goal-oriented therapy focusing on solutions and client strengths rather than problems",
+      "techniques": [
+        {
+          "name": "Miracle Question",
+          "definition": "Asking clients to imagine waking after a miracle solved their problem and describe what would be different, helping identify concrete goals and preferred future. Creates clarity about desired outcomes.",
+          "aliases": [
+            "crystal ball technique",
+            "preferred future scenario",
+            "miracle scenario",
+            "ideal outcome exploration"
+          ]
+        },
+        {
+          "name": "Scaling Questions",
+          "definition": "Using a 0-10 scale to assess problem severity, progress, confidence, or motivation, making abstract concepts concrete and trackable. Helps measure change and identify next steps.",
+          "aliases": [
+            "rating scales",
+            "progress scaling",
+            "numerical rating",
+            "scale assessment"
+          ]
+        },
+        {
+          "name": "Exception Finding",
+          "definition": "Identifying times when the problem was absent or less severe to discover existing coping strategies and strengths. Highlights what's already working.",
+          "aliases": [
+            "finding exceptions",
+            "identifying successes",
+            "exception exploration"
+          ]
+        },
+        {
+          "name": "Coping Questions",
+          "definition": "Asking how client has managed to cope despite difficulties, emphasizing resilience and existing strengths.",
+          "aliases": [
+            "strength identification",
+            "resilience exploration",
+            "coping exploration"
+          ]
+        },
+        {
+          "name": "Compliments",
+          "definition": "Genuine recognition of client strengths, resources, and progress to build confidence and motivation.",
+          "aliases": [
+            "positive feedback",
+            "strength affirmation",
+            "acknowledging progress"
+          ]
+        }
+      ]
+    },
+    "Other": {
+      "full_name": "Other Evidence-Based Techniques",
+      "description": "Cross-modality techniques used in multiple therapeutic approaches",
+      "techniques": [
+        {
+          "name": "Validation",
+          "definition": "Communicating understanding and acceptance of a client's emotional experience as valid and understandable given their history and context. Reduces shame and increases trust.",
+          "aliases": [
+            "emotional validation",
+            "empathic responding",
+            "validating feelings",
+            "acceptance of experience"
+          ]
+        },
+        {
+          "name": "Behavioral Rehearsal",
+          "definition": "Practicing new behaviors, communication skills, or coping strategies in session through role-play before real-life implementation. Builds confidence and refines skills.",
+          "aliases": [
+            "role-playing",
+            "skills practice",
+            "role-play exercises",
+            "behavioral practice"
+          ]
+        },
+        {
+          "name": "Psychoeducation",
+          "definition": "Providing information about mental health conditions, symptoms, treatments, and coping strategies to increase understanding and reduce stigma. Education as intervention.",
+          "aliases": [
+            "educational intervention",
+            "teaching about diagnosis",
+            "information sharing",
+            "patient education"
+          ]
+        },
+        {
+          "name": "Goal Setting",
+          "definition": "Collaboratively establishing specific, measurable, achievable, relevant, and time-bound (SMART) treatment goals to guide therapy.",
+          "aliases": [
+            "treatment planning",
+            "objective setting",
+            "SMART goals",
+            "goal development"
+          ]
+        },
+        {
+          "name": "Emotion Labeling",
+          "definition": "Identifying and naming emotions to increase awareness and reduce intensity. \"Name it to tame it\" principle based on affect labeling research.",
+          "aliases": [
+            "affect labeling",
+            "naming emotions",
+            "emotional awareness",
+            "feeling identification"
+          ]
+        },
+        {
+          "name": "Breathing Exercises",
+          "definition": "Controlled breathing techniques to activate parasympathetic nervous system and reduce anxiety, including box breathing, 4-7-8 breathing, and diaphragmatic breathing.",
+          "aliases": [
+            "breath work",
+            "controlled breathing",
+            "breathing techniques",
+            "respiratory regulation"
+          ]
+        },
+        {
+          "name": "Imagery and Visualization",
+          "definition": "Using mental imagery to practice coping, process emotions, or access positive states. Includes safe place visualization, positive outcome imagery, and healing imagery.",
+          "aliases": [
+            "guided imagery",
+            "visualization exercises",
+            "mental imagery",
+            "imaginal techniques"
+          ]
+        },
+        {
+          "name": "Journaling",
+          "definition": "Structured or free-form writing to process emotions, track patterns, practice gratitude, or work through problems. Expressive writing as therapeutic tool.",
+          "aliases": [
+            "therapeutic writing",
+            "emotional journaling",
+            "diary keeping",
+            "written expression"
+          ]
+        },
+        {
+          "name": "Relapse Prevention",
+          "definition": "Identifying triggers, early warning signs, and coping strategies to prevent return to problematic behaviors or symptom recurrence.",
+          "aliases": [
+            "relapse planning",
+            "prevention strategies",
+            "maintenance planning"
+          ]
+        }
+      ]
+    }
+  }
+}

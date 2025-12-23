@@ -24,6 +24,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { DobbyLogo } from './DobbyLogo';
 import { DobbyLogoGeometric } from './DobbyLogoGeometric';
 import { HeartSpeechIcon } from './HeartSpeechIcon';
+import { MarkdownMessage } from '@/components/MarkdownMessage';
 
 // Types
 export type ChatMode = 'ai' | 'therapist';
@@ -502,16 +503,16 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
                     )}
 
                     {msg.role === 'user' ? (
-                      // User message - text only (no bubble)
-                      <span
-                        className={`max-w-[85%] text-[13px] font-dm text-right ${
-                          isDark ? 'text-white' : 'text-[#5AB9B4]'
+                      // User message - solid color box
+                      <div
+                        className={`max-w-[85%] px-3 py-2 rounded-2xl rounded-tr-sm text-[13px] font-dm text-white ${
+                          isDark ? 'bg-[#7882E7]' : 'bg-[#4ECDC4]'
                         }`}
                       >
                         {msg.content}
-                      </span>
-                    ) : (
-                      // AI message - bubble style
+                      </div>
+                    ) : msg.content ? (
+                      // AI message with content - bubble style with markdown rendering
                       <div
                         className={`max-w-[85%] px-3 py-2 rounded-2xl rounded-tl-sm text-[13px] font-dm ${
                           isDark
@@ -519,29 +520,18 @@ export function AIChatCard({ isFullscreen: externalFullscreen, onFullscreenChang
                             : 'bg-white text-gray-700 shadow-sm border border-gray-100'
                         }`}
                       >
-                        {msg.content}
+                        <MarkdownMessage content={msg.content} isDark={isDark} />
                       </div>
-                    )}
-                  </motion.div>
-                ))}
-
-                {/* Loading indicator */}
-                {isLoading && (
-                  <div className="flex justify-start items-start gap-2">
-                    <div className="flex-shrink-0 mt-1">
-                      <DobbyLogo size={32} />
-                    </div>
-                    <div className={`px-3 py-2 rounded-2xl rounded-tl-sm ${
-                      isDark ? 'bg-[#2a2535]' : 'bg-white shadow-sm border border-gray-100'
-                    }`}>
-                      <div className="flex gap-1">
+                    ) : (
+                      // AI message without content - show loading dots (no bubble)
+                      <div className="flex gap-1.5 pt-2">
                         <span className={`w-2 h-2 rounded-full animate-bounce ${isDark ? 'bg-[#8B6AAE]' : 'bg-[#5AB9B4]'}`} style={{ animationDelay: '0ms' }} />
                         <span className={`w-2 h-2 rounded-full animate-bounce ${isDark ? 'bg-[#8B6AAE]' : 'bg-[#5AB9B4]'}`} style={{ animationDelay: '150ms' }} />
                         <span className={`w-2 h-2 rounded-full animate-bounce ${isDark ? 'bg-[#8B6AAE]' : 'bg-[#5AB9B4]'}`} style={{ animationDelay: '300ms' }} />
                       </div>
-                    </div>
-                  </div>
-                )}
+                    )}
+                  </motion.div>
+                ))}
 
                 <div ref={messagesEndRef} />
               </div>

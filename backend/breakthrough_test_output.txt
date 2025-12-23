@@ -1,0 +1,197 @@
+================================================================================
+BREAKTHROUGH DETECTION - ALL SESSIONS TEST
+================================================================================
+
+
+================================================================================
+SESSION 1
+================================================================================
+Session ID: session_01_alex_chen
+Transcript segments: 58
+
+📊 RESULTS:
+Has breakthrough: True
+Number of breakthrough candidates: 4
+
+⭐ PRIMARY BREAKTHROUGH:
+  Type: Emotional Shift
+  Description: Alex openly shares feelings of depression and passive suicidal ideation.
+  Confidence: 0.90
+  Evidence: Alex expresses a deep sense of hopelessness and fatigue, acknowledging scary thoughts and the overwhelming nature of their current emotional state. This is a significant step in emotional processing and vulnerability.
+  Timestamp: 00:16
+
+📝 ALL BREAKTHROUGH CANDIDATES (4):
+
+  1. Emotional Shift (confidence: 0.90)
+     Alex openly shares feelings of depression and passive suicidal ideation.
+
+  2. Relational Realization (confidence: 0.85)
+     Alex recognizes a pattern of anxiety and fear of abandonment in relationships.
+
+  3. Cognitive Insight (confidence: 0.90)
+     Alex articulates the emotional burden of hiding their true self from their family.
+
+  4. Cognitive Insight (confidence: 0.85)
+     Alex acknowledges the impact of untreated ADHD and parental beliefs on their self-perception.
+
+================================================================================
+SESSION 2
+================================================================================
+Session ID: session_02_alex_chen
+Transcript segments: 57
+
+📊 RESULTS:
+Has breakthrough: True
+Number of breakthrough candidates: 2
+
+⭐ PRIMARY BREAKTHROUGH:
+  Type: Cognitive Insight
+  Description: Alex identifies the specific thoughts and feelings triggered by seeing their ex's Instagram post.
+  Confidence: 0.90
+  Evidence: Alex articulates the connection between the trigger (Instagram post) and their thoughts of worthlessness, which is a significant step in understanding their emotional cycle.
+  Timestamp: 55:38
+
+📝 ALL BREAKTHROUGH CANDIDATES (2):
+
+  1. Cognitive Insight (confidence: 0.90)
+     Alex identifies the specific thoughts and feelings triggered by seeing their ex's Instagram post.
+
+  2. Relational Realization (confidence: 0.85)
+     Alex acknowledges the hope that their ex might return, despite recognizing the relationship's end.
+
+================================================================================
+SESSION 3
+================================================================================
+Session ID: session_03_alex_chen
+Transcript segments: 47
+
+📊 RESULTS:
+Has breakthrough: True
+Number of breakthrough candidates: 3
+
+⭐ PRIMARY BREAKTHROUGH:
+  Type: Cognitive Insight
+  Description: Alex realizes the connection between untreated ADHD and their depression and anxiety.
+  Confidence: 1.00
+  Evidence: Alex expresses a significant realization that their ADHD might be contributing to their depression, rather than being separate issues. This is a new understanding of how their mental health conditions are interrelated.
+  Timestamp: 00:14
+
+📝 ALL BREAKTHROUGH CANDIDATES (3):
+
+  1. Cognitive Insight (confidence: 1.00)
+     Alex realizes the connection between untreated ADHD and their depression and anxiety.
+
+  2. Relational Realization (confidence: 0.90)
+     Alex realizes that their struggles with time management and forgetfulness are symptoms of ADHD, not personal failings.
+
+  3. Emotional Shift (confidence: 0.95)
+     Alex experiences relief and hope upon realizing their struggles are treatable.
+
+================================================================================
+SESSION 4
+================================================================================
+Session ID: session_04_alex_chen
+Transcript segments: 46
+
+📊 RESULTS:
+Has breakthrough: True
+Number of breakthrough candidates: 3
+
+⭐ PRIMARY BREAKTHROUGH:
+  Type: Emotional Shift
+  Description: Alex experiences a deep emotional release and acknowledges the intensity of their loneliness and grief.
+  Confidence: 0.90
+  Evidence: Alex describes a significant emotional reaction to Valentine's Day, leading to an 'ugly crying' episode, indicating a genuine emotional processing of their loneliness and loss.
+  Timestamp: 02:18
+
+📝 ALL BREAKTHROUGH CANDIDATES (3):
+
+  1. Emotional Shift (confidence: 0.90)
+     Alex experiences a deep emotional release and acknowledges the intensity of their loneliness and grief.
+
+  2. Cognitive Insight (confidence: 0.80)
+     Alex identifies and begins to challenge the cognitive distortion of being 'unlovable.'
+
+  3. Self-Compassion (confidence: 0.85)
+     Alex begins to adopt a more compassionate view of themselves, recognizing their journey in managing anxiety.
+
+================================================================================
+SESSION 5
+================================================================================
+Session ID: session_05_alex_chen
+Transcript segments: 51
+
+📊 RESULTS:
+Has breakthrough: True
+Number of breakthrough candidates: 4
+
+⭐ PRIMARY BREAKTHROUGH:
+  Type: Relational Realization
+  Description: Alex confronts the tension between authenticity and self-protection in the context of family relationships.
+  Confidence: 0.95
+  Evidence: Alex acknowledges the complexity of coming out to their family, balancing the desire for authenticity with the need for self-protection, and receives validation from the therapist.
+  Timestamp: 00:42
+
+📝 ALL BREAKTHROUGH CANDIDATES (4):
+
+  1. Cognitive Insight (confidence: 0.90)
+     Alex recognizes the internalized belief of being 'weak and broken' as a product of parental and cultural messages, not an inherent truth.
+
+  2. Cognitive Insight (confidence: 0.85)
+     Alex begins to practice cognitive defusion, recognizing the thought as unhelpful and not inherently true.
+
+  3. Values Clarification (confidence: 0.90)
+     Alex articulates core values and aligns therapy with those values, reinforcing the importance of their therapeutic journey.
+
+  4. Relational Realization (confidence: 0.95)
+     Alex confronts the tension between authenticity and self-protection in the context of family relationships.
+
+================================================================================
+SESSION 6
+================================================================================
+Session ID: session_06_alex_chen
+Transcript segments: 52
+
+📊 RESULTS:
+Has breakthrough: True
+Number of breakthrough candidates: 3
+
+⭐ PRIMARY BREAKTHROUGH:
+  Type: Emotional Shift
+  Description: Alex expresses genuine hope for the future and considers happiness outside of a relationship.
+  Confidence: 0.95
+  Evidence: Alex articulates a new sense of hope and self-sufficiency, indicating a significant emotional shift from previous sessions.
+  Timestamp: 50:13
+
+📝 ALL BREAKTHROUGH CANDIDATES (3):
+
+  1. Cognitive Insight (confidence: 0.90)
+     Alex reframes the breakup from a personal failure to a matter of incompatibility.
+
+  2. Emotional Shift (confidence: 0.95)
+     Alex expresses genuine hope for the future and considers happiness outside of a relationship.
+
+  3. Behavioral Commitment (confidence: 0.85)
+     Alex reconnects with friends and finds joy in social interactions.
+
+================================================================================
+SESSION 7
+================================================================================
+Session ID: session_07_alex_chen
+Transcript segments: 42
+
+📊 RESULTS:
+Has breakthrough: True
+Number of breakthrough candidates: 3
+
+⭐ PRIMARY BREAKTHROUGH:
+  Type: Cognitive Insight
+  Description: Alex connects their anxious attachment style to childhood experiences with their parents.
+  Confidence: 1.00
+  Evidence: Alex realizes their behavior in relationships mirrors their childhood experiences of conditional love and approval, leading to a significant understanding of their attachment style.
+  Timestamp: 00:21
+
+📝 ALL BREAKTHROUGH CANDIDATES (3):
+
+  1. Cognitive Insight (confidence: 1.00)
+     Alex connects their

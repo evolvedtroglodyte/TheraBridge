@@ -1,0 +1,151 @@
+{
+  "demo_metadata": {
+    "timestamp": "2025-12-22T14:29:24.290141",
+    "session_file": "session_01_crisis_intake.json",
+    "total_processing_time_estimate": "~50 seconds",
+    "total_cost_estimate": "$0.09"
+  },
+  "wave1_results": {
+    "mood_analysis": {
+      "mood_score": 4.5,
+      "confidence": 0.85,
+      "emotional_tone": "overwhelmed and anxious",
+      "rationale": "Patient reports feeling overwhelmed with school workload, difficulty sleeping (only 4 hours/night), and passive suicidal ideation without active plan. However, patient is reaching out for help and engaged in conversation, which are protective factors.",
+      "key_indicators": [
+        "Passive suicidal ideation present (reached out to roommate for help)",
+        "Severe sleep disruption (4 hours/night, difficulty falling asleep)",
+        "Overwhelming stress from school demands",
+        "First therapy session - seeking help (positive protective factor)",
+        "Engaged and responsive during intake (moderate engagement)"
+      ]
+    },
+    "topic_extraction": {
+      "topics": [
+        "Crisis intervention and suicidal ideation assessment",
+        "Academic stress and overwhelming coursework"
+      ],
+      "action_items": [
+        "Practice sleep hygiene routine (no screens 1 hour before bed, consistent bedtime)",
+        "Reach out to academic advisor about course load reduction options"
+      ],
+      "technique": "Crisis assessment and safety planning",
+      "summary": "Patient experiencing acute distress with passive suicidal ideation triggered by overwhelming academic demands and severe sleep deprivation. Therapist conducted comprehensive safety assessment and established immediate coping strategies.",
+      "confidence": 0.9
+    },
+    "breakthrough_detection": {
+      "has_breakthrough": true,
+      "primary_breakthrough": {
+        "type": "emotional_release",
+        "description": "Patient openly acknowledged suicidal thoughts and reached out for help",
+        "confidence": 0.88,
+        "evidence": [
+          "First time verbalizing suicidal ideation to a professional",
+          "Demonstrated trust by sharing vulnerable feelings",
+          "Showed willingness to engage in safety planning"
+        ],
+        "timestamp_start": 450.2,
+        "timestamp_end": 520.8
+      }
+    }
+  },
+  "wave2_results": {
+    "deep_analysis": {
+      "progress_indicators": {
+        "symptom_reduction": {
+          "detected": false,
+          "description": "First session - baseline established. Severe sleep disruption (4 hours/night) and acute distress noted.",
+          "confidence": 0.95
+        },
+        "skill_development": [
+          {
+            "skill": "Crisis hotline awareness",
+            "proficiency": "beginner",
+            "evidence": "Learned about 988 Suicide & Crisis Lifeline and when to use it"
+          },
+          {
+            "skill": "Sleep hygiene basics",
+            "proficiency": "beginner",
+            "evidence": "Introduced to consistent bedtime routine and screen-free wind-down"
+          }
+        ],
+        "goal_progress": [
+          {
+            "goal": "Immediate safety and crisis stabilization",
+            "status": "on_track",
+            "evidence": "Patient verbalized safety plan and agreed to call 988 if ideation intensifies"
+          }
+        ],
+        "behavioral_changes": [
+          "Reached out for help (first time seeking professional support)",
+          "Engaged openly in safety planning discussion"
+        ]
+      },
+      "therapeutic_insights": {
+        "key_realizations": [
+          "You recognized that you needed help and took the courageous step of reaching out - this is a significant protective factor",
+          "You identified the connection between overwhelming academic stress and your mental health decline"
+        ],
+        "patterns": [
+          "Academic pressure appears to be a major stressor affecting sleep and mood",
+          "First session - establishing baseline patterns for future tracking"
+        ],
+        "growth_areas": [
+          "Building healthy sleep habits to support emotional regulation",
+          "Learning to set boundaries with academic demands",
+          "Developing coping strategies for overwhelming moments"
+        ],
+        "strengths": [
+          "Demonstrated remarkable courage by seeking help during a crisis",
+          "Showed honesty and vulnerability when discussing suicidal thoughts",
+          "Actively engaged in safety planning despite feeling overwhelmed",
+          "Reached out to roommate when in distress (using support network)"
+        ]
+      },
+      "coping_skills": {
+        "learned": [
+          "988 Crisis Lifeline",
+          "Sleep hygiene routine",
+          "Safety planning"
+        ],
+        "proficiency": {
+          "988_Crisis_Lifeline": "beginner",
+          "Sleep_hygiene_routine": "beginner",
+          "Safety_planning": "beginner"
+        },
+        "practice_recommendations": [
+          "Try the sleep routine tonight: no screens 1 hour before bed, same bedtime",
+          "Keep the crisis hotline number (988) saved in your phone",
+          "Check in with your roommate daily - they're part of your support network"
+        ]
+      },
+      "therapeutic_relationship": {
+        "engagement_level": "high",
+        "engagement_evidence": "Despite feeling overwhelmed, you answered questions thoughtfully and participated actively in safety planning",
+        "openness": "very_open",
+        "openness_evidence": "You shared vulnerable information about suicidal thoughts in our first session, which shows trust and courage",
+        "alliance_strength": "developing",
+        "alliance_evidence": "You agreed to return for next session and expressed willingness to try suggested coping strategies"
+      },
+      "recommendations": {
+        "practices": [
+          "Practice your sleep routine every night this week (no screens 1 hour before bed, consistent bedtime)",
+          "Reach out to your academic advisor to discuss course load options",
+          "Use your roommate as a check-in person when you're struggling"
+        ],
+        "resources": [
+          "988 Suicide & Crisis Lifeline (call or text, 24/7)",
+          "Crisis Text Line: Text HOME to 741741",
+          "Campus counseling center for urgent walk-in support"
+        ],
+        "reflection_prompts": [
+          "What does it feel like in your body when the academic pressure becomes overwhelming?",
+          "What are three small things that help you feel even slightly better when you're stressed?",
+          "Who in your life makes you feel safe and understood?"
+        ]
+      },
+      "confidence_score": 0.88,
+      "analyzed_at": "2025-12-22T14:29:24.290038"
+    }
+  },
+  "frontend_display_ready": true
+}

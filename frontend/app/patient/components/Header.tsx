@@ -89,7 +89,7 @@ export function Header({ onAskAIClick }: HeaderProps) {
 
   // Determine active page
   const isSessionsPage = pathname?.includes('/sessions');
-  const isDashboardPage = pathname === '/patient/dashboard-v3';
+  const isDashboardPage = pathname === '/patient';
 
   // Triple-click detection for home icon (dev testing feature) - Sessions page only
   const homeClickCountRef = useRef(0);
@@ -162,7 +162,7 @@ export function Header({ onAskAIClick }: HeaderProps) {
 
   // Navigate to sessions page
   const handleSessionsClick = () => {
-    router.push('/patient/sessions');
+    router.push('/patient/dashboard-v3/sessions');
   };
 
   // Navigate to dashboard

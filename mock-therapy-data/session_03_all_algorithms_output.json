@@ -1,0 +1,77 @@
+{
+  "test_metadata": {
+    "session_id": "session_03_alex_chen",
+    "session_file": "session_03_adhd_discovery.json",
+    "test_run_at": "2025-12-23T21:22:35.068156",
+    "algorithms_tested": [
+      "mood_analysis",
+      "topic_extraction",
+      "breakthrough_detection",
+      "technique_validation"
+    ]
+  },
+  "session_info": {
+    "id": "session_03_alex_chen",
+    "filename": "session_03_2025-01-31.mp3",
+    "duration_seconds": 3000.0,
+    "duration_minutes": 50.0,
+    "total_segments": 162,
+    "therapist_segments": 68,
+    "client_segments": 94,
+    "timestamp": "20250131_140000"
+  },
+  "algorithms": {
+    "mood_analysis": {
+      "success": false,
+      "error": "Mood analysis failed: Error code: 400 - {'error': {'message': \"Unsupported value: 'temperature' does not support 0.3 with this model. Only the default (1) value is supported.\", 'type': 'invalid_request_error', 'param': 'temperature', 'code': 'unsupported_value'}}"
+    },
+    "topic_extraction": {
+      "success": false,
+      "error": "Topic extraction failed: Error code: 400 - {'error': {'message': \"Unsupported value: 'temperature' does not support 0.3 with this model. Only the default (1) value is supported.\", 'type': 'invalid_request_error', 'param': 'temperature', 'code': 'unsupported_value'}}"
+    },
+    "breakthrough_detection": {
+      "success": true,
+      "output": {
+        "session_id": "session_03_alex_chen",
+        "has_breakthrough": true,
+        "breakthrough_count": 1,
+        "primary_breakthrough": {
+          "type": "Positive Discovery",
+          "confidence": 0.95,
+          "description": "Alex recognizes for the first time that their longstanding struggles (distraction, time blindness, forgetfulness, task initiation) are core ADHD symptoms rather than laziness or personal failure, and realizes that untreated ADHD is likely a major driver of their depression and anxiety. This reframes their self-concept from 'bad at life' to 'neurodivergent needing support,' bringing relief and openness to treatment.",
+          "evidence": "\"Oh my god. Oh my god. That's... I never connected those things... But you're saying the ADHD could be causing some of the depression?\" [16:18] | \"I never thought about it that way... I just thought I was getting worse at everything. Like I'm not trying hard enough or I'm lazy...\" [12:49] | \"Wait, really? Like this isn't just me being bad at life?\" [14:27] | \"This is kind of blowing my mind... I'm realizing how much energy I've been spending hating myself for things that might actually be symptoms.\" [24:04] | \"It's just... it's relief, you know? Like maybe I'm not fundamentally broken. Maybe there's actually something that can help.\" [32:04]"
+        },
+        "all_breakthroughs": [
+          {
+            "type": "Positive Discovery",
+            "confidence_score": 0.95,
+            "description": "Alex recognizes for the first time that their longstanding struggles (distraction, time blindness, forgetfulness, task initiation) are core ADHD symptoms rather than laziness or personal failure, and realizes that untreated ADHD is likely a major driver of their depression and anxiety. This reframes their self-concept from 'bad at life' to 'neurodivergent needing support,' bringing relief and openness to treatment.",
+            "evidence": "\"Oh my god. Oh my god. That's... I never connected those things... But you're saying the ADHD could be causing some of the depression?\" [16:18] | \"I never thought about it that way... I just thought I was getting worse at everything. Like I'm not trying hard enough or I'm lazy...\" [12:49] | \"Wait, really? Like this isn't just me being bad at life?\" [14:27] | \"This is kind of blowing my mind... I'm realizing how much energy I've been spending hating myself for things that might actually be symptoms.\" [24:04] | \"It's just... it's relief, you know? Like maybe I'm not fundamentally broken. Maybe there's actually something that can help.\" [32:04]",
+            "timestamp_start": 978,
+            "timestamp_end": 1924,
+            "speaker_sequence": [
+              {
+                "speaker": "SPEAKER_01",
+                "text": "Oh my god. Oh my god. That's... I never connected those things. Like I always thought the depression was making me unable to focus, not the other way around. Or like, both things happening separately. But you're saying the ADHD could be causing some of the depression?"
+              },
+              {
+                "speaker": "SPEAKER_00",
+                "text": "It's not that simple - they're both real and they affect each other. But yes, untreated ADHD absolutely contributes to depression and anxiety, especially in high-achieving people who have been masking and compensating for years. Eventually the compensatory strategies stop working and it feels like everything is falling apart."
+              },
+              {
+                "speaker": "SPEAKER_01",
+                "text": "That's exactly what it feels like. Like I used to be able to handle things and now I just can't."
+              }
+            ]
+          }
+        ],
+        "session_summary": "Session showed 1 significant breakthrough moment(s). Primary insight: Alex recognizes for the first time that their longstanding struggles (distraction, time blindness, forgetfulness, task initiation) are core ADHD symptoms rather than laziness or personal failure, and realizes that untreated ADHD is likely a major driver of their depression and anxiety. This reframes their self-concept from 'bad at life' to 'neurodivergent needing support,' bringing relief and openness to treatment.",
+        "emotional_trajectory": "exploratory \u2192 engaged \u2192 reflective"
+      }
+    },
+    "technique_validation": {
+      "success": false,
+      "error": "'output'"
+    }
+  }
+}

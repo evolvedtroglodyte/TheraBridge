@@ -26,6 +26,9 @@ import { ShareModal } from './ShareModal';
 import { DobbyLogo } from '../DobbyLogo';
 import { DobbyLogoGeometric } from '../DobbyLogoGeometric';
 import { HeartSpeechIcon } from '../HeartSpeechIcon';
+import { MarkdownMessage } from '@/components/MarkdownMessage';
+import { BridgeIcon } from '@/components/TheraBridgeLogo';
+import { CompactScrollbar } from '@/components/CompactScrollbar';
 
 // Types - exported for use in AIChatCard
 export type ChatMode = 'ai' | 'therapist';
@@ -81,8 +84,8 @@ const MAX_CHARS = 500;
 
 // User data (mock)
 const USER = {
-  name: 'Vishnu Anapalli',
-  firstName: 'Vishnu',
+  name: 'Alex Thompson',
+  firstName: 'Alex',
 };
 
 export function FullscreenChat({
@@ -123,6 +126,7 @@ export function FullscreenChat({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const promptsContainerRef = useRef<HTMLDivElement>(null);
 
   // Track scroll position for logo click behavior
   const handleScroll = useCallback(() => {
@@ -372,7 +376,7 @@ export function FullscreenChat({
           isDark={isDark}
           onHomeClick={() => {
             onClose();
-            router.push('/patient/dashboard-v3');
+            router.push('/patient');
           }}
           onThemeToggle={toggleTheme}
         />
@@ -380,15 +384,56 @@ export function FullscreenChat({
         {/* Main Content */}
         <div
           className={`flex-1 flex flex-col transition-colors duration-300 ${
-            isDark ? 'bg-[#1a1625]' : 'bg-[#F8F7F4]'
+            isDark ? 'bg-[#1a1625]' : 'bg-[#ECEAE5]'
           }`}
         >
-          {/* Header Bar */}
+          {/* Header Bar - White background to match sidebar */}
           <div
             className={`relative flex items-center justify-center h-14 px-5 border-b flex-shrink-0 ${
-              isDark ? 'border-[#2a2535]' : 'border-[#E5E2DE]'
+              isDark ? 'bg-[#1a1625] border-[#3d3548]' : 'bg-white border-[#E0DDD8]'
             }`}
           >
+            {/* Left Side - Theme Toggle only */}
+            <div className="absolute left-3 top-1/2 -translate-y-1/2">
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${
+                  isDark ? 'hover:bg-[#3d3548]' : 'hover:bg-gray-100'
+                }`}
+                aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                {isDark ? (
+                  <svg
+                    className="w-[22px] h-[22px]"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#93B4DC"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ filter: 'drop-shadow(0 0 4px rgba(147, 180, 220, 0.6)) drop-shadow(0 0 10px rgba(147, 180, 220, 0.3))' }}
+                  >
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                  </svg>
+                ) : (
+                  <svg
+                    className="w-[22px] h-[22px]"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#F5A623"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ filter: 'drop-shadow(0 0 4px rgba(245, 166, 35, 0.5)) drop-shadow(0 0 8px rgba(245, 166, 35, 0.25))' }}
+                  >
+                    <circle cx="12" cy="12" r="4" />
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                  </svg>
+                )}
+              </button>
+            </div>
+
             {/* Centered Dobby Logo + DOBBY text - illuminating, clickable */}
             <div
               className="cursor-pointer flex items-center gap-2"
@@ -437,10 +482,8 @@ export function FullscreenChat({
             className="flex-1 overflow-y-auto px-6"
           >
             <div className="max-w-3xl mx-auto">
-              {/* Welcome Greeting - Always visible at top, sticky when scrolling */}
-              <div className={`sticky top-0 z-10 pt-8 pb-8 ${
-                isDark ? 'bg-[#1a1625]' : 'bg-[#F8F7F4]'
-              }`}>
+              {/* Welcome Greeting - Scrolls naturally with chat content */}
+              <div className="pt-8 pb-8">
                 <h1
                   className={`font-crimson text-[32px] font-medium text-center ${
                     isDark ? 'text-gray-200' : 'text-[#1a1a1a]'
@@ -481,35 +524,35 @@ export function FullscreenChat({
                       <DobbyLogo size={37} />
                     ) : null}
                   </div>
-                  <div
-                    className={`font-dm text-sm leading-relaxed max-w-[70%] p-4 rounded-2xl ${
-                      msg.role === 'user'
-                        ? 'bg-gradient-to-br from-[#5AB9B4] to-[#4A9D99] text-white rounded-tr-sm'
-                        : isDark
-                          ? 'bg-[#2a2535] text-gray-300 rounded-tl-sm'
-                          : 'bg-white text-gray-700 shadow-sm border border-gray-100 rounded-tl-sm'
-                    }`}
-                  >
-                    {msg.content}
-                  </div>
-                </motion.div>
-              ))}
 
-              {/* Loading indicator */}
-              {isLoading && (
-                <div className="flex gap-3 mb-4">
-                  <DobbyLogo size={37} />
-                  <div className={`p-4 rounded-2xl rounded-tl-sm ${
-                    isDark ? 'bg-[#2a2535]' : 'bg-white shadow-sm border border-gray-100'
-                  }`}>
-                    <div className="flex gap-1">
+                  {/* Show loading dots if assistant message is empty (still thinking) */}
+                  {msg.role === 'assistant' && !msg.content ? (
+                    <div className="flex gap-1.5 pt-4">
                       <span className={`w-2 h-2 rounded-full animate-bounce ${isDark ? 'bg-[#8B6AAE]' : 'bg-[#5AB9B4]'}`} style={{ animationDelay: '0ms' }} />
                       <span className={`w-2 h-2 rounded-full animate-bounce ${isDark ? 'bg-[#8B6AAE]' : 'bg-[#5AB9B4]'}`} style={{ animationDelay: '150ms' }} />
                       <span className={`w-2 h-2 rounded-full animate-bounce ${isDark ? 'bg-[#8B6AAE]' : 'bg-[#5AB9B4]'}`} style={{ animationDelay: '300ms' }} />
                     </div>
-                  </div>
-                </div>
-              )}
+                  ) : (
+                    <div
+                      className={`font-dm text-sm leading-relaxed max-w-[70%] p-4 rounded-2xl ${
+                        msg.role === 'user'
+                          ? isDark
+                            ? 'bg-[#7882E7] text-white rounded-tr-sm'
+                            : 'bg-[#4ECDC4] text-white rounded-tr-sm'
+                          : isDark
+                            ? 'bg-[#2a2535] text-gray-300 rounded-tl-sm'
+                            : 'bg-white text-gray-700 shadow-sm border border-gray-100 rounded-tl-sm'
+                      }`}
+                    >
+                      {msg.role === 'assistant' ? (
+                        <MarkdownMessage content={msg.content} isDark={isDark} />
+                      ) : (
+                        msg.content
+                      )}
+                    </div>
+                  )}
+                </motion.div>
+              ))}
 
               <div ref={messagesEndRef} />
             </div>
@@ -555,7 +598,7 @@ export function FullscreenChat({
                     transition={{ duration: 0.2 }}
                     className="overflow-hidden"
                   >
-                    <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide mb-3">
+                    <div ref={promptsContainerRef} className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide mb-1">
                       {SUGGESTED_PROMPTS.map((prompt, idx) => (
                         <button
                           key={idx}
@@ -570,6 +613,13 @@ export function FullscreenChat({
                         </button>
                       ))}
                     </div>
+
+                    {/* Compact Scrollbar - 60px tiny variant */}
+                    <CompactScrollbar
+                      containerRef={promptsContainerRef}
+                      isDark={isDark}
+                      className="mb-2"
+                    />
                   </motion.div>
                 )}
               </AnimatePresence>

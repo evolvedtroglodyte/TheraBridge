@@ -411,6 +411,24 @@ class ApiClient {
   ): Promise<ApiResult<T>> {
     return this.post<T>(`/api/v1/sessions/${sessionId}/autofill`, { template_type: templateType }, options);
   }
+
+  // ============================================================================
+  // Patient Consistency API Methods
+  // ============================================================================
+
+  /**
+   * Get patient session consistency metrics
+   * @param patientId - The patient ID
+   * @param days - Number of days to analyze (default: 90)
+   * @returns ApiResult<ConsistencyMetrics>
+   */
+  getPatientConsistency<T>(
+    patientId: string,
+    days: number = 90,
+    options?: ApiRequestOptions
+  ): Promise<ApiResult<T>> {
+    return this.get<T>(`/api/sessions/patient/${patientId}/consistency?days=${days}`, options);
+  }
 }
 
 export const apiClient = new ApiClient();

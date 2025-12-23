@@ -1,0 +1,98 @@
+/**
+ * Global styles for TherapyBridge Dashboard v3
+ * - Custom scrollbar styling
+ * - Font imports
+ * - Utility classes
+ */
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #2a2435;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4a4458;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #5AB9B4;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #a78bfa;
+}
+
+/* Hide scrollbar for horizontal scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Font families */
+.font-serif {
+  font-family: 'Crimson Pro', Georgia, serif;
+}
+
+.font-mono {
+  font-family: 'Space Mono', 'Fira Code', 'IBM Plex Mono', monospace;
+}
+
+/* Smooth transitions */
+button, a {
+  transition: all 0.2s ease-out;
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid #5AB9B4;
+  outline-offset: 2px;
+}
+
+.dark :focus-visible {
+  outline-color: #a78bfa;
+}
+
+/* Remove focus outlines in fullscreen chat (custom styling handles feedback) */
+.fullscreen-chat-container *:focus,
+.fullscreen-chat-container *:focus-visible {
+  outline: none;
+}
+
+/* Backdrop blur support */
+@supports ((-webkit-backdrop-filter: blur(8px)) or (backdrop-filter: blur(8px))) {
+  .backdrop-blur-sm {
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+}
+
+/* Dobby Logo Animations */
+@keyframes earWiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+@keyframes blink {
+  0%, 85%, 100% { transform: scaleY(1); }
+  90% { transform: scaleY(0.1); }
+}

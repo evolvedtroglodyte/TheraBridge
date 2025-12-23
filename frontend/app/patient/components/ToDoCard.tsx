@@ -17,6 +17,10 @@ import { tasks as initialTasks } from '../lib/mockData';
 import { modalVariants, backdropVariants } from '../lib/utils';
 import { useModalAccessibility } from '../hooks/useModalAccessibility';
 
+// Font families - matching SessionCard
+const fontSerif = '"Crimson Pro", Georgia, serif';
+const fontSans = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
 export function ToDoCard() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
@@ -47,18 +51,24 @@ export function ToDoCard() {
       {/* Compact Card */}
       <motion.div
         onClick={() => setIsExpanded(true)}
-        className="bg-[#F8F7F4] dark:bg-[#2a2435] rounded-lg border border-[#E0DDD8] dark:border-[#3d3548] p-5 shadow-lg cursor-pointer h-[280px] flex flex-col transition-colors duration-300"
-        whileHover={{ y: -2, boxShadow: '0 6px 16px rgba(0,0,0,0.12)' }}
+        className="bg-gradient-to-br from-[#FFF5F0] to-[#FFF8F3] dark:from-[#2a2435] dark:to-[#1a1625] rounded-3xl p-6 cursor-pointer h-[280px] flex flex-col overflow-hidden transition-colors duration-300 border border-gray-200/50 dark:border-[#3d3548]"
+        style={{
+          boxShadow: '0 2px 16px rgba(90,185,180,0.15)'
+        }}
+        whileHover={{
+          boxShadow: '0 4px 20px rgba(90,185,180,0.25)',
+          y: -2
+        }}
         transition={{ duration: 0.2 }}
       >
-        <h2 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-2">To-Do</h2>
-        <div className="flex items-center justify-center mb-4">
-          <span className="text-sm font-light text-gray-600 dark:text-gray-400">
+        <h2 style={{ fontFamily: fontSans }} className="text-lg font-light text-gray-800 dark:text-gray-200 mb-3 text-center">To-Do</h2>
+        <div className="flex items-center justify-center mb-2">
+          <span style={{ fontFamily: fontSans }} className="text-sm font-light text-gray-600 dark:text-gray-400">
             {progressPercent}% ({completedCount}/{totalCount})
           </span>
         </div>
 
-        {/* Progress Bar */}
+        {/* Progress Bar - directly under percentage */}
         <div className="w-full h-2 bg-gray-200 dark:bg-[#3d3548] rounded-full overflow-hidden mb-6">
           <motion.div
             className="h-full bg-gradient-to-r from-[#5AB9B4] to-[#B8A5D6] dark:from-[#a78bfa] dark:to-[#c084fc]"
@@ -92,6 +102,7 @@ export function ToDoCard() {
                 )}
               </div>
               <span
+                style={{ fontFamily: fontSerif }}
                 className={`text-sm font-medium ${
                   task.completed
                     ? 'line-through text-gray-400 dark:text-gray-600'
@@ -104,7 +115,7 @@ export function ToDoCard() {
           ))}
 
           {tasks.length > 3 && (
-            <p className="text-xs text-gray-500 dark:text-gray-500 pt-2">
+            <p style={{ fontFamily: fontSans }} className="text-xs text-gray-500 dark:text-gray-500 pt-2">
               +{tasks.length - 3} more tasks
             </p>
           )}
@@ -130,7 +141,7 @@ export function ToDoCard() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="fixed w-[600px] max-h-[80vh] bg-[#F8F7F4] dark:bg-[#2a2435] rounded-3xl shadow-2xl p-8 z-[1001] overflow-y-auto border-2 border-[#E0DDD8] dark:border-gray-600"
+              className="fixed w-[800px] max-h-[85vh] bg-gradient-to-br from-[#FFF5F0] to-[#FFF8F3] dark:from-[#2a2435] dark:to-[#1a1625] rounded-3xl shadow-2xl p-8 z-[1001] overflow-y-auto border-2 border-[#E0DDD8] dark:border-gray-600"
               role="dialog"
               aria-modal="true"
               aria-labelledby="todo-title"
@@ -147,10 +158,12 @@ export function ToDoCard() {
                 <X className="w-6 h-6 text-gray-600 dark:text-gray-400" />
               </button>
 
-              <h2 className="text-2xl font-light text-gray-800 dark:text-gray-200 mb-2">Homework Tasks</h2>
-              <p className="text-sm font-light text-gray-600 dark:text-gray-400 mb-6">
-                {progressPercent}% complete ({completedCount}/{totalCount} tasks)
-              </p>
+              <div className="mb-6 pr-12 text-center">
+                <h2 style={{ fontFamily: fontSans }} className="text-2xl font-medium text-gray-800 dark:text-gray-200 mb-1">To-Do</h2>
+                <p style={{ fontFamily: fontSans }} className="text-sm font-light text-gray-600 dark:text-gray-400">
+                  {progressPercent}% complete ({completedCount}/{totalCount} tasks)
+                </p>
+              </div>
 
               {/* Progress Bar */}
               <div className="w-full h-2 bg-gray-200 dark:bg-[#3d3548] rounded-full overflow-hidden mb-8">
@@ -164,7 +177,7 @@ export function ToDoCard() {
               {/* Active Tasks */}
               {activeTasks.length > 0 && (
                 <div className="mb-8">
-                  <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-4">
+                  <h3 style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-4">
                     Active Tasks
                   </h3>
                   <div className="space-y-4">
@@ -175,8 +188,8 @@ export function ToDoCard() {
                           className="w-5 h-5 rounded-full border-2 border-[#5AB9B4] dark:border-[#a78bfa] flex-shrink-0 mt-0.5 hover:bg-[#5AB9B4]/10 dark:hover:bg-[#a78bfa]/10 transition-colors"
                         />
                         <div className="flex-1">
-                          <p className="text-sm font-light text-gray-700 dark:text-gray-300">{task.text}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                          <p style={{ fontFamily: fontSerif }} className="text-sm font-light text-gray-700 dark:text-gray-300">{task.text}</p>
+                          <p style={{ fontFamily: fontSans }} className="text-xs text-gray-500 dark:text-gray-500 mt-1">
                             From: Session {task.sessionId.replace('s', '')} ({task.sessionDate})
                           </p>
                         </div>
@@ -190,7 +203,7 @@ export function ToDoCard() {
               {completedTasks.length > 0 && (
                 <div>
                   <div className="h-px bg-gray-200 dark:bg-[#3d3548] mb-6" />
-                  <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-4">
+                  <h3 style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-4">
                     Completed Tasks
                   </h3>
                   <div className="space-y-4">
@@ -211,8 +224,8 @@ export function ToDoCard() {
                           </svg>
                         </button>
                         <div className="flex-1">
-                          <p className="text-sm font-light text-gray-700 dark:text-gray-400 line-through">{task.text}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                          <p style={{ fontFamily: fontSerif }} className="text-sm font-light text-gray-700 dark:text-gray-400 line-through">{task.text}</p>
+                          <p style={{ fontFamily: fontSans }} className="text-xs text-gray-500 dark:text-gray-500 mt-1">
                             From: Session {task.sessionId.replace('s', '')} ({task.sessionDate})
                           </p>
                         </div>
