@@ -1,5 +1,7 @@
 # Audio Transcription Pipeline - Web UI
 
+> **📌 Repository Rules:** This subproject follows the global repository rules defined in [`/.claude/CLAUDE.md`](../../.claude/CLAUDE.md). Please review the root CLAUDE.md for critical workflows including git-first policies, change logging requirements, and repository organization standards.
+
 ## Project Overview
 
 Web interface for the audio transcription pipeline. Displays speaker-diarized transcripts with synchronized audio playback, granular highlighting, and interactive timeline navigation.
