@@ -29,11 +29,13 @@ interface ChatRequestBody {
  * Handles streaming chat with GPT-4o, database persistence, and patient context injection
  */
 export async function POST(req: NextRequest) {
+  console.log('[Chat API] POST request started');
   try {
+    console.log('[Chat API] Parsing request body...');
     const body: ChatRequestBody = await req.json();
     const { message, conversationId, sessionId, userId } = body;
 
-    console.log('[Chat API] Request received:', { userId, hasMessage: !!message, conversationId });
+    console.log('[Chat API] Request received:', { userId, hasMessage: !!message, conversationId, message: message?.substring(0, 50) });
 
     if (!message || !userId) {
       return new Response(

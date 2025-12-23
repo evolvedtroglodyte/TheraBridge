@@ -280,13 +280,21 @@ export function FullscreenChat({
       }
     } catch (error) {
       console.error('Chat error:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        type: typeof error,
+        name: error instanceof Error ? error.name : 'Unknown'
+      });
 
       // Update temp message with error fallback
       const fallbackContent = error instanceof Error && error.message.includes('limit')
         ? "⚠️ You've reached your daily message limit (50 messages). The limit resets at midnight."
-        : mode === 'ai'
-          ? "I understand you're working through that. Based on your recent sessions, this connects to the boundary-setting work you've been doing. Would you like to explore this further?"
-          : "I've forwarded your message to your therapist. They typically respond within 24 hours. Is there anything else I can help you with in the meantime?";
+        : error instanceof Error && error.message.includes('Failed to fetch')
+          ? "⚠️ Unable to connect to the chat service. Please check your internet connection and try again."
+          : mode === 'ai'
+            ? "I understand you're working through that. Based on your recent sessions, this connects to the boundary-setting work you've been doing. Would you like to explore this further?"
+            : "I've forwarded your message to your therapist. They typically respond within 24 hours. Is there anything else I can help you with in the meantime?";
 
       setMessages(prev =>
         prev.map(msg =>

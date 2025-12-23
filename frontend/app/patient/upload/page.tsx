@@ -1,38 +1,43 @@
 'use client';
 
 /**
- * Upload Page - Audio file upload interface
+ * Audio Upload Page - EXACT MATCH to original UI
+ * Matches audio-transcription-pipeline/ui-web/frontend exactly
+ *
+ * NEW: Integrated with ProcessingContext for dashboard auto-refresh
  */
 
-import { Suspense, useState } from 'react';
-import { ThemeProvider, useTheme } from '@/app/patient/contexts/ThemeContext';
+import { useState, useEffect } from 'react';
+import FileUploader from './components/FileUploader';
+import AudioRecorder from './components/AudioRecorder';
+import UploadProgress from './components/UploadProgress';
+import ResultsView from './components/ResultsView';
 import { ProcessingProvider, useProcessing } from '@/contexts/ProcessingContext';
-import { NavigationBar } from '@/components/NavigationBar';
-import FileUploader from '@/app/patient/upload/components/FileUploader';
-import AudioRecorder from '@/app/patient/upload/components/AudioRecorder';
-import UploadProgress from '@/app/patient/upload/components/UploadProgress';
-import ResultsView from '@/app/patient/upload/components/ResultsView';
-import { DashboardSkeleton } from '@/app/patient/components/DashboardSkeleton';
 
 type ViewState = 'upload' | 'processing' | 'results';
 
-function UploadPageContent() {
+/**
+ * Inner component that uses ProcessingContext
+ */
+function UploadPageInner() {
   const [view, setView] = useState<ViewState>('upload');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const { startTracking } = useProcessing();
-  const { isDark } = useTheme();
 
   const handleUploadSuccess = (newSessionId: string, file: File) => {
     console.log('[Upload] Success - navigating to processing', { sessionId: newSessionId, filename: file.name });
     setSessionId(newSessionId);
     setUploadedFile(file);
     setView('processing');
+
+    // Start tracking this session for dashboard auto-refresh
     startTracking(newSessionId);
   };
 
   const handleProcessingComplete = () => {
     setView('results');
+    // Note: ProcessingContext will auto-notify dashboard when status changes to 'completed'
   };
 
   const handleReset = () => {
@@ -42,12 +47,8 @@ function UploadPageContent() {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
-      isDark ? 'bg-[#1a1625]' : 'bg-[#ECEAE5]'
-    }`}>
-      <NavigationBar />
-
-      <main className="w-full px-4 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <main className="container mx-auto px-4">
         {view === 'upload' && (
           <div className="space-y-8">
             <FileUploader onUploadSuccess={handleUploadSuccess} />
@@ -84,14 +85,13 @@ function UploadPageContent() {
   );
 }
 
+/**
+ * Wrapper that provides ProcessingContext
+ */
 export default function UploadPage() {
   return (
-    <ThemeProvider>
-      <ProcessingProvider>
-        <Suspense fallback={<DashboardSkeleton />}>
-          <UploadPageContent />
-        </Suspense>
-      </ProcessingProvider>
-    </ThemeProvider>
+    <ProcessingProvider>
+      <UploadPageInner />
+    </ProcessingProvider>
   );
 }

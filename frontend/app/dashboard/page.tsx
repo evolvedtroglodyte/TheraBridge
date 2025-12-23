@@ -1,15 +1,6 @@
 'use client';
 
-/**
- * Main Dashboard - Patient view with 5 interactive cards
- * - Full dashboard layout with Notes/Goals, AI Chat, To-Do, Progress, Therapist Bridge
- * - Grid-based responsive layout
- * - Warm cream background with therapy-appropriate aesthetics
- * - Full dark mode support
- */
-
-import { useState, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense } from 'react';
 import '../patient/styles.css';
 import { ThemeProvider } from '@/app/patient/contexts/ThemeContext';
 import { SessionDataProvider } from '@/app/patient/contexts/SessionDataContext';
@@ -24,28 +15,19 @@ import { DashboardSkeleton } from '@/app/patient/components/DashboardSkeleton';
 import { ProcessingRefreshBridge } from '@/app/patient/components/ProcessingRefreshBridge';
 
 export default function DashboardPage() {
-  const router = useRouter();
-
   return (
     <ThemeProvider>
       <ProcessingProvider>
         <SessionDataProvider>
           <ProcessingRefreshBridge />
           <Suspense fallback={<DashboardSkeleton />}>
-            <div className="min-h-screen bg-[#ECEAE5] dark:bg-[#1a1625] transition-colors duration-300 relative">
+            <div className="min-h-screen bg-[#ECEAE5] dark:bg-[#1a1625] transition-colors duration-300">
               <NavigationBar />
-
               <main className="w-full max-w-[1400px] mx-auto px-12 py-12">
-                {/* Top Row - 50/50 Split */}
                 <div className="grid grid-cols-2 gap-6 mb-10">
                   <NotesGoalsCard />
-                  <AIChatCard
-                    isFullscreen={false}
-                    onFullscreenChange={() => {}}
-                  />
+                  <AIChatCard isFullscreen={false} onFullscreenChange={() => {}} />
                 </div>
-
-                {/* Middle Row - 3 Equal Cards */}
                 <div className="grid grid-cols-3 gap-6 mb-10">
                   <ToDoCard />
                   <ProgressPatternsCard />

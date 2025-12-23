@@ -12,6 +12,7 @@ from datetime import datetime
 import openai
 import os
 import json
+from app.config.model_config import get_model_name
 
 
 @dataclass
@@ -50,19 +51,19 @@ class BreakthroughDetector:
     - Therapist-client interaction dynamics
     """
 
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-5"):
+    def __init__(self, api_key: Optional[str] = None, override_model: Optional[str] = None):
         """
         Initialize with OpenAI API key and model selection.
 
         Args:
             api_key: OpenAI API key. If None, uses OPENAI_API_KEY env var.
-            model: OpenAI model to use (default: gpt-5 for complex reasoning)
+            override_model: Optional model override for testing (default: uses gpt-5 from config)
         """
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         if not self.api_key:
             raise ValueError("OpenAI API key required for breakthrough detection")
         openai.api_key = self.api_key
-        self.model = model
+        self.model = get_model_name("breakthrough_detection", override_model=override_model)
 
     def analyze_session(
         self,
@@ -163,10 +164,10 @@ class BreakthroughDetector:
         system_prompt = self._create_breakthrough_detection_prompt()
 
         # Call OpenAI API
+        # NOTE: GPT-5 series does NOT support custom temperature - uses internal calibration
         try:
-            # GPT-5 doesn't support custom temperature, use default (1.0)
             response = openai.chat.completions.create(
-                model=self.model,  # gpt-5
+                model=self.model,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": f"Analyze this therapy session transcript:\n\n{conversation_text}"}

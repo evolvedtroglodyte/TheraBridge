@@ -15,6 +15,7 @@ from datetime import datetime
 import openai
 import os
 import json
+from app.config.model_config import get_model_name
 
 
 @dataclass
@@ -43,20 +44,20 @@ class MoodAnalyzer:
     - Speaking patterns and verbal markers
     """
 
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-5-mini"):
+    def __init__(self, api_key: Optional[str] = None, override_model: Optional[str] = None):
         """
         Initialize the mood analyzer.
 
         Args:
             api_key: OpenAI API key. If None, uses OPENAI_API_KEY env var.
-            model: OpenAI model to use (default: gpt-5-mini)
+            override_model: Optional model override for testing (default: uses gpt-5-nano from config)
         """
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         if not self.api_key:
             raise ValueError("OpenAI API key required for mood analysis")
 
         openai.api_key = self.api_key
-        self.model = model
+        self.model = get_model_name("mood_analysis", override_model=override_model)
 
     def analyze_session_mood(
         self,
@@ -88,6 +89,7 @@ class MoodAnalyzer:
         prompt = self._create_analysis_prompt(patient_segments)
 
         # Call OpenAI API
+        # NOTE: GPT-5 series does NOT support custom temperature - uses internal calibration
         try:
             response = openai.chat.completions.create(
                 model=self.model,
@@ -101,7 +103,6 @@ class MoodAnalyzer:
                         "content": prompt
                     }
                 ],
-                temperature=0.3,  # Lower temperature for more consistent analysis
                 response_format={"type": "json_object"}
             )
 

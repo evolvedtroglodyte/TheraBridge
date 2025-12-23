@@ -24,6 +24,7 @@ import logging
 
 from app.database import get_db
 from supabase import Client
+from app.config.model_config import get_model_name
 
 logger = logging.getLogger(__name__)
 
@@ -116,20 +117,21 @@ class DeepAnalyzer:
     - Patient history (previous sessions, mood trends, recurring themes)
     """
 
-    def __init__(self, api_key: Optional[str] = None, db: Optional[Client] = None):
+    def __init__(self, api_key: Optional[str] = None, db: Optional[Client] = None, override_model: Optional[str] = None):
         """
         Initialize the deep analyzer.
 
         Args:
             api_key: OpenAI API key. If None, uses OPENAI_API_KEY env var.
             db: Supabase client. If None, uses default from get_db()
+            override_model: Optional model override for testing (default: uses gpt-5.2 from config)
         """
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         if not self.api_key:
             raise ValueError("OpenAI API key required for deep analysis")
 
         openai.api_key = self.api_key
-        self.model = "gpt-4o"  # More complex reasoning needed
+        self.model = get_model_name("deep_analysis", override_model=override_model)
         self.db = db or next(get_db())
 
     async def analyze_session(
@@ -156,6 +158,7 @@ class DeepAnalyzer:
         prompt = self._create_analysis_prompt(context)
 
         # Call OpenAI API
+        # NOTE: GPT-5 series does NOT support custom temperature - uses internal calibration
         try:
             response = openai.chat.completions.create(
                 model=self.model,
@@ -169,7 +172,6 @@ class DeepAnalyzer:
                         "content": prompt
                     }
                 ],
-                temperature=0.3,  # Lower temperature for consistent analysis
                 response_format={"type": "json_object"}
             )
 

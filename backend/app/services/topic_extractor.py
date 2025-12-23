@@ -18,6 +18,7 @@ import openai
 import os
 import json
 from app.services.technique_library import get_technique_library, TechniqueLibrary
+from app.config.model_config import get_model_name
 
 
 @dataclass
@@ -46,20 +47,20 @@ class TopicExtractor:
     The AI naturally concludes topics from context without hardcoded outputs.
     """
 
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-5-mini"):
+    def __init__(self, api_key: Optional[str] = None, override_model: Optional[str] = None):
         """
         Initialize the topic extractor with technique library.
 
         Args:
             api_key: OpenAI API key. If None, uses OPENAI_API_KEY env var.
-            model: OpenAI model to use (default: gpt-5-mini)
+            override_model: Optional model override for testing (default: uses gpt-5-mini from config)
         """
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         if not self.api_key:
             raise ValueError("OpenAI API key required for topic extraction")
 
         openai.api_key = self.api_key
-        self.model = model
+        self.model = get_model_name("topic_extraction", override_model=override_model)
 
         # Load technique library for validation
         self.technique_library: TechniqueLibrary = get_technique_library()
@@ -92,6 +93,7 @@ class TopicExtractor:
         prompt = self._create_extraction_prompt(conversation)
 
         # Call OpenAI API
+        # NOTE: GPT-5 series does NOT support custom temperature - uses internal calibration
         try:
             response = openai.chat.completions.create(
                 model=self.model,
@@ -105,7 +107,6 @@ class TopicExtractor:
                         "content": prompt
                     }
                 ],
-                temperature=0.3,  # Lower temperature for consistent extraction
                 response_format={"type": "json_object"}
             )
 
