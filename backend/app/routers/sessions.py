@@ -191,7 +191,24 @@ async def get_all_sessions(
             detail="Invalid or missing demo token. Initialize demo first."
         )
 
-    patient_id = demo_user["id"]
+    user_id = demo_user["id"]
+
+    # Get patient record for this user
+    patient_response = (
+        db.table("patients")
+        .select("id")
+        .eq("user_id", user_id)
+        .single()
+        .execute()
+    )
+
+    if not patient_response.data:
+        raise HTTPException(
+            status_code=404,
+            detail="Patient record not found for this user"
+        )
+
+    patient_id = patient_response.data["id"]
 
     # Fetch all sessions for this patient, ordered by date DESC (newest first)
     response = (
