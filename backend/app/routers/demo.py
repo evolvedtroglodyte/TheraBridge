@@ -608,7 +608,13 @@ async def get_demo_status(
     try:
         roadmap_response = db.table("patient_roadmap").select("updated_at").eq("patient_id", patient_id).execute()
         if roadmap_response.data and len(roadmap_response.data) > 0:
-            roadmap_updated_at = roadmap_response.data[0].get("updated_at")
+            # Handle case where response is a dict or a string
+            first_row = roadmap_response.data[0]
+            if isinstance(first_row, dict):
+                roadmap_updated_at = first_row.get("updated_at")
+            else:
+                # If it's a string, it's already the updated_at value
+                roadmap_updated_at = first_row
     except Exception as e:
         # Roadmap table might not exist yet (Phase 5 not complete)
         logger.debug(f"Could not query roadmap table: {e}")
