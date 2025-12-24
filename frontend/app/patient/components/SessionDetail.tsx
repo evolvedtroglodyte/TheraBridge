@@ -8,7 +8,7 @@
  * - FIXED: Accessibility - focus trap, Escape key, focus restoration
  */
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowLeft, Star } from 'lucide-react';
 import { Session } from '../lib/types';
@@ -19,13 +19,49 @@ import { DeepAnalysisSection } from './DeepAnalysisSection';
 import { LoadingOverlay } from './LoadingOverlay';
 import { mapNumericMoodToCategory, formatMoodScore } from '../../../lib/mood-mapper';
 import { renderMoodEmoji } from './SessionIcons';
-import { ThemeToggle } from '../../../components/ui/theme-toggle';
+import { useTheme } from 'next-themes';
 
 // Font families - matching dashboard standard (Inter + Crimson Pro)
 const TYPOGRAPHY = {
   serif: '"Crimson Pro", Georgia, serif',
   sans: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
 } as const;
+
+// Theme Toggle Icon (matching NavigationBar style)
+function ThemeIcon({ isDark }: { isDark: boolean }) {
+  if (isDark) {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#93B4DC"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-[22px] h-[22px]"
+        style={{ filter: 'drop-shadow(0 0 4px rgba(147, 180, 220, 0.6)) drop-shadow(0 0 10px rgba(147, 180, 220, 0.3))' }}
+      >
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#F5A623"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-[22px] h-[22px]"
+      style={{ filter: 'drop-shadow(0 0 4px rgba(245, 166, 35, 0.5)) drop-shadow(0 0 8px rgba(245, 166, 35, 0.25))' }}
+    >
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+    </svg>
+  );
+}
 
 interface SessionDetailProps {
   session: Session | null;
@@ -41,6 +77,16 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
   const previousSessionIdRef = useRef<string | null>(null);
 
   const { loadingSessions } = useSessionData();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = theme === 'dark';
+  const toggleTheme = () => setTheme(isDark ? 'light' : 'dark');
 
   // Accessibility: focus trap, Escape key, scroll lock
   useModalAccessibility({
@@ -123,7 +169,15 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
           {/* Controls (Right) */}
           <div className="flex items-center gap-3">
             {/* Theme Toggle */}
-            <ThemeToggle />
+            {mounted && (
+              <button
+                onClick={toggleTheme}
+                className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-[#3d3548] transition-colors"
+                aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                <ThemeIcon isDark={isDark} />
+              </button>
+            )}
 
             {/* Close Button (X icon) */}
             <button
@@ -201,10 +255,10 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
                   {session.mood_score !== undefined && session.mood_score !== null ? (
                     <div className="flex items-center gap-2">
                       {/* Custom emoji based on numeric score */}
-                      {renderMoodEmoji(
+                      {mounted && renderMoodEmoji(
                         mapNumericMoodToCategory(session.mood_score),
                         18,
-                        false // isDark - will be handled by component
+                        isDark
                       )}
                       {/* Numeric score */}
                       <span style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '13px', fontWeight: 500 }} className="text-gray-800 dark:text-gray-200">
