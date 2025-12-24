@@ -119,28 +119,31 @@ All implementation for PR #3 (Phases 0-5) is complete. This plan systematically 
 
 ---
 
-### Task 5: Local Backend Testing
-**Test backend endpoints locally**
+### Task 5: Railway Backend Testing
+**Test backend endpoints on Railway production deployment**
 
 **Steps:**
-1. Start backend server: `cd backend && source venv/bin/activate && uvicorn app.main:app --reload`
-2. Test POST /api/demo/initialize - verify creates patient + sessions
-3. Test GET /api/demo/status - verify includes new fields
-4. Monitor logs for Wave 1 completion
-5. Monitor logs for Wave 2 completion + roadmap generation
-6. Test GET /api/patients/{patientId}/roadmap - verify returns roadmap data
-7. Test POST /api/demo/stop - verify processes terminate
-8. Test POST /api/demo/resume - verify smart resume logic
+1. Deploy to Railway: `git push origin main`
+2. Monitor deployment: Use Railway MCP `get-logs` with logType="deploy"
+3. Get production URL from Railway dashboard
+4. Test POST /api/demo/initialize - verify creates patient + sessions
+5. Test GET /api/demo/status - verify includes new fields (processing_state, roadmap_updated_at, can_resume)
+6. Monitor Railway logs for Wave 1 completion
+7. Monitor Railway logs for Wave 2 completion + roadmap generation (look for "ROADMAP GENERATION" prefix)
+8. Test GET /api/patients/{patientId}/roadmap - verify returns roadmap data
+9. Test POST /api/demo/stop - verify processes terminate
+10. Test POST /api/demo/resume - verify smart resume logic
 
 **Success criteria:**
-- All endpoints return expected responses
+- All endpoints return expected responses in production
 - Roadmap generation triggers after Wave 2
-- Logs show 5-step orchestration
-- Database contains roadmap data
+- Railway logs show 5-step orchestration with flush=True output
+- Database contains roadmap data (verify via Supabase MCP)
 
 **Environment setup:**
-- Ensure `ROADMAP_COMPACTION_STRATEGY=hierarchical` (default)
-- Ensure OpenAI API key is set
+- Set `ROADMAP_COMPACTION_STRATEGY=hierarchical` in Railway environment variables (default)
+- OpenAI API key already configured in Railway
+- All Railway env vars already set
 
 ---
 
@@ -214,35 +217,39 @@ All implementation for PR #3 (Phases 0-5) is complete. This plan systematically 
 
 ---
 
-### Task 8: Frontend Integration Testing
-**Test frontend displays roadmap correctly**
+### Task 8: Railway Frontend Integration Testing
+**Test frontend displays roadmap correctly on Railway production**
 
 **Steps:**
-1. Start frontend: `cd frontend && npm run dev`
-2. Navigate to patient dashboard
-3. Verify "Your Journey" card shows empty state initially
-4. Click "Initialize Demo" or load existing demo patient
-5. Monitor card for loading overlay when roadmap generates
-6. Verify roadmap content displays after first Wave 2 (~60s)
-7. Verify session counter shows "Based on 1 out of 10 uploaded sessions"
-8. Wait for Session 2 Wave 2 to complete
-9. Verify loading overlay appears again
-10. Verify roadmap updates with new content
-11. Verify counter shows "2 out of 10"
-12. Test expanded modal view
-13. Test Stop/Resume button flow
+1. Push frontend to Railway: `git push origin main` (triggers automatic deployment)
+2. Get production frontend URL from Railway dashboard
+3. Open production URL in browser
+4. Navigate to patient dashboard
+5. Verify "Your Journey" card shows empty state initially
+6. Click "Initialize Demo" or load existing demo patient
+7. Monitor card for loading overlay when roadmap generates
+8. Verify roadmap content displays after first Wave 2 (~60s)
+9. Verify session counter shows "Based on 1 out of 10 uploaded sessions"
+10. Wait for Session 2 Wave 2 to complete
+11. Verify loading overlay appears again
+12. Verify roadmap updates with new content
+13. Verify counter shows "2 out of 10"
+14. Test expanded modal view (click card to expand)
+15. Test Stop/Resume button flow
 
 **Success criteria:**
-- Loading states appear at correct times
+- Loading states appear at correct times on production
 - Roadmap content updates after each Wave 2
-- Session counter increments correctly
-- Modal works properly
+- Session counter increments correctly (1/10 → 2/10 → ... → 10/10)
+- Modal works properly with animations
 - Stop/Resume button changes states correctly
+- No errors in production
 
-**Browser testing:**
-- Check Network tab for API polling
+**Browser testing (production):**
+- Check Network tab for API polling to Railway backend
 - Check Console for errors
-- Verify localStorage persistence
+- Verify localStorage persistence across refreshes
+- Test in multiple browsers (Chrome, Firefox, Safari)
 
 ---
 

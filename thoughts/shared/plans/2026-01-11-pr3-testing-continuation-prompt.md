@@ -85,45 +85,56 @@ WHERE table_name = 'roadmap_versions';
 
 Use `mcp__supabase__execute_sql` to run these queries and verify the schema matches the migration.
 
-#### 2. Backend Verification (Local Development)
+#### 2. Backend Verification (Railway Production)
 
-**Start backend server:**
+**Deploy to Railway:**
 ```bash
-cd backend
-source venv/bin/activate
-uvicorn app.main:app --reload
+# Push to main branch (triggers automatic Railway deployment)
+git push origin main
+
+# Monitor deployment logs
+# Use Railway MCP: mcp__Railway__get-logs
 ```
 
-**Test endpoints:**
+**Get production URL from Railway dashboard**
+
+**Test endpoints in production:**
 ```bash
+# Set production URL
+PROD_URL=<your-railway-backend-url>
+
 # Test demo initialization (creates patient + 10 sessions)
-curl -X POST http://localhost:8000/api/demo/initialize
+curl -X POST $PROD_URL/api/demo/initialize
 
 # Save the demo_token from response
 
 # Test demo status (should include processing_state, roadmap_updated_at)
-curl -H "X-Demo-Token: <your-token>" http://localhost:8000/api/demo/status
+curl -H "X-Demo-Token: <your-token>" $PROD_URL/api/demo/status
 
 # Test roadmap endpoint (should return 404 or roadmap data)
-curl http://localhost:8000/api/patients/<patient-id>/roadmap
+curl $PROD_URL/api/patients/<patient-id>/roadmap
 
 # Test stop endpoint
-curl -X POST -H "X-Demo-Token: <your-token>" http://localhost:8000/api/demo/stop
+curl -X POST -H "X-Demo-Token: <your-token>" $PROD_URL/api/demo/stop
 
 # Test resume endpoint
-curl -X POST -H "X-Demo-Token: <your-token>" http://localhost:8000/api/demo/resume
+curl -X POST -H "X-Demo-Token: <your-token>" $PROD_URL/api/demo/resume
 ```
 
-#### 3. Frontend Verification (Local Development)
+#### 3. Frontend Verification (Railway Production)
 
-**Start frontend dev server:**
+**Deploy to Railway:**
 ```bash
-cd frontend
-npm run dev
+# Push to main branch (triggers automatic Railway deployment)
+git push origin main
+
+# Frontend deploys automatically with backend
 ```
 
-**Browser testing checklist:**
-- [ ] Load patient dashboard → "Your Journey" card shows empty state
+**Get production frontend URL from Railway dashboard**
+
+**Browser testing checklist (production):**
+- [ ] Load production patient dashboard → "Your Journey" card shows empty state
 - [ ] Click "Initialize Demo" or load demo patient
 - [ ] Verify "Your Journey" card shows loading overlay when roadmap generates
 - [ ] Verify roadmap content appears after first Wave 2 completes (~60s)
@@ -132,36 +143,52 @@ npm run dev
 - [ ] Verify roadmap content updates (should be different from Session 1)
 - [ ] Test Stop/Resume flow:
   - Click "Stop Processing" button (should turn green "Resume Processing")
-  - Verify processing actually stops
+  - Verify processing actually stops (check Railway logs)
   - Click "Resume Processing" (should turn red "Stop Processing")
   - Verify processing continues from stopped session
 - [ ] Wait for all 10 sessions to complete → Verify button shows "Processing Complete" (gray, disabled)
 - [ ] Verify final roadmap shows "Based on 10 out of 10 uploaded sessions"
 
+**Railway Logs Monitoring:**
+- Use Railway MCP `get-logs` to monitor backend logs
+- Look for "ROADMAP GENERATION" prefix in logs
+- Verify 5-step orchestration output appears
+
 #### 4. Compaction Strategy Testing
 
-**Test all 3 strategies** (requires backend restart for each):
+**Test all 3 strategies** (requires Railway environment variable change for each):
 
 **Strategy 1: Hierarchical (Default)**
 ```bash
-# In backend/.env or environment
-export ROADMAP_COMPACTION_STRATEGY="hierarchical"
+# Set in Railway environment variables dashboard
+ROADMAP_COMPACTION_STRATEGY=hierarchical
 
-# Start backend, run 10-session demo, verify roadmap generates
+# Redeploy backend (Railway auto-restarts with new env var)
+# Run 10-session demo via production frontend
+# Verify roadmap generates after each Wave 2
+# Check Railway logs for tier compaction messages
 ```
 
 **Strategy 2: Progressive**
 ```bash
-export ROADMAP_COMPACTION_STRATEGY="progressive"
+# Update Railway environment variable
+ROADMAP_COMPACTION_STRATEGY=progressive
 
-# Reset demo, run again, verify roadmap generates with lighter context
+# Redeploy backend
+# Initialize new demo patient (different from Strategy 1)
+# Verify roadmap generates with lighter context
+# Check logs for "progressive" strategy output
 ```
 
 **Strategy 3: Full**
 ```bash
-export ROADMAP_COMPACTION_STRATEGY="full"
+# Update Railway environment variable
+ROADMAP_COMPACTION_STRATEGY=full
 
-# Reset demo, run again, verify roadmap generates with full context
+# Redeploy backend
+# Initialize new demo patient
+# Verify roadmap generates with full context
+# Check logs for "full" strategy output
 ```
 
 **For each strategy, verify:**
@@ -201,14 +228,24 @@ WHERE patient_id = '<patient-id>';
 
 **Expected:** 1 row, sessions_analyzed=10, total_sessions=10
 
-#### 6. Railway Deployment Verification (Optional)
+#### 6. Railway Deployment Verification (REQUIRED)
 
-If testing in production:
+**All testing is done on Railway production deployment:**
 
 **Check Railway logs:**
 ```bash
 # Use Railway MCP to get logs
-# Look for roadmap generation output after Wave 2
+mcp__Railway__get-logs with:
+  - logType: "deploy" (for application logs)
+  - service: <backend-service-name>
+  - filter: "ROADMAP GENERATION" (to see orchestration output)
+
+# Look for:
+# - "[Step 1/5] Fetching session data..."
+# - "[Step 2/5] Generating session insights..."
+# - "[Step 3/5] Building context..."
+# - "[Step 4/5] Generating roadmap..."
+# - "[Step 5/5] Updating database..."
 ```
 
 **Verify in production browser:**
@@ -216,6 +253,7 @@ If testing in production:
 - [ ] Trigger demo initialization
 - [ ] Verify roadmap generates and displays correctly
 - [ ] Test Stop/Resume flow in production
+- [ ] Check Railway logs for process termination/restart messages
 
 #### 7. Performance & Cost Monitoring
 

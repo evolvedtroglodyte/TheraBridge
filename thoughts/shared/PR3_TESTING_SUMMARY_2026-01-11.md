@@ -193,17 +193,17 @@ async def get_patient_roadmap(
 
 ## Remaining Testing Tasks
 
-The following tasks require **RUNTIME TESTING** (cannot be verified via static code analysis):
+The following tasks require **RUNTIME TESTING ON RAILWAY** (cannot be verified via static code analysis):
 
-### ⏳ Task 5: Local Backend Testing
+### ⏳ Task 5: Railway Backend Testing
 **Status:** PENDING
 
 **Requirements:**
-- Start backend server locally
-- Test all 5 endpoints with curl/Postman
+- Deploy to Railway (push to main branch)
+- Test all 5 endpoints in production
 - Verify roadmap generation triggers after Wave 2
-- Monitor logs for 5-step orchestration output
-- Verify database writes to both tables
+- Monitor Railway logs for 5-step orchestration output
+- Verify database writes to both tables via Supabase MCP
 
 ### ⏳ Task 6: Compaction Strategy Testing
 **Status:** PENDING
@@ -224,16 +224,16 @@ The following tasks require **RUNTIME TESTING** (cannot be verified via static c
 - Verify sessions_analyzed increments
 - Verify metadata fields populated correctly
 
-### ⏳ Task 8: Frontend Integration Testing
+### ⏳ Task 8: Railway Frontend Integration Testing
 **Status:** PENDING
 
 **Requirements:**
-- Load patient dashboard in browser
+- Deploy to Railway and load production frontend in browser
 - Verify "Your Journey" card shows empty state initially
-- Trigger demo initialization
+- Trigger demo initialization via production UI
 - Verify loading overlay appears during roadmap generation
 - Verify roadmap updates after each Wave 2 completion
-- Verify session counter increments
+- Verify session counter increments correctly
 
 ### ⏳ Task 9: Stop/Resume Flow Testing
 **Status:** PENDING
@@ -258,40 +258,55 @@ The following tasks require **RUNTIME TESTING** (cannot be verified via static c
 
 ## Testing Environment Setup
 
-**Backend:**
+**Deployment:**
 ```bash
-cd backend
-source venv/bin/activate
-export ROADMAP_COMPACTION_STRATEGY=hierarchical  # or progressive, full
-uvicorn app.main:app --reload
+# Push to Railway (triggers automatic deployment)
+git push origin main
+
+# Monitor deployment
+# Use Railway MCP: mcp__Railway__get-logs
 ```
 
-**Frontend:**
-```bash
-cd frontend
-npm run dev
+**Environment Variables (set in Railway dashboard):**
+```
+ROADMAP_COMPACTION_STRATEGY=hierarchical  # or progressive, full
+OPENAI_API_KEY=<your-key>
+# All other env vars already configured
 ```
 
 **Database:**
 - Use Supabase MCP tools for SQL queries
 - `mcp__supabase__execute_sql` for data verification
+- Database is already connected to Railway
 
-**API Testing:**
+**Railway API Testing:**
 ```bash
+# Get production URL from Railway
+PROD_URL=<your-railway-url>
+
 # Initialize demo
-curl -X POST http://localhost:8000/api/demo/initialize
+curl -X POST $PROD_URL/api/demo/initialize
 
 # Check status (includes roadmap_updated_at)
-curl -H "X-Demo-Token: <token>" http://localhost:8000/api/demo/status
+curl -H "X-Demo-Token: <token>" $PROD_URL/api/demo/status
 
 # Get roadmap
-curl http://localhost:8000/api/patients/<patient-id>/roadmap
+curl $PROD_URL/api/patients/<patient-id>/roadmap
 
 # Stop processing
-curl -X POST -H "X-Demo-Token: <token>" http://localhost:8000/api/demo/stop
+curl -X POST -H "X-Demo-Token: <token>" $PROD_URL/api/demo/stop
 
 # Resume processing
-curl -X POST -H "X-Demo-Token: <token>" http://localhost:8000/api/demo/resume
+curl -X POST -H "X-Demo-Token: <token>" $PROD_URL/api/demo/resume
+```
+
+**Railway Logs:**
+```
+# Use Railway MCP to monitor logs
+mcp__Railway__get-logs with:
+- logType: "deploy" (for application logs)
+- service: backend service name
+- Filter for "ROADMAP GENERATION" to see orchestration output
 ```
 
 ---
@@ -369,11 +384,11 @@ curl -X POST -H "X-Demo-Token: <token>" http://localhost:8000/api/demo/resume
 
 1. ✅ **Code Review Complete** - All backend/frontend code verified
 2. ✅ **Critical Bug Fixed** - Missing endpoint implemented
-3. ⏳ **Local Backend Testing** - Test all endpoints with real data
-4. ⏳ **Frontend Integration Testing** - Test UI in browser
-5. ⏳ **Railway Deployment** - Deploy and test in production
-6. ⏳ **End-to-End Verification** - Full 10-session demo test
-7. ⏳ **Performance Analysis** - Measure costs and timing
+3. ⏳ **Railway Deployment** - Push to main, deploy to production
+4. ⏳ **Railway API Testing** - Test all endpoints in production
+5. ⏳ **Production Frontend Testing** - Test UI in production browser
+6. ⏳ **End-to-End Verification** - Full 10-session demo test on Railway
+7. ⏳ **Performance Analysis** - Measure costs and timing via Railway logs
 8. ⏳ **Final Sign-off** - Mark PR #3 complete
 
 ---
