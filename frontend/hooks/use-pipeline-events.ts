@@ -34,6 +34,7 @@ export function usePipelineEvents(options: UsePipelineEventsOptions) {
   const [isConnected, setIsConnected] = useState(false);
   const [events, setEvents] = useState<PipelineEvent[]>([]);
   const eventSourceRef = useRef<EventSource | null>(null);
+  const handleEventRef = useRef<(event: PipelineEvent) => void>();
 
   const handleEvent = useCallback(
     (event: PipelineEvent) => {
@@ -80,6 +81,11 @@ export function usePipelineEvents(options: UsePipelineEventsOptions) {
     [onEvent, onWave1SessionComplete, onWave2SessionComplete]
   );
 
+  // Update ref when handleEvent changes
+  useEffect(() => {
+    handleEventRef.current = handleEvent;
+  }, [handleEvent]);
+
   useEffect(() => {
     if (!enabled || !patientId) {
       return;
@@ -99,7 +105,10 @@ export function usePipelineEvents(options: UsePipelineEventsOptions) {
     eventSource.onmessage = (messageEvent) => {
       try {
         const event: PipelineEvent = JSON.parse(messageEvent.data);
-        handleEvent(event);
+        // Use ref to avoid stale closure
+        if (handleEventRef.current) {
+          handleEventRef.current(event);
+        }
       } catch (error) {
         console.error("Failed to parse SSE event:", error);
       }
@@ -108,7 +117,7 @@ export function usePipelineEvents(options: UsePipelineEventsOptions) {
     eventSource.onerror = (error) => {
       console.error("SSE connection error:", error);
       setIsConnected(false);
-      eventSource.close();
+      // Don't close - let browser handle reconnection
     };
 
     // Cleanup on unmount
@@ -117,7 +126,7 @@ export function usePipelineEvents(options: UsePipelineEventsOptions) {
       eventSource.close();
       setIsConnected(false);
     };
-  }, [enabled, patientId, handleEvent]);
+  }, [enabled, patientId]);  // Removed handleEvent to prevent reconnection loop
 
   return {
     isConnected,
