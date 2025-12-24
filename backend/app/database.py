@@ -132,16 +132,18 @@ async def get_session_with_breakthrough(session_id: str) -> dict:
 
     session = session_response.data
 
-    # Get all breakthroughs for session
-    if session.get("has_breakthrough"):
-        breakthroughs_response = (
-            db.table("breakthrough_history")
-            .select("*")
-            .eq("session_id", session_id)
-            .order("confidence_score", desc=True)
-            .execute()
-        )
-        session["all_breakthroughs"] = breakthroughs_response.data
+    # NOTE: breakthrough_history table does not exist (production fix 2026-01-08)
+    # Breakthrough detection results are stored in therapy_sessions.has_breakthrough
+    # Historical tracking via separate table is not currently implemented
+    # if session.get("has_breakthrough"):
+    #     breakthroughs_response = (
+    #         db.table("breakthrough_history")
+    #         .select("*")
+    #         .eq("session_id", session_id)
+    #         .order("confidence_score", desc=True)
+    #         .execute()
+    #     )
+    #     session["all_breakthroughs"] = breakthroughs_response.data
 
     return session
 
@@ -179,22 +181,24 @@ async def store_breakthrough_analysis(
         .execute()
     )
 
-    # Store in breakthrough_history
-    if all_breakthroughs:
-        for i, bt in enumerate(all_breakthroughs):
-            history_entry = {
-                "session_id": session_id,
-                "breakthrough_type": bt["type"],
-                "description": bt["description"],
-                "evidence": bt["evidence"],
-                "confidence_score": bt["confidence"],
-                "timestamp_start": bt.get("timestamp_start", 0),
-                "timestamp_end": bt.get("timestamp_end", 0),
-                "dialogue_excerpt": bt.get("dialogue_excerpt", []),
-                "is_primary": (i == 0),  # First one is primary
-            }
-
-            db.table("breakthrough_history").insert(history_entry).execute()
+    # NOTE: breakthrough_history table does not exist (production fix 2026-01-08)
+    # Breakthrough detection results are stored in therapy_sessions via has_breakthrough & breakthrough_data
+    # Historical tracking via separate table is not currently implemented
+    # if all_breakthroughs:
+    #     for i, bt in enumerate(all_breakthroughs):
+    #         history_entry = {
+    #             "session_id": session_id,
+    #             "breakthrough_type": bt["type"],
+    #             "description": bt["description"],
+    #             "evidence": bt["evidence"],
+    #             "confidence_score": bt["confidence"],
+    #             "timestamp_start": bt.get("timestamp_start", 0),
+    #             "timestamp_end": bt.get("timestamp_end", 0),
+    #             "dialogue_excerpt": bt.get("dialogue_excerpt", []),
+    #             "is_primary": (i == 0),  # First one is primary
+    #         }
+    #
+    #         db.table("breakthrough_history").insert(history_entry).execute()
 
     logger.info(f"✓ Stored breakthrough analysis for session {session_id}")
     return session_update.data

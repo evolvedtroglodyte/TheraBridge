@@ -671,36 +671,42 @@ Return your analysis as JSON following the specified format. Be compassionate, s
 
     async def _get_breakthrough_history(self, patient_id: str) -> List[Dict[str, Any]]:
         """Get breakthrough history for the patient."""
-        if self.db is None:
-            return []  # No DB available (testing/mocking)
+        # NOTE: breakthrough_history table does not exist (production fix 2026-01-08)
+        # Breakthrough detection results are stored in therapy_sessions.has_breakthrough
+        # Historical tracking via separate table is not currently implemented
+        # Returning empty list to prevent errors in Wave 2 analysis
+        return []
 
-        try:
-            # Get all sessions for this patient
-            sessions_response = (
-                self.db.table("therapy_sessions")
-                .select("id")
-                .eq("patient_id", patient_id)
-                .execute()
-            )
-
-            if not sessions_response.data:
-                return []
-
-            session_ids = [s["id"] for s in sessions_response.data]
-
-            # Get breakthroughs for these sessions
-            response = (
-                self.db.table("breakthrough_history")
-                .select("*")
-                .in_("session_id", session_ids)
-                .order("created_at", desc=True)
-                .limit(10)
-                .execute()
-            )
-            return response.data if response.data else []
-        except Exception as e:
-            logger.warning(f"Failed to get breakthrough history: {e}")
-            return []
+        # if self.db is None:
+        #     return []  # No DB available (testing/mocking)
+        #
+        # try:
+        #     # Get all sessions for this patient
+        #     sessions_response = (
+        #         self.db.table("therapy_sessions")
+        #         .select("id")
+        #         .eq("patient_id", patient_id)
+        #         .execute()
+        #     )
+        #
+        #     if not sessions_response.data:
+        #         return []
+        #
+        #     session_ids = [s["id"] for s in sessions_response.data]
+        #
+        #     # Get breakthroughs for these sessions
+        #     response = (
+        #         self.db.table("breakthrough_history")
+        #         .select("*")
+        #         .in_("session_id", session_ids)
+        #         .order("created_at", desc=True)
+        #         .limit(10)
+        #         .execute()
+        #     )
+        #     return response.data if response.data else []
+        # except Exception as e:
+        #     logger.warning(f"Failed to get breakthrough history: {e}")
+        #     return []
 
     def _detect_speaker_roles(self, segments: List[Dict[str, Any]]) -> Dict[str, str]:
         """

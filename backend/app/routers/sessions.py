@@ -298,18 +298,20 @@ async def get_patient_sessions(
     # Get technique library for definition lookups
     technique_lib = get_technique_library()
 
-    # Optionally fetch breakthrough history for each session
-    if include_breakthroughs:
-        for session in sessions:
-            if session.get("has_breakthrough"):
-                bt_response = (
-                    db.table("breakthrough_history")
-                    .select("*")
-                    .eq("session_id", session["id"])
-                    .order("confidence_score", desc=True)
-                    .execute()
-                )
-                session["all_breakthroughs"] = bt_response.data
+    # NOTE: breakthrough_history table reference removed (production fix 2026-01-08)
+    # Breakthrough detection results are stored in therapy_sessions.has_breakthrough
+    # Historical tracking via separate table is not currently implemented
+    # if include_breakthroughs:
+    #     for session in sessions:
+    #         if session.get("has_breakthrough"):
+    #             bt_response = (
+    #                 db.table("breakthrough_history")
+    #                 .select("*")
+    #                 .eq("session_id", session["id"])
+    #                 .order("confidence_score", desc=True)
+    #                 .execute()
+    #             )
+    #             session["all_breakthroughs"] = bt_response.data
 
     # Enrich sessions with technique definitions
     for session in sessions:
@@ -615,44 +617,47 @@ async def analyze_breakthrough(
         )
 
 
-@router.get("/patient/{patient_id}/breakthroughs")
-async def get_patient_breakthroughs(
-    patient_id: str,
-    min_confidence: Optional[float] = None,
-    breakthrough_type: Optional[str] = None,
-    db: Client = Depends(get_db)
-):
-    """
-    Get all breakthroughs for a patient across all sessions
-
-    Args:
-        patient_id: Patient UUID
-        min_confidence: Minimum confidence score filter
-        breakthrough_type: Filter by type (cognitive_insight, etc.)
-
-    Returns:
-        List of breakthroughs with session context
-    """
-    # Build query
-    query = (
-        db.table("breakthrough_history")
-        .select("*, therapy_sessions(session_date, duration_minutes)")
-        .in_("session_id",
-            db.table("therapy_sessions")
-            .select("id")
-            .eq("patient_id", patient_id)
-        )
-    )
-
-    if min_confidence:
-        query = query.gte("confidence_score", min_confidence)
-
-    if breakthrough_type:
-        query = query.eq("breakthrough_type", breakthrough_type)
-
-    response = query.order("created_at", desc=True).execute()
-
-    return response.data
+# NOTE: Endpoint disabled - breakthrough_history table does not exist (production fix 2026-01-08)
+# Breakthrough detection results are stored in therapy_sessions.has_breakthrough
+# Historical tracking via separate table is not currently implemented
+# @router.get("/patient/{patient_id}/breakthroughs")
+# async def get_patient_breakthroughs(
+#     patient_id: str,
+#     min_confidence: Optional[float] = None,
+#     breakthrough_type: Optional[str] = None,
+#     db: Client = Depends(get_db)
+# ):
+#     """
+#     Get all breakthroughs for a patient across all sessions
+#
+#     Args:
+#         patient_id: Patient UUID
+#         min_confidence: Minimum confidence score filter
+#         breakthrough_type: Filter by type (cognitive_insight, etc.)
+#
+#     Returns:
+#         List of breakthroughs with session context
+#     """
+#     # Build query
+#     query = (
+#         db.table("breakthrough_history")
+#         .select("*, therapy_sessions(session_date, duration_minutes)")
+#         .in_("session_id",
+#             db.table("therapy_sessions")
+#             .select("id")
+#             .eq("patient_id", patient_id)
+#         )
+#     )
+#
+#     if min_confidence:
+#         query = query.gte("confidence_score", min_confidence)
+#
+#     if breakthrough_type:
+#         query = query.eq("breakthrough_type", breakthrough_type)
+#
+#     response = query.order("created_at", desc=True).execute()
+#
+#     return response.data
 
 
 @router.get("/patient/{patient_id}/consistency")
