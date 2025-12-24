@@ -19,9 +19,9 @@ import { DeepAnalysisSection } from './DeepAnalysisSection';
 import { renderMoodEmoji } from './SessionIcons';
 import { useTheme } from '../contexts/ThemeContext';
 
-// Font families - matching SessionCard (using system-ui throughout)
-const fontSerif = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-const fontSans = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+// Font families - matching SessionCard
+const fontSerif = '"Crimson Pro", Georgia, serif';
+const fontSans = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 interface SessionDetailProps {
   session: Session | null;
@@ -123,7 +123,7 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
           {/* Left Column - Transcript */}
           <div className="border-r border-[#E0DDD8] dark:border-[#3d3548] overflow-y-auto p-8 bg-[#F8F7F4] dark:bg-[#1a1625]">
             <div className="flex items-center justify-between mb-6">
-              <h3 style={{ fontFamily: fontSans }} className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+              <h3 style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200">
                 Session Transcript
               </h3>
 
@@ -181,7 +181,7 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
 
           {/* Right Column - Analysis */}
           <div className="overflow-y-auto p-8 bg-gray-50 dark:bg-[#2a2435]">
-            <h3 style={{ fontFamily: fontSans }} className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6 text-center">
+            <h3 style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200 mb-6 text-center">
               Session Analysis
             </h3>
 
