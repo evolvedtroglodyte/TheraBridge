@@ -4,6 +4,87 @@ Detailed history of all development sessions, architectural decisions, and imple
 
 ---
 
+## 2026-01-09 - GPT-5-nano API Investigation & Final Fix for BLOCKER #2 ✅ COMPLETE
+
+**Context:** Investigated why action_items_summary was NULL in production despite successful API integration. Discovered GPT-5-nano API constraints through iterative testing and comparison with other services.
+
+**Problem Discovery:**
+- Initial fix (commit `8e3bd82`) added ActionItemsSummarizer to seed script, but all summaries were NULL
+- Sessions API returned 200 OK, but `action_items_summary` was empty string or NULL
+- No API errors logged, but GPT-5-nano consistently returned 0 characters
+
+**Investigation Process (6 iterations):**
+
+**Iteration 1 - Parameter Fix (`a9cc104`):**
+- Issue: OpenAI API error: "Unsupported parameter: 'max_tokens'"
+- Fix: Changed `max_tokens=30` → `max_completion_tokens=30`
+- Result: ❌ Still empty strings (no errors, but 0 chars generated)
+
+**Iteration 2 - Temperature Removal (`7ff3cab`):**
+- Issue: OpenAI API error: "Unsupported value: 'temperature' does not support 0.3"
+- Fix: Removed `temperature=0.3` parameter entirely
+- Result: ❌ Still empty strings (API succeeds, content is empty)
+
+**Iteration 3 - Token Limit Increase (`e73fbbc`):**
+- Hypothesis: `max_completion_tokens=30` too restrictive
+- Fix: Increased to `max_completion_tokens=60` (allows ~80 chars)
+- Result: ❌ Still empty strings (API succeeds, content remains empty)
+
+**Iteration 4 - Model Switch (`12a61f7`):**
+- Hypothesis: GPT-5-nano doesn't exist or is broken
+- Fix: Switched to `gpt-4o-mini` (proven working model)
+- Result: ✅ SUCCESS! Summaries generated (40-45 chars)
+- Evidence: "Create safety plan & explore ADHD options" (41), "Use TIPP skills & limit social media triggers" (45)
+
+**Iteration 5 - Evidence Gathering:**
+- Checked if GPT-5-nano works elsewhere in codebase
+- Found: mood_analyzer also uses gpt-5-nano successfully
+- Key difference: mood_analyzer uses NO optional parameters
+- Database verification: mood_score populated correctly (5.5, confidence 0.85)
+
+**Iteration 6 - Final Fix (`ab52d2a`):**
+- **Root Cause Identified:** GPT-5-nano returns empty strings with ANY optional parameters
+- **Solution:** Call API with ONLY `model` + `messages` (minimal params)
+- **Evidence:** Consistent with mood_analyzer implementation pattern
+- **Result:** ✅ SUCCESS! All 10 sessions generated summaries (39-45 chars)
+
+**Production Verification Results:**
+```
+✅ "Save crisis resources & schedule ADHD eval" (42 chars)
+✅ "Use TIPP in crisis & limit ex on social media" (45 chars)
+✅ "Get ADHD meds eval referral & track symptoms" (44 chars)
+✅ "Take Adderall XR; log proof & reframe belief" (44 chars)
+✅ "Practice defusion & self-family kindness" (40 chars)
+✅ "Meditate daily & try social in PDX w Jordan" (43 chars)
+✅ "Journal anxiety & sit with urges focus values" (45 chars)
+✅ "Practice TIPP & DEAR MAN to request 2 nights" (44 chars)
+✅ "Draft NB note to parents & roleplay out" (39 chars)
+✅ "Respect space & watch distress with Jordan..." (45 chars)
+```
+
+**Key Learnings:**
+1. **GPT-5-nano API Constraints:** Cannot use `temperature`, `max_completion_tokens`, or any optional params
+2. **Debugging Pattern:** Compare with working service using same model (mood_analyzer)
+3. **Parameter Minimalism:** Some models require bare minimum API calls (model + messages only)
+4. **Model Consistency:** Use same parameter pattern across all services using same model
+
+**Files Modified:**
+- `backend/app/config/model_config.py` - Kept gpt-5-nano for action_summary
+- `backend/app/services/action_items_summarizer.py` - Removed ALL optional parameters
+
+**Commits:**
+- `a9cc104` - Update OpenAI API parameter for GPT-5 compatibility
+- `7ff3cab` - Remove temperature parameter for GPT-5-nano compatibility
+- `e73fbbc` - Increase max_completion_tokens to allow GPT-5-nano output
+- `12a61f7` - Switch action_summary to gpt-4o-mini (testing)
+- `ab52d2a` - Switch action_summary to gpt-5-nano with no parameters ✅ FINAL
+
+**Status:** BLOCKER #2 fully resolved. Backend complete. Ready for Phase 2 frontend testing.
+
+**Next:** Frontend UI verification of all 6 Phase 1C features (separate window/session).
+
+---
+
 ## 2026-01-08 - Critical Production Fixes for PR #1 Phase 1C ✅ COMPLETE
 
 **Context:** Fixed 3 critical blockers discovered during production testing. All blockers preventing Phase 1C from functioning have been resolved.

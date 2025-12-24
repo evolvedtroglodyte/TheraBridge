@@ -140,14 +140,30 @@ Before creating any new file, ask:
 
 ## Current Focus: SessionDetail UI Improvements + Wave 1 Action Summarization (PR #1)
 
-**PR #1 Status:** ✅ CRITICAL FIXES COMPLETE - Ready for Final Testing
+**PR #1 Status:** ✅ BACKEND COMPLETE - Ready for Frontend Testing (Phase 2)
 
-**Production Fix Results (2026-01-08):**
+**Production Fix Results - BLOCKER #2 FINAL FIX (2026-01-09):**
 - ✅ **BLOCKER #1 FIXED:** Removed all `breakthrough_history` table references - API now returns 200 OK
-- ✅ **BLOCKER #2 FIXED:** ActionItemsSummarizer integrated into seed script - summaries now generated
+- ✅ **BLOCKER #2 FINALLY FIXED:** GPT-5-nano working with minimal parameters - summaries generating (39-45 chars)
 - ✅ **BLOCKER #3 RESOLVED:** Frontend accessible - API working correctly
-- 📋 **Test Report:** `thoughts/shared/PRODUCTION_TEST_RESULTS_2026-01-08.md`
+- 📋 **Initial Test Report:** `thoughts/shared/PRODUCTION_TEST_RESULTS_2026-01-08.md`
 - 🔧 **Fix Summary:** `thoughts/shared/PRODUCTION_FIX_SUMMARY_2026-01-08.md`
+- 📝 **Final Testing Prompt:** `thoughts/shared/PR1_FINAL_TESTING_PROMPT_2026-01-08.md`
+
+**Critical Discovery - GPT-5-nano API Constraints (2026-01-09):**
+- **Root Cause:** GPT-5-nano returns empty strings when ANY optional parameters are used
+- **Issue:** `temperature=X` OR `max_completion_tokens=X` → empty response
+- **Solution:** Call API with ONLY `model` + `messages` (no optional params)
+- **Evidence:** mood_analyzer (also gpt-5-nano) uses same minimal parameter approach
+- **Commits:** 6 iterations to discover issue (a9cc104 → 7ff3cab → e73fbbc → 12a61f7 → ab52d2a)
+- **Final Fix:** Commit `ab52d2a` - Switch to gpt-5-nano with NO parameters ✅
+
+**Production Verification (2026-01-09):**
+- ✅ All 10 test sessions generated action summaries (39-45 chars)
+- ✅ Examples: "Save crisis resources & schedule ADHD eval" (42), "Use TIPP in crisis & limit ex on social media" (45)
+- ✅ Database `action_items_summary` column populated correctly
+- ✅ Backend API returning summaries in sessions endpoint
+- ⏳ Frontend UI testing pending (Phase 2)
 
 **Phase 1C Implementation Complete (2026-01-08):**
 - ✅ Database migration applied - `action_items_summary` TEXT column added via Supabase MCP
@@ -181,6 +197,11 @@ Before creating any new file, ask:
 - ⏳ Phase 1B Deferred: Header fonts + Timeline deprecation (non-critical)
 
 **Commits (PR #1):**
+- `ab52d2a` - fix(pr1-phase1c): Switch action_summary to gpt-5-nano with no parameters ✅ FINAL FIX
+- `12a61f7` - fix(pr1-phase1c): Switch action_summary to gpt-4o-mini (GPT-5-nano broken)
+- `e73fbbc` - fix(pr1-phase1c): Increase max_completion_tokens to allow GPT-5-nano output
+- `7ff3cab` - fix(pr1-phase1c): Remove temperature parameter for GPT-5-nano compatibility
+- `a9cc104` - fix(pr1-phase1c): Update OpenAI API parameter for GPT-5 compatibility
 - `8e3bd82` - fix(pr1-phase1c): Add ActionItemsSummarizer to Wave 1 seed script (Blocker #2)
 - `3e9ea89` - fix(pr1-phase1c): Remove breakthrough_history table references (Blocker #1)
 - `8d50165` - docs: Production testing results and fix handoff documentation
