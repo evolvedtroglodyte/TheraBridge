@@ -140,28 +140,34 @@ Before creating any new file, ask:
 
 ## Current Focus: SessionDetail UI Improvements + Wave 1 Action Summarization (PR #1)
 
-**PR #1 Status:** Phase 1C Planning Complete ✅ | Implementation Pending
+**PR #1 Status:** Phase 1C Complete ✅ | Ready for Production Testing
 
-**Phase 1C Scope (Extended - 2026-01-07):**
-- [ ] Display numeric mood score next to custom emoji in SessionDetail
-- [ ] Show technique definitions below technique names in SessionDetail
-- [ ] Replace "Back to Dashboard" button with X icon (top-right corner)
-- [ ] Add theme toggle button to SessionDetail header
-- [ ] Create 45-char action items summary via new Wave 1 LLM call
-- [ ] Update SessionCard to display condensed action summary as second bullet
+**Phase 1C Complete (2026-01-08):**
+- ✅ Database migration applied - `action_items_summary` TEXT column added via Supabase MCP
+- ✅ Backend: ActionItemsSummarizer service (gpt-5-nano, 45-char max)
+- ✅ Backend: Sequential action summarization integrated into Wave 1 orchestration
+- ✅ Backend: Sessions API enriched with technique definitions from technique_library.json
+- ✅ Frontend: Mood mapper utility (numeric 0-10 → categorical sad/neutral/happy)
+- ✅ Frontend: Session interface extended with 8 new fields
+- ✅ Frontend: SessionCard uses condensed action summary (45 chars)
+- ✅ Frontend: SessionDetail displays mood score + emoji, technique definitions, X button, theme toggle
+- ✅ Build verified successful, TypeScript compiles without errors
+- ✅ Git commits pushed (be21ae3 implementation, 6d22548 documentation)
 
-**Planning Complete (2026-01-07):**
-- ✅ Wave 0 research: Custom emoji logic, data flow verification, Railway logs
-- ✅ Implementation plan: `thoughts/shared/plans/2026-01-07-sessiondetail-ui-improvements-wave1-action-summarization.md`
-- ✅ Architecture design: Sequential action summarization after topic extraction
-- ✅ Cost analysis: +0.7% increase ($0.0003/session)
-- ✅ Technical decisions documented (mood mapping, technique definitions, UI changes)
+**Implementation Details (2026-01-08):**
+- Wave 0 research: Custom emoji logic, data flow verification, Railway logs
+- Implementation plan: `thoughts/shared/plans/2026-01-07-sessiondetail-ui-improvements-wave1-action-summarization.md`
+- Architecture: Sequential action summarization after topic extraction (preserves quality)
+- Cost impact: +0.7% increase (+$0.0003/session) - negligible
+- Files modified: 10 total (3 new, 7 modified)
 
 **Previous Phases:**
 - ✅ Phase 1A Complete (2026-01-07): Font standardization for SessionDetail + DeepAnalysisSection
-- ⏳ Phase 1B Deferred: Header fonts + Timeline deprecation
+- ⏳ Phase 1B Deferred: Header fonts + Timeline deprecation (non-critical)
 
-**Commits (Phase 1A):**
+**Commits (PR #1):**
+- `6d22548` - docs: Update SESSION_LOG and TheraBridge.md with Phase 1C completion
+- `be21ae3` - Feature: PR #1 Phase 1C - SessionDetail UI improvements + Wave 1 action summarization
 - `d3f7390` - Feature: PR #1 Phase 1A - Font standardization for SessionDetail and DeepAnalysisSection
 - `87098f6` - Fix: Complete Tailwind font class removal in SessionDetail.tsx
 - `c2eea93` - Fix: Add missing fontFamily to badges in DeepAnalysisSection
@@ -205,12 +211,13 @@ Before creating any new file, ask:
 - `NEXT_PUBLIC_POLLING_INTERVAL_WAVE2=3000` - 3s during Wave 2
 
 **API Cost Breakdown (OpenAI GPT-5 series):**
-- **Per Session**: ~$0.042 (4.2¢)
-  - Wave 1: ~$0.0102 (mood + topics + breakthrough)
+- **Per Session**: ~$0.0423 (4.23¢)
+  - Wave 1: ~$0.0105 (mood + topics + action summary + breakthrough)
   - Wave 2: ~$0.0318 (deep analysis + prose)
-- **Full Demo (10 sessions)**: ~$0.42
+- **Full Demo (10 sessions)**: ~$0.423
 - **With Whisper transcription**: +$3.60 (60-min sessions)
 - **Stop after Wave 1**: Saves ~$0.32
+- **Phase 1C Cost Increase**: +0.7% (+$0.0003/session) - negligible
 
 **Next Steps:**
 - [x] ~~Monitor production logs for granular update behavior~~ ✅ COMPLETE
@@ -218,10 +225,12 @@ Before creating any new file, ask:
 - [x] ~~Add OpenAI credits for testing~~ ✅ COMPLETE
 - [x] ~~**PR #1 Phase 1A:** Font standardization~~ ✅ COMPLETE
 - [x] ~~**PR #1 Phase 1C:** Planning for UI improvements + Wave 1 action summarization~~ ✅ COMPLETE
-- [ ] **PR #1 Phase 1C:** Execute implementation (backend + frontend + database)
-- [ ] **PR #1 Phase 1C:** Test and verify (Railway logs, UI rendering, data flow)
+- [x] ~~**PR #1 Phase 1C:** Execute implementation (backend + frontend + database)~~ ✅ COMPLETE
+- [ ] **PR #1:** Test in production (trigger demo pipeline, verify action summaries, mood scores, technique definitions)
+- [ ] **PR #1:** Monitor Railway logs for sequential action summarization execution
+- [ ] **PR #1:** Verify UI renders correctly (mood emoji + score, technique definitions, X button, theme toggle)
 - [ ] **PR #1:** Merge all phases and update documentation
-- [ ] **PR #1 Phase 1B:** Header fonts + Timeline deprecation (deferred)
+- [ ] **PR #1 Phase 1B:** Header fonts + Timeline deprecation (deferred to future)
 - [ ] **PR #2:** Implement Prose Analysis UI with Toggle
 - [ ] Implement Feature 2: Analytics Dashboard
 
