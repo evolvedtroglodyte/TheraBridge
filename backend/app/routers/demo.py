@@ -406,7 +406,18 @@ async def get_demo_status(
     Returns:
         DemoStatusResponse with user info, session count, and per-session completion
     """
-    patient_id = demo_user["id"]
+    user_id = demo_user["id"]
+
+    # Look up the patient record to get patient_id
+    patient_response = db.table("patients").select("id").eq("user_id", user_id).single().execute()
+
+    if not patient_response.data:
+        raise HTTPException(
+            status_code=404,
+            detail="Patient record not found for demo user"
+        )
+
+    patient_id = patient_response.data["id"]
 
     # Fetch all sessions with analysis data
     sessions_response = db.table("therapy_sessions").select(
