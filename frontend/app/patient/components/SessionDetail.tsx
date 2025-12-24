@@ -97,7 +97,7 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
           </button>
 
           <div className="text-center">
-            <h2 id="session-detail-title" className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            <h2 id="session-detail-title" style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200">
               Session {session.id.replace('s', '')} - {session.date}, 2024
             </h2>
             {session.milestone && (
@@ -122,8 +122,8 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
         <div className="flex-1 grid grid-cols-2 overflow-hidden">
           {/* Left Column - Transcript */}
           <div className="border-r border-[#E0DDD8] dark:border-[#3d3548] overflow-y-auto p-8 bg-[#F8F7F4] dark:bg-[#1a1625]">
-            <div className="flex items-center justify-between mb-6">
-              <h3 style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200">
+            <div className="flex flex-col items-center mb-6">
+              <h3 style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200 mb-3">
                 Session Transcript
               </h3>
 
