@@ -58,6 +58,34 @@ class DemoStatusResponse(BaseModel):
 # Background Tasks
 # ============================================================================
 
+async def populate_session_transcripts_background(patient_id: str):
+    """Background task to populate session transcripts from JSON files"""
+    logger.info(f"📝 Populating session transcripts for patient {patient_id}")
+
+    try:
+        # Get Python executable from current environment
+        python_exe = sys.executable
+
+        # Run transcript population script
+        result = subprocess.run(
+            [python_exe, "backend/scripts/seed_all_sessions.py", patient_id],
+            capture_output=True,
+            text=True,
+            timeout=300  # 5 minute timeout
+        )
+
+        if result.returncode == 0:
+            logger.info(f"✅ Session transcripts populated for patient {patient_id}")
+            logger.info(result.stdout)
+        else:
+            logger.error(f"❌ Transcript population failed: {result.stderr}")
+
+    except subprocess.TimeoutExpired:
+        logger.error(f"❌ Transcript population timeout for patient {patient_id}")
+    except Exception as e:
+        logger.error(f"❌ Transcript population error: {e}")
+
+
 async def run_wave1_analysis_background(patient_id: str):
     """Background task to run Wave 1 analysis"""
     logger.info(f"🚀 Starting Wave 1 analysis for patient {patient_id}")
@@ -112,17 +140,20 @@ async def run_wave2_analysis_background(patient_id: str):
         logger.error(f"❌ Wave 2 analysis error: {e}")
 
 
-async def run_full_analysis_pipeline(patient_id: str):
-    """Run both Wave 1 and Wave 2 analysis sequentially"""
-    logger.info(f"🧠 Starting full analysis pipeline for patient {patient_id}")
+async def run_full_initialization_pipeline(patient_id: str):
+    """Run complete initialization: transcripts → Wave 1 → Wave 2"""
+    logger.info(f"🎬 Starting full initialization pipeline for patient {patient_id}")
 
-    # Run Wave 1 first
+    # Step 1: Populate transcripts from JSON files
+    await populate_session_transcripts_background(patient_id)
+
+    # Step 2: Run Wave 1 analysis (topics, mood, summary)
     await run_wave1_analysis_background(patient_id)
 
-    # Then run Wave 2 (requires Wave 1 to be complete)
+    # Step 3: Run Wave 2 analysis (deep analysis, patterns)
     await run_wave2_analysis_background(patient_id)
 
-    logger.info(f"🎉 Full analysis pipeline complete for patient {patient_id}")
+    logger.info(f"🎉 Full initialization pipeline complete for patient {patient_id}")
 
 
 # ============================================================================
@@ -156,8 +187,8 @@ async def initialize_demo(
     logger.info(f"Initializing demo user with token: {demo_token}")
 
     try:
-        # Call SQL function to seed demo data (v3 uses fixed date for Session 1)
-        response = db.rpc("seed_demo_v3", {"p_demo_token": demo_token}).execute()
+        # Call SQL function to seed demo data (v4 creates all 10 sessions)
+        response = db.rpc("seed_demo_v4", {"p_demo_token": demo_token}).execute()
 
         if not response.data or len(response.data) == 0:
             raise HTTPException(
@@ -178,12 +209,12 @@ async def initialize_demo(
 
         logger.info(f"✓ Demo user created: {patient_id} with {len(session_ids)} sessions")
 
-        # Trigger background analysis if enabled
+        # Trigger background initialization pipeline if enabled
         analysis_status = "pending"
         if run_analysis:
-            background_tasks.add_task(run_full_analysis_pipeline, str(patient_id))
+            background_tasks.add_task(run_full_initialization_pipeline, str(patient_id))
             analysis_status = "processing"
-            logger.info(f"🧠 Queued Wave 1 + Wave 2 analysis for patient {patient_id}")
+            logger.info(f"🎬 Queued full initialization (transcripts + Wave 1 + Wave 2) for patient {patient_id}")
 
         return DemoInitResponse(
             demo_token=demo_token,
