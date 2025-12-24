@@ -373,8 +373,10 @@ export function usePatientSessions() {
         const roadmapTimestamp = (status as any).roadmap_updated_at;
         const lastRoadmapTimestamp = (sessionStatesRef.current as any)._last_roadmap_timestamp;
 
+        console.log(`[Roadmap Debug] Checking roadmap: current=${roadmapTimestamp}, last=${lastRoadmapTimestamp}`);
+
         if (roadmapTimestamp && roadmapTimestamp !== lastRoadmapTimestamp) {
-          console.log(`[Polling Debug] Roadmap updated, timestamp changed: ${lastRoadmapTimestamp} → ${roadmapTimestamp}`);
+          console.log(`[Roadmap Debug] ✓ Roadmap updated! Triggering refresh: ${lastRoadmapTimestamp} → ${roadmapTimestamp}`);
           setLoadingRoadmap(true);
 
           // Store new timestamp
