@@ -9,6 +9,7 @@
 import { Suspense, useState } from 'react';
 import { SessionDataProvider } from '@/app/patient/contexts/SessionDataContext';
 import { ProcessingProvider } from '@/contexts/ProcessingContext';
+import { WaveCompletionBridge } from '@/app/patient/components/WaveCompletionBridge';
 import { FullscreenChat, ChatMessage, ChatMode } from '@/app/patient/components/FullscreenChat';
 import { DashboardSkeleton } from '@/app/patient/components/DashboardSkeleton';
 
@@ -20,6 +21,7 @@ export default function AskAIPage() {
   return (
     <ProcessingProvider>
       <SessionDataProvider>
+        <WaveCompletionBridge />
         <Suspense fallback={<DashboardSkeleton />}>
           {/* Fullscreen chat without NavigationBar */}
           <FullscreenChat

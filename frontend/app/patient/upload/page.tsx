@@ -8,11 +8,14 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import FileUploader from './components/FileUploader';
 import AudioRecorder from './components/AudioRecorder';
 import UploadProgress from './components/UploadProgress';
 import ResultsView from './components/ResultsView';
 import { ProcessingProvider, useProcessing } from '@/contexts/ProcessingContext';
+import { SessionDataProvider } from '@/app/patient/contexts/SessionDataContext';
+import { WaveCompletionBridge } from '@/app/patient/components/WaveCompletionBridge';
 
 type ViewState = 'upload' | 'processing' | 'results';
 
@@ -20,19 +23,20 @@ type ViewState = 'upload' | 'processing' | 'results';
  * Inner component that uses ProcessingContext
  */
 function UploadPageInner() {
+  const router = useRouter();
   const [view, setView] = useState<ViewState>('upload');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const { startTracking } = useProcessing();
 
   const handleUploadSuccess = (newSessionId: string, file: File) => {
-    console.log('[Upload] Success - navigating to processing', { sessionId: newSessionId, filename: file.name });
-    setSessionId(newSessionId);
-    setUploadedFile(file);
-    setView('processing');
+    console.log('[Upload] Success - redirecting to sessions page', { sessionId: newSessionId, filename: file.name });
 
     // Start tracking this session for dashboard auto-refresh
     startTracking(newSessionId);
+
+    // Redirect to sessions page where SSE will show live updates
+    router.push('/sessions');
   };
 
   const handleProcessingComplete = () => {
@@ -86,12 +90,15 @@ function UploadPageInner() {
 }
 
 /**
- * Wrapper that provides ProcessingContext
+ * Wrapper that provides ProcessingContext and SessionDataContext
  */
 export default function UploadPage() {
   return (
     <ProcessingProvider>
-      <UploadPageInner />
+      <SessionDataProvider>
+        <WaveCompletionBridge />
+        <UploadPageInner />
+      </SessionDataProvider>
     </ProcessingProvider>
   );
 }

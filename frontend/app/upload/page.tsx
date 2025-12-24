@@ -5,8 +5,11 @@
  */
 
 import { Suspense, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useTheme } from '@/app/patient/contexts/ThemeContext';
 import { ProcessingProvider, useProcessing } from '@/contexts/ProcessingContext';
+import { SessionDataProvider } from '@/app/patient/contexts/SessionDataContext';
+import { WaveCompletionBridge } from '@/app/patient/components/WaveCompletionBridge';
 import { NavigationBar } from '@/components/NavigationBar';
 import FileUploader from '@/app/patient/upload/components/FileUploader';
 import AudioRecorder from '@/app/patient/upload/components/AudioRecorder';
@@ -19,6 +22,7 @@ import { DashboardSkeleton } from '@/app/patient/components/DashboardSkeleton';
 type ViewState = 'upload' | 'processing' | 'results';
 
 function UploadPageContent() {
+  const router = useRouter();
   const [view, setView] = useState<ViewState>('upload');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -26,11 +30,11 @@ function UploadPageContent() {
   const { isDark } = useTheme();
 
   const handleUploadSuccess = (newSessionId: string, file: File) => {
-    console.log('[Upload] Success - navigating to processing', { sessionId: newSessionId, filename: file.name });
-    setSessionId(newSessionId);
-    setUploadedFile(file);
-    setView('processing');
+    console.log('[Upload] Success - redirecting to sessions page', { sessionId: newSessionId, filename: file.name });
     startTracking(newSessionId);
+
+    // Redirect to sessions page where SSE will show live updates
+    router.push('/sessions');
   };
 
   const handleProcessingComplete = () => {
@@ -55,9 +59,9 @@ function UploadPageContent() {
             {/* Demo Transcript Uploader - Centered */}
             <div className="flex justify-center">
               <DemoTranscriptUploader onUploadSuccess={(sessionId) => {
-                console.log('[Upload] Demo upload success:', sessionId);
-                setSessionId(sessionId);
-                setView('processing');
+                console.log('[Upload] Demo upload success - redirecting to sessions:', sessionId);
+                startTracking(sessionId);
+                router.push('/sessions');
               }} />
             </div>
 
@@ -119,9 +123,12 @@ function UploadPageContent() {
 export default function UploadPage() {
   return (
     <ProcessingProvider>
-      <Suspense fallback={<DashboardSkeleton />}>
-        <UploadPageContent />
-      </Suspense>
+      <SessionDataProvider>
+        <WaveCompletionBridge />
+        <Suspense fallback={<DashboardSkeleton />}>
+          <UploadPageContent />
+        </Suspense>
+      </SessionDataProvider>
     </ProcessingProvider>
   );
 }
