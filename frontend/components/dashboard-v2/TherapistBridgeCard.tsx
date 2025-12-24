@@ -45,12 +45,6 @@ interface TherapistBridgeCardProps {
 // Animation Variants
 // ============================================================================
 
-const cardVariants = {
-  initial: { scale: 1 },
-  hover: { scale: 1.02, transition: { type: "spring" as const, stiffness: 400, damping: 25 } },
-  tap: { scale: 0.98 },
-};
-
 const sectionVariants = {
   hidden: { opacity: 0, y: 10 },
   visible: (i: number) => ({
@@ -87,10 +81,12 @@ export function TherapistBridgeCard({
           // Soft glow shadow as specified
           boxShadow: "0 2px 16px rgba(91, 185, 180, 0.15)",
         }}
-        variants={cardVariants}
-        initial="initial"
-        whileHover="hover"
-        whileTap="tap"
+        initial={{ y: 0 }}
+        whileHover={{
+          y: -2,
+          transition: { duration: 0.2, ease: 'easeOut' }
+        }}
+        whileTap={{ scale: 0.99 }}
         onClick={() => setIsExpanded(true)}
         role="button"
         tabIndex={0}

@@ -346,13 +346,16 @@ export function FullscreenChat({
     setConversationId(undefined); // Clear conversation ID for fresh chat
   };
 
-  // Logo/text click handler - scroll to top only
+  // Logo click handler - navigate to home/dashboard
   const handleLogoClick = () => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
+    if (enableHomeNavigation) {
+      // If embedded (overlay), close the modal to return to dashboard
+      // If standalone page (/ask-ai), navigate to dashboard
+      if (isEmbedded) {
+        onClose();
+      } else {
+        router.push('/dashboard');
+      }
     }
   };
 
@@ -373,8 +376,8 @@ export function FullscreenChat({
           : "fixed inset-0 z-[2000] flex fullscreen-chat-container"
         }
       >
-        {/* Sidebar */}
-        <ChatSidebar
+        {/* Sidebar - HIDDEN (Commented out as per user request) */}
+        {/* <ChatSidebar
           isExpanded={sidebarExpanded}
           onToggle={() => setSidebarExpanded(!sidebarExpanded)}
           recentChats={recentChats}
@@ -392,33 +395,52 @@ export function FullscreenChat({
             }
           } : undefined}
           onThemeToggle={toggleTheme}
-        />
+        /> */}
 
-        {/* Main Content */}
+        {/* Main Content - Now full width with consistent background */}
         <div
           className={`flex-1 flex flex-col transition-colors duration-300 ${
-            isDark ? 'bg-[#1a1625]' : 'bg-[#ECEAE5]'
+            isDark ? 'bg-[#1a1625]' : 'bg-[#F8F7F4]'
           }`}
         >
-          {/* Header Bar - White background to match sidebar */}
+          {/* Header Bar - White background, full width border */}
           <div
-            className={`relative flex items-center justify-center h-14 px-5 border-b flex-shrink-0 ${
-              isDark ? 'bg-[#1a1625] border-[#3d3548]' : 'bg-white border-[#E0DDD8]'
+            className={`relative flex items-center justify-between h-14 px-5 border-b flex-shrink-0 ${
+              isDark ? 'bg-[#1a1625] border-white' : 'bg-white border-white'
             }`}
           >
-            {/* Centered Dobby Logo + DOBBY text - illuminating, clickable */}
+            {/* Left Side - TheraBridge Logo (Home button) */}
             <div
-              className="cursor-pointer flex items-center gap-2"
+              onClick={handleLogoClick}
+              style={{
+                cursor: enableHomeNavigation ? 'pointer' : 'default',
+                transition: enableHomeNavigation ? 'transform 0.2s ease, filter 0.2s ease' : 'none',
+              }}
+              onMouseEnter={enableHomeNavigation ? (e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.filter = 'brightness(1.2)';
+              } : undefined}
+              onMouseLeave={enableHomeNavigation ? (e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.filter = 'brightness(1)';
+              } : undefined}
+              className="flex items-center gap-2"
+            >
+              <BridgeIcon size={28} />
+            </div>
+
+            {/* Center - Dobby Logo + DOBBY text - illuminating, non-clickable */}
+            <div
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2"
               style={{
                 filter: isDark
                   ? 'drop-shadow(0 0 8px rgba(139, 106, 174, 0.56)) drop-shadow(0 0 17px rgba(139, 106, 174, 0.35))'
                   : 'drop-shadow(0 0 8px rgba(90, 185, 180, 0.56)) drop-shadow(0 0 17px rgba(90, 185, 180, 0.35))',
               }}
-              onClick={handleLogoClick}
             >
               {/* Logo - always visible */}
               <DobbyLogo size={50} />
-              {/* DOBBY text - always visible, clickable for scroll to top */}
+              {/* DOBBY text - always visible, non-clickable branding */}
               <span
                 className={`font-mono text-lg font-medium tracking-[4px] uppercase ${
                   isDark ? 'text-[#9B7AC4]' : 'text-[#5AB9B4]'
@@ -428,8 +450,8 @@ export function FullscreenChat({
               </span>
             </div>
 
-            {/* Right Side - Share button only */}
-            <div className="absolute right-5 top-1/2 -translate-y-1/2 flex items-center gap-2">
+            {/* Right Side - Share button */}
+            <div className="flex items-center gap-2">
               {/* Share Button */}
               <button
                 onClick={() => setShareModalOpen(true)}
