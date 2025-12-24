@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from app.services.session_insights_summarizer import SessionInsightsSummarizer
 from app.services.roadmap_generator import RoadmapGenerator
-from app.database import get_supabase_client
+from app.database import get_supabase_admin
 
 
 def generate_roadmap_for_session(patient_id: str, session_id: str):
@@ -35,7 +35,7 @@ def generate_roadmap_for_session(patient_id: str, session_id: str):
     3. Generate roadmap
     4. Update database (patient_roadmap + roadmap_versions)
     """
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
 
     print(f"\n{'='*60}", flush=True)
     print(f"ROADMAP GENERATION - Session {session_id}", flush=True)

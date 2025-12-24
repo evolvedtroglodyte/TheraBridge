@@ -434,6 +434,7 @@ async def main(patient_id: str):
                     [sys.executable, roadmap_script, patient_id, session['id']],
                     capture_output=True,
                     text=True,
+                    env=os.environ.copy(),  # Pass environment variables (OPENAI_API_KEY, etc.)
                     timeout=60  # 60 second timeout for roadmap generation
                 )
 
