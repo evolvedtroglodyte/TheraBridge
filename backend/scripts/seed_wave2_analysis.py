@@ -424,30 +424,26 @@ async def main(patient_id: str):
             session["deep_analysis"] = deep_analysis
             previous_cumulative_context = cumulative_context
 
-            # PR #3 Phase 5: Generate roadmap after Wave 2 completes
+            # PR #3 Phase 5: Generate roadmap after Wave 2 completes (non-blocking)
             print(f"\n[Roadmap] Triggering roadmap generation for session {session['id']}", flush=True)
             try:
-                # Run generate_roadmap.py as subprocess
+                # Run generate_roadmap.py as detached subprocess (fire and forget)
+                # This ensures roadmap generation continues even if Wave 2 script exits
                 import subprocess
                 roadmap_script = os.path.join(os.path.dirname(__file__), 'generate_roadmap.py')
-                result = subprocess.run(
+
+                # Use Popen for non-blocking execution
+                # Inherit stdout/stderr so logs appear in Railway
+                # start_new_session=True detaches from parent process group
+                subprocess.Popen(
                     [sys.executable, roadmap_script, patient_id, session['id']],
-                    capture_output=True,
-                    text=True,
+                    stdout=None,  # Inherit parent's stdout (Railway captures this)
+                    stderr=None,  # Inherit parent's stderr
                     env=os.environ.copy(),  # Pass environment variables (OPENAI_API_KEY, etc.)
-                    timeout=60  # 60 second timeout for roadmap generation
+                    start_new_session=True  # Detach from parent process group
                 )
+                print(f"[Roadmap] ✓ Roadmap generation started (async) for session {session['id']}", flush=True)
 
-                if result.returncode == 0:
-                    print(f"[Roadmap] ✓ Roadmap generated for session {session['id']}", flush=True)
-                    # Print roadmap script output
-                    if result.stdout:
-                        print(result.stdout, flush=True)
-                else:
-                    print(f"[Roadmap] ✗ Roadmap generation failed: {result.stderr}", flush=True)
-
-            except subprocess.TimeoutExpired:
-                print(f"[Roadmap] ✗ Roadmap generation timeout (60s)", flush=True)
             except Exception as e:
                 print(f"[Roadmap] ✗ Roadmap generation error: {e}", flush=True)
 
