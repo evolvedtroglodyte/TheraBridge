@@ -8,9 +8,14 @@ NOTE: GPT-5 series models do NOT support custom temperature parameters.
 They use internal calibrated randomness - attempting to set temperature causes API errors.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
+from typing import Optional, Any
+from datetime import datetime
+import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class TaskComplexity(Enum):
@@ -229,6 +234,244 @@ def print_model_summary() -> None:
 
     print(f"TOTAL ESTIMATED COST: ${total_cost:.4f} per session (~{total_cost * 100:.2f}¢)")
     print("\n" + "=" * 50 + "\n")
+
+
+@dataclass
+class GenerationCost:
+    """
+    Tracks cost and timing for a single AI generation.
+
+    Attributes:
+        task: The task type (e.g., "deep_analysis", "mood_analysis")
+        model: The model used (e.g., "gpt-5.2", "gpt-5-nano")
+        input_tokens: Number of input tokens
+        output_tokens: Number of output tokens
+        cost: Total cost in USD
+        duration_ms: Generation time in milliseconds
+        timestamp: When the generation occurred
+        session_id: Optional session ID for tracking
+        metadata: Optional additional metadata
+    """
+    task: str
+    model: str
+    input_tokens: int
+    output_tokens: int
+    cost: float
+    duration_ms: int
+    timestamp: datetime = field(default_factory=datetime.utcnow)
+    session_id: Optional[str] = None
+    metadata: Optional[dict] = None
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary for JSON serialization or database storage."""
+        return {
+            "task": self.task,
+            "model": self.model,
+            "input_tokens": self.input_tokens,
+            "output_tokens": self.output_tokens,
+            "cost": self.cost,
+            "duration_ms": self.duration_ms,
+            "timestamp": self.timestamp.isoformat(),
+            "session_id": self.session_id,
+            "metadata": self.metadata
+        }
+
+
+def calculate_cost(model_name: str, input_tokens: int, output_tokens: int) -> float:
+    """
+    Calculate the actual cost for a generation based on token usage.
+
+    Args:
+        model_name: Name of the model used (e.g., "gpt-5.2")
+        input_tokens: Number of input tokens used
+        output_tokens: Number of output tokens generated
+
+    Returns:
+        Cost in USD
+
+    Example:
+        >>> calculate_cost("gpt-5.2", 5000, 800)
+        0.0199  # $0.0199
+    """
+    if model_name not in MODEL_REGISTRY:
+        logger.warning(f"Unknown model '{model_name}' for cost calculation, returning 0")
+        return 0.0
+
+    config = MODEL_REGISTRY[model_name]
+    input_cost = (input_tokens / 1_000_000) * config.cost_per_1m_input
+    output_cost = (output_tokens / 1_000_000) * config.cost_per_1m_output
+
+    return input_cost + output_cost
+
+
+def store_generation_cost_sync(
+    cost_info: 'GenerationCost',
+    patient_id: Optional[str] = None
+) -> None:
+    """
+    Synchronous version of store_generation_cost for non-async contexts.
+
+    Uses a direct database connection without async/await.
+
+    Args:
+        cost_info: GenerationCost object from track_generation_cost()
+        patient_id: Optional patient UUID string for association
+    """
+    import os
+    import psycopg2
+    import json
+
+    try:
+        database_url = os.getenv("DATABASE_URL")
+        if not database_url:
+            logger.warning("DATABASE_URL not set, skipping cost storage")
+            return
+
+        conn = psycopg2.connect(database_url)
+        cur = conn.cursor()
+        cur.execute(
+            """
+            INSERT INTO generation_costs (
+                task, model, input_tokens, output_tokens, cost, duration_ms,
+                session_id, patient_id, metadata, created_at
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                cost_info.task,
+                cost_info.model,
+                cost_info.input_tokens,
+                cost_info.output_tokens,
+                cost_info.cost,
+                cost_info.duration_ms,
+                cost_info.session_id,
+                patient_id,
+                json.dumps(cost_info.metadata) if cost_info.metadata else None,
+                cost_info.timestamp
+            )
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+        logger.debug(f"Stored generation cost: {cost_info.task} = ${cost_info.cost:.6f}")
+    except Exception as e:
+        logger.error(f"Failed to store generation cost (sync): {e}")
+        # Don't raise - cost tracking failure shouldn't break the main flow
+
+
+def track_generation_cost(
+    response: Any,
+    task: str,
+    model: str,
+    start_time: float,
+    session_id: Optional[str] = None,
+    patient_id: Optional[str] = None,
+    metadata: Optional[dict] = None,
+    persist: bool = True
+) -> GenerationCost:
+    """
+    Extract cost information from an OpenAI API response and create a GenerationCost record.
+    Automatically persists to database by default.
+
+    Args:
+        response: The OpenAI API response object (ChatCompletion)
+        task: Task identifier (e.g., "deep_analysis", "mood_analysis")
+        model: Model name used (e.g., "gpt-5.2")
+        start_time: time.time() value from before the API call
+        session_id: Optional session ID for tracking
+        patient_id: Optional patient ID for tracking
+        metadata: Optional additional metadata to store
+        persist: Whether to store in database (default: True)
+
+    Returns:
+        GenerationCost object with all tracking information
+
+    Example:
+        start = time.time()
+        response = client.chat.completions.create(...)
+        cost_info = track_generation_cost(response, "deep_analysis", "gpt-5.2", start, session_id)
+    """
+    end_time = time.time()
+    duration_ms = int((end_time - start_time) * 1000)
+
+    # Extract token usage from response
+    input_tokens = response.usage.prompt_tokens if response.usage else 0
+    output_tokens = response.usage.completion_tokens if response.usage else 0
+
+    # Calculate actual cost
+    cost = calculate_cost(model, input_tokens, output_tokens)
+
+    generation_cost = GenerationCost(
+        task=task,
+        model=model,
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        cost=cost,
+        duration_ms=duration_ms,
+        session_id=session_id,
+        metadata=metadata
+    )
+
+    # Log for visibility
+    logger.info(
+        f"[Cost] {task}: {input_tokens} in / {output_tokens} out = ${cost:.6f} ({duration_ms}ms)"
+    )
+    print(
+        f"[Cost] {task}: {input_tokens} in / {output_tokens} out = ${cost:.6f} ({duration_ms}ms)",
+        flush=True
+    )
+
+    # Persist to database (sync, non-blocking failure)
+    if persist:
+        store_generation_cost_sync(generation_cost, patient_id=patient_id)
+
+    return generation_cost
+
+
+async def store_generation_cost(
+    cost_info: GenerationCost,
+    patient_id: Optional[str] = None
+) -> None:
+    """
+    Store a GenerationCost record in the database.
+
+    This function is async because database operations should be non-blocking.
+    Call this after track_generation_cost() to persist the cost data.
+
+    Args:
+        cost_info: GenerationCost object from track_generation_cost()
+        patient_id: Optional patient UUID string for association
+
+    Example:
+        cost_info = track_generation_cost(response, "deep_analysis", "gpt-5.2", start, session_id)
+        await store_generation_cost(cost_info, patient_id=str(patient.id))
+    """
+    # Import here to avoid circular imports
+    from app.database import get_db_connection
+
+    try:
+        conn = await get_db_connection()
+        await conn.execute(
+            """
+            INSERT INTO generation_costs (
+                task, model, input_tokens, output_tokens, cost, duration_ms,
+                session_id, patient_id, metadata, created_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            """,
+            cost_info.task,
+            cost_info.model,
+            cost_info.input_tokens,
+            cost_info.output_tokens,
+            cost_info.cost,
+            cost_info.duration_ms,
+            cost_info.session_id,  # Can be None
+            patient_id,  # Can be None
+            cost_info.metadata,  # JSONB, can be None
+            cost_info.timestamp
+        )
+        await conn.close()
+    except Exception as e:
+        logger.error(f"Failed to store generation cost: {e}")
+        # Don't raise - cost tracking failure shouldn't break the main flow
 
 
 if __name__ == "__main__":
