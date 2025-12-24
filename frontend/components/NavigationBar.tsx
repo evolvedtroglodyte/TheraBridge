@@ -13,6 +13,10 @@ import { useTheme } from 'next-themes';
 import { CombinedLogo, BridgeIcon } from './TheraBridgeLogo';
 import { demoApiClient } from '@/lib/demo-api-client';
 
+const TYPOGRAPHY = {
+  sans: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+} as const;
+
 // Theme Toggle Icon
 function ThemeIcon({ isDark }: { isDark: boolean }) {
   if (isDark) {
@@ -180,53 +184,73 @@ export function NavigationBar() {
       <nav className="flex items-center gap-8">
         <button
           onClick={handleDashboardClick}
-          className={`text-sm font-medium transition-all pb-1 border-b-2 ${
+          style={{
+            fontFamily: TYPOGRAPHY.sans,
+            fontSize: '14px',
+            fontWeight: 500,
+            ...(isDashboardPage ? {
+              filter: 'drop-shadow(0 0 6px rgba(90, 185, 180, 0.4)) brightness(1.1)',
+            } : {})
+          }}
+          className={`transition-all pb-1 border-b-2 ${
             isDashboardPage
               ? 'text-[#5AB9B4] dark:text-[#a78bfa] border-[#5AB9B4] dark:border-[#a78bfa]'
               : 'text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa] border-transparent'
           }`}
-          style={isDashboardPage ? {
-            filter: 'drop-shadow(0 0 6px rgba(90, 185, 180, 0.4)) brightness(1.1)',
-          } : {}}
         >
           Dashboard
         </button>
         <button
           onClick={handleSessionsClick}
-          className={`text-sm font-medium transition-all pb-1 border-b-2 ${
+          style={{
+            fontFamily: TYPOGRAPHY.sans,
+            fontSize: '14px',
+            fontWeight: 500,
+            ...(isSessionsPage ? {
+              filter: 'drop-shadow(0 0 6px rgba(90, 185, 180, 0.4)) brightness(1.1)',
+            } : {})
+          }}
+          className={`transition-all pb-1 border-b-2 ${
             isSessionsPage
               ? 'text-[#5AB9B4] dark:text-[#a78bfa] border-[#5AB9B4] dark:border-[#a78bfa]'
               : 'text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa] border-transparent'
           }`}
-          style={isSessionsPage ? {
-            filter: 'drop-shadow(0 0 6px rgba(90, 185, 180, 0.4)) brightness(1.1)',
-          } : {}}
         >
           Sessions
         </button>
         <button
           onClick={handleUploadClick}
-          className={`text-sm font-medium transition-all pb-1 border-b-2 ${
+          style={{
+            fontFamily: TYPOGRAPHY.sans,
+            fontSize: '14px',
+            fontWeight: 500,
+            ...(isUploadPage ? {
+              filter: 'drop-shadow(0 0 6px rgba(90, 185, 180, 0.4)) brightness(1.1)',
+            } : {})
+          }}
+          className={`transition-all pb-1 border-b-2 ${
             isUploadPage
               ? 'text-[#5AB9B4] dark:text-[#a78bfa] border-[#5AB9B4] dark:border-[#a78bfa]'
               : 'text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa] border-transparent'
           }`}
-          style={isUploadPage ? {
-            filter: 'drop-shadow(0 0 6px rgba(90, 185, 180, 0.4)) brightness(1.1)',
-          } : {}}
         >
           Upload
         </button>
         <button
           onClick={handleAskAIClick}
-          className={`text-sm font-medium transition-all pb-1 border-b-2 ${
+          style={{
+            fontFamily: TYPOGRAPHY.sans,
+            fontSize: '14px',
+            fontWeight: 500,
+            ...(isAskAIPage ? {
+              filter: 'drop-shadow(0 0 6px rgba(90, 185, 180, 0.4)) brightness(1.1)',
+            } : {})
+          }}
+          className={`transition-all pb-1 border-b-2 ${
             isAskAIPage
               ? 'text-[#5AB9B4] dark:text-[#a78bfa] border-[#5AB9B4] dark:border-[#a78bfa]'
               : 'text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa] border-transparent'
           }`}
-          style={isAskAIPage ? {
-            filter: 'drop-shadow(0 0 6px rgba(90, 185, 180, 0.4)) brightness(1.1)',
-          } : {}}
         >
           Ask AI
         </button>
