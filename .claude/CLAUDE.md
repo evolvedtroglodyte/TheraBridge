@@ -108,30 +108,32 @@ Before creating any new file, ask:
 
 # TherapyBridge - Project State
 
-## Current Focus: Status Endpoint Fixed - Testing Hard Refresh Flow ✅
+## Current Focus: Polling Logic Optimized - Full Flow Working ✅
 
-**Latest Fix (Commit 9fe5344):**
-- Fixed `/api/demo/status` endpoint returning `total: 0` despite sessions existing
-- Root cause: Endpoint was using USER ID instead of PATIENT ID to query sessions
-- Solution: Added patient lookup `db.table("patients").select("id").eq("user_id", user_id)` before querying sessions
+**Latest Fixes (Commits 952e574, f0fe777, cd8cf3d):**
+- ✅ Added session count tracking to detect when transcripts finish loading (0 → 10 sessions)
+- ✅ Fixed polling to only refresh when counts actually change (not on every poll)
+- ✅ Fixed polling to continue through `wave1_complete` status until `wave2_complete`
+- ✅ Added graceful timeout handling for sessions endpoint during initialization
 
-**Previous Fixes (Commits b477185-9d403a5):**
-- ✅ Fixed SSE race condition on hard refresh (patient ID reactivity)
-- ✅ Removed hard refresh detection from home and sessions pages
-- ✅ Centralized demo initialization in WaveCompletionBridge with continuous polling
+**Previous Fixes (Commits 9fe5344, e51b642, 2e53cba):**
+- ✅ Fixed `/api/demo/status` endpoint using patient_id instead of user_id
+- ✅ Removed duplicate demo initialization from usePatientSessions hook
 - ✅ Fixed status endpoint returning `wave2_complete` when `session_count == 0`
+- ✅ Removed hard refresh detection from home and sessions pages
 
 **Current Behavior:**
-- Hard refresh clears localStorage → triggers demo initialization
-- WaveCompletionBridge polls for patient ID every 500ms
-- SSE connects only after patient ID is available
-- Status endpoint now correctly queries sessions using patient_id
+1. **Demo Init (0-3s)**: Demo initialized, patient ID stored
+2. **Transcripts Loading (0-30s)**: Sessions endpoint may timeout, polling starts
+3. **Transcripts Complete (~30s)**: Polling detects `sessions: 0 → 10`, loads sessions
+4. **Wave 1 Complete (~60s)**: Polling detects `wave1: 0 → 10`, refreshes with analysis
+5. **Wave 2 Complete (~90s)**: Polling detects `wave2: 0 → 10`, shows deep analysis
+6. **Polling Stops**: When status reaches `wave2_complete`
 
 **Next Steps:**
-1. Wait for Railway deployment to complete (commit 9fe5344)
-2. Test full hard refresh flow end-to-end
-3. Verify status endpoint returns correct session counts
-4. Verify Wave 1 analysis completes and UI updates via polling
+1. Test full initialization flow from hard refresh
+2. Verify Wave 2 analysis completes and UI updates with prose text
+3. Monitor for any remaining edge cases
 
 **Full Documentation:** See `Project MDs/TherapyBridge.md`
 **Detailed Session History:** See `.claude/SESSION_LOG.md`
