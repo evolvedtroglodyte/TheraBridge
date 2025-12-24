@@ -140,9 +140,16 @@ Before creating any new file, ask:
 
 ## Current Focus: SessionDetail UI Improvements + Wave 1 Action Summarization (PR #1)
 
-**PR #1 Status:** Phase 1C Complete ✅ | Ready for Production Testing
+**PR #1 Status:** ❌ BLOCKED - Production Testing Failed (3 Critical Blockers)
 
-**Phase 1C Complete (2026-01-08):**
+**Production Testing Results (2026-01-08):**
+- ❌ **BLOCKER #1:** Missing `breakthrough_history` table - API returning 500 errors
+- ❌ **BLOCKER #2:** Action summarizer NOT called in seed script - all summaries NULL
+- ❌ **BLOCKER #3:** Frontend completely inaccessible due to API failure
+- 📋 **Full Report:** `thoughts/shared/PRODUCTION_TEST_RESULTS_2026-01-08.md`
+- 🔧 **Fix Prompt:** `thoughts/shared/PRODUCTION_FIX_PROMPT_2026-01-08.md`
+
+**Phase 1C Implementation Complete (2026-01-08):**
 - ✅ Database migration applied - `action_items_summary` TEXT column added via Supabase MCP
 - ✅ Backend: ActionItemsSummarizer service (gpt-5-nano, 45-char max)
 - ✅ Backend: Sequential action summarization integrated into Wave 1 orchestration
@@ -238,9 +245,12 @@ Before creating any new file, ask:
 - [x] ~~**PR #1 Phase 1C:** Execute implementation (backend + frontend + database)~~ ✅ COMPLETE
 - [x] ~~**PR #1 Phase 1C:** Apply database migration via Supabase MCP~~ ✅ COMPLETE
 - [x] ~~**PR #1 Phase 1C:** Update documentation (SESSION_LOG, TheraBridge, CLAUDE)~~ ✅ COMPLETE
-- [ ] **PR #1 Production Testing:** Test in production (trigger demo pipeline, verify new features)
-- [ ] **PR #1 Production Testing:** Monitor Railway logs for sequential action summarization
-- [ ] **PR #1 Production Testing:** Verify UI renders correctly (all 6 features)
+- [x] ~~**PR #1 Production Testing:** Test in production~~ ❌ FAILED (3 blockers found)
+- [ ] **PR #1 CRITICAL FIXES:** Fix 3 production blockers (see PRODUCTION_FIX_PROMPT_2026-01-08.md)
+  - [ ] Fix #1: Create/remove `breakthrough_history` table
+  - [ ] Fix #2: Update seed script to call ActionItemsSummarizer
+  - [ ] Fix #3: Verify frontend loads after API fix
+- [ ] **PR #1 Re-Testing:** Re-run production test plan after fixes
 - [ ] **PR #1:** Merge all phases and finalize
 - [ ] **PR #1 Phase 1B:** Header fonts + Timeline deprecation (deferred to future)
 - [ ] **PR #2:** Implement Prose Analysis UI with Toggle
