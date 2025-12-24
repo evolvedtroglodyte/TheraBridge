@@ -64,17 +64,17 @@ export function ChatSidebar({
           <div
             onClick={onHomeClick}
             style={{
-              cursor: 'pointer',
-              transition: 'transform 0.2s ease, filter 0.2s ease',
+              cursor: onHomeClick ? 'pointer' : 'default',
+              transition: onHomeClick ? 'transform 0.2s ease, filter 0.2s ease' : 'none',
             }}
-            onMouseEnter={(e) => {
+            onMouseEnter={onHomeClick ? (e) => {
               e.currentTarget.style.transform = 'scale(1.05)';
               e.currentTarget.style.filter = 'brightness(1.2)';
-            }}
-            onMouseLeave={(e) => {
+            } : undefined}
+            onMouseLeave={onHomeClick ? (e) => {
               e.currentTarget.style.transform = 'scale(1)';
               e.currentTarget.style.filter = 'brightness(1)';
-            }}
+            } : undefined}
             className={isDark ? 'text-[#8B6AAE]' : 'text-[#5AB9B4]'}
           >
             <BridgeIcon size={28} />

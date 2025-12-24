@@ -60,6 +60,8 @@ export interface FullscreenChatProps {
   setConversationId: React.Dispatch<React.SetStateAction<string | undefined>>;
   // NEW: Control whether chat is fullscreen overlay or embedded in page
   isEmbedded?: boolean;
+  // NEW: Control whether home icon in sidebar should navigate (default: true)
+  enableHomeNavigation?: boolean;
 }
 
 // Mock data for recent chats
@@ -100,6 +102,7 @@ export function FullscreenChat({
   conversationId,
   setConversationId,
   isEmbedded = false,
+  enableHomeNavigation = true,
 }: FullscreenChatProps) {
   const { isDark, toggleTheme } = useTheme();
   const { user, isLoading: authLoading } = useAuth();
@@ -380,10 +383,9 @@ export function FullscreenChat({
           onSelectChat={handleSelectChat}
           userName={USER.name}
           isDark={isDark}
-          onHomeClick={() => {
-            // Removed dashboard navigation - Dobby chat stays in chat
+          onHomeClick={enableHomeNavigation ? () => {
             onClose();
-          }}
+          } : undefined}
           onThemeToggle={toggleTheme}
         />
 

@@ -53,7 +53,107 @@ export const sessions: Session[] = [
       { speaker: 'Therapist', text: 'That\'s a profound realization. How does that shift how you see yourself now?' },
       { speaker: 'Patient', text: 'I think... I think I deserve kindness. Even from myself.' }
     ],
-    patientSummary: 'Breakthrough session with emotional release. Patient connected childhood neglect to adult self-worth issues and demonstrated genuine self-compassion.'
+    patientSummary: 'Breakthrough session with emotional release. Patient connected childhood neglect to adult self-worth issues and demonstrated genuine self-compassion.',
+    deep_analysis: {
+      progress_indicators: {
+        symptom_reduction: {
+          detected: true,
+          description: 'Significant reduction in negative self-talk and self-blame patterns. Patient demonstrates internalized understanding that childhood neglect was not their fault.',
+          confidence: 0.92
+        },
+        skill_development: [
+          {
+            skill: 'Self-compassion practice',
+            proficiency: 'developing',
+            evidence: 'Successfully completed compassionate letter-writing exercise with emotional breakthrough'
+          },
+          {
+            skill: 'Emotional awareness and acceptance',
+            proficiency: 'proficient',
+            evidence: 'Allowed emotional release without judgment, recognized crying as healing rather than weakness'
+          }
+        ],
+        goal_progress: [
+          {
+            goal: 'Develop healthier self-image',
+            status: 'on_track',
+            evidence: 'Verbalized deserving kindness from self - major shift from previous negative core beliefs'
+          }
+        ],
+        behavioral_changes: [
+          'Engaging with difficult emotions rather than suppressing them',
+          'Practicing self-directed compassion exercises independently',
+          'Reframing childhood experiences through adult understanding'
+        ]
+      },
+      therapeutic_insights: {
+        key_realizations: [
+          'Connected childhood neglect to current self-worth struggles - "I was never the problem"',
+          'Recognized deserving of self-kindness as fundamental truth, not something to earn',
+          'Understanding that emotional release (crying) is part of healing, not weakness'
+        ],
+        patterns: [
+          'Historical pattern of internalizing others\' failures as personal deficiencies',
+          'Tendency to intellectualize emotions to avoid feeling them fully',
+          'Gradual shift from external validation-seeking to internal self-acceptance'
+        ],
+        growth_areas: [
+          'Continuing to practice self-compassion in daily moments, not just exercises',
+          'Extending kindness to present-day self, not only inner child',
+          'Challenging remaining perfectionistic standards in work and relationships'
+        ],
+        strengths: [
+          'Willingness to engage with painful material and vulnerability',
+          'Capacity for deep emotional insight and self-reflection',
+          'Ability to connect past experiences to present patterns',
+          'Resilience in facing difficult emotions head-on'
+        ]
+      },
+      coping_skills: {
+        learned: ['Compassionate letter-writing', 'Inner child dialogue', 'Emotional acceptance', 'Self-validation'],
+        proficiency: {
+          'Compassionate_letter_writing': 'developing',
+          'Inner_child_dialogue': 'developing',
+          'Emotional_acceptance': 'proficient',
+          'Self_validation': 'beginner'
+        },
+        practice_recommendations: [
+          'Continue daily self-compassion check-ins using the 3-question format (What am I feeling? What do I need? How can I give that to myself?)',
+          'Practice compassionate self-talk when perfectionism triggers arise at work',
+          'Use the letter-writing technique when experiencing shame or self-blame'
+        ]
+      },
+      therapeutic_relationship: {
+        engagement_level: 'high',
+        engagement_evidence: 'Deeply engaged with therapeutic process, willing to try challenging exercises, brought completed homework with genuine effort',
+        openness: 'very_open',
+        openness_evidence: 'Shared profound emotional vulnerability, allowed tears and emotional expression in session, connected openly about childhood trauma',
+        alliance_strength: 'strong',
+        alliance_evidence: 'High trust evident in willingness to explore painful material, follows through on therapeutic assignments, collaborative in session'
+      },
+      recommendations: {
+        practices: [
+          'Daily self-compassion meditation (5 minutes in morning)',
+          'Continue letter-writing to younger self weekly',
+          'Practice self-validation before seeking external reassurance',
+          'Notice and note moments of self-kindness in journal'
+        ],
+        resources: [
+          '"Self-Compassion" by Kristin Neff (especially Chapters 3-4 on shame and self-kindness)',
+          'Loving-Kindness meditation app (start with self-directed practice)',
+          'Adult Children of Emotionally Immature Parents support group (meets Thursdays)'
+        ],
+        reflection_prompts: [
+          'What would you say to a friend experiencing what you\'re going through?',
+          'How has childhood neglect shaped your current relationships?',
+          'What does "deserving kindness" mean to you now versus before this session?',
+          'When do you find it hardest to be compassionate toward yourself?'
+        ]
+      },
+      confidence_score: 0.91,
+      analyzed_at: '2024-12-10T15:45:00Z'
+    },
+    analysis_confidence: 0.91
   },
   {
     id: 's8',

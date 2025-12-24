@@ -32,6 +32,7 @@ export default function AskAIPage() {
             conversationId={conversationId}
             setConversationId={setConversationId}
             isEmbedded={false} // Changed to false for true fullscreen
+            enableHomeNavigation={false} // Disable home icon navigation on dedicated page
           />
         </Suspense>
       </SessionDataProvider>
