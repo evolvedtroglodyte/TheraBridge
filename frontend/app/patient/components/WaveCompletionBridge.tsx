@@ -35,7 +35,7 @@ export function WaveCompletionBridge() {
       const id = demoTokenStorage.getPatientId();
       const initStatus = demoTokenStorage.getInitStatus();
 
-      if (id && id !== patientId) {
+      if (id) {
         console.log('[WaveCompletionBridge] ✓ Patient ID found:', id);
         setPatientId(id);
         setIsReady(true);
@@ -71,7 +71,7 @@ export function WaveCompletionBridge() {
     }, 500);
 
     return () => clearInterval(interval);
-  }, [patientId]);
+  }, []); // Run once on mount - don't restart when patientId changes
 
   // Connect to SSE and handle events (only after we have patient ID)
   const { isConnected, events } = usePipelineEvents({
