@@ -67,7 +67,8 @@ export interface DeepAnalysis {
 
 export interface Session {
   id: string;
-  date: string;
+  date: string;  // Display format: "Jan 10" or "May 9"
+  rawDate?: Date;  // For sorting - Date object parsed from backend or mock data
   duration: string;
   therapist: string;
   mood: MoodType;
