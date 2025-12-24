@@ -167,8 +167,8 @@ export function NavigationBar() {
         </button>
       </nav>
 
-      {/* Right section - Full TheraBridge Logo */}
-      <div className="flex items-center justify-end pr-6 w-[200px]">
+      {/* Right section - TheraBridge Logo */}
+      <div className="flex items-center justify-end gap-3 pr-6 w-[240px]">
         <CombinedLogo iconSize={28} textClassName="text-base" />
       </div>
     </header>
