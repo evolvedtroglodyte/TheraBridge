@@ -59,8 +59,8 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
 
   const isBreakthrough = !!session.milestone;
 
-  // Extract summary from patientSummary (first 200 chars)
-  const summary = session.patientSummary || 'Session summary not available.';
+  // Extract summary from AI-generated Wave 1 analysis (with fallback to legacy field)
+  const summary = session.summary || session.patientSummary || 'Summary not yet generated.';
 
   // Extract 1 strategy + 1 action (show both types)
   const techniquesAndActions = [

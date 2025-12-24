@@ -59,9 +59,9 @@ export function SessionCard({ session }: SessionCardProps) {
             </div>
           )}
 
-          {notes?.topic_summary && (
+          {session.summary && (
             <p className="text-sm text-muted-foreground line-clamp-2">
-              {notes.topic_summary}
+              {session.summary}
             </p>
           )}
 

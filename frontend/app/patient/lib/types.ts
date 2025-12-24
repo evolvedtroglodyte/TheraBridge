@@ -76,9 +76,15 @@ export interface Session {
   actions: string[];
   milestone?: Milestone;
   transcript?: TranscriptEntry[];
-  patientSummary?: string;
+  patientSummary?: string;  // Deprecated: Use summary instead
   deep_analysis?: DeepAnalysis;
   analysis_confidence?: number;
+  // Wave 1 AI Analysis - Topic Extraction (from backend)
+  summary?: string;  // Ultra-brief summary (max 150 chars) - AI-generated
+  action_items?: string[];  // 2 action items - AI-generated
+  technique?: string;  // Primary therapeutic technique - AI-generated
+  extraction_confidence?: number;  // 0.0 to 1.0
+  topics_extracted_at?: string;  // ISO timestamp
 }
 
 export interface Milestone {

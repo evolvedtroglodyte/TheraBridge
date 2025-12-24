@@ -65,20 +65,20 @@ export function ToDoCard() {
           <h2 style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200 mb-2">To-Do</h2>
           <p style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500 }} className="text-gray-500 dark:text-gray-400">Action items from your sessions</p>
         </div>
-        <div className="flex items-center justify-center mb-2">
-          <span style={{ fontFamily: fontSans, fontSize: '13px', fontWeight: 500 }} className="text-gray-600 dark:text-gray-400">
-            {progressPercent}% ({completedCount}/{totalCount})
-          </span>
-        </div>
 
-        {/* Progress Bar - directly under percentage */}
-        <div className="w-full h-2 bg-gray-200 dark:bg-[#3d3548] rounded-full overflow-hidden mb-6">
-          <motion.div
-            className="h-full bg-gradient-to-r from-[#5AB9B4] to-[#B8A5D6] dark:from-[#a78bfa] dark:to-[#c084fc]"
-            initial={{ width: 0 }}
-            animate={{ width: `${progressPercent}%` }}
-            transition={{ duration: 0.4, ease: 'easeOut' }}
-          />
+        {/* Progress Bar - percentage on left, bar on right */}
+        <div className="flex items-center gap-3 mb-6">
+          <span style={{ fontFamily: fontSans, fontSize: '13px', fontWeight: 500 }} className="text-gray-600 dark:text-gray-400 whitespace-nowrap">
+            {progressPercent}%
+          </span>
+          <div className="flex-1 h-2 bg-gray-200 dark:bg-[#3d3548] rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-to-r from-[#5AB9B4] to-[#B8A5D6] dark:from-[#a78bfa] dark:to-[#c084fc]"
+              initial={{ width: 0 }}
+              animate={{ width: `${progressPercent}%` }}
+              transition={{ duration: 0.4, ease: 'easeOut' }}
+            />
+          </div>
         </div>
 
         {/* Task List Preview */}

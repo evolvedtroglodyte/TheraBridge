@@ -98,7 +98,7 @@ export function FullscreenChat({
   conversationId,
   setConversationId,
 }: FullscreenChatProps) {
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark } = useTheme();
   const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
@@ -393,47 +393,6 @@ export function FullscreenChat({
               isDark ? 'bg-[#1a1625] border-[#3d3548]' : 'bg-white border-[#E0DDD8]'
             }`}
           >
-            {/* Left Side - Theme Toggle only */}
-            <div className="absolute left-3 top-1/2 -translate-y-1/2">
-              {/* Theme Toggle */}
-              <button
-                onClick={toggleTheme}
-                className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${
-                  isDark ? 'hover:bg-[#3d3548]' : 'hover:bg-gray-100'
-                }`}
-                aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-              >
-                {isDark ? (
-                  <svg
-                    className="w-[22px] h-[22px]"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#93B4DC"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ filter: 'drop-shadow(0 0 4px rgba(147, 180, 220, 0.6)) drop-shadow(0 0 10px rgba(147, 180, 220, 0.3))' }}
-                  >
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-[22px] h-[22px]"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#F5A623"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ filter: 'drop-shadow(0 0 4px rgba(245, 166, 35, 0.5)) drop-shadow(0 0 8px rgba(245, 166, 35, 0.25))' }}
-                  >
-                    <circle cx="12" cy="12" r="4" />
-                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-                  </svg>
-                )}
-              </button>
-            </div>
-
             {/* Centered Dobby Logo + DOBBY text - illuminating, clickable */}
             <div
               className="cursor-pointer flex items-center gap-2"
