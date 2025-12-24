@@ -12,30 +12,19 @@
  *   - Disconnects when all analysis complete
  */
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSessionData } from "../contexts/SessionDataContext";
 import { usePipelineEvents } from "@/hooks/use-pipeline-events";
-import { demoApiClient } from "@/lib/demo-api-client";
+import { useDemoInitialization } from "@/hooks/useDemoInitialization";
 
 export function WaveCompletionBridge() {
   const { refresh, setSessionLoading } = useSessionData();
-  const [patientId, setPatientId] = useState<string | null>(null);
+  const { patientId, isReady } = useDemoInitialization();
 
-  // Get patient ID from demo token
-  useEffect(() => {
-    async function fetchPatientId() {
-      const status = await demoApiClient.getStatus();
-      if (status) {
-        setPatientId(status.patient_id);
-      }
-    }
-    fetchPatientId();
-  }, []);
-
-  // Connect to SSE and handle events
+  // Connect to SSE and handle events (only after demo is ready)
   const { isConnected, events } = usePipelineEvents({
     patientId: patientId || "",
-    enabled: !!patientId,
+    enabled: isReady && !!patientId,
 
     onWave1SessionComplete: async (sessionId, sessionDate) => {
       console.log(
