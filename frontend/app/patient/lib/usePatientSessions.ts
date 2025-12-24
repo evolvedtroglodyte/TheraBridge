@@ -9,7 +9,7 @@
  * Phase 4 Implementation: Removed all mock data, fully dynamic loading
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   tasks as mockTasks,
   timelineData as mockTimeline,
@@ -19,6 +19,7 @@ import {
 import { Session, Task, TimelineEntry, TimelineEvent, MajorEventEntry, MoodType } from './types';
 import { apiClient } from '@/lib/api-client';
 import { demoTokenStorage } from '@/lib/demo-token-storage';
+import { demoApiClient } from '@/lib/demo-api-client';
 
 /**
  * Hook to provide session data for the dashboard.
@@ -34,6 +35,8 @@ export function usePatientSessions() {
   const [unifiedTimeline, setUnifiedTimeline] = useState<TimelineEvent[]>([]);
   const [majorEvents, setMajorEvents] = useState<MajorEventEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [analysisStatus, setAnalysisStatus] = useState<string>('pending');
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const loadAllSessions = async () => {
@@ -119,6 +122,62 @@ export function usePatientSessions() {
 
     loadAllSessions();
   }, []);
+
+  // Polling effect: Auto-refresh sessions while analysis is in progress
+  useEffect(() => {
+    // Only poll if we have incomplete analysis
+    const shouldPoll = analysisStatus === 'pending' || analysisStatus === 'processing';
+
+    if (shouldPoll && demoTokenStorage.isInitialized()) {
+      console.log('[Polling] Starting analysis status polling (5s interval)...');
+
+      pollingIntervalRef.current = setInterval(async () => {
+        try {
+          // Check demo status
+          const status = await demoApiClient.getStatus();
+
+          if (!status) {
+            return; // Failed to fetch, try again next interval
+          }
+
+          console.log('[Polling] Analysis status:', {
+            status: status.analysis_status,
+            wave1: status.wave1_complete,
+            wave2: status.wave2_complete,
+            total: status.session_count
+          });
+
+          setAnalysisStatus(status.analysis_status);
+
+          // If analysis status changed, refresh sessions to show new data
+          const hasNewData = status.wave1_complete > 0 || status.wave2_complete > 0;
+          if (hasNewData) {
+            console.log('[Polling] New analysis data detected, refreshing sessions...');
+            refresh();
+          }
+
+          // Stop polling if fully complete
+          if (status.analysis_status === 'wave2_complete') {
+            console.log('[Polling] Analysis complete! Stopping polling.');
+            if (pollingIntervalRef.current) {
+              clearInterval(pollingIntervalRef.current);
+              pollingIntervalRef.current = null;
+            }
+          }
+        } catch (err) {
+          console.error('[Polling] Error checking status:', err);
+        }
+      }, 5000); // Poll every 5 seconds
+
+      return () => {
+        if (pollingIntervalRef.current) {
+          console.log('[Polling] Cleaning up polling interval');
+          clearInterval(pollingIntervalRef.current);
+          pollingIntervalRef.current = null;
+        }
+      };
+    }
+  }, [analysisStatus]);
 
   // Manual refresh function - reloads from API
   const refresh = () => {
