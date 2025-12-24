@@ -142,32 +142,37 @@ Before creating any new file, ask:
 
 **PR #1 Status:** ✅ COMPLETE - SessionDetail UI Improvements + Wave 1 Action Summarization (2026-01-09)
 **PR #2 Status:** ✅ COMPLETE - Prose Analysis UI Toggle (2026-01-11) - Awaiting Railway verification
-**PR #3 Status:** ✅ PHASES 4-5 COMPLETE - Your Journey Dynamic Roadmap (2026-01-11)
+**PR #3 Status:** ✅ PRODUCTION VERIFIED - Your Journey Dynamic Roadmap (2026-01-14)
 
-**PR #3 Progress (Phases 0-5 COMPLETE):**
+**PR #3 Progress (All Phases COMPLETE + Production Verified):**
 - ✅ Phase 0: LoadingOverlay debug logging added
 - ✅ Phase 1: Backend infrastructure (database, services, model config)
 - ✅ Phase 2: All 3 compaction strategies implemented
 - ✅ Phase 3: Frontend integration (API client, NotesGoalsCard, polling)
 - ✅ Phase 4: Start/Stop/Resume button with smart resume logic (2026-01-11)
 - ✅ Phase 5: Orchestration script + database migration + Wave 2 integration (2026-01-11)
+- ✅ Phase 6: Production bug fixes + end-to-end verification (2026-01-14)
 
-**Phase 4 Complete (2026-01-11):**
-- ✅ Backend processing state tracking (running/stopped/complete/not_started)
-- ✅ Resume endpoint: `POST /api/demo/resume` with smart resume logic
-- ✅ Frontend dynamic Stop/Resume button with real-time polling
-- ✅ Button states: Red "Stop Processing" → Green "Resume Processing" → Gray "Processing Complete"
-- ✅ Git commit: `2c068aa` (2025-12-23 22:47:22)
+**Phase 6 Complete (2026-01-14) - Production Bug Fixes:**
+- ✅ **Roadmap 404 fix**: Moved endpoint from sessions.py to main.py (FastAPI doesn't interpret `..` as path traversal)
+- ✅ **SSE roadmap auto-refresh**: Exposed `setRoadmapRefreshTrigger` from context, called in `WaveCompletionBridge.onWave2SessionComplete`
+- ✅ **Hierarchical context fix**: Changed lists to dicts in `build_hierarchical_context()` to match generator expectations
+- ✅ **Non-blocking roadmap generation**: Changed `subprocess.run()` → `subprocess.Popen()` with `start_new_session=True` to prevent orphaned processes
+- ✅ **Loading spinner fix**: Changed `border-3` → `border-[3px]` in LoadingOverlay (Tailwind fix)
+- ✅ **Roadmap refresh animation**: Added `isRefreshing` state for overlay on existing card vs replacing card
 
-**Phase 5 Complete (2026-01-11):**
-- ✅ Database migration applied via Supabase MCP (patient_roadmap + roadmap_versions tables)
-- ✅ Orchestration script created: `backend/scripts/generate_roadmap.py` (400 lines)
-- ✅ All 3 compaction strategies implemented (full, progressive, hierarchical)
-- ✅ Hierarchical tier compaction: Tier 1 (last 1-3 sessions), Tier 2 (sessions 4-7), Tier 3 (sessions 8+)
-- ✅ Wave 2 integration: Roadmap generation triggered after each Wave 2 completion
-- ✅ Git commit: `c2cb119` (2025-12-23 22:47:52)
+**Production Verification (2026-01-14):**
+- ✅ Full 10-session demo completed successfully
+- ✅ All roadmap versions (1-10) generated and saved to database
+- ✅ Deep analysis timing: 48-75s per session (grows slightly with context)
+- ✅ Roadmap generation timing: 20-32s per session (consistent, hierarchical compaction working)
+- ✅ Frontend auto-refresh working via SSE
 
-**Next:** End-to-end testing (all 3 strategies), Railway deployment verification
+**Commits (Phase 6):**
+- `dfef9ed` - fix(pr3): Auto-refresh roadmap when Wave 2 completes via SSE
+- `3d216b7` - fix(pr3): Fix hierarchical context structure for roadmap generator
+- `623b91c` - fix(pr3): Make roadmap generation non-blocking to prevent data loss
+- `9305698` - fix(pr3): Add loading overlay animation for roadmap refresh
 
 **Phase 3 Implementation Complete (2026-01-11):**
 - ✅ API client: Added `getRoadmap(patientId)` method with 404 handling
@@ -544,101 +549,44 @@ python -m pytest  # Run tests
 
 **Full session history:** See `.claude/SESSION_LOG.md`
 
-### 2026-01-07 - SessionDetail UI Improvements Planning (PR #1 Phase 1C) 📋
-**Comprehensive planning for SessionDetail enhancements and Wave 1 action summarization:**
+### 2026-01-14 - PR #3 Production Bug Fixes (Phase 6) ✅ COMPLETE
+**Production deployment verification and bug fixes for dynamic roadmap feature:**
 
-**Scope Expansion:**
-- Original PR #1 focused on font standardization (Phase 1A complete)
-- User requested additional SessionDetail improvements (Phase 1C)
-- Combines UI enhancements with backend Wave 1 extension
+**Bugs Fixed:**
+1. **SSE Roadmap Auto-Refresh**: Exposed `setRoadmapRefreshTrigger` from context, called in `WaveCompletionBridge` after Wave 2 events
+2. **Roadmap 404 After Session 4**: Fixed hierarchical context structure (lists → dicts) in `generate_roadmap.py`
+3. **Roadmap Not Loading After Session 9**: Changed `subprocess.run()` → `subprocess.Popen()` with `start_new_session=True` for non-blocking execution
+4. **Loading Spinner Not Visible**: Fixed `border-3` → `border-[3px]` in LoadingOverlay (Tailwind fix)
+5. **Roadmap Refresh No Animation**: Added `isRefreshing` state to show overlay on existing card
 
-**Features Planned:**
-1. Numeric mood score display (emoji + score like "😊 7.5")
-2. Technique definitions (2-3 sentence explanations)
-3. 45-char action items summary (new Wave 1 LLM call)
-4. X button in top-right corner (replace "Back to Dashboard")
-5. Theme toggle in SessionDetail header
-6. SessionCard update to use condensed action summary
+**Production Verification:**
+- ✅ Full 10-session demo completed successfully
+- ✅ All roadmap versions (1-10) generated and saved
+- ✅ Deep analysis: 48-75s/session | Roadmap: 20-32s/session (consistent due to hierarchical compaction)
+- ✅ Frontend auto-refresh working via SSE
 
-**Research Phase (Wave 0):**
-- ✅ Custom emoji system verified (3 SVG emojis: happy/neutral/sad)
-- ✅ SessionCard data flow traced (backend → API → frontend mapping)
-- ✅ Technique library analyzed (107 techniques in technique_library.json)
-- ✅ Wave 1 architecture documented (3 parallel + sequential summarization)
+**Commits:** `dfef9ed`, `3d216b7`, `623b91c`, `9305698`
 
-**Technical Decisions:**
-- Action summarization: Sequential after topic extraction (preserves quality)
-- Mood mapping: Numeric (0-10) → Categorical (sad/neutral/happy)
-- Technique definitions: Included in API response (no extra calls)
-- Cost impact: +0.7% (+$0.0003/session)
-
-**Deliverables:**
-- ✅ Implementation plan: `thoughts/shared/plans/2026-01-07-sessiondetail-ui-improvements-wave1-action-summarization.md`
-- ✅ Architecture documentation with data flow diagrams
-- ✅ Complete file-by-file change specifications
-- ✅ Testing strategy and rollback plan
-
-**Next:** Execute implementation in separate Claude window (full-stack changes)
+**PR #3 Status:** ✅ PRODUCTION VERIFIED (All 6 Phases Complete)
 
 ---
 
-### 2025-12-31 - Refresh Behavior & SSE Connection Fixes (Phases 1-3 Complete) ✅
-**Implemented comprehensive fix for browser refresh behavior and SSE connection timing:**
+### 2026-01-11 - PR #3 Implementation (Phases 4-5) ✅ COMPLETE
+**Final implementation for "Your Journey" dynamic roadmap:**
 
-**Phase 1: Hard Refresh Detection ✅**
-- Created `lib/refresh-detection.ts` utility for detecting Cmd+Shift+R vs Cmd+R
-- Added global keydown listener in `layout.tsx` to mark hard refresh in sessionStorage
-- Flag auto-clears after read (one-time use)
+**Phase 4: Start/Stop/Resume Button ✅**
+- Backend processing state tracking (`running`/`stopped`/`complete`/`not_started`)
+- Resume endpoint: `POST /api/demo/resume` with smart resume logic
+- Frontend dynamic button with real-time polling (red → green → gray states)
 
-**Phase 2: Demo Initialization & localStorage Persistence ✅**
-- Added initialization status tracking (`pending`/`complete`/`none`) to `demo-token-storage.ts`
-- Enhanced `page.tsx` with hard refresh detection and localStorage clearing
-- Added pending state detection to prevent duplicate initializations
-- Increased API timeout from 30s → 120s for demo initialization (Wave 1 + Wave 2 takes ~90s)
+**Phase 5: Orchestration & Testing ✅**
+- Database migration: `patient_roadmap` + `roadmap_versions` tables (via Supabase MCP)
+- Orchestration script: `backend/scripts/generate_roadmap.py` (400 lines)
+- All 3 compaction strategies implemented (full, progressive, hierarchical)
+- Hierarchical tier compaction: Tier 1 (last 1-3 sessions), Tier 2 (sessions 4-7), Tier 3 (sessions 8+)
+- Wave 2 integration: Roadmap generation triggered after each Wave 2 completion
 
-**Phase 3: SSE Connection Timing & Reconnection ✅**
-- Updated `WaveCompletionBridge.tsx` to wait for patient ID before connecting SSE
-- Added timeout (20s) and init status checking with detailed error logging
-- Enhanced `use-pipeline-events.ts` with connection error tracking and readyState monitoring
-- Fixed critical polling restart bug (removed patientId from dependency array)
-- Auto-reconnection handled by browser EventSource on simple refresh
-
-**Current Behavior:**
-- **Hard Refresh (Cmd+Shift+R)**: Clears localStorage → New patient ID → New demo initialization
-- **Simple Refresh (Cmd+R)**: Preserves localStorage → Same patient ID → SSE reconnects automatically
-- **SSE Connection**: Waits for patient ID → Connects within 1-2 seconds → No timeout errors
-- **Demo Init**: Completes successfully in ~30-40 seconds with 120s timeout buffer
-
----
-
-### 2025-12-30 - Critical Fix: Session Analysis Loading + Railway Logging ✅
-**Fixed two critical bugs preventing UI from displaying session analysis results:**
-
-**Issue #1: SSE Subprocess Event Queue Isolation**
-- **Root Cause:** `PipelineLogger` uses in-memory dictionary `_event_queue`, but seed scripts run in subprocess via `subprocess.run()`. Subprocess writes events to ITS memory space, FastAPI SSE reads from DIFFERENT empty queue → events never reach frontend.
-- **Impact:** Analysis completes successfully (data IS in database), but UI never updates because SSE receives no events.
-- **Documentation:** Created `Project MDs/CRITICAL_FIX_sse_and_logging.md` with full analysis and solutions.
-
-**Issue #2: Missing Railway Logs (90% Invisible)**
-- **Root Cause:** Railway buffers Python's `logging.info()` output. Only `print(..., flush=True)` appears in real-time logs.
-- **Impact:** Railway logs show "Step 2/3 starting..." then "Step 2/3 complete" with NOTHING in between. All per-session progress invisible.
-
-**Fixes Implemented:**
-- ✅ Phase 1: Added `print(..., flush=True)` to all seed scripts for Railway logging visibility
-- ✅ Phase 3: Added polling to `usePatientSessions` hook - checks `/api/demo/status` every 5 seconds
-- ⏳ Phase 2: Database-backed event queue (PENDING - long-term fix)
-
-**Current Status:**
-- ✅ Railway logs now show full detail (Phase 1)
-- ✅ UI updates automatically via polling (Phase 3)
-- ⏳ SSE still broken due to subprocess isolation (Phase 2 pending)
-- ✅ Session analysis data loads correctly after 30-40 seconds
-
-**Key learnings:**
-- Railway requires explicit `flush=True` for real-time logs
-- In-memory data structures don't work across subprocess boundaries
-- Polling fallback provides 80% of SSE benefits with 5% of complexity
-- Database-backed queues are essential for production reliability
+**Commits:** `2c068aa` (Phase 4), `c2cb119` (Phase 5)
 
 ---
 

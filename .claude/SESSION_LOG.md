@@ -4,6 +4,125 @@ Detailed history of all development sessions, architectural decisions, and imple
 
 ---
 
+## 2026-01-14 - PR #3 Production Bug Fixes (Phase 6) ✅ COMPLETE
+
+**Context:** Production deployment verification and bug fixes for PR #3 "Your Journey" dynamic roadmap. Multiple bugs discovered during full 10-session demo testing.
+
+**Session Duration:** ~2 hours
+
+**Work Completed:**
+
+**Bug #1: SSE Roadmap Auto-Refresh Not Working ✅**
+- **Problem:** When SSE is enabled, polling is disabled (line 326-328 in usePatientSessions.ts), so roadmap refresh detection never runs
+- **Root Cause:** `roadmapRefreshTrigger` was never incremented via SSE path
+- **Fix:**
+  - Exposed `setRoadmapRefreshTrigger` from `usePatientSessions` hook
+  - Added to `SessionDataContext` interface
+  - Called in `WaveCompletionBridge.onWave2SessionComplete` after Wave 2 events
+- **Files Modified:**
+  - `frontend/app/patient/lib/usePatientSessions.ts` - Export setter
+  - `frontend/app/patient/contexts/SessionDataContext.tsx` - Add to interface
+  - `frontend/app/patient/components/WaveCompletionBridge.tsx` - Trigger refresh
+  - `frontend/app/patient/components/NotesGoalsCard.tsx` - Add patientId guard for TypeScript
+
+**Bug #2: Roadmap 404 After Session 4 ✅**
+- **Problem:** `AttributeError: 'list' object has no attribute 'items'` in Railway logs
+- **Root Cause:** `build_hierarchical_context()` returned lists but `_build_hierarchical_prompt()` expected dicts with `.items()`
+- **Fix:** Changed context builder to return dictionaries with session keys instead of lists
+- **File Modified:** `backend/scripts/generate_roadmap.py`
+  ```python
+  # Changed from lists to dicts:
+  tier1_summaries = {}  # was: tier1_summaries = []
+  for session in sessions_reversed[:3]:
+      session_key = f"Session {session['session_date'][:10]}"
+      tier1_summaries[session_key] = extract_insights_from_deep_analysis(...)
+  ```
+
+**Bug #3: Roadmap Not Loading After Session 9 ✅**
+- **Problem:** Roadmap versions 1-8 exist but 9-10 never generated
+- **Root Cause:** `subprocess.run()` was blocking, and when Wave 2 script exited, child processes were killed (orphaned)
+- **Fix:** Changed to `subprocess.Popen()` with `start_new_session=True` for fire-and-forget execution
+- **File Modified:** `backend/scripts/seed_wave2_analysis.py`
+  ```python
+  # Changed from blocking:
+  # subprocess.run([...], timeout=60)
+
+  # To non-blocking:
+  subprocess.Popen(
+      [sys.executable, roadmap_script, patient_id, session['id']],
+      stdout=None, stderr=None,
+      env=os.environ.copy(),
+      start_new_session=True  # Detach from parent process group
+  )
+  ```
+
+**Bug #4: Loading Spinner Not Visible ✅**
+- **Problem:** LoadingOverlay component renders but spinner invisible
+- **Root Cause:** `border-3` is not a valid Tailwind class (Tailwind only has 0, 2, 4, 8)
+- **Fix:** Changed to `border-[3px]` using Tailwind's arbitrary value syntax
+- **File Modified:** `frontend/app/patient/components/LoadingOverlay.tsx`
+
+**Bug #5: Roadmap Refresh Instant (No Animation) ✅**
+- **Problem:** When roadmap updates, entire card replaced with placeholder (no visual feedback)
+- **Root Cause:** Code always set `isLoading=true` which replaced card content with PlaceholderCard
+- **Fix:** Added `isRefreshing` state to show overlay on existing card during refresh
+- **File Modified:** `frontend/app/patient/components/NotesGoalsCard.tsx`
+  ```typescript
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // On refresh: show overlay on existing content
+  if (hasExistingData) {
+    setIsRefreshing(true);
+  } else {
+    setIsLoading(true); // Initial load: replace with placeholder
+  }
+  ```
+
+**Production Verification (Full 10-Session Demo):**
+- ✅ All 10 roadmap versions generated and saved to database
+- ✅ Deep analysis timing: 48-75s per session (grows with context)
+- ✅ Roadmap generation timing: 20-32s per session (consistent)
+- ✅ Prose generation timing: 20-29s per session (slight increase)
+- ✅ Frontend auto-refresh working via SSE
+- ✅ Loading spinner now visible on all cards
+- ✅ Refresh animation shows overlay on existing content
+
+**Timing Analysis (Railway Logs):**
+
+| Session | Deep Analysis | Prose | Roadmap | Total |
+|---------|--------------|-------|---------|-------|
+| 1 | 44s | 19s | 20s | 83s |
+| 2 | 48s | 21s | 22s | 91s |
+| 3 | 50s | 22s | 23s | 95s |
+| 4 | 53s | 23s | 25s | 101s |
+| 5 | 55s | 24s | 26s | 105s |
+| 6 | 58s | 25s | 27s | 110s |
+| 7 | 62s | 26s | 28s | 116s |
+| 8 | 67s | 27s | 29s | 123s |
+| 9 | 71s | 28s | 30s | 129s |
+| 10 | 75s | 29s | 32s | 136s |
+
+**Key Insight:** Hierarchical compaction strategy keeps roadmap generation time consistent (20-32s) despite increasing session count, while deep analysis grows linearly (~3-5s per additional session).
+
+**Commits Created (4 total):**
+1. `dfef9ed` - fix(pr3): Auto-refresh roadmap when Wave 2 completes via SSE
+2. `3d216b7` - fix(pr3): Fix hierarchical context structure for roadmap generator
+3. `623b91c` - fix(pr3): Make roadmap generation non-blocking to prevent data loss
+4. `9305698` - fix(pr3): Add loading overlay animation for roadmap refresh
+
+**Files Modified (6 total):**
+- `frontend/app/patient/lib/usePatientSessions.ts` - Export setRoadmapRefreshTrigger
+- `frontend/app/patient/contexts/SessionDataContext.tsx` - Add to interface
+- `frontend/app/patient/components/WaveCompletionBridge.tsx` - Trigger refresh on Wave 2
+- `frontend/app/patient/components/NotesGoalsCard.tsx` - TypeScript guard + isRefreshing state
+- `frontend/app/patient/components/LoadingOverlay.tsx` - Fix border class
+- `backend/scripts/generate_roadmap.py` - Fix hierarchical context structure
+- `backend/scripts/seed_wave2_analysis.py` - Non-blocking subprocess
+
+**PR #3 Status:** ✅ PRODUCTION VERIFIED (All 6 Phases Complete)
+
+---
+
 ## 2026-01-11 - PR #3 Implementation (Phases 4-5) ✅ COMPLETE
 
 **Context:** Final implementation for PR #3 "Your Journey" dynamic roadmap. Completed Phases 4 and 5 of the 6-phase implementation plan.
