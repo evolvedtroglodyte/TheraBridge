@@ -14,7 +14,7 @@ import { CombinedLogo, BridgeIcon } from './TheraBridgeLogo';
 import { demoApiClient } from '@/lib/demo-api-client';
 
 const TYPOGRAPHY = {
-  sans: 'var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  sans: 'var(--font-inter)',
 } as const;
 
 // Theme Toggle Icon
