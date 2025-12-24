@@ -28,7 +28,11 @@ class SessionInsightsSummarizer:
             api_key: OpenAI API key (uses env var if not provided)
             override_model: Override default model (for testing)
         """
-        self.client = openai.OpenAI(api_key=api_key)
+        # Only pass api_key if explicitly provided, otherwise let OpenAI use env var
+        if api_key:
+            self.client = openai.OpenAI(api_key=api_key)
+        else:
+            self.client = openai.OpenAI()  # Uses OPENAI_API_KEY env var
         self.model = get_model_name("session_insights", override_model=override_model)
 
     def generate_insights(
