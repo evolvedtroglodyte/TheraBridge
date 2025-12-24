@@ -135,6 +135,79 @@ class SpeakerLabelingResponse(BaseModel):
 # Session CRUD Endpoints
 # ============================================================================
 
+@router.get("/")
+async def get_all_sessions(
+    request: Request,
+    demo_user: dict = Depends(get_demo_user),
+    db: Client = Depends(get_db)
+):
+    """
+    Get ALL sessions for the current demo patient
+
+    This endpoint is designed for fully dynamic session loading in the frontend.
+    It fetches all sessions for the authenticated demo user and returns them
+    sorted by date (newest first).
+
+    **Authentication:** Requires Demo-Token header
+
+    **Returns:**
+        List of sessions with all fields:
+        - id, patient_id, therapist_id
+        - session_date, duration_minutes, status
+        - transcript (JSONB array of segments)
+        - AI analysis fields (topics, action_items, technique, summary)
+        - mood analysis fields (mood_score, mood_confidence, emotional_tone)
+        - Wave 2 fields (deep_analysis, prose_analysis)
+
+    **Example Response:**
+    ```json
+    [
+      {
+        "id": "uuid",
+        "patient_id": "uuid",
+        "session_date": "2025-01-10",
+        "duration_minutes": 60,
+        "status": "completed",
+        "transcript": [{...}],
+        "topics": ["Depression", "Family conflict"],
+        "action_items": ["Practice mindfulness", "Talk to parents"],
+        "technique": "CBT - Cognitive Restructuring",
+        "summary": "Discussed coping strategies for family stress.",
+        "mood_score": 6.5,
+        "mood_confidence": 0.85,
+        "emotional_tone": "hopeful"
+      },
+      ...
+    ]
+    ```
+
+    **Use Case:**
+        Frontend calls this endpoint on dashboard load to fetch all sessions
+        dynamically instead of using hardcoded mock data.
+    """
+    if not demo_user:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or missing demo token. Initialize demo first."
+        )
+
+    patient_id = demo_user["id"]
+
+    # Fetch all sessions for this patient, ordered by date DESC (newest first)
+    response = (
+        db.table("therapy_sessions")
+        .select("*")
+        .eq("patient_id", patient_id)
+        .order("session_date", desc=True)
+        .execute()
+    )
+
+    if not response.data:
+        return []
+
+    return response.data
+
+
 @router.get("/{session_id}")
 async def get_session(
     session_id: str,
