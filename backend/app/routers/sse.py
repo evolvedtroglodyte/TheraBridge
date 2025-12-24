@@ -64,8 +64,8 @@ async def stream_events(patient_id: str, request: Request):
     Returns:
         StreamingResponse with text/event-stream content type
     """
-    # Get origin from request for CORS
-    origin = request.headers.get("origin", "*")
+    # Get origin from request for CORS (use request origin or fallback to production frontend)
+    origin = request.headers.get("origin", "https://therabridge.up.railway.app")
 
     return StreamingResponse(
         event_generator(patient_id, request),
@@ -75,6 +75,8 @@ async def stream_events(patient_id: str, request: Request):
             "Connection": "keep-alive",
             "X-Accel-Buffering": "no",  # Disable nginx buffering
             "Access-Control-Allow-Origin": origin,  # Allow SSE from frontend
-            "Access-Control-Allow-Credentials": "true"
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Methods": "GET, OPTIONS"
         }
     )
