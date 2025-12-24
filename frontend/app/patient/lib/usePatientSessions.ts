@@ -38,6 +38,8 @@ export function usePatientSessions() {
   const [analysisStatus, setAnalysisStatus] = useState<string>('pending');
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [patientId, setPatientId] = useState<string | null>(null);
+  const lastWave1Count = useRef<number>(0);
+  const lastWave2Count = useRef<number>(0);
 
   // Watch for patient ID changes (demo initialization)
   useEffect(() => {
@@ -166,10 +168,17 @@ export function usePatientSessions() {
 
           setAnalysisStatus(status.analysis_status);
 
-          // If analysis status changed, refresh sessions to show new data
-          const hasNewData = status.wave1_complete > 0 || status.wave2_complete > 0;
-          if (hasNewData) {
-            console.log('[Polling] New analysis data detected, refreshing sessions...');
+          // Only refresh if counts actually changed (not just > 0)
+          const wave1Changed = status.wave1_complete !== lastWave1Count.current;
+          const wave2Changed = status.wave2_complete !== lastWave2Count.current;
+
+          if (wave1Changed || wave2Changed) {
+            console.log('[Polling] Analysis progress detected:', {
+              wave1: `${lastWave1Count.current} → ${status.wave1_complete}`,
+              wave2: `${lastWave2Count.current} → ${status.wave2_complete}`
+            });
+            lastWave1Count.current = status.wave1_complete;
+            lastWave2Count.current = status.wave2_complete;
             refresh();
           }
 
