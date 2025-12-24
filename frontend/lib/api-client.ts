@@ -104,6 +104,17 @@ class ApiClient {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), timeout);
 
+        // Log full request details for debugging
+        console.log('[API Request]', {
+          url: `${API_BASE_URL}${endpoint}`,
+          method: config.method || 'GET',
+          headers: config.headers,
+          hasAccessToken: !!accessToken,
+          hasDemoToken: !!demoToken,
+          attempt: currentAttempt,
+          timeout,
+        });
+
         let response: Response;
         try {
           response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -114,12 +125,14 @@ class ApiClient {
           clearTimeout(timeoutId);
 
           if (error instanceof DOMException && error.name === 'AbortError') {
+            console.error('[API Request] ✗ Timeout:', `${API_BASE_URL}${endpoint}`, timeout + 'ms');
             lastError = {
               type: 'timeout',
               message: `Request timeout after ${timeout}ms`,
               timeoutMs: timeout,
             };
           } else {
+            console.error('[API Request] ✗ Network error:', `${API_BASE_URL}${endpoint}`, error);
             lastError = {
               type: 'network',
               message: error instanceof Error ? error.message : 'Network request failed',
@@ -141,6 +154,14 @@ class ApiClient {
         }
 
         clearTimeout(timeoutId);
+
+        // Log response status
+        console.log('[API Response]', {
+          url: `${API_BASE_URL}${endpoint}`,
+          status: response.status,
+          statusText: response.statusText,
+          ok: response.ok,
+        });
 
         // Handle 401 (token expired) - attempt refresh
         if (response.status === 401) {
