@@ -14,21 +14,25 @@ Creating a standalone GitHub repository for the parallel orchestration system, p
 - **Tone**: All of the above (edgy/rebellious, professional but bold, meme-heavy, technical/academic)
 
 ### Repository Setup
-- **Repository Name**: Match the catchy name (ship-fast-as-fuck)
+- **Repository Name**: ship-fast-as-fuck
 - **Account**: Personal repo (newdldewdl)
 - **License**: RESEARCH NEEDED - determine best option for open source orchestration tool
+- **URL**: https://github.com/newdldewdl/ship-fast-as-fuck
 
 ### Installation
 - **Methods**: All of the above
-  - One-line install script
+  - One-line install script (`curl | bash`)
   - Clone + symlink approach
-  - Package manager integration
+  - Package manager integration (npm, pip, homebrew)
   - Built-in Claude Code skill directory integration
-  - Auto-detect Claude Code installation path
+  - Auto-detect Claude Code installation path (use Context7 MCP to find default paths)
 
 ### Documentation
 - **Depth**: Comprehensive guide (architecture deep-dive, examples, troubleshooting)
-- **Format**: Killer README + Wiki for now (GitHub Pages later)
+- **Format**:
+  - **README**: Modular with links to wiki (marketable, quick to scan)
+  - **Wiki**: Comprehensive deep dives
+  - **GitHub Pages**: Later (after initial release)
 - **Marketing**: Everything except testimonials
   - Speed improvements with metrics
   - Cost savings calculations
@@ -36,10 +40,12 @@ Creating a standalone GitHub repository for the parallel orchestration system, p
   - Comparison tables vs other approaches
 
 ### Context7 MCP Integration
-- **All of the above**:
-  - Auto-pull latest Claude docs on install
-  - Include docs as part of the repo
-  - Reference docs externally
+- **Purpose**: ONLY for gathering Claude documentation to properly create the repo
+- **NOT part of SFAF**: Context7 MCP is a research tool, not shipped with SFAF
+- **Usage**: Use Context7 MCP during development to:
+  - Find Claude Code default installation paths
+  - Research Claude Code skill structure
+  - Pull latest documentation about Claude Code features
 
 ### Feature Set
 - **Scope**: The FULL orchestrator
@@ -48,12 +54,14 @@ Creating a standalone GitHub repository for the parallel orchestration system, p
   - Mandatory cleanup
 
 ### Files to Include
-- **All orchestrator documentation files**:
-  - `.claude/agents/cl/parallel-orchestrator.md`
-  - `.claude/DYNAMIC_WAVE_ORCHESTRATION.md`
-  - `.claude/ORCHESTRATION_SYSTEM_INDEX.md`
-  - `.claude/ORCHESTRATION_IMPROVEMENTS.md`
-  - `.claude/ORCHESTRATION_RECURSION_SAFETY.md`
+- **EVERYTHING from the orchestrator system**:
+  - `.claude/agents/cl/parallel-orchestrator.md` (agent definition)
+  - `.claude/commands/cl/orchestrate.md` (skill command)
+  - `.claude/DYNAMIC_WAVE_ORCHESTRATION.md` (methodology)
+  - `.claude/ORCHESTRATION_SYSTEM_INDEX.md` (documentation index)
+  - `.claude/ORCHESTRATION_IMPROVEMENTS.md` (feature history)
+  - `.claude/ORCHESTRATION_RECURSION_SAFETY.md` (safety system)
+  - Any supporting code, scripts, or utilities
 
 ### Launch Strategy
 - **Immediate**: Just post the repo first
