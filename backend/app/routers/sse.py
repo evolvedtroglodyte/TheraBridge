@@ -11,6 +11,13 @@ import json
 
 router = APIRouter(prefix="/api/sse", tags=["sse"])
 
+@router.options("/events/{patient_id}")
+async def sse_preflight(patient_id: str):
+    """Handle CORS preflight for SSE endpoint"""
+    return {
+        "message": "OK"
+    }
+
 async def event_generator(patient_id: str, request: Request):
     """
     SSE event generator - streams pipeline events to client
@@ -20,8 +27,12 @@ async def event_generator(patient_id: str, request: Request):
 
     """
     last_event_index = 0
+    ping_counter = 0
 
     try:
+        # Send initial connection event
+        yield f"data: {json.dumps({'event': 'connected', 'patient_id': patient_id})}\n\n"
+
         while True:
             # Check if client disconnected
             if await request.is_disconnected():
@@ -39,6 +50,12 @@ async def event_generator(patient_id: str, request: Request):
                     yield f"data: {json.dumps(event)}\n\n"
 
                 last_event_index = len(events)
+            else:
+                # Send keep-alive ping every 15 seconds to prevent Railway timeout
+                ping_counter += 1
+                if ping_counter >= 30:  # 30 * 0.5s = 15 seconds
+                    yield ": keep-alive\n\n"
+                    ping_counter = 0
 
             # Sleep briefly to avoid tight loop
             await asyncio.sleep(0.5)  # 500ms interval
