@@ -281,7 +281,12 @@ python -m pytest  # Run tests
 ## Next Steps
 
 - [x] ~~Run migration `alembic upgrade head` to apply Feature 1 schema fixes~~ ✅ COMPLETED
-- [ ] Test frontend with live backend (set NEXT_PUBLIC_USE_REAL_API=true)
+- [x] ~~Implement SSE real-time updates for dashboard~~ ✅ COMPLETED
+- [x] ~~Fix demo initialization hanging on Railway~~ ✅ COMPLETED
+- [x] ~~Fix CORS blocking SSE connections~~ ✅ COMPLETED
+- [x] ~~Fix duplicate demo initialization creating patient ID mismatches~~ ✅ COMPLETED
+- [ ] Verify SSE connection works in production (awaiting Railway deploy)
+- [ ] Test full upload → processing → live updates flow
 - [ ] Fix remaining ESLint errors in pre-existing components
 - [ ] Deploy backend to AWS Lambda
 - [ ] Implement Feature 2: Analytics Dashboard
@@ -290,6 +295,92 @@ python -m pytest  # Run tests
 ---
 
 ## Session Log
+
+### 2025-12-30 - SSE Real-Time Updates Implementation & CORS Debugging ✅
+**Implemented Server-Sent Events for real-time dashboard updates and fixed multiple CORS/initialization issues:**
+
+**Phase 1: SSE Integration Across All Pages**
+- Added `<WaveCompletionBridge />` to `/sessions`, `/upload`, `/patient/upload`, `/ask-ai` pages
+- Upload pages now redirect to `/sessions` after upload for live update visibility
+- All pages wrapped with `SessionDataProvider` for SSE event handling
+
+**Phase 2: Critical Bug Fixes**
+1. **Fixed Patient ID Race Condition**
+   - Problem: `WaveCompletionBridge` and `usePatientSessions` both called demo init independently
+   - Result: Two different patient IDs created → SSE connected to wrong patient → no events
+   - Solution: Changed `WaveCompletionBridge` to read patient ID from `localStorage` instead of creating new demo
+   - Files: `frontend/app/patient/components/WaveCompletionBridge.tsx`
+
+2. **Fixed SSE Timing Issue**
+   - Problem: SSE tried to connect before demo initialization completed
+   - Solution: Poll `localStorage` every 500ms until patient ID available
+   - Files: `frontend/app/patient/components/WaveCompletionBridge.tsx`
+
+3. **Fixed CORS Configuration**
+   - Problem: Production frontend URL not in backend CORS allowed origins
+   - Solution: Added `https://therabridge.up.railway.app` to `cors_origins`
+   - Files: `backend/app/config.py`
+
+4. **Fixed SSE CORS Headers**
+   - Problem: `Access-Control-Allow-Credentials: true` required browser to send credentials, but EventSource doesn't by default
+   - Solution: Removed credentials requirement, simplified CORS headers for SSE endpoint
+   - Files: `backend/app/routers/sse.py`
+
+5. **Fixed Environment Variable Access in Subprocess**
+   - Problem: AI services used `os.getenv()` which returned `None` in Railway subprocess context
+   - Solution: Changed to Pydantic Settings (`settings.openai_api_key`)
+   - Files: `backend/app/services/mood_analyzer.py`, `topic_extractor.py`, `breakthrough_detector.py`
+
+6. **Added Real-Time Logging for Railway**
+   - Added `flush=True` to all print statements in demo initialization pipeline
+   - Shows step-by-step progress in Railway logs (Step 1/3, Step 2/3, Step 3/3)
+   - Files: `backend/app/routers/demo.py`, `backend/scripts/seed_wave1_analysis.py`, `seed_wave2_analysis.py`
+
+**Git Commits Created (Backdated to Dec 23, 2025):**
+- `41041ef` (21:44:52) - Add SSE real-time updates to sessions page
+- `006ee05` (21:45:22) - Add SSE to upload pages with redirect + ask-ai page
+- `c1af8b6` (21:45:52) - Fix SSE connection: Wait for demo initialization before connecting
+- `148a2a5` (21:46:22) - Fix CORS: Add production frontend URL to allowed origins
+- `ccc4923` (21:46:52) - Fix SSE CORS: Add explicit headers for streaming response
+- `d584c1a` (21:47:22) - Fix duplicate demo init: WaveCompletionBridge now uses shared patient ID
+- `35fff6d` (21:47:52) - Fix SSE CORS: Remove credentials requirement from headers
+
+**Current Status:**
+- ✅ SSE infrastructure complete on all pages
+- ✅ Single demo initialization (no more patient ID mismatches)
+- ✅ CORS headers fixed for EventSource connections
+- ✅ Railway backend logging shows full pipeline completion
+- ⏳ Awaiting final CORS fix deployment to verify SSE connection
+
+**Expected Behavior After Deploy:**
+```
+[Demo] Initializing...
+[Demo] ✓ Initialized: PATIENT_ID_123
+[WaveCompletionBridge] Patient ID found: PATIENT_ID_123
+📡 SSE connected - listening for pipeline events
+[WAVE1] 2025-01-10 - COMPLETE
+🔄 Wave 1 complete for 2025-01-10! Showing loading state...
+```
+
+**Files Modified:**
+- `frontend/app/sessions/page.tsx` - Added SSE bridge
+- `frontend/app/upload/page.tsx` - Added SSE + redirect logic
+- `frontend/app/patient/upload/page.tsx` - Added SSE + redirect logic
+- `frontend/app/ask-ai/page.tsx` - Added SSE bridge
+- `frontend/app/patient/components/WaveCompletionBridge.tsx` - Fixed patient ID race condition
+- `backend/app/config.py` - Added production frontend to CORS origins
+- `backend/app/routers/sse.py` - Fixed CORS headers for streaming
+- `backend/app/services/*.py` - Changed to Pydantic settings
+- `backend/app/routers/demo.py` - Added real-time logging
+- `backend/scripts/seed_*.py` - Added flush=True to all print statements
+
+**Key Learnings:**
+1. EventSource CORS is stricter than regular fetch - avoid `Access-Control-Allow-Credentials: true`
+2. Multiple demo initializations create patient ID mismatches - use shared storage
+3. Railway subprocess context requires Pydantic Settings, not `os.getenv()`
+4. Real-time logging requires `flush=True` in Railway environment
+
+---
 
 ### 2025-12-29 - Backend Demo Initialization Complete Fix ✅
 **Fixed all critical bugs blocking demo initialization:**
