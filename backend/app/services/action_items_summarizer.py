@@ -80,7 +80,7 @@ class ActionItemsSummarizer:
                     {"role": "user", "content": prompt}
                 ],
                 # Note: gpt-5-nano only supports temperature=1 (default), cannot customize
-                max_completion_tokens=30,    # ~45 chars = ~15 tokens, give buffer
+                max_completion_tokens=60,    # Increased from 30 to allow model to generate output
             )
 
             # Extract summary
