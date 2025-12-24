@@ -309,37 +309,32 @@ def build_hierarchical_context(patient_id: str, current_session_id: str, current
     # Distribute sessions into tiers (from most recent backwards)
     sessions_reversed = list(reversed(sessions_with_wave2))
 
-    # Tier 1: Last 1-3 sessions (full insights)
-    tier1_insights = [
-        {
-            "session_date": session["session_date"],
-            "insights": extract_insights_from_deep_analysis(session.get("deep_analysis", {}))
-        }
-        for session in sessions_reversed[:3]
-    ]
+    # Tier 1: Last 1-3 sessions (full insights) - dict format for generator
+    tier1_summaries = {}
+    for session in sessions_reversed[:3]:
+        session_key = f"Session {session['session_date'][:10]}"
+        tier1_summaries[session_key] = extract_insights_from_deep_analysis(session.get("deep_analysis", {}))
 
-    # Tier 2: Sessions 4-7 (paragraph summaries)
-    tier2_summaries = [
-        {
-            "session_date": session["session_date"],
-            "summary": truncate_prose(session.get("prose_analysis", ""), 300)
-        }
-        for session in sessions_reversed[3:7]
-    ] if num_sessions >= 4 else []
+    # Tier 2: Sessions 4-7 (paragraph summaries) - dict format for generator
+    tier2_summaries = {}
+    if num_sessions >= 4:
+        for session in sessions_reversed[3:7]:
+            session_range = f"Session {session['session_date'][:10]}"
+            tier2_summaries[session_range] = truncate_prose(session.get("prose_analysis", ""), 300)
 
     # Tier 3: Sessions 8+ (journey arc - combine into single narrative)
-    tier3_arc = None
+    tier3_summary = None
     if num_sessions >= 8:
         arc_pieces = [
-            f"{session['session_date']}: {session.get('prose_analysis', '').split('.')[0]}"
+            f"{session['session_date'][:10]}: {session.get('prose_analysis', '').split('.')[0]}"
             for session in sessions_reversed[7:]
         ]
-        tier3_arc = " | ".join(arc_pieces)
+        tier3_summary = " | ".join(arc_pieces)
 
     return {
-        "tier1_insights": tier1_insights,
+        "tier1_summaries": tier1_summaries,
         "tier2_summaries": tier2_summaries,
-        "tier3_arc": tier3_arc,
+        "tier3_summary": tier3_summary,
         "previous_roadmap": previous_roadmap
     }
 
