@@ -1,16 +1,64 @@
 -- Migration 015: Create Session Bridge tables + generation_metadata table
 --
 -- This migration creates:
--- 1. generation_metadata table (shared metadata for Your Journey + Session Bridge)
--- 2. patient_session_bridge table (1 per patient)
--- 3. session_bridge_versions table (append-only version history)
+-- 1. patient_session_bridge table (1 per patient)
+-- 2. session_bridge_versions table (append-only version history)
+-- 3. generation_metadata table (shared metadata for Your Journey + Session Bridge)
 --
 -- Date: 2026-01-18
 -- Related: Session Bridge Backend Integration
 -- Prerequisites: Migration 014 (Your Journey rename) must be applied first
+-- Note: Tables created in dependency order to avoid circular FK issues
 
 -- ================================================================
--- STEP 1: Create generation_metadata table (shared across features)
+-- STEP 1: Create Session Bridge main table (no dependencies)
+-- ================================================================
+CREATE TABLE patient_session_bridge (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    patient_id UUID NOT NULL UNIQUE REFERENCES patients(id) ON DELETE CASCADE,
+
+    -- current_version_id will be added via ALTER TABLE after session_bridge_versions exists
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ================================================================
+-- STEP 2: Create Session Bridge versions table (depends on patient_session_bridge)
+-- ================================================================
+CREATE TABLE session_bridge_versions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    session_bridge_id UUID NOT NULL REFERENCES patient_session_bridge(id) ON DELETE CASCADE,
+    version_number INTEGER NOT NULL,
+
+    -- Bridge data (contains shareConcerns, shareProgress, setGoals arrays)
+    bridge_data JSONB NOT NULL,
+
+    -- Generation context (input data used for generation)
+    generation_context JSONB,
+
+    -- Model and cost tracking
+    model_used VARCHAR(50),
+    cost FLOAT,  -- Actual cost from track_generation_cost()
+    generation_duration_ms INTEGER,
+
+    -- generation_metadata_id will be added via ALTER TABLE after generation_metadata exists
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    -- Unique constraint: one version per patient per version number
+    UNIQUE(patient_id, version_number)
+);
+
+-- ================================================================
+-- STEP 3: Add current_version_id to patient_session_bridge
+-- ================================================================
+ALTER TABLE patient_session_bridge
+ADD COLUMN current_version_id UUID REFERENCES session_bridge_versions(id);
+
+-- ================================================================
+-- STEP 4: Create generation_metadata table (depends on session_bridge_versions, your_journey_versions)
 -- ================================================================
 CREATE TABLE generation_metadata (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -43,50 +91,16 @@ CREATE TABLE generation_metadata (
 );
 
 -- ================================================================
--- STEP 2: Create Session Bridge main table
+-- STEP 5: Add generation_metadata_id FK to version tables
 -- ================================================================
-CREATE TABLE patient_session_bridge (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    patient_id UUID NOT NULL UNIQUE REFERENCES patients(id) ON DELETE CASCADE,
+ALTER TABLE session_bridge_versions
+ADD COLUMN generation_metadata_id UUID REFERENCES generation_metadata(id);
 
-    -- Current version reference (updated when new version created)
-    current_version_id UUID REFERENCES session_bridge_versions(id),
-
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+ALTER TABLE your_journey_versions
+ADD COLUMN generation_metadata_id UUID REFERENCES generation_metadata(id) ON DELETE SET NULL;
 
 -- ================================================================
--- STEP 3: Create Session Bridge versions table (append-only history)
--- ================================================================
-CREATE TABLE session_bridge_versions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
-    session_bridge_id UUID NOT NULL REFERENCES patient_session_bridge(id) ON DELETE CASCADE,
-    version_number INTEGER NOT NULL,
-
-    -- Bridge data (contains shareConcerns, shareProgress, setGoals arrays)
-    bridge_data JSONB NOT NULL,
-
-    -- Generation context (input data used for generation)
-    generation_context JSONB,
-
-    -- Model and cost tracking
-    model_used VARCHAR(50),
-    cost FLOAT,  -- Actual cost from track_generation_cost()
-    generation_duration_ms INTEGER,
-
-    -- Link to shared metadata table
-    generation_metadata_id UUID REFERENCES generation_metadata(id),
-
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-
-    -- Unique constraint: one version per patient per version number
-    UNIQUE(patient_id, version_number)
-);
-
--- ================================================================
--- STEP 4: Create indexes for optimal query performance
+-- STEP 6: Create indexes for optimal query performance
 -- ================================================================
 
 -- Partial indexes for polymorphic FK (only index non-NULL values)
@@ -111,14 +125,6 @@ ON session_bridge_versions(session_bridge_id);
 
 CREATE INDEX idx_session_bridge_versions_version_number
 ON session_bridge_versions(patient_id, version_number);
-
--- ================================================================
--- STEP 5: Add generation_metadata_id column to existing tables
--- ================================================================
--- Link existing Your Journey versions to new metadata table (nullable for backward compatibility)
-
-ALTER TABLE your_journey_versions
-ADD COLUMN generation_metadata_id UUID REFERENCES generation_metadata(id) ON DELETE SET NULL;
 
 -- ================================================================
 -- COMMENTS

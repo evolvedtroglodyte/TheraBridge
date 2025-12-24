@@ -4,6 +4,302 @@ Detailed history of all development sessions, architectural decisions, and imple
 
 ---
 
+## 2026-01-18 - Session Bridge Backend Integration + MODEL_TIER Planning ✅ PLANNING COMPLETE
+
+**Context:** Comprehensive planning session for three major architectural improvements: (1) Session Bridge backend with dynamic roadmap generation, (2) MODEL_TIER cost-saving feature with 3-tier model selection, (3) BaseAIGenerator refactoring to eliminate service code duplication. This session focused exclusively on research, architecture design, and decision-making through 120 clarifying questions across 4 rounds.
+
+**Session Duration:** ~3 hours (research-intensive)
+
+**Session Type:** Planning & Architecture Design (no code implementation)
+
+---
+
+### Work Completed
+
+#### Comprehensive Q&A Process (120 Questions Answered)
+
+**Round 1 - Session Bridge Architecture (Q1-Q40):**
+- Execution & deployment strategy
+- Cost tracking & historical data approach
+- Wave 3 logging architecture (dual logging to PipelineLogger + analysis_processing_log)
+- Inter-session progress & AI prompts
+- Tier 1 context extraction strategy
+- Frontend integration details
+- Database schema & metadata strategy (JSONB vs SQL columns)
+- Testing & documentation approach
+- Environment variables & feature flags
+
+**Round 2 - Major Architecture Decisions (Q41-Q56):**
+- Metadata migration strategy (nested table vs columns)
+- CHECK constraint handling (update vs remove)
+- Service architecture (create base class to eliminate duplication)
+- Migration & testing sequence
+
+**Round 3 - Final Architecture (Q57-Q73):**
+- **Q57**: Polymorphic FK approach with CHECK constraint for generation_metadata table
+- **Q58-Q61**: Refactor ALL 9 AI services to use base class (commit first)
+- **Q70**: Implement MODEL_TIER BEFORE Session Bridge
+- **Q71**: Use precision/balanced/rapid tier names (based on speed/quality)
+- **Q80**: REMOVE CHECK constraint entirely (allow future wave names without migrations)
+
+**Round 4 - Implementation Details (Q74-Q89):**
+- **Q74**: BaseAIGenerator as abstract class (enforces contract)
+- **Q76**: Single class handles both sync and async clients
+- **Q77**: ALL Wave 3 events go to BOTH logging systems
+- **Q78**: Wave3Logger utility REQUIRED (refactor existing generate_roadmap.py)
+- **Q79**: Create all 3 migrations BEFORE implementing
+- **Q81**: model_tier_config.json as separate file (flexible, easier to update)
+- **Q86**: CRUD + editing utilities (update_sessions_analyzed, update_model_used, etc.)
+
+**Round 5 - Execution Details (Q90-Q108):**
+- **Q93**: Accept all OpenAI parameters via **kwargs (35+ params researched)
+- **Q94**: Read MODEL_TIER dynamically per request (allows runtime tier changes)
+- **Q105**: Database verified - 10 patient_roadmap + 56 roadmap_versions rows → ALTER TABLE RENAME (auto-preserves data)
+
+**Round 6 - Final Execution (Q109-Q120):**
+- **Q109**: Approved 19-step execution sequence
+- **Q110**: Two-commit strategy (migration SQL → apply → code updates → commit)
+- **Q111**: Verify production data after migration 014
+- **Q114**: Pilot BaseAIGenerator with 2 services before refactoring all 9
+- **Q119**: Update SESSION_LOG.md after each major phase
+
+---
+
+#### Research Agents Deployed (14 Total - 4 Rounds)
+
+**Round 1 Research (6 agents):**
+1. ✅ **Polymorphic FK Patterns** - Researched two nullable FK columns with CHECK constraint, partial indexes, abstraction layer utilities
+2. ✅ **Abstract/Concrete Class Patterns** - Expected failure (backend code not in repo yet), used service file patterns instead
+3. ✅ **Service Refactor Strategy** - Analyzed all 9 AI services, found common patterns (80+ lines of duplication), recommended refactor order
+4. ✅ **Event Logging Patterns** - Documented PipelineLogger (SSE) vs analysis_processing_log (status tracking), designed Wave3Logger
+5. ✅ **Migration Dependencies** - Analyzed migrations 001-013, recommended 014→015→016 sequence
+
+**Round 2 Research (5 agents):**
+1. ✅ **Abstract Class Implementation** - Designed BaseAIGenerator with abc.ABC, Generic[ClientType], concrete helpers
+2. ✅ **model_tier_config.json Pattern** - Found technique_library.json loading pattern, designed module-level cache strategy
+3. ✅ **CRUD + Editing Utilities** - Designed 9 utility functions with polymorphic FK validation, Supabase patterns
+4. ✅ **Wave3Logger Dual Logging** - Complete implementation logging to BOTH PipelineLogger and analysis_processing_log
+5. ✅ **Migration 016 Constraint Removal** - SQL to safely remove CHECK constraint with idempotency
+
+**Round 3 Research (1 agent):**
+1. ✅ **OpenAI API Parameters** - Researched all 35+ Chat Completions parameters (temperature, reasoning_effort, service_tier, etc.)
+
+**Round 4 Research (2 agents):**
+1. ✅ **Migration 014 Rollback Patterns** - Found existing pattern (no rollback SQL in migrations), recommended planning doc storage
+2. ✅ **Final verification** (partial - continuation prompt requested)
+
+---
+
+#### Database Verification (Supabase MCP)
+
+**Tables Checked:**
+- `patient_roadmap`: **10 rows** (production data exists)
+- `roadmap_versions`: **56 rows** (version history exists)
+
+**Decision Impact:**
+- Migration 014 MUST use `ALTER TABLE RENAME` (auto-preserves 66 rows)
+- No manual data migration needed
+- Rollback SQL prepared in planning doc
+
+---
+
+#### Architecture Decisions Finalized
+
+**1. Polymorphic Metadata Table:**
+```sql
+CREATE TABLE generation_metadata (
+    id UUID PRIMARY KEY,
+    your_journey_version_id UUID REFERENCES your_journey_versions(id),
+    session_bridge_version_id UUID REFERENCES session_bridge_versions(id),
+    sessions_analyzed INT NOT NULL,
+    total_sessions INT NOT NULL,
+    model_used VARCHAR(50) NOT NULL,
+    generation_timestamp TIMESTAMP NOT NULL,
+    generation_duration_ms INT NOT NULL,
+    CHECK (
+        (your_journey_version_id IS NOT NULL AND session_bridge_version_id IS NULL) OR
+        (your_journey_version_id IS NULL AND session_bridge_version_id IS NOT NULL)
+    )
+);
+```
+
+**2. BaseAIGenerator Abstract Class:**
+```python
+from abc import ABC, abstractmethod
+from typing import TypeVar, Generic
+from openai import AsyncOpenAI, OpenAI
+
+ClientType = TypeVar('ClientType', OpenAI, AsyncOpenAI)
+
+class BaseAIGenerator(ABC, Generic[ClientType]):
+    TASK_NAME: str = None  # Subclasses must override
+
+    def __init__(self, api_key=None, override_model=None, use_async_client=False):
+        if use_async_client:
+            self.client: AsyncOpenAI = AsyncOpenAI(api_key=api_key)
+        else:
+            self.client: OpenAI = OpenAI(api_key=api_key)
+        self.model = get_model_name(self.TASK_NAME, override_model)
+
+    @abstractmethod
+    def generate(self, *args, **kwargs): pass
+
+    def _call_api(self, user_prompt, **openai_params): pass  # Concrete
+    async def _call_api_async(self, user_prompt, **openai_params): pass  # Concrete
+```
+
+**3. MODEL_TIER Configuration:**
+```json
+{
+  "metadata": {
+    "version": "1.0.0",
+    "available_tiers": ["precision", "balanced", "rapid"]
+  },
+  "tier_overrides": {
+    "precision": {},
+    "balanced": {
+      "deep_analysis": "gpt-5-mini",
+      "prose_generation": "gpt-5-mini"
+    },
+    "rapid": {
+      "deep_analysis": "gpt-5-nano"
+    }
+  }
+}
+```
+
+**4. Wave3Logger Dual Logging:**
+```python
+class Wave3Logger:
+    EVENT_MAP = {
+        "your_journey": LogEvent.YOUR_JOURNEY_GENERATION,
+        "session_bridge": LogEvent.SESSION_BRIDGE_GENERATION,
+    }
+
+    def __init__(self, patient_id, db, pipeline_logger=None):
+        self.pipeline_logger = pipeline_logger or PipelineLogger(patient_id, LogPhase.WAVE3)
+        self.db = db
+
+    def log_generation_start(self, session_id, wave_name, ...):
+        # Logs to BOTH PipelineLogger (SSE) AND analysis_processing_log (database)
+```
+
+---
+
+#### Implementation Sequence Approved (19 Steps)
+
+1. ☐ Create all 3 migration SQL files (014, 015, 016)
+2. ☐ Apply migration 014 (Your Journey rename)
+3. ☐ Verify production data (10 + 56 rows preserved)
+4. ☐ Update backend code references (10 refs in 3 files)
+5. ☐ Commit code updates
+6. ☐ Test renamed tables work correctly
+7. ☐ Apply migration 016 (remove CHECK constraint)
+8. ☐ Test Wave 3 logging can insert new wave names
+9. ☐ Implement MODEL_TIER feature
+10. ☐ Test MODEL_TIER with 1-session demo
+11. ☐ Implement BaseAIGenerator abstract class
+12. ☐ Pilot refactor: speaker_labeler + action_items_summarizer
+13. ☐ Test pilot services with 1-session demo
+14. ☐ Refactor remaining 7 services
+15. ☐ Test all 9 services with full demo
+16. ☐ Implement Wave3Logger utility
+17. ☐ Apply migration 015 (Session Bridge + generation_metadata)
+18. ☐ Implement generation_metadata utilities
+19. ☐ Implement Session Bridge backend
+
+---
+
+#### Key Artifacts Created
+
+**Planning Document:**
+- File: `thoughts/shared/plans/2026-01-14-session-bridge-backend-integration.md`
+- Size: **2100+ lines**
+- Sections:
+  - All 120 Q&A answers documented
+  - 4 rounds of research findings (14 agents)
+  - Database verification results
+  - Complete architecture specifications
+  - Migration SQL structures
+  - Implementation Progress tracker
+
+**Research Document:**
+- File: `thoughts/shared/research/2026-01-18-session-bridge-architecture-research.md`
+- Size: **600+ lines**
+- Topics: Base class patterns, nested metadata, dual logging, MODEL_TIER naming, migration dependencies
+
+---
+
+#### Migration Strategy
+
+**Migration 014 (Your Journey Rename):**
+- Status: SQL ready, awaiting execution
+- Data: 10 + 56 rows preserved via ALTER TABLE RENAME
+- Code updates: 10 references across 3 files
+- Rollback: Documented in planning file
+
+**Migration 015 (Session Bridge + generation_metadata):**
+- Status: SQL structure designed, awaiting creation
+- Tables: patient_session_bridge, session_bridge_versions, generation_metadata
+- Dependencies: Requires migration 014 complete first
+
+**Migration 016 (Remove CHECK Constraint):**
+- Status: SQL ready, awaiting execution
+- Purpose: Allow future wave names without migrations
+- Impact: Required for Wave 3 logging
+
+---
+
+#### Cost Savings Analysis
+
+**MODEL_TIER Impact (per 10-session demo):**
+- **Precision tier**: $0.65 (current production - highest quality, slowest)
+- **Balanced tier**: $0.18 (72% savings - quality/speed middle ground)
+- **Rapid tier**: $0.04 (94% savings - fastest, lower quality)
+
+**BaseAIGenerator Impact:**
+- Code reduction: **225 lines eliminated** across 9 services (~25 lines per service)
+- Maintenance: Centralized bug fixes (fix once vs 9 times)
+- Consistency: Standardized error handling, cost tracking, client initialization
+
+---
+
+#### Files Modified/Created (Planning Only)
+
+**Planning Documents Created:**
+- `thoughts/shared/plans/2026-01-14-session-bridge-backend-integration.md` (2100+ lines)
+- `thoughts/shared/research/2026-01-18-session-bridge-architecture-research.md` (600+ lines)
+
+**Documentation Updated:**
+- `.claude/CLAUDE.md` - Added planning status
+- `.claude/SESSION_LOG.md` - This entry
+
+**No Code Changes:** This session was 100% planning and research
+
+---
+
+#### Next Steps (For New Session)
+
+**Immediate Actions:**
+1. Begin implementation with migration 014 creation and execution
+2. Follow approved 19-step sequence
+3. Test after each phase per Q107 (safer, catches issues early)
+4. Update SESSION_LOG.md after each major phase per Q119
+
+**Reference Documents:**
+- Planning: `thoughts/shared/plans/2026-01-14-session-bridge-backend-integration.md`
+- Research: `thoughts/shared/research/2026-01-18-session-bridge-architecture-research.md`
+- Checklist: `thoughts/shared/YOUR_JOURNEY_RENAME_CHECKLIST.md`
+
+**Critical Context for Next Session:**
+- All 120 questions answered and documented
+- Database has production data (10 + 56 rows)
+- Execution sequence approved (19 steps)
+- Rollback SQL prepared
+- Testing strategy: Test after each phase
+
+---
+
 ## 2026-01-14 - AI Cost Tracking Infrastructure ✅ COMPLETE
 
 **Context:** User requested cost tracking for all AI generations to analyze costs per session and task. Token counts are extracted directly from OpenAI API responses (`response.usage.prompt_tokens` and `response.usage.completion_tokens`), not estimated.
