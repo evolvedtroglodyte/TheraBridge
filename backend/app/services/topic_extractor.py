@@ -17,8 +17,9 @@ from datetime import datetime
 from openai import AsyncOpenAI
 import os
 import json
+import time
 from app.services.technique_library import get_technique_library, TechniqueLibrary
-from app.config.model_config import get_model_name
+from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
 from app.config import settings
 
 
@@ -33,6 +34,7 @@ class SessionMetadata:
     raw_meta_summary: str  # Full AI response for reference
     confidence: float  # 0.0 to 1.0
     extracted_at: datetime
+    cost_info: Optional[GenerationCost] = None  # Cost tracking for this generation
 
 
 class TopicExtractor:
@@ -96,6 +98,7 @@ class TopicExtractor:
         # Call OpenAI API
         # NOTE: GPT-5 series does NOT support custom temperature - uses internal calibration
         try:
+            start_time = time.time()
             response = await self.client.chat.completions.create(
                 model=self.model,
                 messages=[
@@ -109,6 +112,15 @@ class TopicExtractor:
                     }
                 ],
                 response_format={"type": "json_object"}
+            )
+
+            # Track cost and timing
+            cost_info = track_generation_cost(
+                response=response,
+                task="topic_extraction",
+                model=self.model,
+                start_time=start_time,
+                session_id=session_id
             )
 
             result = json.loads(response.choices[0].message.content)
@@ -156,7 +168,8 @@ class TopicExtractor:
                 summary=summary,
                 raw_meta_summary=response.choices[0].message.content,
                 confidence=confidence,
-                extracted_at=datetime.utcnow()
+                extracted_at=datetime.utcnow(),
+                cost_info=cost_info
             )
 
         except Exception as e:

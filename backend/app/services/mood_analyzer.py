@@ -15,7 +15,8 @@ from datetime import datetime
 from openai import AsyncOpenAI
 import os
 import json
-from app.config.model_config import get_model_name
+import time
+from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
 from app.config import settings
 
 
@@ -29,6 +30,7 @@ class MoodAnalysis:
     key_indicators: List[str]  # Specific signals that influenced the score
     emotional_tone: str  # Overall emotional quality (e.g., "anxious", "hopeful", "flat")
     analyzed_at: datetime
+    cost_info: Optional[GenerationCost] = None  # Cost tracking for this generation
 
 
 class MoodAnalyzer:
@@ -92,6 +94,7 @@ class MoodAnalyzer:
         # Call OpenAI API
         # NOTE: GPT-5 series does NOT support custom temperature - uses internal calibration
         try:
+            start_time = time.time()
             response = await self.client.chat.completions.create(
                 model=self.model,
                 messages=[
@@ -107,6 +110,15 @@ class MoodAnalyzer:
                 response_format={"type": "json_object"}
             )
 
+            # Track cost and timing
+            cost_info = track_generation_cost(
+                response=response,
+                task="mood_analysis",
+                model=self.model,
+                start_time=start_time,
+                session_id=session_id
+            )
+
             result = json.loads(response.choices[0].message.content)
 
             # Validate and round mood score to 0.5 increments
@@ -119,7 +131,8 @@ class MoodAnalyzer:
                 rationale=result.get("rationale", ""),
                 key_indicators=result.get("key_indicators", []),
                 emotional_tone=result.get("emotional_tone", "neutral"),
-                analyzed_at=datetime.utcnow()
+                analyzed_at=datetime.utcnow(),
+                cost_info=cost_info
             )
 
         except Exception as e:
