@@ -61,8 +61,6 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
 
   // Extract summary from AI-generated Wave 1 analysis (with fallback to legacy field)
   const summary = session.summary || session.patientSummary || 'Summary not yet generated.';
-  const isFromBackend = !!session.summary;  // True if using real backend data
-  const isFromMock = !session.summary && !!session.patientSummary;  // True if using mock data
 
   // Extract 1 strategy + 1 action (show both types)
   const techniquesAndActions = [
@@ -283,18 +281,6 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
           }}>
             {summary}
           </p>
-          {/* Data source indicator */}
-          {isFromMock && (
-            <p style={{
-              fontFamily: fontSans,
-              fontSize: '9px',
-              color: mutedText,
-              marginTop: '4px',
-              opacity: 0.6,
-            }}>
-              ⚠️ Using mock data (not connected to Supabase)
-            </p>
-          )}
         </div>
 
         {/* Divider */}
@@ -449,18 +435,6 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
         }}>
           {summary}
         </p>
-        {/* Data source indicator */}
-        {isFromMock && (
-          <p style={{
-            fontFamily: fontSans,
-            fontSize: '9px',
-            color: mutedText,
-            marginTop: '4px',
-            opacity: 0.6,
-          }}>
-            ⚠️ Using mock data (not connected to Supabase)
-          </p>
-        )}
       </div>
 
       {/* Divider */}
