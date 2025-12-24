@@ -6,13 +6,15 @@ Runs Wave 1 AI analysis on demo sessions:
 1. Mood Analysis (mood score, confidence, rationale, indicators)
 2. Topic Extraction (topics, action items, technique, summary)
 3. Breakthrough Detection (identifies transformative moments)
+4. Action Items Summarization (45-char condensed summary) - SEQUENTIAL
 
 Usage:
     python scripts/seed_wave1_analysis.py <patient_id>
 
 This script:
 - Fetches all sessions for the given patient
-- Runs 3 AI services in parallel per session
+- Runs 3 AI services in parallel per session (mood, topics, breakthrough)
+- Runs action summarization sequentially (after topic extraction)
 - Updates database with Wave 1 results
 - Logs progress and errors
 """
@@ -32,6 +34,7 @@ from app.database import get_supabase_admin
 from app.services.mood_analyzer import MoodAnalyzer
 from app.services.topic_extractor import TopicExtractor
 from app.services.breakthrough_detector import BreakthroughDetector
+from app.services.action_items_summarizer import ActionItemsSummarizer, ActionItemsSummary
 from app.config import settings
 from app.utils.pipeline_logger import PipelineLogger, LogPhase, LogEvent
 
@@ -323,6 +326,37 @@ async def process_session(session: Dict[str, Any], index: int, total: int):
 
     logger.info(f"  ✓ All analyses complete in {parallel_duration:.0f}ms (parallel execution)")
     print(f"  ✓ All analyses complete in {parallel_duration:.0f}ms", flush=True)
+
+    # SEQUENTIAL: Action items summarization (if action items exist)
+    action_items_summary = None
+    action_items = updates.get("action_items")
+    if action_items and len(action_items) == 2:
+        try:
+            logger.info(f"📝 Generating action items summary for session {session_id}...")
+            print(f"📝 Generating action items summary...", flush=True)
+
+            summarizer = ActionItemsSummarizer()
+            summary_result = await summarizer.summarize_action_items(
+                action_items=action_items,
+                session_id=str(session_id)
+            )
+
+            action_items_summary = summary_result.summary
+            updates["action_items_summary"] = action_items_summary
+
+            logger.info(
+                f"✅ Action items summary complete: "
+                f"'{action_items_summary}' ({summary_result.character_count} chars)"
+            )
+            print(
+                f"✅ Action summary: '{action_items_summary}' ({summary_result.character_count} chars)",
+                flush=True
+            )
+
+        except Exception as e:
+            logger.error(f"❌ Action items summarization failed: {str(e)}")
+            print(f"❌ Action summarization failed: {str(e)}", flush=True)
+            # Continue without summary (non-blocking)
 
     # Update database
     if updates:
