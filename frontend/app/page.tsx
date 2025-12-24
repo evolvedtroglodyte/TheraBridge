@@ -26,14 +26,14 @@ export default function Home() {
       try {
         const result = await demoApiClient.initialize()
 
-        if (result.success) {
+        if (result) {
           // Token is automatically stored in localStorage by demoApiClient
-          console.log('✅ Demo initialized:', result.data)
+          console.log('✅ Demo initialized:', result)
 
           // Redirect to dashboard
           router.push('/dashboard')
         } else {
-          console.error('❌ Demo initialization failed:', result.error)
+          console.error('❌ Demo initialization failed: result is null')
           // Still redirect to dashboard (it will handle the error)
           router.push('/dashboard')
         }
