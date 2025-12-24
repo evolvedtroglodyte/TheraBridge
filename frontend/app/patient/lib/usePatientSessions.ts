@@ -167,6 +167,7 @@ export function usePatientSessions() {
 
   // NEW: Roadmap loading state (PR #3)
   const [loadingRoadmap, setLoadingRoadmap] = useState<boolean>(false);
+  const [roadmapRefreshTrigger, setRoadmapRefreshTrigger] = useState<number>(0);
 
   // Helper to set session loading state
   const setSessionLoading = (sessionId: string, loading: boolean) => {
@@ -379,11 +380,12 @@ export function usePatientSessions() {
           // Store new timestamp
           (sessionStatesRef.current as any)._last_roadmap_timestamp = roadmapTimestamp;
 
+          // Increment refresh trigger immediately (NotesGoalsCard will refetch)
+          setRoadmapRefreshTrigger(prev => prev + 1);
+
           // Hide loading overlay after 1000ms (same pattern as session cards)
           setTimeout(() => {
             setLoadingRoadmap(false);
-            // Trigger refetch of roadmap data in NotesGoalsCard
-            refresh();
           }, 1000);
         }
 
@@ -537,6 +539,7 @@ export function usePatientSessions() {
     setSessionLoading, // NEW: Helper to set loading state
     patientId, // NEW (PR #3): Patient ID for API calls
     loadingRoadmap, // NEW (PR #3): Whether roadmap is being generated
+    roadmapRefreshTrigger, // NEW (PR #3): Increments when roadmap should be refetched
   };
 }
 

@@ -34,9 +34,9 @@ export function NotesGoalsCard() {
   const [error, setError] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  const { patientId, loadingRoadmap } = useSessionData();
+  const { patientId, loadingRoadmap, roadmapRefreshTrigger } = useSessionData();
 
-  // Fetch roadmap data on mount and when patientId changes
+  // Fetch roadmap data on mount, when patientId changes, OR when roadmapRefreshTrigger increments
   useEffect(() => {
     if (!patientId) return;
 
@@ -61,7 +61,7 @@ export function NotesGoalsCard() {
     };
 
     fetchRoadmap();
-  }, [patientId]);
+  }, [patientId, roadmapRefreshTrigger]);
 
   // Accessibility hook
   useModalAccessibility({

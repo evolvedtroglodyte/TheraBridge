@@ -41,6 +41,8 @@ interface SessionDataContextType {
   patientId: string | null;
   /** Whether roadmap is currently being generated */
   loadingRoadmap: boolean;
+  /** Increments when roadmap data should be refetched */
+  roadmapRefreshTrigger: number;
 }
 
 const SessionDataContext = createContext<SessionDataContextType | null>(null);
