@@ -65,6 +65,49 @@ function getSessionCounterText(sessionsAnalyzed: number, totalSessions: number):
   return `Based on ${sessionsAnalyzed} out of ${totalSessions} uploaded session${plural}`;
 }
 
+// Card title component for consistent styling across states
+interface CardTitleProps {
+  children?: React.ReactNode;
+}
+
+function CardTitle({ children }: CardTitleProps): React.ReactElement {
+  return (
+    <h2 style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200 mb-4">
+      Your Journey
+      {children}
+    </h2>
+  );
+}
+
+// Placeholder card for loading, error, and empty states
+interface PlaceholderCardProps {
+  message: string;
+  secondaryMessage?: string;
+  isError?: boolean;
+  showOverlay?: boolean;
+}
+
+function PlaceholderCard({ message, secondaryMessage, isError, showOverlay }: PlaceholderCardProps): React.ReactElement {
+  const messageClass = isError ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400';
+
+  return (
+    <div className={`relative ${cardBaseClasses}`}>
+      {showOverlay && <LoadingOverlay visible={true} />}
+      <div className="flex flex-col items-center justify-center h-full text-center">
+        <CardTitle />
+        <p style={{ fontFamily: fontSerif, fontSize: '14px' }} className={`${messageClass} mb-2`}>
+          {message}
+        </p>
+        {secondaryMessage && (
+          <p style={{ fontFamily: fontSans, fontSize: '12px' }} className="text-gray-500 dark:text-gray-500">
+            {secondaryMessage}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function NotesGoalsCard() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [roadmapData, setRoadmapData] = useState<RoadmapData | null>(null);
@@ -79,12 +122,10 @@ export function NotesGoalsCard() {
   useEffect(() => {
     if (!patientId) return;
 
-    // Capture non-null patientId for async closure
-    const currentPatientId = patientId;
-
     async function fetchRoadmap(): Promise<void> {
+      if (!patientId) return; // Guard for TypeScript (already checked in outer scope)
       setIsLoading(true);
-      const result = await apiClient.getRoadmap(currentPatientId);
+      const result = await apiClient.getRoadmap(patientId);
 
       if (!result.success) {
         setError(result.error || 'Failed to load roadmap');
@@ -92,7 +133,6 @@ export function NotesGoalsCard() {
         return;
       }
 
-      // Success - either with data or null (no roadmap yet)
       setRoadmapData(result.data?.roadmap ?? null);
       setMetadata(result.data?.metadata ?? null);
       setError(null);
@@ -111,53 +151,22 @@ export function NotesGoalsCard() {
 
   // Show loading state if initial load or roadmap being generated
   if (isLoading || loadingRoadmap) {
-    return (
-      <div className={`relative ${cardBaseClasses}`}>
-        <LoadingOverlay visible={true} />
-        <div className="flex flex-col items-center justify-center h-full">
-          <h2 style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200 mb-4">
-            Your Journey
-          </h2>
-          <p style={{ fontFamily: fontSerif, fontSize: '14px' }} className="text-gray-600 dark:text-gray-400">
-            {isLoading ? 'Loading roadmap...' : 'Generating roadmap...'}
-          </p>
-        </div>
-      </div>
-    );
+    const message = isLoading ? 'Loading roadmap...' : 'Generating roadmap...';
+    return <PlaceholderCard message={message} showOverlay />;
   }
 
   // Show error state if fetch failed
   if (error) {
-    return (
-      <div className={cardBaseClasses}>
-        <div className="flex flex-col items-center justify-center h-full">
-          <h2 style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200 mb-4">
-            Your Journey
-          </h2>
-          <p style={{ fontFamily: fontSerif, fontSize: '14px' }} className="text-red-600 dark:text-red-400">
-            {error}
-          </p>
-        </div>
-      </div>
-    );
+    return <PlaceholderCard message={error} isError />;
   }
 
   // Show empty state if no roadmap yet (0 sessions analyzed)
   if (!roadmapData || !metadata) {
     return (
-      <div className={cardBaseClasses}>
-        <div className="flex flex-col items-center justify-center h-full text-center">
-          <h2 style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200 mb-4">
-            Your Journey
-          </h2>
-          <p style={{ fontFamily: fontSerif, fontSize: '14px' }} className="text-gray-600 dark:text-gray-400 mb-2">
-            Upload therapy sessions to generate your personalized journey roadmap
-          </p>
-          <p style={{ fontFamily: fontSans, fontSize: '12px' }} className="text-gray-500 dark:text-gray-500">
-            Your roadmap will appear here after your first session is analyzed
-          </p>
-        </div>
-      </div>
+      <PlaceholderCard
+        message="Upload therapy sessions to generate your personalized journey roadmap"
+        secondaryMessage="Your roadmap will appear here after your first session is analyzed"
+      />
     );
   }
 

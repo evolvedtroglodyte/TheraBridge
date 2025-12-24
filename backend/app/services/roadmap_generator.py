@@ -186,32 +186,28 @@ Tone: Warm, professional, empowering, hopeful but realistic
 
     def _validate_roadmap_structure(self, roadmap: dict) -> dict:
         """Validate and fix roadmap structure"""
-        # Ensure required fields with defaults
         roadmap.setdefault("summary", "Your therapeutic journey is in progress.")
 
-        # Ensure list fields are actually lists
-        list_fields = ["achievements", "currentFocus", "sections"]
-        for field in list_fields:
+        # Define list field configurations: (field_name, expected_count, placeholder, display_name)
+        list_configs = [
+            ("achievements", 5, "Continued engagement in therapeutic process", "achievements"),
+            ("currentFocus", 3, "Ongoing skill development and practice", "focus areas"),
+        ]
+
+        for field, expected_count, placeholder, display_name in list_configs:
             roadmap.setdefault(field, [])
             if not isinstance(roadmap[field], list):
                 roadmap[field] = []
+            roadmap[field] = self._normalize_list(roadmap[field], expected_count, placeholder, display_name)
 
-        # Normalize list lengths with padding/truncation
-        roadmap["achievements"] = self._normalize_list(
-            roadmap["achievements"], 5,
-            "Continued engagement in therapeutic process",
-            "achievements"
-        )
-        roadmap["currentFocus"] = self._normalize_list(
-            roadmap["currentFocus"], 3,
-            "Ongoing skill development and practice",
-            "focus areas"
-        )
+        # Handle sections separately (variable count)
+        roadmap.setdefault("sections", [])
+        if not isinstance(roadmap["sections"], list):
+            roadmap["sections"] = []
 
         if len(roadmap["sections"]) != 5:
             print(f"[WARNING] RoadmapGenerator: Expected 5 sections, got {len(roadmap['sections'])}")
 
-        # Ensure all sections have title and content
         for section in roadmap["sections"]:
             section.setdefault("title", "Section")
             section.setdefault("content", "Progress is being made in this area.")
@@ -224,6 +220,22 @@ Tone: Warm, professional, empowering, hopeful but realistic
             print(f"[WARNING] RoadmapGenerator: Expected {expected_count} {field_name}, got {len(items)}")
             items.extend([placeholder] * (expected_count - len(items)))
         return items[:expected_count]
+
+    def _build_prompt_header(
+        self,
+        patient_id: UUID,
+        sessions_analyzed: int,
+        total_sessions: int,
+        strategy_name: str,
+        strategy_description: str
+    ) -> str:
+        """Build common prompt header with patient info and strategy context."""
+        return f"""Patient ID: {patient_id}
+Sessions Analyzed: {sessions_analyzed} out of {total_sessions} uploaded
+
+COMPACTION STRATEGY: {strategy_name}
+{strategy_description}
+"""
 
     def _build_prompt_for_strategy(
         self,
@@ -258,30 +270,16 @@ Tone: Warm, professional, empowering, hopeful but realistic
         Strategy 1: Full Context (No Compaction)
 
         Passes ALL previous sessions' raw Wave 1 + Wave 2 data to LLM.
-
-        Context structure:
-        {
-            "previous_context": {
-                # Nested structure from Wave 2
-                "previous_context": {...},
-                "session_N_wave1": {...},
-                "session_N_wave2": {...}
-            },
-            "current_session": {
-                "wave1": {...},
-                "wave2": {...}
-            }
-        }
-
         Token count: ~50K-80K by Session 10
         Cost: ~$0.014-0.020 per generation
         """
-        prompt = f"""Patient ID: {patient_id}
-Sessions Analyzed: {sessions_analyzed} out of {total_sessions} uploaded
+        header = self._build_prompt_header(
+            patient_id, sessions_analyzed, total_sessions,
+            "Full Context",
+            "You have access to ALL previous sessions' complete Wave 1 and Wave 2 analysis data."
+        )
 
-COMPACTION STRATEGY: Full Context
-You have access to ALL previous sessions' complete Wave 1 and Wave 2 analysis data.
-
+        return f"""{header}
 CUMULATIVE CONTEXT (All Previous Sessions):
 {json.dumps(context, indent=2)}
 
@@ -292,7 +290,7 @@ Generate a comprehensive "Your Journey" roadmap that synthesizes insights across
 The roadmap should reflect the patient's full therapeutic journey from Session 1 to Session {sessions_analyzed}.
 
 Focus on:
-- Overall trajectory (where they started → where they are now)
+- Overall trajectory (where they started -> where they are now)
 - Key milestones and breakthroughs across all sessions
 - Cumulative skill development and progress
 - Emerging patterns visible only across multiple sessions
@@ -300,7 +298,6 @@ Focus on:
 
 Return your response as a JSON object with the roadmap structure.
 """
-        return prompt
 
     def _build_progressive_prompt(
         self,
@@ -314,36 +311,41 @@ Return your response as a JSON object with the roadmap structure.
         Strategy 2: Progressive Summarization
 
         Passes ONLY previous roadmap + current session data.
-        Previous roadmap already contains synthesized insights from Sessions 1 to N-1.
-
-        Context structure:
-        {
-            "previous_roadmap": {
-                "summary": "...",
-                "achievements": [...],
-                "currentFocus": [...],
-                "sections": [...]
-            },  # Only exists if sessions_analyzed > 1
-            "current_session": {
-                "wave1": {...},
-                "wave2": {...}
-            }
-        }
-
         Token count: ~7K-10K (constant)
         Cost: ~$0.0025 per generation
         """
-        # Extract previous roadmap if it exists
         previous_roadmap = context.get("previous_roadmap")
 
-        if previous_roadmap:
-            # Session 2+: Build on previous roadmap
-            prompt = f"""Patient ID: {patient_id}
-Sessions Analyzed: {sessions_analyzed} out of {total_sessions} uploaded
+        # Session 1: No previous roadmap - generate initial
+        if not previous_roadmap:
+            header = self._build_prompt_header(
+                patient_id, sessions_analyzed, total_sessions,
+                "Progressive Summarization",
+                "This is the FIRST roadmap generation for this patient."
+            )
+            return f"""{header}
+CURRENT SESSION DATA (Session 1):
+{json.dumps(current_session, indent=2)}
 
-COMPACTION STRATEGY: Progressive Summarization
-You are updating an existing roadmap with insights from the latest session.
+Generate the INITIAL "Your Journey" roadmap based on Session 1.
+This roadmap will be progressively updated as more sessions are analyzed.
 
+Focus on:
+- Initial presentation and presenting concerns
+- First steps taken in therapy
+- Early insights and rapport building
+- Foundation for future progress
+
+Return your response as a JSON object with the roadmap structure.
+"""
+
+        # Session 2+: Build on previous roadmap
+        header = self._build_prompt_header(
+            patient_id, sessions_analyzed, total_sessions,
+            "Progressive Summarization",
+            "You are updating an existing roadmap with insights from the latest session."
+        )
+        return f"""{header}
 PREVIOUS ROADMAP (Sessions 1-{sessions_analyzed - 1}):
 {json.dumps(previous_roadmap, indent=2)}
 
@@ -365,30 +367,6 @@ Important:
 
 Return your response as a JSON object with the roadmap structure.
 """
-        else:
-            # Session 1: No previous roadmap
-            prompt = f"""Patient ID: {patient_id}
-Sessions Analyzed: {sessions_analyzed} out of {total_sessions} uploaded
-
-COMPACTION STRATEGY: Progressive Summarization
-This is the FIRST roadmap generation for this patient.
-
-CURRENT SESSION DATA (Session 1):
-{json.dumps(current_session, indent=2)}
-
-Generate the INITIAL "Your Journey" roadmap based on Session 1.
-This roadmap will be progressively updated as more sessions are analyzed.
-
-Focus on:
-- Initial presentation and presenting concerns
-- First steps taken in therapy
-- Early insights and rapport building
-- Foundation for future progress
-
-Return your response as a JSON object with the roadmap structure.
-"""
-
-        return prompt
 
     def _build_hierarchical_prompt(
         self,
@@ -401,84 +379,51 @@ Return your response as a JSON object with the roadmap structure.
         """
         Strategy 3: Hierarchical Summarization
 
-        Uses multi-tier summaries that compact at different granularities:
-        - Tier 1: Per-session insights (3-5 bullets) - Recent sessions
-        - Tier 2: Every 5 sessions → compacted paragraph - Mid-range history
-        - Tier 3: Every 10 sessions → journey arc narrative - Long-term trajectory
-
-        Context structure:
-        {
-            "tier3_summary": "Sessions 1-10 arc narrative",  # Only if sessions_analyzed > 10
-            "tier2_summaries": {
-                "sessions_11_15": "Paragraph summary",
-                "sessions_16_20": "Paragraph summary"
-            },  # Only if sessions_analyzed > 10
-            "tier1_summaries": {
-                "session_N": ["insight 1", "insight 2", ...],  # Recent sessions
-                "session_N+1": [...]
-            },
-            "previous_roadmap": {...},  # Previous roadmap
-            "current_session": {
-                "wave1": {...},
-                "wave2": {...},
-                "insights": [...]  # Generated by SessionInsightsSummarizer
-            }
-        }
-
+        Uses multi-tier summaries that compact at different granularities.
         Token count: ~10K-12K
         Cost: ~$0.003-0.004 per generation
         """
-        # Determine tier structure based on sessions_analyzed
-        tier3_threshold = 10
-        tier2_threshold = 5
+        header = self._build_prompt_header(
+            patient_id, sessions_analyzed, total_sessions,
+            "Hierarchical Summarization",
+            "Multi-tier context provides both high-level trajectory and recent session details."
+        )
 
-        # Build tier context
+        # Build tier sections
+        tier_sections = []
+
+        # Tier 3: Long-term trajectory
         tier3_summary = context.get("tier3_summary")
-        tier2_summaries = context.get("tier2_summaries", {})
-        tier1_summaries = context.get("tier1_summaries", {})
-        previous_roadmap = context.get("previous_roadmap")
-
-        # Build prompt with appropriate tier context
-        prompt = f"""Patient ID: {patient_id}
-Sessions Analyzed: {sessions_analyzed} out of {total_sessions} uploaded
-
-COMPACTION STRATEGY: Hierarchical Summarization
-Multi-tier context provides both high-level trajectory and recent session details.
-"""
-
-        # Add Tier 3 if exists (Sessions 1-10+ arc)
         if tier3_summary:
-            prompt += f"""
-TIER 3 - LONG-TERM TRAJECTORY (Sessions 1-{tier3_threshold}):
-{tier3_summary}
+            tier_sections.append(f"TIER 3 - LONG-TERM TRAJECTORY (Sessions 1-10):\n{tier3_summary}")
 
-"""
-
-        # Add Tier 2 summaries if exist (5-session chunks)
+        # Tier 2: Mid-range summaries
+        tier2_summaries = context.get("tier2_summaries", {})
         if tier2_summaries:
-            prompt += "TIER 2 - MID-RANGE HISTORY (5-session summaries):\n"
+            tier2_lines = ["TIER 2 - MID-RANGE HISTORY (5-session summaries):"]
             for session_range, summary in tier2_summaries.items():
-                prompt += f"\n{session_range}: {summary}\n"
-            prompt += "\n"
+                tier2_lines.append(f"\n{session_range}: {summary}")
+            tier_sections.append("\n".join(tier2_lines))
 
-        # Add Tier 1 summaries (recent sessions)
+        # Tier 1: Recent session insights
+        tier1_summaries = context.get("tier1_summaries", {})
         if tier1_summaries:
-            prompt += "TIER 1 - RECENT SESSIONS (detailed insights):\n"
+            tier1_lines = ["TIER 1 - RECENT SESSIONS (detailed insights):"]
             for session_key, insights in tier1_summaries.items():
-                prompt += f"\n{session_key}:\n"
+                tier1_lines.append(f"\n{session_key}:")
                 for insight in insights:
-                    prompt += f"  - {insight}\n"
-            prompt += "\n"
+                    tier1_lines.append(f"  - {insight}")
+            tier_sections.append("\n".join(tier1_lines))
 
-        # Add previous roadmap
+        # Previous roadmap
+        previous_roadmap = context.get("previous_roadmap")
         if previous_roadmap:
-            prompt += f"""PREVIOUS ROADMAP (Sessions 1-{sessions_analyzed - 1}):
-{json.dumps(previous_roadmap, indent=2)}
+            tier_sections.append(f"PREVIOUS ROADMAP (Sessions 1-{sessions_analyzed - 1}):\n{json.dumps(previous_roadmap, indent=2)}")
 
-"""
+        tier_context = "\n\n".join(tier_sections) + "\n\n" if tier_sections else ""
 
-        # Add current session
-        prompt += f"""CURRENT SESSION DATA (Session {sessions_analyzed}):
+        return f"""{header}
+{tier_context}CURRENT SESSION DATA (Session {sessions_analyzed}):
 {json.dumps(current_session, indent=2)}
 
 Generate an UPDATED "Your Journey" roadmap that synthesizes:
@@ -492,8 +437,6 @@ Show how Session {sessions_analyzed} fits into the larger journey narrative.
 
 Return your response as a JSON object with the roadmap structure.
 """
-
-        return prompt
 
     @staticmethod
     def compact_tier1_to_tier2(tier1_summaries: dict) -> str:

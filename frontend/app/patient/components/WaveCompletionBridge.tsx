@@ -20,7 +20,7 @@ import { usePipelineEvents } from "@/hooks/use-pipeline-events";
 import { demoTokenStorage } from "@/lib/demo-token-storage";
 
 export function WaveCompletionBridge() {
-  const { refresh, setSessionLoading } = useSessionData();
+  const { refresh, setSessionLoading, setRoadmapRefreshTrigger } = useSessionData();
   const [patientId, setPatientId] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
@@ -160,6 +160,10 @@ export function WaveCompletionBridge() {
       console.log(`[DEBUG] ${sessionDate} waiting for refresh...`);
       await pendingRefreshRef.current;
       console.log(`[DEBUG] ${sessionDate} refresh complete, clearing overlay in 300ms`);
+
+      // Trigger roadmap refresh (roadmap is generated after each Wave 2 completion)
+      console.log(`[Roadmap] 🔄 Triggering roadmap refresh after Wave 2 for ${sessionDate}`);
+      setRoadmapRefreshTrigger(prev => prev + 1);
 
       // Small delay to ensure user sees the overlay before it disappears
       await new Promise(resolve => setTimeout(resolve, 300));

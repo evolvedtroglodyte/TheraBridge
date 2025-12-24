@@ -258,6 +258,27 @@ def build_progressive_context(patient_id: str, current_session_id: str, supabase
     return {"previous_roadmap": roadmap_result.data[0]["roadmap_data"]}
 
 
+def extract_insights_from_deep_analysis(deep_analysis: dict, max_insights: int = 5) -> list[str]:
+    """Extract key insights from deep_analysis structure."""
+    insights = []
+
+    if "breakthrough_patterns" in deep_analysis:
+        insights.extend(deep_analysis["breakthrough_patterns"][:2])
+    if "themes" in deep_analysis:
+        insights.extend([theme["description"] for theme in deep_analysis.get("themes", [])[:2]])
+
+    return insights[:max_insights]
+
+
+def truncate_prose(prose: str, max_length: int) -> str:
+    """Truncate prose to max_length, adding ellipsis if needed."""
+    if not prose:
+        return ""
+    if len(prose) <= max_length:
+        return prose
+    return prose[:max_length] + "..."
+
+
 def build_hierarchical_context(patient_id: str, current_session_id: str, current_insights: list[str], supabase) -> dict:
     """
     Build hierarchical context (tiered summaries)
@@ -277,68 +298,50 @@ def build_hierarchical_context(patient_id: str, current_session_id: str, current
     sessions_with_wave2 = [s for s in sessions_result.data if s.get("prose_analysis")]
     num_sessions = len(sessions_with_wave2)
 
-    context = {
-        "tier1_insights": [],  # Last 1-3 sessions (full insights)
-        "tier2_summaries": [],  # Sessions 4-7 (paragraph summaries)
-        "tier3_arc": None,  # Sessions 8+ (journey arc)
-        "previous_roadmap": None
-    }
-
     # Get previous roadmap if exists
     roadmap_result = supabase.table("patient_roadmap") \
         .select("roadmap_data") \
         .eq("patient_id", patient_id) \
         .execute()
 
-    if roadmap_result.data:
-        context["previous_roadmap"] = roadmap_result.data[0]["roadmap_data"]
+    previous_roadmap = roadmap_result.data[0]["roadmap_data"] if roadmap_result.data else None
 
     # Distribute sessions into tiers (from most recent backwards)
     sessions_reversed = list(reversed(sessions_with_wave2))
 
     # Tier 1: Last 1-3 sessions (full insights)
-    tier1_sessions = sessions_reversed[:3]
-    for session in tier1_sessions:
-        # Extract insights from deep_analysis
-        deep_analysis = session.get("deep_analysis", {})
-        insights = []
-
-        # Extract key insights from deep_analysis structure
-        if "breakthrough_patterns" in deep_analysis:
-            insights.extend(deep_analysis["breakthrough_patterns"][:2])
-        if "themes" in deep_analysis:
-            insights.extend([theme["description"] for theme in deep_analysis.get("themes", [])[:2]])
-
-        context["tier1_insights"].append({
+    tier1_insights = [
+        {
             "session_date": session["session_date"],
-            "insights": insights[:5]  # Max 5 insights per session
-        })
+            "insights": extract_insights_from_deep_analysis(session.get("deep_analysis", {}))
+        }
+        for session in sessions_reversed[:3]
+    ]
 
     # Tier 2: Sessions 4-7 (paragraph summaries)
-    if num_sessions >= 4:
-        tier2_sessions = sessions_reversed[3:7]
-        for session in tier2_sessions:
-            prose = session.get("prose_analysis", "")
-            # Use first 300 characters as summary
-            summary = prose[:300] + "..." if len(prose) > 300 else prose
-            context["tier2_summaries"].append({
-                "session_date": session["session_date"],
-                "summary": summary
-            })
+    tier2_summaries = [
+        {
+            "session_date": session["session_date"],
+            "summary": truncate_prose(session.get("prose_analysis", ""), 300)
+        }
+        for session in sessions_reversed[3:7]
+    ] if num_sessions >= 4 else []
 
     # Tier 3: Sessions 8+ (journey arc - combine into single narrative)
+    tier3_arc = None
     if num_sessions >= 8:
-        tier3_sessions = sessions_reversed[7:]
-        arc_pieces = []
-        for session in tier3_sessions:
-            prose = session.get("prose_analysis", "")
-            # Extract first sentence or ~100 characters
-            first_sentence = prose.split('.')[0] if prose else ""
-            arc_pieces.append(f"{session['session_date']}: {first_sentence}")
+        arc_pieces = [
+            f"{session['session_date']}: {session.get('prose_analysis', '').split('.')[0]}"
+            for session in sessions_reversed[7:]
+        ]
+        tier3_arc = " | ".join(arc_pieces)
 
-        context["tier3_arc"] = " | ".join(arc_pieces)
-
-    return context
+    return {
+        "tier1_insights": tier1_insights,
+        "tier2_summaries": tier2_summaries,
+        "tier3_arc": tier3_arc,
+        "previous_roadmap": previous_roadmap
+    }
 
 
 def estimate_cost(context: dict, roadmap: dict) -> float:

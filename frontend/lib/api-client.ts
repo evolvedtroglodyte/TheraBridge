@@ -478,8 +478,17 @@ class ApiClient {
   // ============================================================================
 
   /**
+   * Helper to convert ApiResult to simplified response format
+   */
+  private toSimpleResult<T>(result: ApiResult<T>): { success: boolean; data?: T; error?: string } {
+    if (result.success) {
+      return { success: true, data: result.data };
+    }
+    return { success: false, error: result.error };
+  }
+
+  /**
    * Initialize demo user and get demo token
-   * @returns ApiResult with demo credentials
    */
   async initializeDemo(): Promise<{
     success: boolean;
@@ -499,101 +508,43 @@ class ApiClient {
       expires_at: string;
       message: string;
     }>('/api/demo/initialize', {});
-
-    if (result.success) {
-      return { success: true, data: result.data };
-    } else {
-      return { success: false, error: result.error };
-    }
+    return this.toSimpleResult(result);
   }
 
   /**
    * Fetch single session by ID
-   * @param sessionId - The session ID to fetch
-   * @returns ApiResult with session data
    */
-  async getSessionById(sessionId: string): Promise<{
-    success: boolean;
-    data?: any;
-    error?: string;
-  }> {
+  async getSessionById(sessionId: string): Promise<{ success: boolean; data?: any; error?: string }> {
     const result = await this.get<any>(`/api/sessions/${sessionId}`);
-
-    if (result.success) {
-      return { success: true, data: result.data };
-    } else {
-      return { success: false, error: result.error };
-    }
+    return this.toSimpleResult(result);
   }
 
   /**
-   * Fetch ALL sessions for the current demo patient
-   *
-   * This endpoint is designed for fully dynamic session loading.
-   * It fetches all sessions from the database and returns them
-   * sorted by date (newest first).
-   *
-   * **Requires:** Demo-Token header (automatically added by request method)
-   *
-   * @returns ApiResult with array of sessions
-   *
-   * @example
-   * ```ts
-   * const result = await apiClient.getAllSessions();
-   * if (result.success) {
-   *   console.log(`Loaded ${result.data.length} sessions`);
-   *   result.data.forEach(session => console.log(session.session_date));
-   * }
-   * ```
+   * Fetch ALL sessions for the current demo patient.
+   * Sessions are sorted by date (newest first).
    */
-  async getAllSessions(): Promise<{
-    success: boolean;
-    data?: any[];
-    error?: string;
-  }> {
+  async getAllSessions(): Promise<{ success: boolean; data?: any[]; error?: string }> {
     const result = await this.get<any[]>('/api/sessions/');
-
-    if (result.success) {
-      return { success: true, data: result.data };
-    } else {
-      return { success: false, error: result.error };
-    }
+    return this.toSimpleResult(result);
   }
 
   /**
-   * Get patient roadmap data
-   *
-   * Fetches the latest roadmap for the given patient ID.
+   * Get patient roadmap data.
    * Returns null if no roadmap exists yet (no sessions analyzed).
-   *
-   * @param patientId - The patient's ID
-   * @returns ApiResponse with roadmap data or null
-   *
-   * @example
-   * ```ts
-   * const result = await apiClient.getRoadmap('patient-123');
-   * if (result.success && result.data) {
-   *   console.log(result.data.roadmap.summary);
-   *   console.log(`Based on ${result.data.metadata.sessions_analyzed} sessions`);
-   * }
-   * ```
    */
-  async getRoadmap(patientId: string): Promise<{
-    success: boolean;
-    data?: any;
-    error?: string;
-  }> {
+  async getRoadmap(patientId: string): Promise<{ success: boolean; data?: any; error?: string }> {
     const result = await this.get<any>(`/api/patients/${patientId}/roadmap`);
 
     if (result.success) {
       return { success: true, data: result.data };
-    } else {
-      // Check if it's a 404 (roadmap doesn't exist yet)
-      if (result.status === 404) {
-        return { success: true, data: null };
-      }
-      return { success: false, error: result.error };
     }
+
+    // 404 means no roadmap yet - treat as success with null data
+    if (result.status === 404) {
+      return { success: true, data: null };
+    }
+
+    return { success: false, error: result.error };
   }
 }
 

@@ -542,6 +542,7 @@ export function usePatientSessions() {
     patientId, // NEW (PR #3): Patient ID for API calls
     loadingRoadmap, // NEW (PR #3): Whether roadmap is being generated
     roadmapRefreshTrigger, // NEW (PR #3): Increments when roadmap should be refetched
+    setRoadmapRefreshTrigger, // NEW (PR #3): Trigger roadmap refresh (for SSE handler)
   };
 }
 

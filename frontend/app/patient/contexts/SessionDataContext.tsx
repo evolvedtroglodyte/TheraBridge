@@ -43,6 +43,8 @@ interface SessionDataContextType {
   loadingRoadmap: boolean;
   /** Increments when roadmap data should be refetched */
   roadmapRefreshTrigger: number;
+  /** Trigger roadmap refresh (for SSE handler when Wave 2 completes) */
+  setRoadmapRefreshTrigger: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const SessionDataContext = createContext<SessionDataContextType | null>(null);
