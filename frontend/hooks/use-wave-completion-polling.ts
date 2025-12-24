@@ -46,12 +46,16 @@ export function useWaveCompletionPolling(
       const response = await demoApiClient.getStatus();
 
       if (response) {
+        // Count completed sessions from the sessions array
+        const wave1CompletedCount = response.sessions?.filter(s => s.wave1_complete).length || 0;
+        const wave2CompletedCount = response.sessions?.filter(s => s.wave2_complete).length || 0;
+
         const newStatus: WaveCompletionStatus = {
-          wave1Complete: response.wave1_complete === response.session_count,
-          wave2Complete: response.wave2_complete === response.session_count,
+          wave1Complete: wave1CompletedCount === response.session_count,
+          wave2Complete: wave2CompletedCount === response.session_count,
           sessionCount: response.session_count,
-          wave1CompletedCount: response.wave1_complete,
-          wave2CompletedCount: response.wave2_complete,
+          wave1CompletedCount: wave1CompletedCount,
+          wave2CompletedCount: wave2CompletedCount,
         };
 
         setStatus(newStatus);
