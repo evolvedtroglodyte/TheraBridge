@@ -17,6 +17,7 @@ import { useModalAccessibility } from '../hooks/useModalAccessibility';
 import { useSessionData } from '../contexts/SessionDataContext';
 import { DeepAnalysisSection } from './DeepAnalysisSection';
 import { LoadingOverlay } from './LoadingOverlay';
+import { DobbyLogo } from './DobbyLogo';
 import { mapNumericMoodToCategory, formatMoodScore } from '../../../lib/mood-mapper';
 import { renderMoodEmoji } from './SessionIcons';
 import { useTheme } from 'next-themes';
@@ -26,6 +27,151 @@ const TYPOGRAPHY = {
   serif: '"Crimson Pro", Georgia, serif',
   sans: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
 } as const;
+
+// Analysis view type
+type AnalysisView = 'prose' | 'structured';
+
+// Tab Toggle Component
+interface TabToggleProps {
+  activeView: AnalysisView;
+  onViewChange: (view: AnalysisView) => void;
+  hasProse: boolean;
+  hasStructured: boolean;
+}
+
+function TabToggle({ activeView, onViewChange, hasProse, hasStructured }: TabToggleProps) {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
+  // Color palette (matching dashboard theme)
+  const activeColor = isDark ? '#a78bfa' : '#5AB9B4'; // Purple (dark) / Teal (light)
+  const inactiveColor = isDark ? '#64748b' : '#94a3b8'; // Slate gray
+  const activeBg = isDark ? 'rgba(167, 139, 250, 0.15)' : 'rgba(90, 185, 180, 0.15)';
+
+  return (
+    <div
+      className="flex items-center gap-2 mb-6 p-1 bg-gray-100 dark:bg-[#1a1625] rounded-lg border border-gray-200 dark:border-[#3d3548]"
+      role="tablist"
+      aria-label="Analysis view selector"
+    >
+      {/* Prose Tab */}
+      <button
+        role="tab"
+        aria-selected={activeView === 'prose'}
+        aria-controls="prose-panel"
+        disabled={!hasProse}
+        onClick={() => onViewChange('prose')}
+        className={`
+          flex-1 px-4 py-2.5 rounded-md transition-all duration-200
+          ${activeView === 'prose' ? 'shadow-sm' : 'opacity-60 hover:opacity-80'}
+          ${!hasProse && 'cursor-not-allowed opacity-40'}
+        `}
+        style={{
+          backgroundColor: activeView === 'prose' ? activeBg : 'transparent',
+          fontFamily: TYPOGRAPHY.sans,
+          fontSize: '13px',
+          fontWeight: activeView === 'prose' ? 600 : 500,
+          color: activeView === 'prose' ? activeColor : inactiveColor,
+        }}
+      >
+        📖 Narrative
+      </button>
+
+      {/* Structured Tab */}
+      <button
+        role="tab"
+        aria-selected={activeView === 'structured'}
+        aria-controls="structured-panel"
+        disabled={!hasStructured}
+        onClick={() => onViewChange('structured')}
+        className={`
+          flex-1 px-4 py-2.5 rounded-md transition-all duration-200
+          ${activeView === 'structured' ? 'shadow-sm' : 'opacity-60 hover:opacity-80'}
+          ${!hasStructured && 'cursor-not-allowed opacity-40'}
+        `}
+        style={{
+          backgroundColor: activeView === 'structured' ? activeBg : 'transparent',
+          fontFamily: TYPOGRAPHY.sans,
+          fontSize: '13px',
+          fontWeight: activeView === 'structured' ? 600 : 500,
+          color: activeView === 'structured' ? activeColor : inactiveColor,
+        }}
+      >
+        📊 Structured
+      </button>
+    </div>
+  );
+}
+
+// Prose Analysis View Component
+interface ProseAnalysisViewProps {
+  prose: string;
+  generatedAt?: string;
+  confidence: number;
+}
+
+function ProseAnalysisView({ prose, generatedAt, confidence }: ProseAnalysisViewProps) {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
+  return (
+    <div
+      role="tabpanel"
+      id="prose-panel"
+      aria-labelledby="prose-tab"
+      className="animate-fadeIn"
+    >
+      {/* Header with Dobby logo */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 flex items-center justify-center">
+            <DobbyLogo size={40} />
+          </div>
+          <div>
+            <h3 style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200">
+              Clinical Narrative
+            </h3>
+            <p style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '11px' }} className="text-gray-500 dark:text-gray-400">
+              AI-powered analysis • {Math.round(confidence * 100)}% confidence
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Prose content */}
+      <div className="prose-container p-6 bg-white dark:bg-[#1a1625] rounded-xl border border-gray-200 dark:border-[#3d3548]">
+        {/* Split prose into paragraphs for better readability */}
+        {prose.split('\n\n').map((paragraph, idx) => (
+          <p
+            key={idx}
+            style={{
+              fontFamily: TYPOGRAPHY.serif,
+              fontSize: '15px',
+              fontWeight: 400,
+              lineHeight: 1.8,
+              marginBottom: idx < prose.split('\n\n').length - 1 ? '16px' : '0'
+            }}
+            className="text-gray-700 dark:text-gray-300"
+          >
+            {paragraph}
+          </p>
+        ))}
+      </div>
+
+      {/* Timestamp footer */}
+      {generatedAt && (
+        <p style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '11px' }} className="text-gray-400 dark:text-gray-500 mt-3 text-right">
+          Generated {new Date(generatedAt).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit'
+          })}
+        </p>
+      )}
+    </div>
+  );
+}
 
 // Theme Toggle Icon (matching NavigationBar style)
 function ThemeIcon({ isDark }: { isDark: boolean }) {
@@ -79,6 +225,22 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
   const { loadingSessions } = useSessionData();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+
+  // Analysis view toggle state
+  const [analysisView, setAnalysisView] = useState<AnalysisView>('prose');
+
+  // Load preference from localStorage on mount
+  useEffect(() => {
+    const savedView = localStorage.getItem('therabridge_analysis_view') as AnalysisView | null;
+    if (savedView === 'prose' || savedView === 'structured') {
+      setAnalysisView(savedView);
+    }
+  }, []);
+
+  // Save preference to localStorage when changed
+  useEffect(() => {
+    localStorage.setItem('therabridge_analysis_view', analysisView);
+  }, [analysisView]);
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -361,13 +523,68 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
               </div>
             )}
 
-            {/* Deep Clinical Analysis */}
-            {session.deep_analysis && (
-              <div className="mt-6 p-4 bg-[#5AB9B4]/5 dark:bg-[#a78bfa]/10 rounded-xl border border-[#5AB9B4]/20 dark:border-[#a78bfa]/30">
-                <DeepAnalysisSection
-                  analysis={session.deep_analysis}
-                  confidence={session.analysis_confidence || 0.8}
+            {/* Analysis Section with Toggle */}
+            {(session.prose_analysis || session.deep_analysis) && (
+              <div className="mt-6">
+                {/* Tab Toggle */}
+                <TabToggle
+                  activeView={analysisView}
+                  onViewChange={setAnalysisView}
+                  hasProse={!!session.prose_analysis}
+                  hasStructured={!!session.deep_analysis}
                 />
+
+                {/* Prose View */}
+                {analysisView === 'prose' && session.prose_analysis && (
+                  <motion.div
+                    key="prose"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ProseAnalysisView
+                      prose={session.prose_analysis}
+                      generatedAt={session.prose_generated_at}
+                      confidence={session.analysis_confidence || 0.8}
+                    />
+                  </motion.div>
+                )}
+
+                {/* Structured View */}
+                {analysisView === 'structured' && session.deep_analysis && (
+                  <motion.div
+                    key="structured"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="p-4 bg-[#5AB9B4]/5 dark:bg-[#a78bfa]/10 rounded-xl border border-[#5AB9B4]/20 dark:border-[#a78bfa]/30">
+                      <DeepAnalysisSection
+                        analysis={session.deep_analysis}
+                        confidence={session.analysis_confidence || 0.8}
+                      />
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Fallback: No analysis available */}
+                {analysisView === 'prose' && !session.prose_analysis && (
+                  <div className="p-6 bg-gray-50 dark:bg-[#1a1625] rounded-xl border border-gray-200 dark:border-[#3d3548] text-center">
+                    <p style={{ fontFamily: TYPOGRAPHY.serif, fontSize: '14px', fontStyle: 'italic' }} className="text-gray-500 dark:text-gray-500">
+                      Narrative analysis not yet available for this session.
+                    </p>
+                  </div>
+                )}
+
+                {analysisView === 'structured' && !session.deep_analysis && (
+                  <div className="p-6 bg-gray-50 dark:bg-[#1a1625] rounded-xl border border-gray-200 dark:border-[#3d3548] text-center">
+                    <p style={{ fontFamily: TYPOGRAPHY.serif, fontSize: '14px', fontStyle: 'italic' }} className="text-gray-500 dark:text-gray-500">
+                      Structured analysis not yet available for this session.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
