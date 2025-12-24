@@ -89,7 +89,49 @@
 ## Development Status
 
 ### Active PRs
-- None currently (PR #3 moved to Completed)
+
+**Session Bridge Backend Integration** - ✅ BACKEND COMPLETE (87%) - Awaiting Migration Application (2026-01-18)
+
+**What it does:**
+- Generates patient-facing shareable content after each therapy session
+- Three content categories: shareConcerns (challenges), shareProgress (wins), setGoals (focus areas)
+- Uses gradient hierarchical compaction (Tier 1: last 3 sessions, Tier 2: sessions 4-7, Tier 3: sessions 8+)
+- Integrates with Wave 2 orchestration (non-blocking subprocess)
+
+**Technical Implementation:**
+- Service: `backend/app/services/session_bridge_generator.py` (SyncAIGenerator subclass)
+- Orchestration: `backend/scripts/generate_session_bridge.py`
+- Database: `patient_session_bridge`, `session_bridge_versions` tables (migrations 014, 015)
+- Logging: Wave3Logger (dual logging to stdout + file + database)
+- Model: gpt-5.2 (configurable via MODEL_TIER)
+
+**Architecture:**
+- Polymorphic metadata table shared with Your Journey roadmap
+- Versioned history (append-only bridge_versions)
+- Cost tracking integrated via BaseAIGenerator
+- MODEL_TIER support (precision/balanced/rapid)
+
+**Implementation Status:**
+- ✅ Phase 1: BaseAIGenerator abstract class with cost tracking
+- ✅ Phase 2: Wave3Logger with database-backed logging
+- ✅ Phase 3: SyncAIGenerator synchronous wrapper
+- ✅ Phase 4: SessionBridgeGenerator service
+- ✅ Phase 5: Orchestration script with gradient compaction
+- ✅ Phase 6: Generation metadata utilities
+- ✅ Phase 7: Wave 2 integration hook
+- ⏳ Phase 8: Database migration application (migrations 014, 015)
+- ⏳ Phase 9: Production testing with 10-session demo
+- ⏳ Phase 10: Frontend integration (TherapistBridgeCard connection)
+
+**Next Steps:**
+- Apply migrations 014, 015 to create Session Bridge tables
+- Test with 10-session demo
+- Frontend integration (TherapistBridgeCard connection)
+
+**Related Documentation:**
+- Planning: `thoughts/shared/plans/2026-01-14-session-bridge-backend-integration.md`
+- Implementation: `.claude/SESSION_LOG.md` (2026-01-18 entry)
+- Unit Tests: `backend/tests/test_model_tier.py`, `backend/tests/test_generation_metadata.py`
 
 ### Completed PRs
 - **PR #3:** Your Journey Dynamic Roadmap
