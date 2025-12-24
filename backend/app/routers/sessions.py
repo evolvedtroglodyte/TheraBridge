@@ -222,7 +222,29 @@ async def get_all_sessions(
     if not response.data:
         return []
 
-    return response.data
+    sessions = response.data
+
+    # Get technique library for definition lookups
+    technique_lib = get_technique_library()
+
+    # Enrich sessions with technique definitions
+    for session in sessions:
+        # Add technique definition if technique exists
+        if session.get("technique"):
+            try:
+                technique_def = technique_lib.get_technique_definition(
+                    session["technique"]
+                )
+                session["technique_definition"] = technique_def
+            except Exception as e:
+                logger.warning(
+                    f"Could not find definition for technique '{session.get('technique')}': {e}"
+                )
+                session["technique_definition"] = None
+        else:
+            session["technique_definition"] = None
+
+    return sessions
 
 
 @router.get("/{session_id}")

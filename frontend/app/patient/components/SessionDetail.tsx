@@ -197,10 +197,26 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
                 </div>
                 <div>
                   <p style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '11px', fontWeight: 500 }} className="text-gray-500 dark:text-gray-500 mb-1">Session Mood</p>
-                  <p style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '13px', fontWeight: 500 }} className="text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                    <span style={{ fontSize: '18px' }}>{moodEmoji}</span>
-                    <span className="capitalize">{session.mood}</span>
-                  </p>
+                  {/* Use numeric mood score if available, otherwise fall back to categorical mood */}
+                  {session.mood_score !== undefined && session.mood_score !== null ? (
+                    <div className="flex items-center gap-2">
+                      {/* Custom emoji based on numeric score */}
+                      {renderMoodEmoji(
+                        mapNumericMoodToCategory(session.mood_score),
+                        18,
+                        false // isDark - will be handled by component
+                      )}
+                      {/* Numeric score */}
+                      <span style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '13px', fontWeight: 500 }} className="text-gray-800 dark:text-gray-200">
+                        {formatMoodScore(session.mood_score)}
+                      </span>
+                    </div>
+                  ) : (
+                    <p style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '13px', fontWeight: 500 }} className="text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                      <span style={{ fontSize: '18px' }}>{moodEmoji}</span>
+                      <span className="capitalize">{session.mood}</span>
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -220,34 +236,6 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
               </ul>
             </div>
 
-            {/* Mood Score Section */}
-            {session.mood_score !== undefined && session.mood_score !== null && (
-              <div className="mb-6 pb-5 border-b border-[#E0DDD8] dark:border-[#3d3548]">
-                <h4 style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} className="text-gray-700 dark:text-gray-300 mb-3">
-                  Session Mood
-                </h4>
-                <div className="flex items-center gap-3">
-                  {/* Custom emoji based on numeric score */}
-                  {renderMoodEmoji(
-                    mapNumericMoodToCategory(session.mood_score),
-                    28,
-                    false // isDark - will be handled by component
-                  )}
-
-                  {/* Numeric score */}
-                  <span style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '18px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200">
-                    {formatMoodScore(session.mood_score)}
-                  </span>
-
-                  {/* Emotional tone (optional) */}
-                  {session.emotional_tone && (
-                    <span style={{ fontFamily: TYPOGRAPHY.serif, fontSize: '14px', fontWeight: 400, fontStyle: 'italic' }} className="text-gray-600 dark:text-gray-400">
-                      ({session.emotional_tone})
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
 
             {/* Strategy Used */}
             <div className="mb-6">
