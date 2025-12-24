@@ -168,7 +168,7 @@ function ProgressIndicatorsCard({ data }: { data: ProgressIndicator }) {
                   <p style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '14px', fontWeight: 500 }} className="text-gray-800 dark:text-gray-200">
                     {skill.skill}
                   </p>
-                  <span style={{ fontSize: '11px' }} className="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 capitalize">
+                  <span style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '11px', fontWeight: 500 }} className="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 capitalize">
                     {skill.proficiency}
                   </span>
                 </div>
@@ -194,7 +194,7 @@ function ProgressIndicatorsCard({ data }: { data: ProgressIndicator }) {
                   <p style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '14px', fontWeight: 500 }} className="text-gray-800 dark:text-gray-200">
                     {goal.goal}
                   </p>
-                  <span style={{ fontSize: '11px' }} className="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 capitalize">
+                  <span style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '11px', fontWeight: 500 }} className="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 capitalize">
                     {goal.status.replace('_', ' ')}
                   </span>
                 </div>
@@ -332,11 +332,11 @@ function CopingSkillsCard({ data }: { data: CopingSkills }) {
               return (
                 <span
                   key={idx}
-                  style={{ fontSize: '11px', fontWeight: 500 }}
+                  style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '11px', fontWeight: 500 }}
                   className="px-3 py-1.5 bg-white dark:bg-gray-800/50 rounded-full text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
                 >
                   {skill}
-                  <span className="ml-1 text-[10px] opacity-75 capitalize">
+                  <span style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '10px' }} className="ml-1 opacity-75 capitalize">
                     ({proficiency})
                   </span>
                 </span>
