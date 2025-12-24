@@ -1,6 +1,90 @@
-# TherapyBridge Session Log
+# TheraBridge Session Log
 
 Detailed history of all development sessions, architectural decisions, and implementation work.
+
+---
+
+## 2025-01-06 - Font Standardization Planning (PR #1) 📋
+
+**Context:** SessionDetail and DeepAnalysisSection currently use `system-ui` fonts instead of dashboard standard (Inter + Crimson Pro). This creates visual inconsistency with SessionCard and dashboard widgets. Header navigation has no explicit fonts.
+
+**Planning Session Summary:**
+
+**Font Inconsistencies Identified:**
+- **SessionDetail.tsx (lines 22-23):** Both `fontSans` and `fontSerif` incorrectly set to `system-ui`
+- **DeepAnalysisSection.tsx (lines 18-19):** Both fonts set to `system-ui`, resulting in 7 different font combinations
+- **Header.tsx:** Navigation buttons use default Tailwind classes (no explicit font family)
+- **Timeline components:** TimelineSidebar.tsx and HorizontalTimeline.tsx are deprecated but not marked
+
+**Dashboard Font Standard (Discovered):**
+Analyzed 6 dashboard components (SessionCard, NotesGoalsCard, AIChatCard, ToDoCard, ProgressPatternsCard, TherapistBridgeCard):
+- **Heading font:** Crimson Pro, 600 weight, 20px (compact) / 24px (modal)
+- **Section labels:** Inter, 500 weight, 11px, uppercase, letter-spacing 1px
+- **Body text:** Crimson Pro, 400 weight, 14px, line-height 1.6
+- **List items:** Crimson Pro, 300 weight, 13px, line-height 1.5
+- **Metadata:** Inter, 500 weight, 11-13px
+
+**Decisions Made:**
+1. **Font Strategy:** Apply dashboard standard to SessionDetail, DeepAnalysisSection, Header
+2. **Implementation Approach:** Use TYPOGRAPHY constants (file-local) for easy iteration
+3. **Phased Rollout:**
+   - Phase 1A: SessionDetail + DeepAnalysisSection → Test → Iterate
+   - Phase 1B: Header + Timeline deprecation
+4. **Future Refactoring:** Eventually migrate to shared constants (lib/typography.ts) in Phase 3
+
+**Typography Specifications:**
+- Main titles: Crimson Pro 600, 24px (SessionDetail is fullscreen, matches modal pattern)
+- Section headers: Crimson Pro 600, 20px (major dividers like "Session Transcript")
+- Subsection labels: Inter 500, 11px, uppercase, letter-spacing 1px
+- Body paragraphs: Crimson Pro 400, 14px, line-height 1.6
+- List items/evidence: Crimson Pro 400, 13px, line-height 1.5
+- Metadata labels: Inter 500, 11px
+- Metadata values: Inter 500, 13px
+- Speaker labels: Inter 600, 13px (transcript)
+- Timestamps: Inter 500, 11px
+
+**Pull Request Created:**
+- **PR #1:** Font Standardization - SessionDetail & DeepAnalysis
+  - Status: Planned
+  - Plan: `thoughts/shared/plans/2025-01-06-font-standardization-sessiondetail.md`
+  - Commits: Phase 1A (SessionDetail + DeepAnalysis), Phase 1B (Header + Timeline deprecation)
+
+**PR Tracking System Established:**
+- **Hybrid approach:** SESSION_LOG.md (full narrative) + TheraBridge.md (quick reference)
+- **Status lifecycle:** Planned → In Progress → Testing → Review → Merged → Deployed
+- **Documentation updated:** CLAUDE.md section added for PR tracking workflow
+- **Session entries:** New entry required for each status change
+
+**Prose Analysis Discovery:**
+- Backend generates BOTH `deep_analysis` (JSONB structured) and `prose_analysis` (TEXT narrative) in Wave 2
+- Frontend currently only displays structured analysis (DeepAnalysisSection with 5 colored cards)
+- Prose analysis (500-750 words, 5 paragraphs) is fetched but never rendered
+- **PR #2 planned:** Add tab toggle (Structured ⇄ Prose) with localStorage persistence, default to Prose view
+
+**Color Palette Planning (PR #2):**
+- Unified palette based on dashboard teal/purple theme
+- Keep 5 card colors for visual distinction, adjusted for harmony
+- Proposed: Progress (emerald), Insights (amber), Skills (blue), Relationship (rose), Recommendations (purple)
+
+**Files to be Changed:**
+- `frontend/app/patient/components/SessionDetail.tsx` (Phase 1A)
+- `frontend/app/patient/components/DeepAnalysisSection.tsx` (Phase 1A)
+- `frontend/app/patient/components/Header.tsx` (Phase 1B)
+- `frontend/app/patient/components/TimelineSidebar.tsx` → `TimelineSidebar.DEPRECATED.tsx` (Phase 1B)
+- `frontend/app/patient/components/HorizontalTimeline.tsx` → `HorizontalTimeline.DEPRECATED.tsx` (Phase 1B)
+
+**Next Steps:**
+- [ ] Review detailed implementation plan
+- [ ] Implement Phase 1A (SessionDetail + DeepAnalysisSection fonts)
+- [ ] Test in light mode and dark mode
+- [ ] Screenshot before/after for comparison
+- [ ] Iterate on font sizes/weights if needed
+- [ ] Implement Phase 1B (Header + Timeline deprecation)
+- [ ] Update SESSION_LOG.md as status changes
+- [ ] Merge PR #1
+- [ ] Plan PR #2 (Prose Analysis UI)
+
+**Current Status:** Implementation plan written, awaiting review and approval.
 
 ---
 

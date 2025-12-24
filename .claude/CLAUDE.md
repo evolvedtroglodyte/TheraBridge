@@ -106,9 +106,41 @@ Before creating any new file, ask:
 
 ---
 
-# TherapyBridge - Project State
+## Pull Request Tracking
 
-## Current Focus: Real-Time Granular Session Updates - COMPLETE ✅
+**Hybrid System:** PR information tracked in TWO places:
+
+1. **SESSION_LOG.md** (Full narrative)
+   - Detailed session notes for every status change
+   - Full context and decision history
+   - New entry per PR status update (Planned → In Progress → Testing → Review → Merged → Deployed)
+   - Links to implementation sessions, testing sessions, etc.
+   - Format: `## YYYY-MM-DD - [Title] (PR #X)`
+
+2. **TheraBridge.md "Development Status" section** (Quick reference)
+   - Current state of all PRs (Active / Completed / Planned)
+   - Minimal info: PR number, title, status, plan link, related sessions
+   - Single source of truth for "what's happening NOW"
+   - Update this section as PR status changes
+
+**PR Numbering:** Sequential (PR #1, PR #2, PR #3...)
+
+**Status Lifecycle:** Planned → In Progress → Testing → Review → Merged → Deployed
+
+**Session Entry Required:** Create new SESSION_LOG entry for each status change (even solo implementation work without Claude)
+
+**Documentation Files:**
+- Implementation plans live in `thoughts/shared/plans/YYYY-MM-DD-description.md`
+- Plans are detailed (file-by-file changes, line numbers, code snippets)
+- Plans are preserved for reference (not deleted after execution)
+
+---
+
+# TheraBridge - Project State
+
+## Current Focus: Font Standardization & UI Consistency (PR #1)
+
+**Previous Focus (COMPLETE ✅):** Real-Time Granular Session Updates
 
 **Implementation Complete (2026-01-03):**
 - ✅ Backend `/api/demo/status` enhanced with full analysis data per session
@@ -154,10 +186,16 @@ Before creating any new file, ask:
 - **Stop after Wave 1**: Saves ~$0.32
 
 **Next Steps:**
-1. Monitor production logs for granular update behavior
-2. Verify stop button works in production
-3. Add OpenAI credits for testing
-4. Implement Feature 2: Analytics Dashboard
+- [x] ~~Monitor production logs for granular update behavior~~ ✅ COMPLETE
+- [x] ~~Verify stop button works in production~~ ✅ COMPLETE
+- [x] ~~Add OpenAI credits for testing~~ ✅ COMPLETE
+- [ ] **PR #1:** Review Font Standardization plan
+- [ ] **PR #1:** Implement Phase 1A (SessionDetail + DeepAnalysis fonts)
+- [ ] **PR #1:** Test font consistency in light/dark modes
+- [ ] **PR #1:** Implement Phase 1B (Header + Timeline deprecation)
+- [ ] **PR #1:** Merge and update documentation
+- [ ] **PR #2:** Implement Prose Analysis UI with Toggle
+- [ ] Implement Feature 2: Analytics Dashboard
 
 **Full Documentation:** See `Project MDs/TheraBridge.md`
 **Detailed Session History:** See `.claude/SESSION_LOG.md`
@@ -380,6 +418,35 @@ python -m pytest  # Run tests
 ## Recent Sessions (Last 2)
 
 **Full session history:** See `.claude/SESSION_LOG.md`
+
+### 2025-01-06 - Font Standardization Planning (PR #1) 📋
+**Comprehensive planning session for standardizing fonts across SessionDetail, DeepAnalysisSection, and Header:**
+
+**Problem Identified:**
+- SessionDetail and DeepAnalysisSection use `system-ui` instead of dashboard standard (Inter + Crimson Pro)
+- Creates visual inconsistency with SessionCard and dashboard widgets
+- 7 different font combinations in DeepAnalysisSection alone
+
+**Solution Designed:**
+- Apply dashboard font standard: Inter (sans-serif labels), Crimson Pro (serif body text)
+- Use TYPOGRAPHY constants for easy iteration
+- Phased rollout: Phase 1A (SessionDetail + DeepAnalysis) → Test → Phase 1B (Header + deprecations)
+
+**PR Tracking System Established:**
+- Hybrid approach: SESSION_LOG.md (full narrative) + TheraBridge.md (quick reference)
+- Status lifecycle: Planned → In Progress → Testing → Review → Merged → Deployed
+- Implementation plans preserved in `thoughts/shared/plans/`
+
+**Deliverables:**
+- ✅ TheraBridge.md created with Development Status section
+- ✅ SESSION_LOG.md entry documenting all decisions
+- ✅ CLAUDE.md updated with PR tracking workflow
+- ✅ Comprehensive implementation plan written to file
+- ✅ Handoff prompt for next implementation window
+
+**Next:** Implementation in separate Claude window (Phase 1A first, then Phase 1B after testing)
+
+---
 
 ### 2025-12-31 - Refresh Behavior & SSE Connection Fixes (Phases 1-3 Complete) ✅
 **Implemented comprehensive fix for browser refresh behavior and SSE connection timing:**

@@ -642,7 +642,8 @@ async def get_pipeline_logs(
 @router.post("/stop")
 async def stop_demo_processing(
     request: Request,
-    demo_user: dict = Depends(get_demo_user)
+    demo_user: dict = Depends(require_demo_auth),
+    db: Client = Depends(get_db)
 ):
     """
     Stop all running background processes for the current demo.
@@ -651,7 +652,18 @@ async def stop_demo_processing(
     Returns:
         Status of terminated processes
     """
-    patient_id = demo_user["patient_id"]
+    user_id = demo_user["id"]
+
+    # Look up the patient record to get patient_id
+    patient_response = db.table("patients").select("id").eq("user_id", user_id).single().execute()
+
+    if not patient_response.data:
+        raise HTTPException(
+            status_code=404,
+            detail="Patient record not found for demo user"
+        )
+
+    patient_id = patient_response.data["id"]
 
     print(f"🛑 Stop requested for patient {patient_id}", flush=True)
     logger.info(f"🛑 Stop requested for patient {patient_id}")
