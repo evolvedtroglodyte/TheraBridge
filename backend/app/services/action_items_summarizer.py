@@ -80,7 +80,7 @@ class ActionItemsSummarizer:
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.3,  # Lower temperature for consistent, concise output
-                max_tokens=30,    # ~45 chars = ~15 tokens, give buffer
+                max_completion_tokens=30,    # ~45 chars = ~15 tokens, give buffer
             )
 
             # Extract summary
