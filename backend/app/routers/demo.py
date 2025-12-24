@@ -93,6 +93,11 @@ class DemoStatusResponse(BaseModel):
     sessions: List[SessionStatus]  # Per-session status
     roadmap_updated_at: Optional[str] = None  # PR #3: Timestamp of last roadmap update
 
+    # PR #3 Phase 4: Processing state fields
+    processing_state: str  # "running" | "stopped" | "complete" | "not_started"
+    stopped_at_session_id: Optional[str] = None  # Which session was being processed when stopped
+    can_resume: bool  # Whether resume is possible
+
 
 # ============================================================================
 # Background Tasks
@@ -608,6 +613,39 @@ async def get_demo_status(
         # Roadmap table might not exist yet (Phase 5 not complete)
         logger.debug(f"Could not query roadmap table: {e}")
 
+    # PR #3 Phase 4: Determine processing state
+    processing_state = "not_started"
+    stopped_at_session_id = None
+    can_resume = False
+
+    # Check if processing is currently running (check running_processes dict)
+    is_running = patient_id in running_processes and any(
+        proc.returncode is None for proc in running_processes[patient_id].values() if proc
+    )
+
+    # Check if stopped (stopped flag in analysis_status dict)
+    analysis_status_dict = analysis_status.get(patient_id, {})
+    wave1_stopped = analysis_status_dict.get("wave1_stopped", False)
+    wave2_stopped = analysis_status_dict.get("wave2_stopped", False)
+
+    if is_running:
+        processing_state = "running"
+    elif wave2_complete_count == session_count:
+        processing_state = "complete"
+    elif wave1_stopped or wave2_stopped:
+        processing_state = "stopped"
+        can_resume = True
+
+        # Find which session was being processed when stopped
+        for session in sessions:
+            if session.get("topics") and not session.get("prose_analysis"):
+                # Wave 1 complete but Wave 2 incomplete - this is where we stopped
+                stopped_at_session_id = session["id"]
+                break
+    elif wave1_complete_count > 0 or wave2_complete_count > 0:
+        # Some sessions analyzed but not stopped - still processing
+        processing_state = "running"
+
     return DemoStatusResponse(
         demo_token=demo_user["demo_token"],
         patient_id=patient_id,
@@ -619,7 +657,10 @@ async def get_demo_status(
         wave1_complete=wave1_complete_count,
         wave2_complete=wave2_complete_count,
         sessions=session_statuses,
-        roadmap_updated_at=roadmap_updated_at
+        roadmap_updated_at=roadmap_updated_at,
+        processing_state=processing_state,
+        stopped_at_session_id=stopped_at_session_id,
+        can_resume=can_resume
     )
 
 
@@ -694,6 +735,12 @@ async def stop_demo_processing(
     print(f"🛑 Stop requested for patient {patient_id}", flush=True)
     logger.info(f"🛑 Stop requested for patient {patient_id}")
 
+    # PR #3 Phase 4: Set stopped flags for resume detection
+    if patient_id not in analysis_status:
+        analysis_status[patient_id] = {}
+    analysis_status[patient_id]["wave1_stopped"] = True
+    analysis_status[patient_id]["wave2_stopped"] = True
+
     if patient_id not in running_processes:
         return {
             "message": "No running processes found for this demo",
@@ -736,4 +783,87 @@ async def stop_demo_processing(
         "message": f"Successfully stopped {len(terminated)} running processes",
         "patient_id": patient_id,
         "terminated": terminated
+    }
+
+
+@router.post("/resume")
+async def resume_demo_processing(
+    request: Request,
+    demo_user: dict = Depends(require_demo_auth),
+    db: Client = Depends(get_db)
+):
+    """
+    Resume processing from where it was stopped.
+
+    Smart resume logic:
+    1. Find incomplete sessions (Wave 1 complete but Wave 2 incomplete)
+    2. Re-run Wave 2 for incomplete session
+    3. Continue with remaining sessions (Wave 1 → Wave 2 → Roadmap)
+
+    Returns immediately after scheduling background tasks.
+    """
+    user_id = demo_user["id"]
+
+    # Look up the patient record to get patient_id
+    patient_response = db.table("patients").select("id").eq("user_id", user_id).single().execute()
+
+    if not patient_response.data:
+        raise HTTPException(
+            status_code=404,
+            detail="Patient record not found for demo user"
+        )
+
+    patient_id = patient_response.data["id"]
+
+    print(f"▶️ Resume requested for patient {patient_id}", flush=True)
+    logger.info(f"▶️ Resume requested for patient {patient_id}")
+
+    # Reset stopped flags
+    if patient_id not in analysis_status:
+        analysis_status[patient_id] = {}
+    analysis_status[patient_id]["wave1_stopped"] = False
+    analysis_status[patient_id]["wave2_stopped"] = False
+
+    # Find incomplete sessions
+    sessions_result = db.table("therapy_sessions") \
+        .select("id, topics, prose_analysis") \
+        .eq("patient_id", patient_id) \
+        .order("session_date") \
+        .execute()
+
+    sessions = sessions_result.data
+    incomplete_session = None
+    next_sessions = []
+
+    for session in sessions:
+        if session.get("topics") and not session.get("prose_analysis"):
+            # Wave 1 complete but Wave 2 incomplete - this is the stopped session
+            if not incomplete_session:
+                incomplete_session = session
+        elif not session.get("topics"):
+            # Wave 1 not started - these are next sessions
+            next_sessions.append(session)
+
+    # Schedule resume tasks
+    if incomplete_session:
+        # Re-run Wave 2 for incomplete session
+        print(f"[RESUME] Re-running Wave 2 for Session {incomplete_session['id']}", flush=True)
+        asyncio.create_task(run_wave2_analysis_background(patient_id))
+
+    # Continue with remaining sessions (Wave 1 → Wave 2 → Roadmap)
+    if next_sessions:
+        print(f"[RESUME] Continuing with {len(next_sessions)} remaining sessions", flush=True)
+
+        async def run_wave1_then_wave2_resume():
+            """Run Wave 1, then start Wave 2 when Wave 1 completes"""
+            await run_wave1_analysis_background(patient_id)
+            # After Wave 1 completes, start Wave 2
+            asyncio.create_task(run_wave2_analysis_background(patient_id))
+
+        asyncio.create_task(run_wave1_then_wave2_resume())
+
+    return {
+        "message": "Processing resumed",
+        "incomplete_session_id": incomplete_session["id"] if incomplete_session else None,
+        "remaining_sessions": len(next_sessions)
     }

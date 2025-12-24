@@ -583,24 +583,16 @@ class ApiClient {
     data?: any;
     error?: string;
   }> {
-    try {
-      const response = await fetch(`${this.baseUrl}/api/patients/${patientId}/roadmap`, {
-        headers: this.getHeaders(),
-      });
+    const result = await this.get<any>(`/api/patients/${patientId}/roadmap`);
 
-      if (!response.ok) {
-        if (response.status === 404) {
-          // Roadmap doesn't exist yet (no sessions analyzed)
-          return { success: true, data: null };
-        }
-        throw new Error(`Failed to fetch roadmap: ${response.statusText}`);
+    if (result.success) {
+      return { success: true, data: result.data };
+    } else {
+      // Check if it's a 404 (roadmap doesn't exist yet)
+      if (result.status === 404) {
+        return { success: true, data: null };
       }
-
-      const data = await response.json();
-      return { success: true, data };
-    } catch (error) {
-      console.error('[API] Error fetching roadmap:', error);
-      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+      return { success: false, error: result.error };
     }
   }
 }

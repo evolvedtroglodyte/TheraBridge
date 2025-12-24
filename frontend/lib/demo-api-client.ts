@@ -39,6 +39,12 @@ export interface DemoStatusResponse {
   wave1_complete: number;
   wave2_complete: number;
   sessions: SessionStatus[];
+  roadmap_updated_at?: string;
+
+  // PR #3 Phase 4: Processing state fields
+  processing_state: 'running' | 'stopped' | 'complete' | 'not_started';
+  stopped_at_session_id?: string;
+  can_resume: boolean;
 }
 
 export const demoApiClient = {
@@ -188,6 +194,38 @@ export const demoApiClient = {
       return result.data;
     } else {
       console.error('[Demo API] ✗ Stop demo failed:', result.error);
+      return null;
+    }
+  },
+
+  /**
+   * Resume processing from where it was stopped (PR #3 Phase 4)
+   * Smart resume logic: Re-runs Wave 2 for incomplete session + continues with remaining
+   */
+  async resume(): Promise<{ message: string; incomplete_session_id?: string; remaining_sessions: number } | null> {
+    const token = demoTokenStorage.getToken();
+    if (!token) {
+      console.error('[Demo API] No demo token found for resume');
+      return null;
+    }
+
+    console.log('[Demo API] Resuming demo processing...');
+
+    const result = await apiClient.post<{ message: string; incomplete_session_id?: string; remaining_sessions: number }>(
+      '/api/demo/resume',
+      {},
+      {
+        headers: {
+          'X-Demo-Token': token,
+        },
+      }
+    );
+
+    if (result.success) {
+      console.log('[Demo API] ✓ Demo processing resumed:', result.data);
+      return result.data;
+    } else {
+      console.error('[Demo API] ✗ Resume demo failed:', result.error);
       return null;
     }
   },
