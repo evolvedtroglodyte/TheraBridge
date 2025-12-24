@@ -48,7 +48,9 @@ export const demoApiClient = {
   async initialize(): Promise<DemoInitResponse | null> {
     console.log('[Demo API] Initializing demo user...');
 
-    const result = await apiClient.post<DemoInitResponse>('/api/demo/initialize');
+    const result = await apiClient.post<DemoInitResponse>('/api/demo/initialize', {}, {
+      timeout: 90000  // 90 seconds for Wave 1 + Wave 2 analysis
+    });
 
     if (result.success) {
       console.log('[Demo API] ✓ Demo initialized:', result.data);
