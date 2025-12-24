@@ -8,8 +8,7 @@
  * - Full dark mode support
  */
 
-import { useState, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense } from 'react';
 import '../patient/styles.css';
 import { SessionDataProvider } from '@/app/patient/contexts/SessionDataContext';
 import { ProcessingProvider } from '@/contexts/ProcessingContext';
@@ -23,8 +22,6 @@ import { DashboardSkeleton } from '@/app/patient/components/DashboardSkeleton';
 import { ProcessingRefreshBridge } from '@/app/patient/components/ProcessingRefreshBridge';
 
 export default function DashboardPage() {
-  const router = useRouter();
-
   return (
     <ProcessingProvider>
       <SessionDataProvider>
