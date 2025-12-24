@@ -185,6 +185,9 @@ async def run_wave2_analysis_background(patient_id: str):
 
 async def run_full_initialization_pipeline(patient_id: str):
     """Run complete initialization: transcripts → Wave 1 → Wave 2"""
+    print("=" * 80, flush=True)
+    print(f"🔥 BACKGROUND TASK EXECUTING: patient_id={patient_id}", flush=True)
+    print("=" * 80, flush=True)
     logger.info("=" * 80)
     logger.info(f"🎬 BACKGROUND TASK STARTED: Full initialization pipeline for patient {patient_id}")
     logger.info("=" * 80)
@@ -229,6 +232,7 @@ async def initialize_demo(
     # Generate unique demo token
     demo_token = str(uuid4())
 
+    print(f"🔥 DEMO INIT START: token={demo_token}", flush=True)
     logger.info(f"Initializing demo user with token: {demo_token}")
 
     try:
