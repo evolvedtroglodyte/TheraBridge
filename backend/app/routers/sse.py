@@ -64,12 +64,17 @@ async def stream_events(patient_id: str, request: Request):
     Returns:
         StreamingResponse with text/event-stream content type
     """
+    # Get origin from request for CORS
+    origin = request.headers.get("origin", "*")
+
     return StreamingResponse(
         event_generator(patient_id, request),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
-            "X-Accel-Buffering": "no"  # Disable nginx buffering
+            "X-Accel-Buffering": "no",  # Disable nginx buffering
+            "Access-Control-Allow-Origin": origin,  # Allow SSE from frontend
+            "Access-Control-Allow-Credentials": "true"
         }
     )
