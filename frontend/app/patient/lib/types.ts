@@ -85,6 +85,9 @@ export interface Session {
   technique?: string;  // Primary therapeutic technique - AI-generated
   extraction_confidence?: number;  // 0.0 to 1.0
   topics_extracted_at?: string;  // ISO timestamp
+  // Wave 2 AI Analysis - Deep Analysis (from backend)
+  prose_analysis?: string;  // Human-readable prose analysis - AI-generated
+  prose_generated_at?: string;  // ISO timestamp
 }
 
 export interface Milestone {

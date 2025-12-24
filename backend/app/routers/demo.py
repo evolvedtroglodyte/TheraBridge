@@ -578,6 +578,74 @@ async def get_demo_status(
     )
 
 
+@router.post("/test-complete-session/{session_id}")
+async def test_complete_session(
+    session_id: str,
+    wave: int = 1,  # 1 or 2
+    db: Client = Depends(get_supabase_admin)
+):
+    """
+    TESTING ONLY - REMOVE BEFORE PRODUCTION
+
+    Manually trigger Wave 1 or Wave 2 completion for a session.
+    This allows testing granular updates without waiting for real analysis.
+
+    Usage:
+    - POST /api/demo/test-complete-session/{session_id}?wave=1
+    - POST /api/demo/test-complete-session/{session_id}?wave=2
+    """
+    try:
+        if wave == 1:
+            # Simulate Wave 1 completion
+            update_data = {
+                "topics": ["Test Topic 1", "Test Topic 2"],
+                "mood_score": 7.5,
+                "summary": "Test summary for manual completion",
+                "technique": "CBT - Cognitive Restructuring",
+                "action_items": ["Test action item"],
+                "topics_extracted_at": datetime.utcnow().isoformat(),
+                "mood_analyzed_at": datetime.utcnow().isoformat()
+            }
+        elif wave == 2:
+            # Simulate Wave 2 completion
+            update_data = {
+                "prose_analysis": "Test prose analysis. This is a manually triggered completion for testing purposes.",
+                "deep_analysis": {
+                    "progress": {"themes": ["test"]},
+                    "insights": {"patterns": ["test"]},
+                    "skills": {"demonstrated": ["test"]},
+                    "relationship": {"quality": "strong"},
+                    "recommendations": {"focus_areas": ["test"]}
+                },
+                "prose_generated_at": datetime.utcnow().isoformat(),
+                "deep_analyzed_at": datetime.utcnow().isoformat()
+            }
+        else:
+            raise HTTPException(status_code=400, detail="Wave must be 1 or 2")
+
+        # Update session
+        response = (
+            db.table("therapy_sessions")
+            .update(update_data)
+            .eq("id", session_id)
+            .execute()
+        )
+
+        if not response.data:
+            raise HTTPException(status_code=404, detail="Session not found")
+
+        return {
+            "success": True,
+            "session_id": session_id,
+            "wave": wave,
+            "message": f"Session manually completed for Wave {wave}"
+        }
+
+    except Exception as e:
+        print(f"Error in test endpoint: {str(e)}", flush=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/logs/{patient_id}")
 async def get_pipeline_logs(
     patient_id: str,

@@ -8,7 +8,7 @@
  * - FIXED: Accessibility - focus trap, Escape key, focus restoration
  */
 
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowLeft, Star } from 'lucide-react';
 import { Session } from '../lib/types';
@@ -29,6 +29,12 @@ interface SessionDetailProps {
 
 export function SessionDetail({ session, onClose }: SessionDetailProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+
+  // Refs for scroll preservation
+  const leftColumnRef = useRef<HTMLDivElement>(null);
+  const rightColumnRef = useRef<HTMLDivElement>(null);
+  const previousSessionIdRef = useRef<string | null>(null);
+
   const { loadingSessions } = useSessionData();
 
   // Accessibility: focus trap, Escape key, scroll lock
@@ -37,6 +43,41 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
     onClose,
     modalRef,
   });
+
+  // Preserve scroll position when session updates
+  useEffect(() => {
+    if (!session) return;
+
+    // If session ID changed (user navigated to different session), reset scroll
+    if (previousSessionIdRef.current !== session.id) {
+      previousSessionIdRef.current = session.id;
+
+      // Reset scroll to top for new session
+      if (leftColumnRef.current) leftColumnRef.current.scrollTop = 0;
+      if (rightColumnRef.current) rightColumnRef.current.scrollTop = 0;
+      return;
+    }
+
+    // Same session, preserve scroll position during updates
+    const leftScroll = leftColumnRef.current?.scrollTop || 0;
+    const rightScroll = rightColumnRef.current?.scrollTop || 0;
+
+    // Restore scroll after React re-renders
+    requestAnimationFrame(() => {
+      if (leftColumnRef.current) {
+        leftColumnRef.current.scrollTo({
+          top: leftScroll,
+          behavior: 'smooth'
+        });
+      }
+      if (rightColumnRef.current) {
+        rightColumnRef.current.scrollTo({
+          top: rightScroll,
+          behavior: 'smooth'
+        });
+      }
+    });
+  }, [session?.id, session?.topics, session?.prose_analysis]); // Re-run when data changes
 
   if (!session) return null;
 
@@ -99,7 +140,10 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
         {/* Two-column Content */}
         <div className="flex-1 grid grid-cols-2 overflow-hidden">
           {/* Left Column - Transcript */}
-          <div className="border-r border-[#E0DDD8] dark:border-[#3d3548] overflow-y-auto p-8 bg-[#F8F7F4] dark:bg-[#1a1625]">
+          <div
+            ref={leftColumnRef}
+            className="border-r border-[#E0DDD8] dark:border-[#3d3548] overflow-y-auto p-8 bg-[#F8F7F4] dark:bg-[#1a1625]"
+          >
             <h3 style={{ fontFamily: fontSans }} className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">
               Session Transcript
             </h3>
@@ -137,7 +181,10 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
           </div>
 
           {/* Right Column - Analysis */}
-          <div className="overflow-y-auto p-8 bg-gray-50 dark:bg-[#2a2435]">
+          <div
+            ref={rightColumnRef}
+            className="overflow-y-auto p-8 bg-gray-50 dark:bg-[#2a2435]"
+          >
             <h3 style={{ fontFamily: fontSans }} className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">
               Session Analysis
             </h3>
