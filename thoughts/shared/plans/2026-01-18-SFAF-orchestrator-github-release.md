@@ -129,33 +129,38 @@ Creating a standalone GitHub repository for the parallel orchestration system, p
 
 ## Open Questions (TO BE RESOLVED BEFORE FINALIZING PLAN)
 
-### Installation & Distribution
-- [ ] What is the exact structure of Claude Code's skill directory?
+### Critical Clarifications Received ✅
+1. **Scope**: Everything (agent, command, docs, utilities, supporting code)
+2. **Dependencies**: Part of Claude Code built-in functionality (TodoWrite, Task tool, etc.)
+3. **Installation Target**: All of the above (files to .claude/agents, package managers, install script)
+4. **Context7 MCP**: Research tool only, NOT shipped with SFAF
+5. **Distribution**: All package managers (npm, pip, homebrew) + install script
+6. **Current State**: Work in progress, test if desired
+7. **README**: Modular with wiki links (marketable)
+
+### Installation & Distribution (Research Needed)
+- [ ] What is the exact structure of Claude Code's skill directory? (Use Context7 MCP)
+- [ ] Where does Claude Code install by default on Mac/Linux/Windows? (Use Context7 MCP)
 - [ ] How do other Claude Code skills handle installation?
-- [ ] Should we create a package.json for npm distribution?
-- [ ] Should we create a setup.py for pip distribution?
+- [ ] What files are required for npm/pip/homebrew packages?
 - [ ] What's the auto-detection strategy for Claude Code installation path?
 
-### Repository Structure
-- [ ] Should we use a monorepo or separate repos for docs/code?
-- [ ] Where should the skill files live? (root vs src/ vs skill/)
-- [ ] How to structure the wiki vs README?
+### Repository Structure (Research Needed)
+- [ ] Where should the skill files live in the repo? (root vs src/ vs skill/)
+- [ ] How to structure wiki pages vs README sections?
+- [ ] What's the standard directory layout for multi-language packages?
 
-### Context7 MCP
-- [ ] Is Context7 MCP available/documented?
-- [ ] How to integrate MCP tools into the skill?
-- [ ] Should Claude docs be bundled or fetched dynamically?
-
-### Technical Implementation
+### Technical Implementation (Research Needed)
 - [ ] Should the orchestrator be a single file or modular?
-- [ ] How to handle updates/versioning?
-- [ ] Should we create a CLI wrapper?
-- [ ] How to handle cross-platform compatibility (Mac/Linux/Windows)?
+- [ ] How to handle updates/versioning across package managers?
+- [ ] Cross-platform compatibility requirements (Mac/Linux/Windows)?
+- [ ] Are there any dependencies on Claude Code internals we need to document?
 
-### Documentation Content
-- [ ] What benchmarks/metrics do we have from real usage?
-- [ ] What example orchestrations can we showcase?
+### Documentation Content (Research Needed)
+- [ ] What benchmarks/metrics exist from current orchestrator usage?
+- [ ] What example orchestrations can we showcase from this project?
 - [ ] How to create architecture diagrams (mermaid, ASCII, images)?
+- [ ] What comparison benchmarks should we include? (vs sequential, vs manual)
 
 ---
 
