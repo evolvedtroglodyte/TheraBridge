@@ -7,17 +7,18 @@ to produce a single 0.0-10.0 mood score (0.5 increments) where:
 - 0.0 = Extremely distressed/negative
 - 5.0 = Neutral/stable
 - 10.0 = Very positive/content
+
+Refactored to use BaseAIGenerator for consistent initialization and cost tracking.
 """
 
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from datetime import datetime
-from openai import AsyncOpenAI
-import os
 import json
 import time
-from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
-from app.config import settings
+
+from app.services.base_ai_generator import AsyncAIGenerator
+from app.config.model_config import track_generation_cost, GenerationCost
 
 
 @dataclass
@@ -33,11 +34,13 @@ class MoodAnalysis:
     cost_info: Optional[GenerationCost] = None  # Cost tracking for this generation
 
 
-class MoodAnalyzer:
+class MoodAnalyzer(AsyncAIGenerator):
     """
     AI-powered mood analysis for therapy sessions.
 
-    Uses GPT-4o-mini to analyze patient mood by examining:
+    Inherits from AsyncAIGenerator for consistent initialization and cost tracking.
+
+    Uses GPT-5-nano to analyze patient mood by examining:
     - Emotional language and sentiment
     - Self-reported feelings and experiences
     - Energy level indicators (sleep, appetite, motivation)
@@ -55,12 +58,18 @@ class MoodAnalyzer:
             api_key: OpenAI API key. If None, uses OPENAI_API_KEY env var.
             override_model: Optional model override for testing (default: uses gpt-5-nano from config)
         """
-        self.api_key = api_key or settings.openai_api_key
-        if not self.api_key:
-            raise ValueError("OpenAI API key required for mood analysis")
+        super().__init__(api_key=api_key, override_model=override_model)
 
-        self.client = AsyncOpenAI(api_key=self.api_key)
-        self.model = get_model_name("mood_analysis", override_model=override_model)
+    def get_task_name(self) -> str:
+        """Return the task name for model selection and cost tracking."""
+        return "mood_analysis"
+
+    def build_messages(self, context: Dict[str, Any]) -> List[Dict[str, str]]:
+        """Build messages for the API call. Required by base class but not used directly."""
+        return [
+            {"role": "system", "content": self._get_system_prompt()},
+            {"role": "user", "content": context.get("prompt", "")}
+        ]
 
     async def analyze_session_mood(
         self,

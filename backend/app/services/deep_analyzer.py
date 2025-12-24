@@ -11,21 +11,19 @@ Analyzes:
 - Therapeutic relationship quality (engagement, openness, alliance strength)
 - Actionable recommendations (practices, resources, reflection prompts)
 
-Uses GPT-4o for complex reasoning and synthesis.
+Refactored to use SyncAIGenerator for consistent initialization and cost tracking.
 """
 
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
-from datetime import datetime, timedelta
-import openai
-import os
+from datetime import datetime
 import json
 import logging
 import time
 
-from app.database import get_db
 from supabase import Client
-from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
+from app.services.base_ai_generator import SyncAIGenerator
+from app.config.model_config import track_generation_cost, GenerationCost
 
 logger = logging.getLogger(__name__)
 
@@ -112,9 +110,11 @@ class DeepAnalysis:
         return result
 
 
-class DeepAnalyzer:
+class DeepAnalyzer(SyncAIGenerator):
     """
     AI-powered deep clinical analysis for therapy sessions.
+
+    Inherits from SyncAIGenerator for consistent initialization and cost tracking.
 
     Synthesizes:
     - Current session transcript
@@ -131,13 +131,19 @@ class DeepAnalyzer:
             db: Supabase client. If None, uses default from get_db()
             override_model: Optional model override for testing (default: uses gpt-5.2 from config)
         """
-        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
-        if not self.api_key:
-            raise ValueError("OpenAI API key required for deep analysis")
-
-        openai.api_key = self.api_key
-        self.model = get_model_name("deep_analysis", override_model=override_model)
+        super().__init__(api_key=api_key, override_model=override_model)
         self.db = db  # Will be None if not provided (for testing/mocking)
+
+    def get_task_name(self) -> str:
+        """Return the task name for model selection and cost tracking."""
+        return "deep_analysis"
+
+    def build_messages(self, context: Dict[str, Any]) -> List[Dict[str, str]]:
+        """Build messages for the API call. Required by base class but not used directly."""
+        return [
+            {"role": "system", "content": self._get_system_prompt()},
+            {"role": "user", "content": context.get("prompt", "")}
+        ]
 
     async def analyze_session(
         self,
@@ -174,7 +180,7 @@ class DeepAnalyzer:
         # NOTE: GPT-5 series does NOT support custom temperature - uses internal calibration
         try:
             start_time = time.time()
-            response = openai.chat.completions.create(
+            response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
                     {

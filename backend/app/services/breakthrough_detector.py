@@ -9,12 +9,11 @@ without relying on hardcoded keywords or patterns.
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from datetime import datetime
-from openai import AsyncOpenAI
-import os
 import json
 import time
-from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
-from app.config import settings
+
+from app.services.base_ai_generator import AsyncAIGenerator
+from app.config.model_config import track_generation_cost, GenerationCost
 
 
 @dataclass
@@ -42,11 +41,13 @@ class SessionBreakthroughAnalysis:
     cost_info: Optional[GenerationCost] = None  # Cost tracking for this generation
 
 
-class BreakthroughDetector:
+class BreakthroughDetector(AsyncAIGenerator):
     """
     AI-powered breakthrough detection for therapy sessions.
 
-    Uses GPT-4 to identify genuine therapeutic breakthroughs by analyzing:
+    Inherits from AsyncAIGenerator for consistent initialization and cost tracking.
+
+    Uses GPT-5 to identify genuine therapeutic breakthroughs by analyzing:
     - Emotional shifts and affect changes
     - Cognitive insights and reframing moments
     - Behavioral commitments and action planning
@@ -62,11 +63,18 @@ class BreakthroughDetector:
             api_key: OpenAI API key. If None, uses OPENAI_API_KEY env var.
             override_model: Optional model override for testing (default: uses gpt-5 from config)
         """
-        self.api_key = api_key or settings.openai_api_key
-        if not self.api_key:
-            raise ValueError("OpenAI API key required for breakthrough detection")
-        self.client = AsyncOpenAI(api_key=self.api_key)
-        self.model = get_model_name("breakthrough_detection", override_model=override_model)
+        super().__init__(api_key=api_key, override_model=override_model)
+
+    def get_task_name(self) -> str:
+        """Return the task name for model selection and cost tracking."""
+        return "breakthrough_detection"
+
+    def build_messages(self, context: Dict[str, Any]) -> List[Dict[str, str]]:
+        """Build messages for the API call. Required by base class but not used directly."""
+        return [
+            {"role": "system", "content": self._create_breakthrough_detection_prompt()},
+            {"role": "user", "content": context.get("prompt", "")}
+        ]
 
     async def analyze_session(
         self,

@@ -10,15 +10,14 @@ Output: 5 flowing paragraphs addressing patient directly, combining:
 - Accessible language with therapeutic jargon
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
 from datetime import datetime
-import openai
-import os
 import logging
 import time
 
-from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
+from app.services.base_ai_generator import SyncAIGenerator
+from app.config.model_config import track_generation_cost, GenerationCost
 
 logger = logging.getLogger(__name__)
 
@@ -35,9 +34,11 @@ class ProseAnalysis:
     cost_info: Optional[GenerationCost] = None  # Cost tracking for this generation
 
 
-class ProseGenerator:
+class ProseGenerator(SyncAIGenerator):
     """
     AI-powered prose generation for therapy session analysis.
+
+    Inherits from SyncAIGenerator for consistent initialization and cost tracking.
 
     Converts structured DeepAnalysis JSON into flowing prose narrative
     that combines compassionate tone with clinical expertise.
@@ -51,12 +52,18 @@ class ProseGenerator:
             api_key: OpenAI API key. If None, uses OPENAI_API_KEY env var.
             override_model: Optional model override for testing (default: gpt-5.2)
         """
-        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
-        if not self.api_key:
-            raise ValueError("OpenAI API key required for prose generation")
+        super().__init__(api_key=api_key, override_model=override_model)
 
-        openai.api_key = self.api_key
-        self.model = get_model_name("deep_analysis", override_model=override_model)  # Uses gpt-5.2
+    def get_task_name(self) -> str:
+        """Return the task name for model selection and cost tracking."""
+        return "prose_generation"
+
+    def build_messages(self, context: Dict[str, Any]) -> List[Dict[str, str]]:
+        """Build messages for the API call. Required by base class but not used directly."""
+        return [
+            {"role": "system", "content": self._get_system_prompt()},
+            {"role": "user", "content": context.get("prompt", "")}
+        ]
 
     async def generate_prose(
         self,
@@ -84,7 +91,7 @@ class ProseGenerator:
         # NOTE: GPT-5 series does NOT support custom temperature
         try:
             start_time = time.time()
-            response = openai.chat.completions.create(
+            response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
                     {

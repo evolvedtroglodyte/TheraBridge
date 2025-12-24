@@ -14,13 +14,12 @@ individual components, optimizing AI usage and consistency.
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from datetime import datetime
-from openai import AsyncOpenAI
-import os
 import json
 import time
+
+from app.services.base_ai_generator import AsyncAIGenerator
 from app.services.technique_library import get_technique_library, TechniqueLibrary
-from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
-from app.config import settings
+from app.config.model_config import track_generation_cost, GenerationCost
 
 
 @dataclass
@@ -37,11 +36,13 @@ class SessionMetadata:
     cost_info: Optional[GenerationCost] = None  # Cost tracking for this generation
 
 
-class TopicExtractor:
+class TopicExtractor(AsyncAIGenerator):
     """
     AI-powered topic and metadata extraction for therapy sessions.
 
-    Uses GPT-4o-mini to analyze full conversation and extract:
+    Inherits from AsyncAIGenerator for consistent initialization and cost tracking.
+
+    Uses GPT-5-mini to analyze full conversation and extract:
     - Main topics discussed
     - Action items/homework assigned
     - Therapeutic techniques employed
@@ -58,15 +59,21 @@ class TopicExtractor:
             api_key: OpenAI API key. If None, uses OPENAI_API_KEY env var.
             override_model: Optional model override for testing (default: uses gpt-5-mini from config)
         """
-        self.api_key = api_key or settings.openai_api_key
-        if not self.api_key:
-            raise ValueError("OpenAI API key required for topic extraction")
-
-        self.client = AsyncOpenAI(api_key=self.api_key)
-        self.model = get_model_name("topic_extraction", override_model=override_model)
+        super().__init__(api_key=api_key, override_model=override_model)
 
         # Load technique library for validation
         self.technique_library: TechniqueLibrary = get_technique_library()
+
+    def get_task_name(self) -> str:
+        """Return the task name for model selection and cost tracking."""
+        return "topic_extraction"
+
+    def build_messages(self, context: Dict[str, Any]) -> List[Dict[str, str]]:
+        """Build messages for the API call. Required by base class but not used directly."""
+        return [
+            {"role": "system", "content": self._get_system_prompt()},
+            {"role": "user", "content": context.get("prompt", "")}
+        ]
 
     async def extract_metadata(
         self,

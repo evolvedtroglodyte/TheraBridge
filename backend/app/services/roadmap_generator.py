@@ -18,18 +18,23 @@ Cost: ~$0.003-0.020 per generation (varies by strategy)
 import json
 import os
 import time
-from typing import Optional, Literal
+from typing import Optional, Literal, Dict, List, Any
 from uuid import UUID
 from datetime import datetime
-import openai
-from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
+
+from app.services.base_ai_generator import SyncAIGenerator
+from app.config.model_config import track_generation_cost, GenerationCost
 
 
 CompactionStrategy = Literal["full", "progressive", "hierarchical"]
 
 
-class RoadmapGenerator:
-    """Generate patient journey roadmaps with configurable compaction strategies"""
+class RoadmapGenerator(SyncAIGenerator):
+    """
+    Generate patient journey roadmaps with configurable compaction strategies.
+
+    Inherits from SyncAIGenerator for consistent initialization and cost tracking.
+    """
 
     def __init__(self, api_key: Optional[str] = None, override_model: Optional[str] = None):
         """
@@ -39,12 +44,7 @@ class RoadmapGenerator:
             api_key: OpenAI API key (uses env var if not provided)
             override_model: Override default model (for testing)
         """
-        # Only pass api_key if explicitly provided, otherwise let OpenAI use env var
-        if api_key:
-            self.client = openai.OpenAI(api_key=api_key)
-        else:
-            self.client = openai.OpenAI()  # Uses OPENAI_API_KEY env var
-        self.model = get_model_name("roadmap_generation", override_model=override_model)
+        super().__init__(api_key=api_key, override_model=override_model)
 
         # Get and validate compaction strategy from env var
         VALID_STRATEGIES = {"full", "progressive", "hierarchical"}
@@ -55,6 +55,17 @@ class RoadmapGenerator:
             raw_strategy = "hierarchical"
 
         self.strategy: CompactionStrategy = raw_strategy
+
+    def get_task_name(self) -> str:
+        """Return the task name for model selection and cost tracking."""
+        return "roadmap_generation"
+
+    def build_messages(self, context: Dict[str, Any]) -> List[Dict[str, str]]:
+        """Build messages for the API call. Required by base class but not used directly."""
+        return [
+            {"role": "system", "content": self._get_system_prompt()},
+            {"role": "user", "content": context.get("prompt", "")}
+        ]
 
     def generate_roadmap(
         self,

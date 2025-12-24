@@ -9,11 +9,12 @@ Analyzes therapy session transcripts to:
 """
 
 from typing import List, Dict, Optional, Any
-import openai
 import json
 import logging
 import time
-from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
+
+from app.services.base_ai_generator import SyncAIGenerator
+from app.config.model_config import track_generation_cost, GenerationCost
 
 logger = logging.getLogger(__name__)
 
@@ -48,12 +49,33 @@ class SpeakerLabelingResult(BaseModel):
 # Speaker Labeling Service
 # ============================================
 
-class SpeakerLabeler:
-    """AI-powered speaker role detection and transcript labeling"""
+class SpeakerLabeler(SyncAIGenerator):
+    """
+    AI-powered speaker role detection and transcript labeling.
 
-    def __init__(self, openai_api_key: str, override_model: Optional[str] = None):
-        self.client = openai.OpenAI(api_key=openai_api_key)
-        self.model = get_model_name("speaker_labeling", override_model=override_model)
+    Inherits from SyncAIGenerator for consistent initialization and cost tracking.
+    """
+
+    def __init__(self, openai_api_key: str = None, override_model: Optional[str] = None):
+        """
+        Initialize the speaker labeler.
+
+        Args:
+            openai_api_key: OpenAI API key. If None, uses OPENAI_API_KEY env var.
+            override_model: Optional model override for testing (default: uses gpt-5-mini from config)
+        """
+        super().__init__(api_key=openai_api_key, override_model=override_model)
+
+    def get_task_name(self) -> str:
+        """Return the task name for model selection and cost tracking."""
+        return "speaker_labeling"
+
+    def build_messages(self, context: Dict[str, Any]) -> List[Dict[str, str]]:
+        """Build messages for the API call. Required by base class but not used directly."""
+        return [
+            {"role": "system", "content": self._get_detection_system_prompt()},
+            {"role": "user", "content": context.get("prompt", "")}
+        ]
 
     def label_transcript(
         self,

@@ -4,15 +4,14 @@ Condenses 2 verbose action items into a single 45-character phrase.
 Uses GPT-5-nano for efficient, cost-effective summarization.
 """
 
-import os
 import logging
 import time
-from typing import List, Optional
-from openai import AsyncOpenAI
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 from pydantic import BaseModel
 
-from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
+from app.services.base_ai_generator import AsyncAIGenerator
+from app.config.model_config import track_generation_cost, GenerationCost
 
 logger = logging.getLogger(__name__)
 
@@ -26,25 +25,37 @@ class ActionItemsSummary(BaseModel):
     cost_info: Optional[dict] = None  # Cost tracking (dict for Pydantic compatibility)
 
 
-class ActionItemsSummarizer:
+class ActionItemsSummarizer(AsyncAIGenerator):
     """
     Summarizes two verbose action items into a single 45-character phrase.
+
+    Inherits from AsyncAIGenerator for consistent initialization and cost tracking.
 
     Uses GPT-5-nano for cost-effective summarization while maintaining
     the core meaning of both action items.
     """
 
-    def __init__(self):
-        """Initialize the summarizer with OpenAI client"""
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            raise ValueError("OPENAI_API_KEY environment variable not set")
+    def __init__(self, api_key: Optional[str] = None, override_model: Optional[str] = None):
+        """
+        Initialize the summarizer with OpenAI client.
 
-        self.client = AsyncOpenAI(api_key=api_key)
-
-        # Use GPT-5-nano for efficient summarization
-        self.model = get_model_name("action_summary", override_model=None)
+        Args:
+            api_key: OpenAI API key. If None, uses OPENAI_API_KEY env var.
+            override_model: Optional model override for testing (default: uses gpt-5-nano from config)
+        """
+        super().__init__(api_key=api_key, override_model=override_model)
         logger.info(f"Initialized ActionItemsSummarizer with model: {self.model}")
+
+    def get_task_name(self) -> str:
+        """Return the task name for model selection and cost tracking."""
+        return "action_summary"
+
+    def build_messages(self, context: Dict[str, Any]) -> List[Dict[str, str]]:
+        """Build messages for the API call. Required by base class but not used directly."""
+        return [
+            {"role": "system", "content": self._get_system_prompt()},
+            {"role": "user", "content": context.get("prompt", "")}
+        ]
 
     async def summarize_action_items(
         self,
