@@ -16,7 +16,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
 import { Session } from '../lib/types';
 import { useTheme } from '../contexts/ThemeContext';
+import { useSessionData } from '../contexts/SessionDataContext';
 import { BreakthroughStar, renderMoodEmoji } from './SessionIcons';
+import { LoadingOverlay } from './LoadingOverlay';
 
 interface SessionCardProps {
   session: Session;
@@ -37,6 +39,8 @@ const cardHeight = 290.5;
 
 export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardProps) {
   const { isDark } = useTheme();
+  const { loadingSessions } = useSessionData();
+  const isLoading = loadingSessions.has(session.id);
 
   // Color system - matching "Your Journey" card for consistency
   const colors = {
@@ -336,6 +340,9 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
             ))}
           </ul>
         </div>
+
+        {/* Loading Overlay */}
+        <LoadingOverlay visible={isLoading} />
       </motion.div>
       </>
     );
@@ -490,6 +497,9 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
           ))}
         </ul>
       </div>
+
+      {/* Loading Overlay */}
+      <LoadingOverlay visible={isLoading} />
     </motion.div>
   );
 }

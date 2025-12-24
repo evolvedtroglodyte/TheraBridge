@@ -14,7 +14,9 @@ import { X, ArrowLeft, Star } from 'lucide-react';
 import { Session } from '../lib/types';
 import { getMoodEmoji, fullscreenVariants } from '../lib/utils';
 import { useModalAccessibility } from '../hooks/useModalAccessibility';
+import { useSessionData } from '../contexts/SessionDataContext';
 import { DeepAnalysisSection } from './DeepAnalysisSection';
+import { LoadingOverlay } from './LoadingOverlay';
 
 // Font families - matching SessionCard (using system-ui throughout)
 const fontSerif = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -27,6 +29,7 @@ interface SessionDetailProps {
 
 export function SessionDetail({ session, onClose }: SessionDetailProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const { loadingSessions } = useSessionData();
 
   // Accessibility: focus trap, Escape key, scroll lock
   useModalAccessibility({
@@ -36,6 +39,8 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
   });
 
   if (!session) return null;
+
+  const isLoading = loadingSessions.has(session.id);
 
   // Debug: Check if deep_analysis exists
   console.log('[SessionDetail] Session:', session.id, 'has deep_analysis:', !!session.deep_analysis);
@@ -235,6 +240,9 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
             )}
           </div>
         </div>
+
+        {/* Loading Overlay */}
+        <LoadingOverlay visible={isLoading} />
       </motion.div>
     </AnimatePresence>
   );
