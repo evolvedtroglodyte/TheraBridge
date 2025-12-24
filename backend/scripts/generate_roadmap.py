@@ -23,6 +23,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from app.services.session_insights_summarizer import SessionInsightsSummarizer
 from app.services.roadmap_generator import RoadmapGenerator
 from app.database import get_supabase_admin
+from app.utils.generation_metadata import create_generation_metadata
 
 
 def log_step(step: str, message: str) -> None:
@@ -48,7 +49,7 @@ def generate_roadmap_for_session(patient_id: str, session_id: str):
     1. Generate session insights from deep_analysis
     2. Build context based on compaction strategy
     3. Generate roadmap
-    4. Update database (patient_roadmap + roadmap_versions)
+    4. Update database (patient_your_journey + your_journey_versions)
     """
     supabase = get_supabase_admin()
 
@@ -148,8 +149,8 @@ def generate_roadmap_for_session(patient_id: str, session_id: str):
     # Step 5: Update database
     log_step("Step 5/5", "Updating database...")
 
-    # Get current version number
-    versions_result = supabase.table("roadmap_versions") \
+    # Get current version number (renamed table: your_journey_versions)
+    versions_result = supabase.table("your_journey_versions") \
         .select("version") \
         .eq("patient_id", patient_id) \
         .order("version", desc=True) \
@@ -159,8 +160,8 @@ def generate_roadmap_for_session(patient_id: str, session_id: str):
     current_version = versions_result.data[0]["version"] if versions_result.data else 0
     new_version = current_version + 1
 
-    # Insert new version
-    supabase.table("roadmap_versions").insert({
+    # Insert new version (renamed table: your_journey_versions)
+    version_result = supabase.table("your_journey_versions").insert({
         "patient_id": patient_id,
         "version": new_version,
         "roadmap_data": roadmap_data,
@@ -170,17 +171,44 @@ def generate_roadmap_for_session(patient_id: str, session_id: str):
         "generation_duration_ms": metadata["generation_duration_ms"]
     }).execute()
 
-    log_success(f"Version {new_version} saved to roadmap_versions")
+    version_id = version_result.data[0]["id"]
+    log_success(f"Version {new_version} saved to your_journey_versions")
 
-    # Upsert to patient_roadmap (latest version)
-    supabase.table("patient_roadmap").upsert({
+    # Create generation_metadata record for this version
+    try:
+        gen_metadata = create_generation_metadata(
+            db=supabase,
+            your_journey_version_id=UUID(version_id),
+            sessions_analyzed=sessions_analyzed,
+            total_sessions=total_sessions,
+            model_used=metadata.get("model_used", "gpt-5.2"),
+            generation_timestamp=datetime.now(),
+            generation_duration_ms=metadata["generation_duration_ms"],
+            last_session_id=UUID(session_id),
+            compaction_strategy=metadata.get("compaction_strategy", "hierarchical"),
+            metadata_json={"tier_counts": metadata.get("tier_counts", {})}
+        )
+        metadata_id = gen_metadata["id"]
+        log_success(f"Generation metadata created: {metadata_id[:8]}...")
+
+        # Link metadata to version
+        supabase.table("your_journey_versions").update({
+            "generation_metadata_id": metadata_id
+        }).eq("id", version_id).execute()
+
+    except Exception as e:
+        print(f"  ⚠ Warning: Failed to create generation_metadata: {e}", flush=True)
+        # Continue - metadata is optional enhancement
+
+    # Upsert to patient_your_journey (latest version, renamed from patient_roadmap)
+    supabase.table("patient_your_journey").upsert({
         "patient_id": patient_id,
         "roadmap_data": roadmap_data,
         "metadata": metadata,
         "updated_at": datetime.now().isoformat()
     }, on_conflict="patient_id").execute()
 
-    log_success("Latest roadmap updated in patient_roadmap")
+    log_success("Latest roadmap updated in patient_your_journey")
 
     print(f"\n{'='*60}", flush=True)
     print(f"ROADMAP GENERATION COMPLETE", flush=True)
@@ -247,7 +275,7 @@ def build_full_context(patient_id: str, current_session_id: str, supabase) -> di
 
 def build_progressive_context(patient_id: str, current_session_id: str, supabase) -> dict:
     """Build progressive context (previous roadmap only)"""
-    roadmap_result = supabase.table("patient_roadmap") \
+    roadmap_result = supabase.table("patient_your_journey") \
         .select("roadmap_data") \
         .eq("patient_id", patient_id) \
         .execute()
@@ -299,7 +327,7 @@ def build_hierarchical_context(patient_id: str, current_session_id: str, current
     num_sessions = len(sessions_with_wave2)
 
     # Get previous roadmap if exists
-    roadmap_result = supabase.table("patient_roadmap") \
+    roadmap_result = supabase.table("patient_your_journey") \
         .select("roadmap_data") \
         .eq("patient_id", patient_id) \
         .execute()

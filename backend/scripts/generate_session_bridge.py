@@ -24,6 +24,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from app.services.session_bridge_generator import SessionBridgeGenerator
 from app.database import get_supabase_admin
 from app.utils.wave3_logger import create_session_bridge_logger, Wave3Event
+from app.utils.generation_metadata import create_generation_metadata
 
 
 def log_step(step: str, message: str) -> None:
@@ -213,6 +214,37 @@ def generate_session_bridge_for_session(patient_id: str, session_id: str):
 
         version_id = version_result.data[0]["id"]
         log_success(f"Version {new_version} saved: {version_id[:8]}...")
+
+        # Create generation_metadata record for this version
+        try:
+            metadata = create_generation_metadata(
+                db=supabase,
+                session_bridge_version_id=UUID(version_id),
+                sessions_analyzed=session_number,
+                total_sessions=len(session_ids),
+                model_used=generator.model,
+                generation_timestamp=datetime.utcnow(),
+                generation_duration_ms=bridge_data.cost_info.duration_ms if bridge_data.cost_info else 0,
+                last_session_id=UUID(session_id),
+                compaction_strategy="tiered",
+                metadata_json={
+                    "tier1_count": len(context.get("tier1_insights", {})),
+                    "tier2_count": len(context.get("tier2_insights", {})),
+                    "has_tier3": bool(context.get("tier3_insights")),
+                    "confidence_score": bridge_data.confidence_score,
+                }
+            )
+            metadata_id = metadata["id"]
+            log_success(f"Generation metadata created: {metadata_id[:8]}...")
+
+            # Link metadata to version
+            supabase.table("session_bridge_versions").update({
+                "generation_metadata_id": metadata_id
+            }).eq("id", version_id).execute()
+
+        except Exception as e:
+            print(f"  ⚠ Warning: Failed to create generation_metadata: {e}", flush=True)
+            # Continue - metadata is optional enhancement
 
         wave3_logger.log_event(
             Wave3Event.VERSION_SAVE,

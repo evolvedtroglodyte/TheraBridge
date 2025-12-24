@@ -447,6 +447,23 @@ async def main(patient_id: str):
             except Exception as e:
                 print(f"[Roadmap] ✗ Roadmap generation error: {e}", flush=True)
 
+            # Session Bridge generation (PR #4 Phase 8) - runs after roadmap
+            print(f"\n[SessionBridge] Triggering session bridge generation for session {session['id']}", flush=True)
+            try:
+                session_bridge_script = os.path.join(os.path.dirname(__file__), 'generate_session_bridge.py')
+
+                subprocess.Popen(
+                    [sys.executable, session_bridge_script, patient_id, session['id']],
+                    stdout=None,
+                    stderr=None,
+                    env=os.environ.copy(),
+                    start_new_session=True
+                )
+                print(f"[SessionBridge] ✓ Session bridge generation started (async) for session {session['id']}", flush=True)
+
+            except Exception as e:
+                print(f"[SessionBridge] ✗ Session bridge generation error: {e}", flush=True)
+
     # Summary
     end_time = datetime.utcnow()
     duration = (end_time - start_time).total_seconds()
