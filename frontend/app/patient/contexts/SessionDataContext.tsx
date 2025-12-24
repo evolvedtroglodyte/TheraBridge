@@ -49,22 +49,10 @@ const SessionDataContext = createContext<SessionDataContextType | null>(null);
  */
 export function SessionDataProvider({ children }: { children: ReactNode }) {
   const data = usePatientSessions();
-  const [loadingSessions, setLoadingSessions] = useState<Set<string>>(new Set());
 
-  const setSessionLoading = useCallback((sessionId: string, loading: boolean) => {
-    setLoadingSessions((prev) => {
-      const next = new Set(prev);
-      if (loading) {
-        next.add(sessionId);
-      } else {
-        next.delete(sessionId);
-      }
-      return next;
-    });
-  }, []);
-
+  // loadingSessions and setSessionLoading are now provided by usePatientSessions hook
   return (
-    <SessionDataContext.Provider value={{ ...data, loadingSessions, setSessionLoading }}>
+    <SessionDataContext.Provider value={data}>
       {children}
     </SessionDataContext.Provider>
   );

@@ -20,6 +20,119 @@ import { Session, Task, TimelineEntry, TimelineEvent, MajorEventEntry, MoodType 
 import { apiClient } from '@/lib/api-client';
 import { demoTokenStorage } from '@/lib/demo-token-storage';
 import { demoApiClient } from '@/lib/demo-api-client';
+import { POLLING_CONFIG, SessionState, logPolling } from '@/lib/polling-config';
+
+/**
+ * Determine polling interval based on analysis phase
+ */
+function determinePollingInterval(status: any): number {
+  const { wave1_complete, session_count, analysis_status } = status;
+
+  // Wave 1 in progress: 1s polling
+  if (wave1_complete < session_count) {
+    return POLLING_CONFIG.wave1Interval;
+  }
+
+  // Wave 1 complete, Wave 2 not started OR in progress: 3s polling
+  if (wave1_complete === session_count && analysis_status !== 'wave2_complete') {
+    return POLLING_CONFIG.wave2Interval;
+  }
+
+  // Default to Wave 2 interval
+  return POLLING_CONFIG.wave2Interval;
+}
+
+/**
+ * Detect which sessions changed since last poll
+ */
+function detectChangedSessions(
+  newSessions: any[],
+  oldStates: Map<string, SessionState>
+): any[] {
+  const changed: any[] = [];
+
+  for (const session of newSessions) {
+    const oldState = oldStates.get(session.session_id);
+
+    // First time seeing this session
+    if (!oldState) {
+      if (session.wave1_complete || session.wave2_complete) {
+        changed.push(session);
+      }
+      continue;
+    }
+
+    // Check if Wave 1 status changed
+    if (!oldState.wave1_complete && session.wave1_complete) {
+      changed.push(session);
+      continue;
+    }
+
+    // Check if Wave 2 status changed
+    if (!oldState.wave2_complete && session.wave2_complete) {
+      changed.push(session);
+      continue;
+    }
+
+    // Check if timestamps changed (re-analysis)
+    if (session.last_wave1_update && session.last_wave1_update !== oldState.last_wave1_update) {
+      changed.push(session);
+      continue;
+    }
+
+    if (session.last_wave2_update && session.last_wave2_update !== oldState.last_wave2_update) {
+      changed.push(session);
+      continue;
+    }
+  }
+
+  return changed;
+}
+
+/**
+ * Update session states ref with new data
+ */
+function updateSessionStatesRef(
+  sessions: any[],
+  statesRef: Map<string, SessionState>
+): void {
+  for (const session of sessions) {
+    statesRef.set(session.session_id, {
+      wave1_complete: session.wave1_complete,
+      wave2_complete: session.wave2_complete,
+      last_wave1_update: session.last_wave1_update,
+      last_wave2_update: session.last_wave2_update,
+    });
+  }
+}
+
+/**
+ * Update changed sessions with loading overlays (staggered for visual effect)
+ */
+async function updateChangedSessions(
+  changedSessions: any[],
+  setSessionLoading: (sessionId: string, loading: boolean) => void
+): Promise<void> {
+  // Show loading overlays with stagger
+  for (let i = 0; i < changedSessions.length; i++) {
+    const session = changedSessions[i];
+    setTimeout(() => {
+      logPolling(`Showing loading overlay for session ${session.session_id}`);
+      setSessionLoading(session.session_id, true);
+    }, i * POLLING_CONFIG.staggerDelay);
+  }
+
+  // Wait for overlay duration + fade
+  await new Promise(resolve =>
+    setTimeout(resolve, POLLING_CONFIG.overlayDuration + POLLING_CONFIG.fadeDuration)
+  );
+
+  // Hide loading overlays
+  for (const session of changedSessions) {
+    logPolling(`Hiding loading overlay for session ${session.session_id}`);
+    setSessionLoading(session.session_id, false);
+  }
+}
 
 /**
  * Hook to provide session data for the dashboard.
@@ -41,6 +154,28 @@ export function usePatientSessions() {
   const lastWave1Count = useRef<number>(0);
   const lastWave2Count = useRef<number>(0);
   const lastSessionCount = useRef<number>(0);
+
+  // NEW: Track individual session states for change detection
+  const sessionStatesRef = useRef<Map<string, SessionState>>(new Map());
+
+  // NEW: Track current polling interval
+  const currentIntervalRef = useRef<number>(POLLING_CONFIG.wave1Interval);
+
+  // NEW: Session loading states (for loading overlays)
+  const [loadingSessions, setLoadingSessions] = useState<Set<string>>(new Set());
+
+  // Helper to set session loading state
+  const setSessionLoading = (sessionId: string, loading: boolean) => {
+    setLoadingSessions(prev => {
+      const next = new Set(prev);
+      if (loading) {
+        next.add(sessionId);
+      } else {
+        next.delete(sessionId);
+      }
+      return next;
+    });
+  };
 
   // Watch for patient ID changes (demo initialization)
   useEffect(() => {
@@ -149,72 +284,96 @@ export function usePatientSessions() {
     loadAllSessions();
   }, [patientId]); // Re-run when patient ID is set
 
-  // Polling effect: Auto-refresh sessions while analysis is in progress
+  // Polling effect: Granular per-session updates with adaptive intervals
   useEffect(() => {
-    // Only poll if we have incomplete analysis
-    // Continue polling until Wave 2 is complete
-    const shouldPoll = analysisStatus !== 'wave2_complete';
-
-    if (shouldPoll && demoTokenStorage.isInitialized()) {
-      console.log('[Polling] Starting analysis status polling (5s interval)...');
-
-      pollingIntervalRef.current = setInterval(async () => {
-        try {
-          // Check demo status
-          const status = await demoApiClient.getStatus();
-
-          if (!status) {
-            return; // Failed to fetch, try again next interval
-          }
-
-          console.log('[Polling] Analysis status:', {
-            status: status.analysis_status,
-            wave1: status.wave1_complete,
-            wave2: status.wave2_complete,
-            total: status.session_count
-          });
-
-          setAnalysisStatus(status.analysis_status);
-
-          // Refresh if any counts changed (sessions, wave1, wave2)
-          const sessionCountChanged = status.session_count !== lastSessionCount.current;
-          const wave1Changed = status.wave1_complete !== lastWave1Count.current;
-          const wave2Changed = status.wave2_complete !== lastWave2Count.current;
-
-          if (sessionCountChanged || wave1Changed || wave2Changed) {
-            console.log('[Polling] Progress detected:', {
-              sessions: `${lastSessionCount.current} → ${status.session_count}`,
-              wave1: `${lastWave1Count.current} → ${status.wave1_complete}`,
-              wave2: `${lastWave2Count.current} → ${status.wave2_complete}`
-            });
-            lastSessionCount.current = status.session_count;
-            lastWave1Count.current = status.wave1_complete;
-            lastWave2Count.current = status.wave2_complete;
-            refresh();
-          }
-
-          // Stop polling if fully complete
-          if (status.analysis_status === 'wave2_complete') {
-            console.log('[Polling] Analysis complete! Stopping polling.');
-            if (pollingIntervalRef.current) {
-              clearInterval(pollingIntervalRef.current);
-              pollingIntervalRef.current = null;
-            }
-          }
-        } catch (err) {
-          console.error('[Polling] Error checking status:', err);
-        }
-      }, 5000); // Poll every 5 seconds
-
-      return () => {
-        if (pollingIntervalRef.current) {
-          console.log('[Polling] Cleaning up polling interval');
-          clearInterval(pollingIntervalRef.current);
-          pollingIntervalRef.current = null;
-        }
-      };
+    // Don't poll if feature disabled or status is complete
+    if (!POLLING_CONFIG.granularUpdatesEnabled || analysisStatus === 'wave2_complete') {
+      return;
     }
-  }, [analysisStatus]);
+
+    logPolling('Starting analysis status polling...');
+
+    const pollStatus = async () => {
+      try {
+        const status = await demoApiClient.getStatus();
+
+        if (!status) {
+          return; // Failed to fetch, try again next interval
+        }
+
+        logPolling('Analysis status:', {
+          status: status.analysis_status,
+          wave1: status.wave1_complete,
+          wave2: status.wave2_complete,
+          total: status.session_count
+        });
+
+        setAnalysisStatus(status.analysis_status);
+
+        // Detect which sessions changed
+        const changedSessions = detectChangedSessions(status.sessions, sessionStatesRef.current);
+
+        if (changedSessions.length > 0) {
+          logPolling(`Progress detected: ${changedSessions.length} session(s) changed`);
+
+          // Update sessions with loading overlays (staggered for polling)
+          await updateChangedSessions(changedSessions, setSessionLoading);
+
+          // Update session states ref
+          updateSessionStatesRef(status.sessions, sessionStatesRef.current);
+
+          // Refresh session data
+          refresh();
+        }
+
+        // Update counts
+        lastSessionCount.current = status.session_count;
+        lastWave1Count.current = status.wave1_complete;
+        lastWave2Count.current = status.wave2_complete;
+
+        // Update polling interval based on analysis phase
+        const newInterval = determinePollingInterval(status);
+        if (newInterval !== currentIntervalRef.current) {
+          logPolling(`Switching polling interval: ${currentIntervalRef.current}ms → ${newInterval}ms`);
+          currentIntervalRef.current = newInterval;
+
+          // Restart polling with new interval
+          if (pollingIntervalRef.current) {
+            clearInterval(pollingIntervalRef.current);
+            pollingIntervalRef.current = null;
+          }
+          startPolling(newInterval);
+        }
+
+        // Stop polling if Wave 2 complete
+        if (status.analysis_status === 'wave2_complete') {
+          logPolling('Analysis complete! Stopping polling.');
+          if (pollingIntervalRef.current) {
+            clearInterval(pollingIntervalRef.current);
+            pollingIntervalRef.current = null;
+          }
+        }
+      } catch (error) {
+        console.error('[Polling] Error fetching status:', error);
+      }
+    };
+
+    const startPolling = (interval: number) => {
+      pollingIntervalRef.current = setInterval(pollStatus, interval);
+    };
+
+    // Start initial polling
+    startPolling(currentIntervalRef.current);
+
+    // Cleanup
+    return () => {
+      logPolling('Cleaning up polling interval');
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+    };
+  }, [analysisStatus]); // Only re-run if analysisStatus changes
 
   // Manual refresh function - reloads from API
   const refresh = () => {
@@ -282,6 +441,8 @@ export function usePatientSessions() {
     sessionCount: sessions.length, // DYNAMIC: Based on database count
     majorEventCount: majorEvents.length,
     isEmpty: !isLoading && sessions.length === 0,
+    loadingSessions, // NEW: Set of session IDs with loading overlays
+    setSessionLoading, // NEW: Helper to set loading state
   };
 }
 
