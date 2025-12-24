@@ -97,33 +97,44 @@ Creating a standalone GitHub repository for the parallel orchestration system, p
 
 ---
 
-## Research Phase (Wave 0)
+## Research Phase (Wave 0) ✅ COMPLETE
 
-### Research Tasks Needed:
-1. **License Research** (web-search-researcher)
-   - Best open source licenses for developer tools
-   - MIT vs Apache 2.0 vs GPL for orchestration tools
-   - Licensing implications for MCP integrations
+### Research Results Summary
 
-2. **Installation Patterns** (codebase-pattern-finder)
-   - How Claude Code skills are structured
-   - Installation patterns from popular CLI tools
-   - Auto-detection patterns for dev tools
+**Agent R1 (codebase-analyzer): Orchestrator Files Analysis**
+- ✅ Analyzed all 6 orchestrator files (~6,666 lines total)
+- ✅ Identified 23 project-specific references to generalize
+- ✅ Mapped dependencies on Claude Code built-in tools (Task, TodoWrite, Bash, Read, Grep, Glob)
+- ✅ Created extraction priority list (3 phases)
+- ✅ System is 85% ready for release (needs generalization + installation guide)
 
-3. **Current Orchestrator Structure** (codebase-analyzer)
-   - Analyze all 5 orchestrator files
-   - Identify dependencies and cross-references
-   - Determine what needs to be extracted/refactored
+**Agent R2 (web-search-researcher): License Research**
+- ✅ **Recommendation: MIT License** for maximum adoption
+- ✅ MIT dominates developer tools (30-35% GitHub market share)
+- ✅ All comparable CLI tools (ripgrep, fzf, jq) use MIT
+- ✅ Simpler than Apache 2.0 (200 words vs 1,400 words)
+- ✅ Best fit for solo developers and "rebel tool" positioning
 
-4. **Repository Structure** (web-search-researcher)
-   - Best practices for open source tool repos
-   - README templates for developer tools
-   - Wiki structures for technical documentation
+**Agent R3 (web-search-researcher): Package Distribution**
+- ✅ **Primary: curl|bash install script** (universal, zero dependencies)
+- ✅ Secondary: npm package (for Node.js developers)
+- ✅ Optional: Homebrew tap, pip package (lower priority)
+- ✅ Created installation script templates for all methods
+- ✅ XDG_CONFIG_HOME support for auto-detection
 
-5. **Claude Documentation Access** (Context7 MCP research)
-   - How to access Claude docs via Context7
-   - What documentation to include
-   - Auto-update strategies
+**Agent R4 (codebase-pattern-finder): Usage Examples**
+- ⚠️ **Finding: No production usage found** in this project
+- ✅ Extracted theoretical examples from documentation
+- ✅ Documented extreme scaling scenarios (10K agents, 1M files)
+- ✅ Found time savings claims: 50-99.9% faster than sequential
+- ⚠️ Need to test orchestrator before claiming benchmarks
+
+**Agent R5 (web-search-researcher): Developer Tool Repos**
+- ✅ Analyzed 10+ successful tools (ripgrep, fzf, aider, bat, starship, thefuck, etc.)
+- ✅ Created README template based on 90%+ adoption patterns
+- ✅ Identified marketing tactics (benchmarks, candid weaknesses, visual demos)
+- ✅ Repository structure recommendation (docs/, examples/, src/)
+- ✅ Tone analysis: Professional + personality works best
 
 ---
 
@@ -138,29 +149,42 @@ Creating a standalone GitHub repository for the parallel orchestration system, p
 6. **Current State**: Work in progress, test if desired
 7. **README**: Modular with wiki links (marketable)
 
-### Installation & Distribution (Research Needed)
-- [ ] What is the exact structure of Claude Code's skill directory? (Use Context7 MCP)
-- [ ] Where does Claude Code install by default on Mac/Linux/Windows? (Use Context7 MCP)
-- [ ] How do other Claude Code skills handle installation?
-- [ ] What files are required for npm/pip/homebrew packages?
-- [ ] What's the auto-detection strategy for Claude Code installation path?
+### Installation & Distribution ✅ RESOLVED
+- ✅ Claude Code directory: `~/.claude` (default) or `$XDG_CONFIG_HOME/.claude` or `$CLAUDE_HOME`
+- ✅ Auto-detection strategy: Check env vars in priority order (CLAUDE_HOME → XDG_CONFIG_HOME → ~/.claude)
+- ✅ Primary: `curl|bash` install script (universal, no dependencies)
+- ✅ Secondary: npm package with post-install script
+- ✅ Optional: Homebrew tap, pip package
 
-### Repository Structure (Research Needed)
-- [ ] Where should the skill files live in the repo? (root vs src/ vs skill/)
-- [ ] How to structure wiki pages vs README sections?
-- [ ] What's the standard directory layout for multi-language packages?
+### Repository Structure ✅ RESOLVED
+- ✅ Recommended layout:
+  ```
+  ship-fast-as-fuck/
+  ├── README.md (modular, 200-500 lines)
+  ├── docs/ (comprehensive wiki content)
+  ├── core/ (agents/, commands/)
+  ├── reference/ (methodology docs)
+  ├── examples/ (use cases)
+  ├── templates/ (integration guides)
+  └── install.sh (primary installer)
+  ```
 
-### Technical Implementation (Research Needed)
-- [ ] Should the orchestrator be a single file or modular?
-- [ ] How to handle updates/versioning across package managers?
-- [ ] Cross-platform compatibility requirements (Mac/Linux/Windows)?
-- [ ] Are there any dependencies on Claude Code internals we need to document?
+### Technical Implementation ✅ RESOLVED
+- ✅ Modular structure (core/ + reference/ separation)
+- ✅ Versioning: Git tags + GitHub releases
+- ✅ Cross-platform: Bash script works on Mac/Linux/Windows (Git Bash, WSL)
+- ✅ Dependencies: Document Claude Code built-in tools (Task, TodoWrite, Bash, etc.)
+- ✅ 23 project-specific references to generalize
 
-### Documentation Content (Research Needed)
-- [ ] What benchmarks/metrics exist from current orchestrator usage?
-- [ ] What example orchestrations can we showcase from this project?
-- [ ] How to create architecture diagrams (mermaid, ASCII, images)?
-- [ ] What comparison benchmarks should we include? (vs sequential, vs manual)
+### Documentation Content ⚠️ PARTIALLY RESOLVED
+- ✅ README template created (based on 10+ successful dev tools)
+- ✅ Marketing tactics identified (benchmarks, visual demos, candid weaknesses)
+- ✅ Architecture diagrams: Use ASCII art (priority) + Mermaid (optional)
+- ⚠️ **CRITICAL: No production usage found** - orchestrator hasn't been tested in real scenarios
+- ⚠️ Need to either:
+  - Test orchestrator before release (get real benchmarks)
+  - Use theoretical examples with disclaimers
+  - Position as "beta" or "experimental"
 
 ---
 
