@@ -90,7 +90,27 @@ export function usePipelineEvents(options: UsePipelineEventsOptions) {
   useEffect(() => {
     if (!enabled || !patientId) {
       console.log('[SSE] Connection disabled or no patient ID');
+
+      // Clean up existing connection if patient ID was cleared
+      if (eventSourceRef.current) {
+        console.log('[SSE] Patient ID cleared - disconnecting existing SSE');
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+        setIsConnected(false);
+        setConnectionError(null);
+      }
       return;
+    }
+
+    // Check if this is a patient ID change (not initial mount)
+    const previousPatientId = eventSourceRef.current?.url.split('/').pop();
+    if (previousPatientId && previousPatientId !== patientId) {
+      console.log(`[SSE] Patient ID changed: ${previousPatientId} → ${patientId}`);
+      console.log('[SSE] Disconnecting from old patient...');
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+      setIsConnected(false);
+      setConnectionError(null);
     }
 
     console.log(`[SSE] Connecting to patient ${patientId}...`);
@@ -105,7 +125,7 @@ export function usePipelineEvents(options: UsePipelineEventsOptions) {
     eventSourceRef.current = eventSource;
 
     eventSource.onopen = () => {
-      console.log("📡 SSE connected - listening for pipeline events");
+      console.log(`📡 SSE connected to patient ${patientId}`);
       setIsConnected(true);
       setConnectionError(null);
     };
@@ -132,24 +152,32 @@ export function usePipelineEvents(options: UsePipelineEventsOptions) {
 
     eventSource.onerror = (error) => {
       console.error("[SSE] Connection error:", error);
-      setIsConnected(false);
 
       // Check readyState to determine error type
-      if (eventSource.readyState === EventSource.CLOSED) {
-        setConnectionError('Connection closed by server');
-      } else if (eventSource.readyState === EventSource.CONNECTING) {
-        setConnectionError('Reconnecting...');
-      } else {
-        setConnectionError('Connection failed');
-      }
+      const readyState = eventSource.readyState;
 
-      // Browser will automatically attempt to reconnect
-      console.log(`[SSE] Browser will attempt reconnection (readyState: ${eventSource.readyState})`);
+      if (readyState === EventSource.CLOSED) {
+        console.error(`[SSE] ✗ Connection closed by server (patient ${patientId} may not exist)`);
+        setConnectionError('Patient not found (404) or forbidden (403)');
+        setIsConnected(false);
+
+        // Close connection permanently for 404/403
+        eventSource.close();
+        eventSourceRef.current = null;
+      } else if (readyState === EventSource.CONNECTING) {
+        console.log('[SSE] Reconnecting...');
+        setConnectionError('Reconnecting...');
+        setIsConnected(false);
+      } else {
+        console.error('[SSE] ✗ Unknown error state');
+        setConnectionError('Connection failed');
+        setIsConnected(false);
+      }
     };
 
-    // Cleanup on unmount
+    // Cleanup on unmount or patient ID change
     return () => {
-      console.log("📡 SSE disconnected");
+      console.log(`📡 SSE disconnected from patient ${patientId}`);
       eventSource.close();
       setIsConnected(false);
       setConnectionError(null);
