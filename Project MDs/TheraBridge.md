@@ -89,24 +89,29 @@
 ## Development Status
 
 ### Active PRs
+- None currently
+
+### Completed PRs
 - **PR #1:** SessionDetail UI Improvements + Wave 1 Action Summarization
-  - Status: Ready for Production Testing (Phase 1A & 1C complete)
+  - Status: ✅ Complete (2026-01-09)
   - Plans:
     - `thoughts/shared/plans/2025-01-06-font-standardization-sessiondetail.md`
     - `thoughts/shared/plans/2026-01-07-sessiondetail-ui-improvements-wave1-action-summarization.md`
-  - Sessions: SESSION_LOG.md (2025-01-06, 2026-01-07 Phase 1A, 2026-01-07 Phase 1C Planning, 2026-01-08 Phase 1C Implementation)
+  - Sessions: SESSION_LOG.md (2025-01-06, 2026-01-07 Phase 1A, 2026-01-07 Phase 1C Planning, 2026-01-08 Phase 1C Implementation, 2026-01-09 Final Testing)
   - Scope: 10 files modified (3 new, 7 modified)
   - Phase 1A: ✅ Complete (commits d3f7390, 87098f6, c2eea93, e7f8e6a)
   - Phase 1B: ⏳ Deferred (Header fonts + Timeline deprecation)
-  - Phase 1C: ✅ Complete (commit be21ae3)
+  - Phase 1C: ✅ Complete (commit be21ae3, fixes: 3e9ea89, 8e3bd82, a9cc104-ab52d2a, f97286e)
 
-### Completed PRs
-- None yet
+- **PR #2:** Prose Analysis UI with Toggle
+  - Status: ✅ Complete (2026-01-11) - Awaiting Railway deployment verification
+  - Plan: `thoughts/shared/plans/2026-01-11-pr2-prose-analysis-ui-toggle.md`
+  - Session: SESSION_LOG.md (2026-01-11)
+  - Scope: 1 file modified (SessionDetail.tsx)
+  - Features: Tab toggle, localStorage persistence, theme-aware colors, Framer Motion transitions
+  - Commit: `8271286`
 
 ### Planned PRs
-- **PR #2:** Prose Analysis UI with Toggle
-  - Status: Planned (depends on PR #1)
-  - Description: Add tab toggle between structured analysis cards and prose narrative view
   - Default view: Prose (with localStorage persistence)
   - Color palette: Unified theme based on dashboard teal/purple
 
