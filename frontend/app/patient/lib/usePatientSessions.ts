@@ -142,7 +142,8 @@ export function usePatientSessions() {
   // Polling effect: Auto-refresh sessions while analysis is in progress
   useEffect(() => {
     // Only poll if we have incomplete analysis
-    const shouldPoll = analysisStatus === 'pending' || analysisStatus === 'processing';
+    // Continue polling until Wave 2 is complete
+    const shouldPoll = analysisStatus !== 'wave2_complete';
 
     if (shouldPoll && demoTokenStorage.isInitialized()) {
       console.log('[Polling] Starting analysis status polling (5s interval)...');
