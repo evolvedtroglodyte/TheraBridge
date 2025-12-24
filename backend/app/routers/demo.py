@@ -418,24 +418,32 @@ async def reset_demo(
 
     This endpoint:
     1. Validates demo token
-    2. Deletes all existing sessions for demo user
-    3. Calls seed function to recreate 10 sessions
-    4. Extends expiry by 24 hours
+    2. Deletes all existing sessions and patient records
+    3. Calls seed_demo_v4 to recreate patient + 10 sessions
+    4. Re-runs transcript population and analysis pipeline
 
     Returns:
         DemoResetResponse with new session IDs
     """
     demo_token = demo_user["demo_token"]
-    patient_id = demo_user["id"]
+    user_id = demo_user["id"]
 
-    logger.info(f"Resetting demo for user: {patient_id}")
+    # Look up current patient_id before deletion
+    patient_response = db.table("patients").select("id").eq("user_id", user_id).single().execute()
+
+    if patient_response.data:
+        old_patient_id = patient_response.data["id"]
+        logger.info(f"Resetting demo for user: {user_id}, patient: {old_patient_id}")
+
+        # Delete existing sessions and patient record
+        db.table("therapy_sessions").delete().eq("patient_id", old_patient_id).execute()
+        db.table("patients").delete().eq("id", old_patient_id).execute()
+    else:
+        logger.info(f"Resetting demo for user: {user_id} (no existing patient)")
 
     try:
-        # Delete existing sessions
-        db.table("therapy_sessions").delete().eq("patient_id", patient_id).execute()
-
-        # Re-seed sessions using SQL function
-        response = db.rpc("seed_demo_user_sessions", {"p_demo_token": demo_token}).execute()
+        # Re-seed using seed_demo_v4 (creates new patient + 10 sessions)
+        response = db.rpc("seed_demo_v4", {"p_demo_token": demo_token}).execute()
 
         if not response.data or len(response.data) == 0:
             raise HTTPException(
@@ -444,14 +452,20 @@ async def reset_demo(
             )
 
         result = response.data[0]
+        new_patient_id = result["patient_id"]
         session_ids = result["session_ids"]
 
-        logger.info(f"✓ Demo reset complete: {len(session_ids)} sessions recreated")
+        logger.info(f"✓ Demo reset complete: new patient {new_patient_id} with {len(session_ids)} sessions")
+
+        # Re-run initialization pipeline in background
+        import asyncio
+        asyncio.create_task(run_full_initialization_pipeline(str(new_patient_id)))
+        logger.info(f"🎬 Started initialization pipeline for reset demo (patient {new_patient_id})")
 
         return DemoResetResponse(
-            patient_id=patient_id,
+            patient_id=str(new_patient_id),
             session_ids=[str(sid) for sid in session_ids],
-            message=f"Demo reset with {len(session_ids)} fresh sessions"
+            message=f"Demo reset with {len(session_ids)} fresh sessions. Analysis running in background."
         )
 
     except Exception as e:

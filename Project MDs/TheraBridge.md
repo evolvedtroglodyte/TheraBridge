@@ -2,14 +2,44 @@
 
 ## Current Focus: Font Standardization & UI Consistency (PR #1)
 
-**Recent Completion (2026-01-03):**
-- ✅ Real-time granular session updates (per-session loading overlays)
-- ✅ SSE event queue with database backing
-- ✅ Adaptive polling (1s Wave 1 → 3s Wave 2)
-- ✅ SessionDetail scroll preservation
-- ✅ Card scaling fix (capped at 1.0x)
-- ✅ Loading overlay debounce bug fix
-- ✅ "Stop Processing" button to terminate pipeline
+**PR #1 Status:** Phase 1B Complete ✅ | Ready for User Testing
+
+**Phase 1A Complete (2026-01-07):**
+- ✅ SessionDetail.tsx - All fonts standardized (Inter + Crimson Pro)
+- ✅ DeepAnalysisSection.tsx - All fonts standardized, badges fixed
+- ✅ Removed all `system-ui` fallbacks and Tailwind font classes
+- ✅ Fixed metadata font mismatch between SessionCard and SessionDetail
+- ✅ Build verified successful, 4 commits pushed to remote
+
+**Phase 1B Complete (2026-01-07):**
+- ✅ Header.tsx - Added Inter font to all 4 navigation buttons (Dashboard, Sessions, Ask AI, Upload)
+- ✅ TimelineSidebar.tsx → TimelineSidebar.DEPRECATED.tsx (marked for future removal)
+- ✅ HorizontalTimeline.tsx → HorizontalTimeline.DEPRECATED.tsx (marked for future removal)
+- ✅ Deprecation comments added to both Timeline components
+- ✅ Build verified successful (no broken imports)
+- ✅ Commit `06d8845` pushed to remote
+
+**Commits (PR #1):**
+- `06d8845` - Feature: PR #1 Phase 1B - Header font standardization and Timeline deprecation
+- `d3f7390` - Feature: PR #1 Phase 1A - Font standardization for SessionDetail and DeepAnalysisSection
+- `87098f6` - Fix: Complete Tailwind font class removal in SessionDetail.tsx
+- `c2eea93` - Fix: Add missing fontFamily to badges in DeepAnalysisSection
+- `e7f8e6a` - Fix: Metadata values use Inter font for consistency
+
+**Previous Focus (COMPLETE ✅):** Real-Time Granular Session Updates
+
+**Implementation Complete (2026-01-03):**
+- ✅ Backend `/api/demo/status` enhanced with full analysis data per session
+- ✅ Frontend granular polling with per-session loading overlays
+- ✅ Adaptive polling: 1s during Wave 1 → 3s during Wave 2 → stop
+- ✅ Database-backed SSE event queue (fixes subprocess isolation bug)
+- ✅ SSE integration with feature flags (disabled by default)
+- ✅ SessionDetail scroll preservation with smooth animation
+- ✅ Test endpoint removed, documentation updated
+- ✅ Fixed card scaling (capped at 1.0 to prevent blown-up cards)
+- ✅ Fixed stuck loading overlays (debouncing bug)
+- ✅ Fixed SessionDetail stale data (updates live while open)
+- ✅ Added "Stop Processing" button to terminate pipeline
 
 **Production Behavior:**
 1. **Demo Init (0-3s):** Patient ID stored, SSE connects
@@ -36,8 +66,8 @@
 **Next Steps:**
 - ✅ Review Font Standardization plan (PR #1)
 - ✅ Implement Phase 1A (SessionDetail + DeepAnalysis fonts)
-- [ ] Test font consistency in light/dark modes (Phase 1A testing)
-- [ ] Implement Phase 1B (Header + Timeline deprecation)
+- ✅ Implement Phase 1B (Header + Timeline deprecation)
+- [ ] Test font consistency in light/dark modes (user testing)
 - [ ] Merge PR #1
 - [ ] Implement PR #2 (Prose Analysis UI with Toggle)
 - [ ] Implement Feature 2: Analytics Dashboard
@@ -49,13 +79,13 @@
 ## Development Status
 
 ### Active PRs
-- **PR #1:** Font Standardization - SessionDetail & DeepAnalysis
-  - Status: Testing (Phase 1A complete, Phase 1B pending)
+- **PR #1:** Font Standardization - SessionDetail & DeepAnalysis & Header
+  - Status: Ready for Testing (Phase 1A & 1B complete)
   - Plan: `thoughts/shared/plans/2025-01-06-font-standardization-sessiondetail.md`
-  - Sessions: SESSION_LOG.md (2025-01-06, 2026-01-07)
-  - Scope: 3 files (SessionDetail.tsx, DeepAnalysisSection.tsx, Header.tsx) + 2 deprecations
-  - Phase 1A: ✅ Complete (commit d3f7390)
-  - Phase 1B: ⏳ Pending user approval after testing
+  - Sessions: SESSION_LOG.md (2025-01-06, 2026-01-07 Phase 1A, 2026-01-07 Phase 1B)
+  - Scope: 3 files modified (SessionDetail.tsx, DeepAnalysisSection.tsx, Header.tsx) + 2 deprecations
+  - Phase 1A: ✅ Complete (commits d3f7390, 87098f6, c2eea93, e7f8e6a)
+  - Phase 1B: ✅ Complete (commit 06d8845)
 
 ### Completed PRs
 - None yet
