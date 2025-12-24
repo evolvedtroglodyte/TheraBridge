@@ -54,9 +54,9 @@ def load_transcript_from_file(filename: str) -> dict:
     Returns:
         Dictionary with transcript segments and metadata
     """
-    # Find the mock-therapy-data directory (should be at repo root)
-    repo_root = Path(__file__).parent.parent.parent
-    sessions_dir = repo_root / "mock-therapy-data" / "sessions"
+    # Find the mock-therapy-data directory (now in backend/)
+    backend_root = Path(__file__).parent.parent
+    sessions_dir = backend_root / "mock-therapy-data" / "sessions"
 
     file_path = sessions_dir / filename
 
