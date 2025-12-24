@@ -234,7 +234,312 @@ Tone: Warm, professional, empowering, hopeful but realistic
 
         return roadmap
 
-    # Strategy-specific methods will be added in Phase 2
-    def _build_prompt_for_strategy(self, *args, **kwargs) -> str:
-        """Build prompt based on selected compaction strategy (implemented in Phase 2)"""
-        raise NotImplementedError("Compaction strategies implemented in Phase 2")
+    # Strategy-specific prompt building
+    def _build_prompt_for_strategy(
+        self,
+        patient_id: UUID,
+        current_session: dict,
+        context: dict,
+        sessions_analyzed: int,
+        total_sessions: int
+    ) -> str:
+        """Build prompt based on selected compaction strategy"""
+        if self.strategy == "full":
+            return self._build_full_context_prompt(
+                patient_id, current_session, context, sessions_analyzed, total_sessions
+            )
+        elif self.strategy == "progressive":
+            return self._build_progressive_prompt(
+                patient_id, current_session, context, sessions_analyzed, total_sessions
+            )
+        elif self.strategy == "hierarchical":
+            return self._build_hierarchical_prompt(
+                patient_id, current_session, context, sessions_analyzed, total_sessions
+            )
+        else:
+            raise ValueError(f"Unknown compaction strategy: {self.strategy}")
+
+    def _build_full_context_prompt(
+        self,
+        patient_id: UUID,
+        current_session: dict,
+        context: dict,
+        sessions_analyzed: int,
+        total_sessions: int
+    ) -> str:
+        """
+        Strategy 1: Full Context (No Compaction)
+
+        Passes ALL previous sessions' raw Wave 1 + Wave 2 data to LLM.
+
+        Context structure:
+        {
+            "previous_context": {
+                # Nested structure from Wave 2
+                "previous_context": {...},
+                "session_N_wave1": {...},
+                "session_N_wave2": {...}
+            },
+            "current_session": {
+                "wave1": {...},
+                "wave2": {...}
+            }
+        }
+
+        Token count: ~50K-80K by Session 10
+        Cost: ~$0.014-0.020 per generation
+        """
+        prompt = f"""Patient ID: {patient_id}
+Sessions Analyzed: {sessions_analyzed} out of {total_sessions} uploaded
+
+COMPACTION STRATEGY: Full Context
+You have access to ALL previous sessions' complete Wave 1 and Wave 2 analysis data.
+
+CUMULATIVE CONTEXT (All Previous Sessions):
+{json.dumps(context, indent=2)}
+
+CURRENT SESSION DATA:
+{json.dumps(current_session, indent=2)}
+
+Generate a comprehensive "Your Journey" roadmap that synthesizes insights across all {sessions_analyzed} sessions.
+The roadmap should reflect the patient's full therapeutic journey from Session 1 to Session {sessions_analyzed}.
+
+Focus on:
+- Overall trajectory (where they started → where they are now)
+- Key milestones and breakthroughs across all sessions
+- Cumulative skill development and progress
+- Emerging patterns visible only across multiple sessions
+- Current state in context of full journey
+"""
+        return prompt
+
+    def _build_progressive_prompt(
+        self,
+        patient_id: UUID,
+        current_session: dict,
+        context: dict,
+        sessions_analyzed: int,
+        total_sessions: int
+    ) -> str:
+        """
+        Strategy 2: Progressive Summarization
+
+        Passes ONLY previous roadmap + current session data.
+        Previous roadmap already contains synthesized insights from Sessions 1 to N-1.
+
+        Context structure:
+        {
+            "previous_roadmap": {
+                "summary": "...",
+                "achievements": [...],
+                "currentFocus": [...],
+                "sections": [...]
+            },  # Only exists if sessions_analyzed > 1
+            "current_session": {
+                "wave1": {...},
+                "wave2": {...}
+            }
+        }
+
+        Token count: ~7K-10K (constant)
+        Cost: ~$0.0025 per generation
+        """
+        # Extract previous roadmap if it exists
+        previous_roadmap = context.get("previous_roadmap")
+
+        if previous_roadmap:
+            # Session 2+: Build on previous roadmap
+            prompt = f"""Patient ID: {patient_id}
+Sessions Analyzed: {sessions_analyzed} out of {total_sessions} uploaded
+
+COMPACTION STRATEGY: Progressive Summarization
+You are updating an existing roadmap with insights from the latest session.
+
+PREVIOUS ROADMAP (Sessions 1-{sessions_analyzed - 1}):
+{json.dumps(previous_roadmap, indent=2)}
+
+CURRENT SESSION DATA (Session {sessions_analyzed}):
+{json.dumps(current_session, indent=2)}
+
+Generate an UPDATED "Your Journey" roadmap that:
+1. Builds on the previous roadmap's narrative
+2. Integrates new insights from Session {sessions_analyzed}
+3. Updates achievements (add new ones, keep most significant from before)
+4. Updates current focus (shift based on latest session)
+5. Updates all 5 sections to reflect cumulative + current progress
+
+Important:
+- Maintain narrative continuity (don't contradict previous roadmap)
+- Show progression (how Session {sessions_analyzed} builds on earlier work)
+- Keep the most important historical insights (don't lose key milestones)
+- Emphasize recent progress (Session {sessions_analyzed} should be prominent)
+"""
+        else:
+            # Session 1: No previous roadmap
+            prompt = f"""Patient ID: {patient_id}
+Sessions Analyzed: {sessions_analyzed} out of {total_sessions} uploaded
+
+COMPACTION STRATEGY: Progressive Summarization
+This is the FIRST roadmap generation for this patient.
+
+CURRENT SESSION DATA (Session 1):
+{json.dumps(current_session, indent=2)}
+
+Generate the INITIAL "Your Journey" roadmap based on Session 1.
+This roadmap will be progressively updated as more sessions are analyzed.
+
+Focus on:
+- Initial presentation and presenting concerns
+- First steps taken in therapy
+- Early insights and rapport building
+- Foundation for future progress
+"""
+
+        return prompt
+
+    def _build_hierarchical_prompt(
+        self,
+        patient_id: UUID,
+        current_session: dict,
+        context: dict,
+        sessions_analyzed: int,
+        total_sessions: int
+    ) -> str:
+        """
+        Strategy 3: Hierarchical Summarization
+
+        Uses multi-tier summaries that compact at different granularities:
+        - Tier 1: Per-session insights (3-5 bullets) - Recent sessions
+        - Tier 2: Every 5 sessions → compacted paragraph - Mid-range history
+        - Tier 3: Every 10 sessions → journey arc narrative - Long-term trajectory
+
+        Context structure:
+        {
+            "tier3_summary": "Sessions 1-10 arc narrative",  # Only if sessions_analyzed > 10
+            "tier2_summaries": {
+                "sessions_11_15": "Paragraph summary",
+                "sessions_16_20": "Paragraph summary"
+            },  # Only if sessions_analyzed > 10
+            "tier1_summaries": {
+                "session_N": ["insight 1", "insight 2", ...],  # Recent sessions
+                "session_N+1": [...]
+            },
+            "previous_roadmap": {...},  # Previous roadmap
+            "current_session": {
+                "wave1": {...},
+                "wave2": {...},
+                "insights": [...]  # Generated by SessionInsightsSummarizer
+            }
+        }
+
+        Token count: ~10K-12K
+        Cost: ~$0.003-0.004 per generation
+        """
+        # Determine tier structure based on sessions_analyzed
+        tier3_threshold = 10
+        tier2_threshold = 5
+
+        # Build tier context
+        tier3_summary = context.get("tier3_summary")
+        tier2_summaries = context.get("tier2_summaries", {})
+        tier1_summaries = context.get("tier1_summaries", {})
+        previous_roadmap = context.get("previous_roadmap")
+
+        # Build prompt with appropriate tier context
+        prompt = f"""Patient ID: {patient_id}
+Sessions Analyzed: {sessions_analyzed} out of {total_sessions} uploaded
+
+COMPACTION STRATEGY: Hierarchical Summarization
+Multi-tier context provides both high-level trajectory and recent session details.
+"""
+
+        # Add Tier 3 if exists (Sessions 1-10+ arc)
+        if tier3_summary:
+            prompt += f"""
+TIER 3 - LONG-TERM TRAJECTORY (Sessions 1-{tier3_threshold}):
+{tier3_summary}
+
+"""
+
+        # Add Tier 2 summaries if exist (5-session chunks)
+        if tier2_summaries:
+            prompt += "TIER 2 - MID-RANGE HISTORY (5-session summaries):\n"
+            for session_range, summary in tier2_summaries.items():
+                prompt += f"\n{session_range}: {summary}\n"
+            prompt += "\n"
+
+        # Add Tier 1 summaries (recent sessions)
+        if tier1_summaries:
+            prompt += "TIER 1 - RECENT SESSIONS (detailed insights):\n"
+            for session_key, insights in tier1_summaries.items():
+                prompt += f"\n{session_key}:\n"
+                for insight in insights:
+                    prompt += f"  - {insight}\n"
+            prompt += "\n"
+
+        # Add previous roadmap
+        if previous_roadmap:
+            prompt += f"""PREVIOUS ROADMAP (Sessions 1-{sessions_analyzed - 1}):
+{json.dumps(previous_roadmap, indent=2)}
+
+"""
+
+        # Add current session
+        prompt += f"""CURRENT SESSION DATA (Session {sessions_analyzed}):
+{json.dumps(current_session, indent=2)}
+
+Generate an UPDATED "Your Journey" roadmap that synthesizes:
+1. Long-term trajectory (Tier 3) - Overall journey arc
+2. Mid-range patterns (Tier 2) - Themes across recent sessions
+3. Recent progress (Tier 1) - Specific recent insights
+4. Latest session (Current) - New developments
+
+The roadmap should reflect BOTH the big picture AND recent details.
+Show how Session {sessions_analyzed} fits into the larger journey narrative.
+"""
+
+        return prompt
+
+    @staticmethod
+    def compact_tier1_to_tier2(tier1_summaries: dict) -> str:
+        """
+        Compact Tier 1 insights (5 sessions worth) into Tier 2 paragraph summary.
+
+        Called every 5 sessions to prevent Tier 1 from growing too large.
+
+        Args:
+            tier1_summaries: Dict of {session_id: [insights]} for 5 sessions
+
+        Returns:
+            Paragraph summary (2-3 sentences) synthesizing 5 sessions
+
+        Example:
+            Input: {
+                "session_01": ["Anxiety trigger identified", "Breathing practiced"],
+                "session_02": ["Breakthrough with avoidance", ...],
+                ...
+            }
+            Output: "Patient made significant progress in Sessions 1-5, identifying work stress as primary anxiety trigger and practicing breathing techniques independently. Breakthrough moment occurred in Session 2 when connecting avoidance patterns to childhood experiences. By Session 5, patient demonstrated consistent skill application."
+        """
+        # This will be called by the orchestration script, not the generator itself
+        # Placeholder for now - actual implementation in orchestration (Phase 5)
+        pass
+
+    @staticmethod
+    def compact_tier2_to_tier3(tier2_summaries: list[str]) -> str:
+        """
+        Compact Tier 2 summaries (10 sessions worth) into Tier 3 journey arc.
+
+        Called every 10 sessions to create high-level trajectory narrative.
+
+        Args:
+            tier2_summaries: List of 2 Tier 2 paragraph summaries (Sessions 1-5, 6-10)
+
+        Returns:
+            Journey arc narrative (3-4 sentences) synthesizing 10 sessions
+
+        Example:
+            Output: "Patient's journey began with acute anxiety symptoms and work-related stress (Sessions 1-5), progressing through skill acquisition and breakthrough insights about avoidance patterns. Mid-journey (Sessions 6-10) focused on applying learned techniques in real-world situations, with increasing confidence and reduced symptom severity. Overall trajectory shows steady improvement in emotional regulation and social functioning."
+        """
+        # Placeholder - implemented in orchestration script (Phase 5)
+        pass
