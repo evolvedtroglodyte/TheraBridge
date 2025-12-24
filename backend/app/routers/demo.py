@@ -212,7 +212,7 @@ async def run_full_initialization_pipeline(patient_id: str):
 async def initialize_demo(
     background_tasks: BackgroundTasks,
     db: Client = Depends(get_db),
-    run_analysis: bool = True  # Query param to enable/disable analysis
+    run_analysis: bool = False  # Query param to enable/disable analysis (DISABLED - SQL already has data)
 ):
     """
     Initialize a new demo user with 10 pre-loaded therapy sessions
