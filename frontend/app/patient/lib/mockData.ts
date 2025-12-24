@@ -19,7 +19,8 @@ import {
 export const sessions: Session[] = [
   {
     id: 's10',
-    date: 'Dec 17',
+    date: 'May 9',
+    rawDate: new Date('2025-05-09'),
     duration: '50m',
     therapist: 'Dr. Sarah Chen',
     mood: 'positive',
@@ -36,7 +37,8 @@ export const sessions: Session[] = [
   },
   {
     id: 's9',
-    date: 'Dec 10',
+    date: 'May 2',
+    rawDate: new Date('2025-05-02'),
     duration: '45m',
     therapist: 'Dr. Sarah Chen',
     mood: 'positive',
@@ -157,7 +159,8 @@ export const sessions: Session[] = [
   },
   {
     id: 's8',
-    date: 'Dec 3',
+    date: 'Apr 18',
+    rawDate: new Date('2025-04-18'),
     duration: '48m',
     therapist: 'Dr. Sarah Chen',
     mood: 'neutral',
@@ -174,7 +177,8 @@ export const sessions: Session[] = [
   },
   {
     id: 's7',
-    date: 'Nov 26',
+    date: 'Apr 4',
+    rawDate: new Date('2025-04-04'),
     duration: '45m',
     therapist: 'Dr. Sarah Chen',
     mood: 'neutral',
@@ -189,7 +193,8 @@ export const sessions: Session[] = [
   },
   {
     id: 's6',
-    date: 'Nov 19',
+    date: 'Mar 14',
+    rawDate: new Date('2025-03-14'),
     duration: '50m',
     therapist: 'Dr. Sarah Chen',
     mood: 'low',
@@ -206,7 +211,8 @@ export const sessions: Session[] = [
   },
   {
     id: 's5',
-    date: 'Nov 12',
+    date: 'Feb 28',
+    rawDate: new Date('2025-02-28'),
     duration: '45m',
     therapist: 'Dr. Sarah Chen',
     mood: 'neutral',
@@ -221,7 +227,8 @@ export const sessions: Session[] = [
   },
   {
     id: 's4',
-    date: 'Nov 5',
+    date: 'Feb 14',
+    rawDate: new Date('2025-02-14'),
     duration: '50m',
     therapist: 'Dr. Sarah Chen',
     mood: 'low',
@@ -237,7 +244,8 @@ export const sessions: Session[] = [
   },
   {
     id: 's3',
-    date: 'Oct 29',
+    date: 'Jan 31',
+    rawDate: new Date('2025-01-31'),
     duration: '45m',
     therapist: 'Dr. Sarah Chen',
     mood: 'low',
@@ -248,7 +256,8 @@ export const sessions: Session[] = [
   },
   {
     id: 's2',
-    date: 'Oct 22',
+    date: 'Jan 17',
+    rawDate: new Date('2025-01-17'),
     duration: '50m',
     therapist: 'Dr. Sarah Chen',
     mood: 'neutral',
@@ -263,7 +272,8 @@ export const sessions: Session[] = [
   },
   {
     id: 's1',
-    date: 'Oct 15',
+    date: 'Jan 10',
+    rawDate: new Date('2025-01-10'),
     duration: '50m',
     therapist: 'Dr. Sarah Chen',
     mood: 'neutral',
@@ -279,15 +289,15 @@ export const sessions: Session[] = [
 ];
 
 export const tasks: Task[] = [
-  { id: 't1', text: 'Practice saying no to one request', completed: true, sessionId: 's10', sessionDate: 'Dec 17' },
-  { id: 't2', text: 'Write compassion letter to younger self', completed: true, sessionId: 's9', sessionDate: 'Dec 10' },
-  { id: 't3', text: 'Daily 10-minute walk', completed: true, sessionId: 's6', sessionDate: 'Nov 19' },
-  { id: 't4', text: 'Challenge one catastrophic thought per day', completed: false, sessionId: 's8', sessionDate: 'Dec 3' },
-  { id: 't5', text: 'Maintain sleep schedule (10pm bedtime)', completed: false, sessionId: 's7', sessionDate: 'Nov 26' },
-  { id: 't6', text: 'Practice I-statements with partner', completed: false, sessionId: 's5', sessionDate: 'Nov 12' },
-  { id: 't7', text: 'Grounding exercise when triggered', completed: true, sessionId: 's4', sessionDate: 'Nov 5' },
-  { id: 't8', text: 'Keep anxiety journal', completed: false, sessionId: 's3', sessionDate: 'Oct 29' },
-  { id: 't9', text: 'Practice TIPP technique daily', completed: true, sessionId: 's2', sessionDate: 'Oct 22' }
+  { id: 't1', text: 'Practice saying no to one request', completed: true, sessionId: 's10', sessionDate: 'May 9' },
+  { id: 't2', text: 'Write compassion letter to younger self', completed: true, sessionId: 's9', sessionDate: 'May 2' },
+  { id: 't3', text: 'Daily 10-minute walk', completed: true, sessionId: 's6', sessionDate: 'Mar 14' },
+  { id: 't4', text: 'Challenge one catastrophic thought per day', completed: false, sessionId: 's8', sessionDate: 'Apr 18' },
+  { id: 't5', text: 'Maintain sleep schedule (10pm bedtime)', completed: false, sessionId: 's7', sessionDate: 'Apr 4' },
+  { id: 't6', text: 'Practice I-statements with partner', completed: false, sessionId: 's5', sessionDate: 'Feb 28' },
+  { id: 't7', text: 'Grounding exercise when triggered', completed: true, sessionId: 's4', sessionDate: 'Feb 14' },
+  { id: 't8', text: 'Keep anxiety journal', completed: false, sessionId: 's3', sessionDate: 'Jan 31' },
+  { id: 't9', text: 'Practice TIPP technique daily', completed: true, sessionId: 's2', sessionDate: 'Jan 17' }
 ];
 
 export const progressMetrics: ProgressMetric[] = [
