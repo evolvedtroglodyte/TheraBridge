@@ -67,3 +67,6 @@ coverage.json
 
 # Note: Each subproject (audio-transcription-pipeline/, backend/)
 # has its own .gitignore for project-specific patterns
+
+# AI Development Tools
+.specstory/
