@@ -158,11 +158,13 @@ async def run_deep_analysis(
         )
 
         logger.info(f"  ✓ Deep analysis complete (confidence: {result.confidence_score:.2f})")
+        print(f"  ✓ Deep analysis complete (confidence: {result.confidence_score:.2f})", flush=True)
 
         return result.to_dict()
 
     except Exception as e:
         logger.error(f"  ✗ Deep analysis failed: {e}")
+        print(f"  ✗ Deep analysis failed: {e}", flush=True)
         return None
 
 
@@ -182,10 +184,12 @@ async def update_session_wave2(session_id: str, deep_analysis: Dict[str, Any]) -
         )
 
         logger.info(f"  ✓ Database updated with deep analysis")
+        print(f"  ✓ Database updated", flush=True)
         return True
 
     except Exception as e:
         logger.error(f"  ✗ Database update failed: {e}")
+        print(f"  ✗ Database update failed: {e}", flush=True)
         return False
 
 

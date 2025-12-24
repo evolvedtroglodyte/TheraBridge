@@ -296,6 +296,60 @@ python -m pytest  # Run tests
 
 ## Session Log
 
+### 2025-12-30 - Critical Fix: Session Analysis Loading + Railway Logging ✅
+**Fixed two critical bugs preventing UI from displaying session analysis results:**
+
+**Issue #1: SSE Subprocess Event Queue Isolation**
+- **Root Cause:** `PipelineLogger` uses in-memory dictionary `_event_queue`, but seed scripts run in subprocess via `subprocess.run()`. Subprocess writes events to ITS memory space, FastAPI SSE reads from DIFFERENT empty queue → events never reach frontend.
+- **Impact:** Analysis completes successfully (data IS in database), but UI never updates because SSE receives no events.
+- **Documentation:** Created `Project MDs/CRITICAL_FIX_sse_and_logging.md` with full analysis and solutions.
+
+**Issue #2: Missing Railway Logs (90% Invisible)**
+- **Root Cause:** Railway buffers Python's `logging.info()` output. Only `print(..., flush=True)` appears in real-time logs.
+- **Impact:** Railway logs show "Step 2/3 starting..." then "Step 2/3 complete" with NOTHING in between. All per-session progress invisible.
+
+**Phase 1: Fix Railway Logging Visibility ✅**
+- Added `print(..., flush=True)` to `seed_wave1_analysis.py` for mood, topics, breakthrough results
+- Added `print(..., flush=True)` to `seed_wave2_analysis.py` for deep analysis, DB updates
+- Railway logs now show detailed per-session progress as analysis runs
+- Commit: `6088e0d` - Fix Railway logging visibility
+
+**Phase 3: Frontend Polling Fallback ✅** (Quick win before Phase 2)
+- Added polling to `usePatientSessions` hook - checks `/api/demo/status` every 5 seconds
+- Auto-refreshes session data when `wave1_complete` or `wave2_complete` increases
+- Stops polling when `analysis_status` reaches `'wave2_complete'`
+- Works independently of SSE (graceful degradation)
+- UI updates within 5 seconds of analysis completion
+- Commit: `aa57ef7` - Add frontend polling fallback
+
+**Phase 2: Database-Backed Event Queue** (PENDING - Long-term fix)
+- Solution: Replace in-memory `_event_queue` with `pipeline_events` database table
+- Survives subprocess boundaries, deployments, multiple workers
+- Migration needed: `012_add_pipeline_events_table.sql`
+- See `Project MDs/CRITICAL_FIX_sse_and_logging.md` for full implementation plan
+
+**Current Status:**
+- ✅ Railway logs now show full detail (Phase 1)
+- ✅ UI updates automatically via polling (Phase 3)
+- ⏳ SSE still broken due to subprocess isolation (Phase 2 pending)
+- ✅ Session analysis data loads correctly after 30-40 seconds
+
+**Files created:**
+- `Project MDs/CRITICAL_FIX_sse_and_logging.md` - Complete analysis and solutions
+
+**Files modified:**
+- `backend/scripts/seed_wave1_analysis.py` - Added stdout logging
+- `backend/scripts/seed_wave2_analysis.py` - Added stdout logging
+- `frontend/app/patient/lib/usePatientSessions.ts` - Added polling fallback
+
+**Key learnings:**
+- Railway requires explicit `flush=True` for real-time logs
+- In-memory data structures don't work across subprocess boundaries
+- Polling fallback provides 80% of SSE benefits with 5% of complexity
+- Database-backed queues are essential for production reliability
+
+---
+
 ### 2025-12-30 - SSE Real-Time Updates Implementation & CORS Debugging ✅
 **Implemented Server-Sent Events for real-time dashboard updates and fixed multiple CORS/initialization issues:**
 

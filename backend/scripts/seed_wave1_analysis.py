@@ -84,6 +84,7 @@ async def run_mood_analysis(session: Dict[str, Any]) -> Dict[str, Any]:
         )
 
         logger.info(f"  ✓ Mood analysis complete: {result.mood_score}/10.0 (confidence: {result.confidence:.2f})")
+        print(f"  ✓ Mood: {result.mood_score}/10.0 (confidence: {result.confidence:.2f})", flush=True)
 
         return {
             "mood_score": result.mood_score,
@@ -96,6 +97,7 @@ async def run_mood_analysis(session: Dict[str, Any]) -> Dict[str, Any]:
 
     except Exception as e:
         logger.error(f"  ✗ Mood analysis failed: {e}")
+        print(f"  ✗ Mood analysis failed: {e}", flush=True)
         return None
 
 
@@ -118,6 +120,7 @@ async def run_topic_extraction(session: Dict[str, Any]) -> Dict[str, Any]:
         )
 
         logger.info(f"  ✓ Topic extraction complete: {len(result.topics)} topics, {result.technique}")
+        print(f"  ✓ Topics: {', '.join(result.topics[:2])}, {result.technique}", flush=True)
 
         return {
             "topics": result.topics,
@@ -131,6 +134,7 @@ async def run_topic_extraction(session: Dict[str, Any]) -> Dict[str, Any]:
 
     except Exception as e:
         logger.error(f"  ✗ Topic extraction failed: {e}")
+        print(f"  ✗ Topic extraction failed: {e}", flush=True)
         return None
 
 
@@ -152,6 +156,7 @@ async def run_breakthrough_detection(session: Dict[str, Any]) -> Dict[str, Any]:
         )
 
         logger.info(f"  ✓ Breakthrough detection complete: {result.has_breakthrough} (candidates: {len(result.breakthrough_candidates)})")
+        print(f"  ✓ Breakthrough: {result.has_breakthrough}", flush=True)
 
         # Build response
         response = {
@@ -178,6 +183,7 @@ async def run_breakthrough_detection(session: Dict[str, Any]) -> Dict[str, Any]:
 
     except Exception as e:
         logger.error(f"  ✗ Breakthrough detection failed: {e}")
+        print(f"  ✗ Breakthrough detection failed: {e}", flush=True)
         return None
 
 
