@@ -142,17 +142,32 @@ Before creating any new file, ask:
 
 **PR #1 Status:** ✅ COMPLETE - SessionDetail UI Improvements + Wave 1 Action Summarization (2026-01-09)
 **PR #2 Status:** ✅ COMPLETE - Prose Analysis UI Toggle (2026-01-11) - Awaiting Railway verification
-**PR #3 Status:** 🚧 IN PROGRESS - Your Journey Dynamic Roadmap (2026-01-11)
+**PR #3 Status:** ✅ PHASES 4-5 COMPLETE - Your Journey Dynamic Roadmap (2026-01-11)
 
-**PR #3 Progress (Phases 0-3 COMPLETE):**
+**PR #3 Progress (Phases 0-5 COMPLETE):**
 - ✅ Phase 0: LoadingOverlay debug logging added
 - ✅ Phase 1: Backend infrastructure (database, services, model config)
 - ✅ Phase 2: All 3 compaction strategies implemented
 - ✅ Phase 3: Frontend integration (API client, NotesGoalsCard, polling)
-- ⏳ Phase 4: Start/Stop/Resume button (NEXT)
-- ⏳ Phase 5: Orchestration & testing
+- ✅ Phase 4: Start/Stop/Resume button with smart resume logic (2026-01-11)
+- ✅ Phase 5: Orchestration script + database migration + Wave 2 integration (2026-01-11)
 
-**Next:** Execute Phases 4-5 in separate Claude window
+**Phase 4 Complete (2026-01-11):**
+- ✅ Backend processing state tracking (running/stopped/complete/not_started)
+- ✅ Resume endpoint: `POST /api/demo/resume` with smart resume logic
+- ✅ Frontend dynamic Stop/Resume button with real-time polling
+- ✅ Button states: Red "Stop Processing" → Green "Resume Processing" → Gray "Processing Complete"
+- ✅ Git commit: `2c068aa` (2025-12-23 22:47:22)
+
+**Phase 5 Complete (2026-01-11):**
+- ✅ Database migration applied via Supabase MCP (patient_roadmap + roadmap_versions tables)
+- ✅ Orchestration script created: `backend/scripts/generate_roadmap.py` (400 lines)
+- ✅ All 3 compaction strategies implemented (full, progressive, hierarchical)
+- ✅ Hierarchical tier compaction: Tier 1 (last 1-3 sessions), Tier 2 (sessions 4-7), Tier 3 (sessions 8+)
+- ✅ Wave 2 integration: Roadmap generation triggered after each Wave 2 completion
+- ✅ Git commit: `c2cb119` (2025-12-23 22:47:52)
+
+**Next:** End-to-end testing (all 3 strategies), Railway deployment verification
 
 **Phase 3 Implementation Complete (2026-01-11):**
 - ✅ API client: Added `getRoadmap(patientId)` method with 404 handling

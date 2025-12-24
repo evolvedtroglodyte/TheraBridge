@@ -89,9 +89,23 @@
 ## Development Status
 
 ### Active PRs
-- None currently
+- None currently (PR #3 moved to Completed)
 
 ### Completed PRs
+- **PR #3:** Your Journey Dynamic Roadmap
+  - Status: ✅ Complete (2026-01-11) - Phases 4-5 implemented, testing pending
+  - Plan: `thoughts/shared/plans/2026-01-11-your-journey-dynamic-roadmap.md` (2,621 lines)
+  - Sessions: SESSION_LOG.md (2026-01-11 Planning Phases 0-3, 2026-01-11 Execution Phases 4-5)
+  - Scope: 7 files (4 modified, 1 new script, 2 migration files)
+  - Phase 0: ✅ Complete (LoadingOverlay debug logging)
+  - Phase 1: ✅ Complete (Backend infrastructure - services, model config)
+  - Phase 2: ✅ Complete (3 compaction strategies: full, progressive, hierarchical)
+  - Phase 3: ✅ Complete (Frontend integration - API, NotesGoalsCard, polling)
+  - Phase 4: ✅ Complete (Start/Stop/Resume button - commit `2c068aa`)
+  - Phase 5: ✅ Complete (Orchestration + DB migration - commit `c2cb119`)
+  - Features: Incremental roadmap updates after each Wave 2, 3 compaction strategies, smart resume logic, version history
+  - Cost: +$0.25-0.80 per 10-session demo (strategy-dependent)
+
 - **PR #1:** SessionDetail UI Improvements + Wave 1 Action Summarization
   - Status: ✅ Complete (2026-01-09)
   - Plans:
@@ -112,8 +126,7 @@
   - Commit: `8271286`
 
 ### Planned PRs
-  - Default view: Prose (with localStorage persistence)
-  - Color palette: Unified theme based on dashboard teal/purple
+- None currently (PR #3 moved to Active)
 
 ---
 
@@ -180,3 +193,74 @@ python tests/test_full_pipeline.py
 - `Scrapping/.env` - Independent project
 
 **Security Note:** .env files currently tracked in git. Production deployments should use environment variables or secrets management.
+
+---
+
+## Future Features & Enhancements
+
+*Technical debt and planned improvements for future implementation.*
+
+### High Priority
+
+**SSE Real-Time Updates**
+- Fix database-backed event queue for subprocess isolation bug
+- Test SSE in Railway production environment
+- Enable `NEXT_PUBLIC_SSE_ENABLED=true` flag once working
+- Location: `backend/app/services/pipeline_logger.py`, `frontend/app/patient/components/WaveCompletionBridge.tsx`
+- Estimated: 4-6 hours
+- Related: Future PR #4
+
+### Medium Priority
+
+**Wave 2 Context Compaction**
+- Apply progressive summarization to Wave 2 analysis (currently uses full nested context)
+- Reduce token usage from ~50K-80K to ~10K-15K by Session 10
+- Saves ~$0.10 per demo run
+- Location: `backend/scripts/seed_wave2_analysis.py:105-143`
+- Estimated: 2-3 hours
+
+**LoadingOverlay Extended Improvements** (After PR #3 Phase 0 minimum fix)
+- Increase overlay duration from 700ms to 1500ms (more visible)
+- Add progress bar showing which session is processing
+- Better logging/debugging infrastructure
+- Location: `frontend/app/patient/components/LoadingOverlay.tsx`
+- Estimated: 2-3 hours
+
+**Roadmap Regeneration API**
+- Add `POST /api/patients/{id}/roadmap/regenerate` endpoint
+- Allow manual roadmap regeneration with different strategies
+- Useful for experimentation and debugging
+- Location: `backend/app/routers/roadmap.py` (new file)
+- Estimated: 1-2 hours
+
+### Low Priority
+
+**Journey-Optimized Roadmap Structure (PR #3 Option B)**
+- Alternative roadmap structure with milestones, trajectories, progress dimensions
+- Requires frontend redesign (new UI components)
+- Better for longitudinal tracking than current section-based approach
+- Location: `frontend/app/patient/components/NotesGoalsCard.tsx`
+- Estimated: 6-8 hours
+- Details documented in PR #3 plan (`thoughts/shared/plans/2026-01-11-your-journey-dynamic-roadmap.md` - Phase 2 section)
+
+**Roadmap Export Features**
+- PDF export of full roadmap history
+- Email summaries to therapists
+- Weekly progress reports
+- Location: `backend/app/services/roadmap_exporter.py` (new service)
+- Estimated: 4-6 hours
+
+**UI Compaction Strategy Toggle**
+- Allow users to switch compaction strategies via UI (not just env var)
+- Compare roadmap outputs side-by-side
+- A/B testing different strategies
+- Location: `frontend/app/patient/components/RoadmapSettings.tsx` (new component)
+- Estimated: 3-4 hours
+
+**Phase 1B - Header Fonts + Timeline Deprecation** (Deferred from PR #1)
+- Complete header font standardization
+- Deprecate Timeline component (replaced by SessionCard grid)
+- Non-critical UI cleanup
+- Location: Various frontend components
+- Estimated: 2-3 hours
+
