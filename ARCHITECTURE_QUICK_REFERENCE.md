@@ -1,367 +1,251 @@
-# TherapyBridge - Architecture Quick Reference
+# TherapyBridge Architecture - Quick Reference
 
-## File Locations for Key Components
-
-### Backend Integration Points
-
-#### Audio Pipeline Integration
-- **Service Wrapper:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/app/services/transcription.py`
-  - Function: `transcribe_audio_file(audio_path: str) -> Dict`
-  - Imports: `from src.pipeline import AudioTranscriptionPipeline`
-  - Blocking call: `pipeline.process(audio_path)`
-
-#### Session Processing (Upload to Extraction)
-- **Router:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/app/routers/sessions.py`
-  - Endpoint: `POST /api/sessions/upload` (line 235)
-  - Background task: `process_audio_pipeline()` (line 109)
-  - Database updates: Lines 136-232 (stage transitions)
-  - Timeline generation: Lines 195-212 (auto-event creation)
-
-#### Note Extraction Service
-- **AI Service:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/app/services/note_extraction.py`
-  - Extraction prompt: Lines 20-80
-  - JSON schema: Lines 55-81
-  - OpenAI call: `AsyncOpenAI(api_key=key).beta.chat.completions.parse()`
-
-#### Analytics & Scheduling
-- **Scheduler Config:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/app/scheduler.py`
-  - APScheduler setup: Lines 27-50
-  - Jobs registration: Line 78 in `main.py`
-
-- **Aggregation Jobs:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/app/tasks/aggregation.py`
-  - Daily stats: `aggregate_daily_stats()` (line 36)
-  - Patient progress: `snapshot_patient_progress()`
-
-#### Database Connection
-- **Connection Pool:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/app/database.py`
-  - Async engine: Lines 44-53 (asyncpg)
-  - Sync engine: Lines 65-74 (psycopg2)
-  - Pool config: Lines 26-29
-  - Dependency: `get_db()` (line 87)
-
-#### Database Models
-- **ORM Models:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/app/models/db_models.py`
-  - User: Lines 13-62 (authentication, roles)
-  - TherapySession: Lines 98-135 (core domain)
-  - TimelineEvent: Lines 138-177 (Feature 5)
-  - TherapistPatient: Lines 77-95 (many-to-many junction)
-
-#### API Endpoints
-- **Sessions:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/app/routers/sessions.py`
-  - POST /api/sessions/upload (line 235)
-  - GET /api/sessions/{id} (line 465)
-  - GET /api/sessions/patients/{id}/timeline (line 592)
-  - POST /api/sessions/patients/{id}/timeline (line 781)
-
-- **Patients:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/app/routers/patients.py`
-  - POST /api/patients/ (create)
-  - GET /api/patients/ (list)
-  - GET /api/patients/{id} (detail)
-
-- **Analytics:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/app/routers/analytics.py`
-  - GET /api/v1/analytics/dashboard
-
-### Frontend Integration Points
-
-#### API Client
-- **Main Client:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/frontend/lib/api-client.ts`
-  - Class: `ApiClient` (line 61)
-  - Methods: `request<T>()`, `get<T>()`, `post<T>()`, `put<T>()`, `delete<T>()`
-  - Token refresh: `handleTokenRefresh()` (line 140)
-
-#### Hooks for Data Fetching
-- **Session Processing:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/frontend/hooks/use-session-processing.ts`
-  - Polling logic: 2-second intervals
-  - Status checks: uploading → processed
-
-- **Session Data:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/frontend/hooks/use-session-data.ts`
-  - Fetches session details
-  - Extracted notes retrieval
-
-#### Pages & Components
-- **Therapist Dashboard:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/frontend/app/therapist/page.tsx`
-  - Patient list with stats
-  - Session filtering/sorting
-
-- **Patient Dashboard:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/frontend/app/patient/page.tsx`
-  - Session summaries
-  - Timeline view
-
-### Audio Pipeline
-
-#### Main Pipeline
-- **CPU/API Version:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/audio-transcription-pipeline/src/pipeline.py`
-  - Class: `AudioTranscriptionPipeline` (line 200+)
-  - Method: `process(audio_path)` - main entry point
-  - Returns: dict with segments, full_text, language, duration
-
-- **Preprocessing:** `AudioPreprocessor` class
-  - Method: `preprocess(audio_path, output_path)`
-  - Trimming, normalization, format conversion
-
-- **Transcription:** `WhisperTranscriber` class
-  - Uses: OpenAI Whisper API (large-v3)
-  - Chunking: For files >25MB
-
-- **Diarization:** `SpeakerDiarizer` class
-  - Uses: pyannote-audio 3.1
-  - Speaker detection: 2 speakers (Therapist, Client)
-
-#### GPU Version (Optional)
-- **GPU Pipeline:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/audio-transcription-pipeline/src/pipeline_gpu.py`
-  - Uses: faster-whisper locally
-  - GPU provider: Vast.ai (not yet integrated)
-
-### Database Migrations
-
-- **Location:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/alembic/versions/`
-- **Key Migrations:**
-  - `808b6192c57c_add_authentication_schema_and_missing_.py` - Auth tables
-  - `d4e5f6g7h8i9_add_timeline_events_table.py` - Timeline (Feature 5)
-  - `e5f6g7h8i9j0_add_goal_tracking_tables.py` - Goal tracking (Feature 6)
-  - `e4f5g6h7i8j9_add_export_tables.py` - Export/reporting (Feature 7)
-  - `g7h8i9j0k1l2_add_security_compliance_tables.py` - HIPAA (Feature 8)
-
-### Configuration & Environment
-
-- **Backend .env:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/.env`
-  - DATABASE_URL (line 14)
-  - OPENAI_API_KEY (line 47)
-  - JWT_SECRET_KEY (line 62)
-  - ENCRYPTION_MASTER_KEY (line 68)
-
-- **Frontend .env.local:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/frontend/.env.local`
-  - NEXT_PUBLIC_API_URL
-  - NEXT_PUBLIC_USE_REAL_API
-
-- **Audio Pipeline .env:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/audio-transcription-pipeline/.env`
-  - OPENAI_API_KEY
-  - HF_TOKEN (HuggingFace for pyannote)
-
-### Testing
-
-- **Backend Tests:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/backend/tests/`
-  - `conftest.py` - Pytest fixtures (auth users, database)
-  - `test_auth_integration.py` - Authentication flow tests
-  - `test_extraction_service.py` - AI extraction tests
-  - `routers/test_sessions.py` - Session endpoint tests
-
-- **Audio Pipeline Tests:** `/Users/newdldewdl/Global Domination 2/peerbridge proj/audio-transcription-pipeline/tests/`
-  - `test_full_pipeline.py` - Complete pipeline test
+**Status:** Comprehensive architecture map created - see ARCHITECTURE.md for full details
 
 ---
 
-## Data Flow Sequences
-
-### Upload → Processing → Display
+## System Layers
 
 ```
-1. Frontend: POST /api/sessions/upload
-   └─> Backend: sessions.py:upload_audio_session() (line 235)
-       ├─ Validate file (line 281)
-       ├─ Create Session record (line 298-308)
-       ├─ Save audio file (line 310-349)
-       ├─ Queue background task (line 369)
-       └─ Return Session (status: "uploading")
-
-2. Background: process_audio_pipeline() (line 109)
-   ├─ Stage 1: Update status → "transcribing"
-   ├─ Stage 2: Call transcription.py:transcribe_audio_file() (line 146)
-   │   └─> AudioTranscriptionPipeline.process()
-   │       ├─ Preprocess
-   │       ├─ Whisper transcribe
-   │       └─ Pyannote diarize
-   │   └─> Update DB with transcript_segments (line 150-160)
-   │
-   ├─ Stage 3: Update status → "extracting_notes"
-   ├─ Stage 4: Call note_extraction.py:extract_notes() (line 164-184)
-   │   └─> GPT-4o extraction
-   │   └─> Update DB with extracted_notes (line 186-193)
-   │
-   ├─ Stage 5: Call timeline.py:auto_generate_session_event() (line 200)
-   │   └─> Create TimelineEvent record
-   │
-   └─ Final: Update status → "processed"
-
-3. Frontend: GET /api/sessions/{id} (polling every 2 sec)
-   └─> Backend: sessions.py:get_session() (line 465)
-       └─> Return current Session with all fields
-           (frontend displays when status == "processed")
-```
-
-### Timeline Query
-
-```
-Frontend: GET /api/sessions/patients/{patient_id}/timeline
-  └─> Backend: sessions.py:get_patient_timeline() (line 592)
-      ├─ Get pagination cursor
-      ├─ Query TimelineEvent (patient_id match)
-      ├─ Apply filters (date, type, importance)
-      ├─ Order by event_date DESC
-      ├─ Paginate (cursor-based, limit 20)
-      └─> Return TimelineEventResponse[]
-```
-
-### Analytics Aggregation
-
-```
-Scheduler: Daily at 0 UTC
-  └─> tasks/aggregation.py:aggregate_daily_stats() (line 36)
-      ├─ Calculate yesterday's date
-      ├─ Query therapy_sessions grouped by therapist_id
-      ├─ Calculate metrics:
-      │  ├─ total_sessions: COUNT(*)
-      │  ├─ total_patients_seen: COUNT(DISTINCT patient_id)
-      │  └─ avg_session_duration: AVG(duration_seconds)
-      ├─ Upsert into daily_stats (ON CONFLICT DO UPDATE)
-      └─ Log results
+┌─────────────────────────────────────────────┐
+│ FRONTEND (Next.js 16 + React 19 + Tailwind) │
+│ app/patient/dashboard-v3/page.tsx           │
+└────────────────────┬────────────────────────┘
+                     │ HTTP REST APIs
+┌────────────────────▼────────────────────────┐
+│ BACKEND (FastAPI + Python 3.13.9)           │
+│ app/routers/sessions.py                     │
+│ app/services/*.py (Mood, Topics, etc.)      │
+└────────────────────┬────────────────────────┘
+                     │ Webhook/Events
+┌────────────────────▼────────────────────────┐
+│ AUDIO PIPELINE (CPU/GPU Transcription)      │
+│ Whisper API + pyannote 3.1 diarization      │
+└─────────────────────────────────────────────┘
 ```
 
 ---
 
-## Key Performance Characteristics
+## Data Flow (Audio Upload → Display)
 
-### Processing Times
-- Audio upload validation: ~100ms
-- File save (1MB chunks): ~1-2 sec per 100MB
-- Transcription (Whisper API): 5-7 min for 23 min audio
-- AI extraction (GPT-4o): ~20 sec
-- Timeline event creation: ~5 sec
-- **Total:** ~7-10 minutes per session
-
-### Database Operations
-- Session creation: <10ms
-- Transcript update: <100ms
-- Extracted notes update: <50ms
-- Timeline query (20 items): <50ms
-- Timeline pagination: <100ms
-
-### Concurrency Limits
-- Thread pool workers: ~5-8 (CPU count + 4)
-- DB connection pool: 20-30 total
-- Max concurrent uploads: ~5 (limited by thread pool)
-- Max timeline queries: ~30 (limited by DB pool)
-
-### Storage Usage
-- Audio file (1 hour @ 64kbps MP3): ~27MB
-- Transcript (typed): ~5-10KB per hour
-- Extracted notes (JSON): ~5-10KB per session
-- Timeline events: ~1-2KB per session
-- **Per session total:** ~27-28MB (mostly audio)
-
----
-
-## Environment Variables (Complete List)
-
-### Backend (backend/.env)
 ```
-ENVIRONMENT=development
-DEBUG=true  # CRITICAL: false in production
-DATABASE_URL=postgresql+asyncpg://...
-DB_POOL_SIZE=20
-DB_MAX_OVERFLOW=10
-OPENAI_API_KEY=sk-proj-...
-OPENAI_MODEL=gpt-4o
-JWT_SECRET_KEY=...
-ENCRYPTION_MASTER_KEY=...
-ENABLE_ANALYTICS_SCHEDULER=true
-```
-
-### Frontend (frontend/.env.local)
-```
-NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_USE_REAL_API=true  # false = use mock data
-```
-
-### Audio Pipeline (audio-transcription-pipeline/.env)
-```
-OPENAI_API_KEY=sk-proj-...
-HF_TOKEN=hf_...  # HuggingFace for pyannote
+User uploads MP3
+    ↓
+POST /api/upload
+    ├─ Store in Supabase Storage
+    ├─ Create therapy_sessions record
+    └─ Return session_id
+    ↓
+POST /api/process
+    ├─ Download audio from storage
+    ├─ Call backend: Whisper + pyannote
+    ├─ Get diarized transcript
+    ├─ Detect speaker roles
+    └─ Store transcript in DB
+    ↓
+WAVE 1 Analysis (Async)
+    ├─ Topic extraction (GPT-4o-mini)
+    ├─ Mood analysis (GPT-4o-mini)
+    └─ Update DB immediately
+    ↓
+WAVE 2 Analysis (Background)
+    ├─ Deep clinical analysis
+    ├─ Breakthrough detection
+    └─ Prose generation
+    ↓
+Frontend usePatientSessions() hook
+    ├─ Fetches sessions from API (or uses mock)
+    └─ Displays in SessionCardsGrid
 ```
 
 ---
 
-## API Response Formats
+## Backend API Endpoints
 
-### Session Response
-```json
-{
-  "id": "uuid",
-  "patient_id": "uuid",
-  "therapist_id": "uuid",
-  "session_date": "2025-12-19T10:00:00",
-  "duration_seconds": 1380,
-  "audio_filename": "session.mp3",
-  "status": "processed",
-  "transcript_text": "...",
-  "transcript_segments": [
-    {"speaker": "Therapist", "text": "...", "start": 0.0, "end": 5.2}
-  ],
-  "extracted_notes": {
-    "key_topics": ["..."],
-    "mood": "positive",
-    "risk_flags": []
-  },
-  "created_at": "2025-12-19T10:00:00"
-}
+### Sessions Router (`/api/sessions`)
+
+**Session CRUD:**
+- `POST /` - Create session
+- `GET /` - List all
+- `GET /{id}` - Get single
+- `GET /patient/{id}` - Get patient's sessions
+
+**Analysis:**
+- `POST /{id}/analyze-mood` - Mood analysis
+- `POST /{id}/extract-topics` - Topic extraction
+- `POST /{id}/detect-breakthrough` - Breakthrough detection
+- `POST /{id}/analyze-deep` - Wave 2 analysis
+
+**Processing:**
+- `POST /{id}/upload-transcript` - Store transcript
+- `GET /{id}/analysis-status` - Check status (Wave 1 & 2)
+
+---
+
+## Frontend Components
+
+### Dashboard V3 (`app/patient/dashboard-v3/`)
+
 ```
-
-### Timeline Event Response
-```json
-{
-  "id": "uuid",
-  "patient_id": "uuid",
-  "event_type": "session",
-  "event_subtype": "completed",
-  "event_date": "2025-12-19T10:00:00",
-  "title": "Session - Positive Mood",
-  "description": "...",
-  "event_metadata": {
-    "mood": "positive",
-    "key_topics": ["..."],
-    "risk_flags": []
-  },
-  "importance": "normal",
-  "created_at": "2025-12-19T10:00:00"
-}
-```
-
-### Timeline Summary Response
-```json
-{
-  "total_events": 42,
-  "events_by_type": {
-    "session": 10,
-    "milestone": 3,
-    "goal": 5
-  },
-  "milestones_achieved": 3,
-  "recent_highlights": ["..."]
-}
+Dashboard
+├── SessionCardsGrid
+│   └── SessionCard (x12)
+│       ├── Mood indicator
+│       ├── Topics
+│       ├── Strategy
+│       └── Actions
+├── TimelineSidebar
+│   └── Session chronology with search
+├── ProgressPatternsCard
+│   └── Mood/topic trends
+├── NotesGoalsCard
+│   └── Treatment goals
+└── ToDoCard
+    └── Action items
 ```
 
 ---
 
-## Critical Paths & Dependencies
+## Key Services
 
-### Session Processing Critical Path
-1. File I/O (sequential): ~2 sec
-2. Transcription (blocking): ~5-7 min
-3. Note extraction: ~20 sec
-4. Timeline creation: ~5 sec
-**Total blocking time:** ~7 minutes per upload
+| Service | File | Input | Output | Cost |
+|---------|------|-------|--------|------|
+| Mood Analyzer | `mood_analyzer.py` | Transcript | Score, indicators | $0.01/session |
+| Topic Extractor | `topic_extractor.py` | Transcript | Topics, actions, summary | $0.01/session |
+| Breakthrough Detector | `breakthrough_detector.py` | Transcript | Breakthroughs, confidence | $0.01/session |
+| Deep Analyzer | `deep_analyzer.py` | Transcript | Progress, insights, skills | $0.02/session |
+| Speaker Labeler | `speaker_labeler.py` | Diarized segments | Therapist/Client labels | Free |
 
-### Database Critical Path
-1. Session creation: 1 query
-2. Update to transcribed: 1 query
-3. Update to processed: 1 query
-4. Timeline insert: 1 query
-**Total queries:** 4 sequential, <500ms cumulative
+---
 
-### API Critical Path
-1. Validate + create: ~100ms
-2. Background task queued
-3. Request returns immediately
-4. Frontend polls every 2 sec until complete
-**Total latency to user:** Immediate feedback + polling
+## Database Key Tables
 
+```
+users                          therapy_sessions
+├─ id (UUID)                  ├─ id (UUID)
+├─ email                       ├─ patient_id (FK)
+├─ first_name                  ├─ therapist_id (FK)
+├─ last_name                   ├─ session_date
+├─ role (therapist|patient)    ├─ transcript (JSONB)
+└─ created_at                  ├─ topics (TEXT[])
+                               ├─ mood_score (0.0-10.0)
+                               ├─ summary (max 150 chars)
+                               ├─ deep_analysis (JSONB)
+                               ├─ wave1_analyzed_at
+                               ├─ wave2_analyzed_at
+                               └─ processing_status
+```
+
+---
+
+## Critical Files Map
+
+### Must-Know Backend
+- **Entry:** `backend/app/main.py` (FastAPI setup)
+- **Config:** `backend/app/config.py` (env vars)
+- **Database:** `backend/app/database.py` (Supabase client)
+- **Routes:** `backend/app/routers/sessions.py` (700+ lines, all endpoints)
+- **Services:** `backend/app/services/*.py` (AI extraction)
+
+### Must-Know Frontend
+- **Dashboard:** `frontend/app/patient/dashboard-v3/page.tsx`
+- **Components:** `frontend/app/patient/dashboard-v3/components/*.tsx`
+- **Data Hook:** `frontend/app/patient/lib/usePatientSessions.ts`
+- **Mock Data:** `frontend/app/patient/lib/mockData.ts` (12 sessions)
+- **Types:** `frontend/app/patient/lib/types.ts`
+- **API Client:** `frontend/lib/api-client.ts`
+- **Upload:** `frontend/app/api/upload/route.ts`
+- **Process:** `frontend/app/api/process/route.ts`
+
+---
+
+## Development Commands
+
+```bash
+# Backend
+cd backend
+source venv/bin/activate
+uvicorn app.main:app --reload
+
+# Frontend
+cd frontend
+npm run dev
+
+# Audio Pipeline
+cd audio-transcription-pipeline
+source venv/bin/activate
+python tests/test_full_pipeline.py audio.mp3
+```
+
+---
+
+## Implementation Status
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Backend API | ✅ Complete | All endpoints working |
+| Frontend Dashboard | ✅ Complete | V3 with all cards |
+| Mood Analysis | ✅ Complete | Wave 1 immediate |
+| Topic Extraction | ✅ Complete | Wave 1 immediate |
+| Breakthrough Detection | ✅ Complete | Wave 2 async |
+| Deep Analysis | ✅ Complete | Wave 2 async |
+| Audio Processing | ✅ Complete | Whisper + pyannote |
+| Speaker Role Detection | ✅ Complete | Heuristic-based |
+| Demo Mode | ✅ Complete | 12 mock sessions |
+| Real API Integration | 🔄 Partial | Toggle available, not fully tested |
+| Therapist Dashboard | ⏳ Pending | Patient view complete |
+| Authentication | 🔄 Partial | Demo mode only |
+
+---
+
+## Key Facts
+
+- **Three independent systems** that communicate via HTTP REST APIs
+- **12 mock therapy sessions** built into frontend for development
+- **Two-wave analysis pipeline:** Wave 1 (immediate), Wave 2 (async background)
+- **No hardcoded output** - all AI responses from GPT-4o-mini
+- **Speaker role detection** uses heuristics (not AI)
+- **Cost:** ~$0.04 per session (all AI services)
+- **Processing time:** 10-30 seconds for Wave 1, 2-5 minutes for Wave 2
+
+---
+
+## Common Tasks
+
+### To enable real API data (instead of mock)
+```typescript
+// app/patient/lib/usePatientSessions.ts
+const USE_MOCK_DATA = false;  // Change this
+```
+
+### To add a new analysis service
+1. Create `backend/app/services/my_service.py`
+2. Add response model to `backend/app/routers/sessions.py`
+3. Add endpoint: `@router.post("/{session_id}/my-endpoint")`
+4. Return response and store in DB
+
+### To modify dashboard layout
+1. Edit `frontend/app/patient/dashboard-v3/page.tsx`
+2. Adjust component order/grid layout
+3. Update component props in `components/` files
+
+### To add a therapist dashboard
+1. Create `frontend/app/therapist/dashboard/page.tsx`
+2. Use `SessionCardsGrid` with therapist view filters
+3. Add therapist-specific routes in navigation
+
+---
+
+## Contact Points Between Systems
+
+| Frontend Action | Backend Endpoint | Data Returned |
+|---|---|---|
+| Load dashboard | `GET /api/sessions/patient/{id}` | Array of sessions |
+| Upload audio | `POST /api/upload` | `{ session_id, file_url }` |
+| Process audio | `POST /api/process` | `{ transcript, status }` |
+| Check status | `GET /api/status/{id}` | `{ progress, status, analysis }` |
+| Get mood history | `GET /api/sessions/patient/{id}/mood-history` | `[{ date, score }]` |
+
+---
+
+For complete details, see: **ARCHITECTURE.md**

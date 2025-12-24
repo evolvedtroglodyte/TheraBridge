@@ -18,6 +18,7 @@ from app.services.prose_generator import ProseGenerator
 from app.services.analysis_orchestrator import AnalysisOrchestrator, analyze_session_full_pipeline
 from app.services.technique_library import get_technique_library
 from app.services.speaker_labeler import label_session_transcript, SpeakerLabelingResult
+from app.services.progress_metrics_extractor import ProgressMetricsExtractor, ProgressMetricsResponse
 from app.middleware.demo_auth import get_demo_user
 from app.config import settings
 from supabase import Client
@@ -1388,6 +1389,121 @@ async def get_technique_definition(technique_name: str):
         technique=technique_name,
         definition=definition
     )
+
+
+# ============================================================================
+# Progress Metrics Endpoints
+# ============================================================================
+
+@router.get("/patient/{patient_id}/progress-metrics", response_model=ProgressMetricsResponse)
+async def get_patient_progress_metrics(
+    patient_id: str,
+    limit: int = 50,
+    db: Client = Depends(get_db)
+):
+    """
+    Get progress metrics for visualization in ProgressPatternsCard.
+
+    Extracts metrics from completed Wave 1 + Wave 2 analyses:
+    - **Mood Trends:** AI-analyzed mood scores over time
+    - **Session Consistency:** Attendance patterns and streaks
+
+    **Args:**
+    - patient_id: Patient UUID
+    - limit: Maximum number of sessions to include (default: 50)
+
+    **Returns:**
+    - ProgressMetricsResponse with chart data ready for Recharts
+
+    **Example Response:**
+    ```json
+    {
+      "metrics": [
+        {
+          "title": "Mood Trends",
+          "description": "AI-analyzed emotional state over time",
+          "emoji": "📈",
+          "insight": "📈 IMPROVING: +36% overall (Recent avg: 6.5/10, Historical: 5.5/10)",
+          "chartData": [
+            {"session": "S10", "mood": 5.5, "date": "Dec 23", "confidence": 0.85},
+            {"session": "S11", "mood": 6.5, "date": "Dec 24", "confidence": 0.85}
+          ]
+        },
+        {
+          "title": "Session Consistency",
+          "description": "Attendance patterns and engagement",
+          "emoji": "📅",
+          "insight": "100% attendance rate - Excellent (Score: 100/100). 10 week streak.",
+          "chartData": [
+            {"week": "Week 1", "attended": 1},
+            {"week": "Week 2", "attended": 1}
+          ]
+        }
+      ],
+      "extracted_at": "2025-12-24T00:40:00Z",
+      "session_count": 10,
+      "date_range": "Nov 15 - Dec 24, 2025"
+    }
+    ```
+
+    **Notes:**
+    - Only sessions with completed Wave 1 (mood_score present) are included
+    - Chart data is formatted for direct use with Recharts components
+    - Insights are AI-generated based on trend analysis
+    """
+    # Get sessions with Wave 1 mood analysis complete
+    sessions_response = (
+        db.table("therapy_sessions")
+        .select("*")
+        .eq("patient_id", patient_id)
+        .not_.is_("mood_score", "null")  # Only sessions with mood analysis
+        .order("session_date", desc=False)  # Chronological order
+        .limit(limit)
+        .execute()
+    )
+
+    if not sessions_response.data:
+        # Return empty metrics if no sessions found
+        return ProgressMetricsResponse(
+            metrics=[],
+            extracted_at=datetime.now().isoformat() + "Z",
+            session_count=0,
+            date_range="No sessions"
+        )
+
+    # Transform database sessions to pipeline-like structure
+    pipeline_data = {
+        "sessions": []
+    }
+
+    for idx, session in enumerate(sessions_response.data, start=1):
+        pipeline_data["sessions"].append({
+            "session_num": idx,
+            "session_id": session["id"],
+            "wave1": {
+                "session_num": idx,
+                "mood_score": session.get("mood_score"),
+                "mood_confidence": session.get("mood_confidence", 0.8),
+                "analyzed_at": session.get("mood_analyzed_at") or session.get("created_at"),
+            },
+            "wave2": {
+                "deep_analysis": session.get("deep_analysis"),
+                "analyzed_at": session.get("deep_analyzed_at"),
+            } if session.get("deep_analysis") else None,
+        })
+
+    # Extract metrics using the service
+    try:
+        metrics = ProgressMetricsExtractor.extract_from_pipeline_json(pipeline_data)
+        logger.info(f"✓ Extracted {len(metrics.metrics)} progress metrics for patient {patient_id}")
+        return metrics
+
+    except Exception as e:
+        logger.error(f"Progress metrics extraction failed: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to extract progress metrics: {str(e)}"
+        )
 
 
 # ============================================================================

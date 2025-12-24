@@ -1,0 +1,53 @@
+{
+  "metrics": [
+    {
+      "title": "Mood Trends",
+      "description": "AI-analyzed emotional state over time",
+      "emoji": "\ud83d\udcc8",
+      "insight": "\ud83d\udcc8 IMPROVING: +36% overall (Recent avg: 6.5/10, Historical: 5.5/10)",
+      "chartData": [
+        {
+          "session": "S10",
+          "mood": 5.5,
+          "date": "Dec 24",
+          "confidence": 0.85
+        },
+        {
+          "session": "S11",
+          "mood": 6.5,
+          "date": "Dec 24",
+          "confidence": 0.85
+        },
+        {
+          "session": "S12",
+          "mood": 7.5,
+          "date": "Dec 24",
+          "confidence": 0.85
+        }
+      ]
+    },
+    {
+      "title": "Session Consistency",
+      "description": "Attendance patterns and engagement",
+      "emoji": "\ud83d\udcc5",
+      "insight": "100% attendance rate - Excellent (Score: 100/100). 3 week streak.",
+      "chartData": [
+        {
+          "week": "Week 1",
+          "attended": 1
+        },
+        {
+          "week": "Week 2",
+          "attended": 1
+        },
+        {
+          "week": "Week 3",
+          "attended": 1
+        }
+      ]
+    }
+  ],
+  "extracted_at": "2025-12-24T04:52:33.074805Z",
+  "session_count": 3,
+  "date_range": "Dec 24 - Dec 24, 2025"
+}

@@ -21,6 +21,7 @@ import { modalVariants, backdropVariants } from '../lib/utils';
 import { useModalAccessibility } from '../hooks/useModalAccessibility';
 import { useConsistencyData } from '../hooks/useConsistencyData';
 import { useMoodAnalysis } from '../hooks/useMoodAnalysis';
+import { useProgressMetrics } from '../hooks/useProgressMetrics';
 import { useTheme } from '../contexts/ThemeContext';
 import type { ProgressMetric } from '../lib/types';
 
@@ -88,9 +89,23 @@ export function ProgressPatternsCard({ patientId, useRealData = false }: Progres
     limit: 50,
   });
 
+  // Fetch unified progress metrics from new endpoint
+  const {
+    metrics: apiMetrics,
+    isLoading: isMetricsLoading
+  } = useProgressMetrics({
+    patientId: patientId || '',
+    limit: 50,
+    useRealData,
+  });
+
   // Merge real consistency and mood data with mock metrics
   // Filter to only show metrics defined in DISPLAYED_METRICS configuration
   const mergedMetrics = useMemo<ProgressMetric[]>(() => {
+    // If API provides metrics, use those instead of manual merging
+    if (useRealData && apiMetrics.length > 0) {
+      return apiMetrics.filter(metric => DISPLAYED_METRICS.includes(metric.title));
+    }
     // Dynamically filter progressMetrics based on DISPLAYED_METRICS array
     const filteredMetrics = progressMetrics.filter(
       metric => DISPLAYED_METRICS.includes(metric.title)
@@ -157,7 +172,7 @@ export function ProgressPatternsCard({ patientId, useRealData = false }: Progres
 
       return metric;
     });
-  }, [useRealData, consistencyData, moodHistory, moodTrend]);
+  }, [useRealData, apiMetrics, consistencyData, moodHistory, moodTrend]);
 
   // Accessibility: focus trap, Escape key, scroll lock
   useModalAccessibility({

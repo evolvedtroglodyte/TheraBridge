@@ -4,6 +4,10 @@ import { useState, useRef, useEffect } from 'react';
 import { Mic, Square } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+// Font families - matching SessionCard
+const fontSerif = '"Crimson Pro", Georgia, serif';
+const fontSans = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
 interface AudioRecorderProps {
   onUploadSuccess: (sessionId: string, file: File) => void;
 }
@@ -126,7 +130,7 @@ export default function AudioRecorder({ onUploadSuccess }: AudioRecorderProps) {
   return (
     <div className="px-8 py-8">
       {/* Section Title */}
-      <h2 className="text-[18px] font-semibold text-center mb-5 text-gray-800 dark:text-gray-200">
+      <h2 style={{ fontFamily: fontSerif }} className="text-[18px] font-semibold text-center mb-5 text-gray-800 dark:text-gray-200">
         Record Audio
       </h2>
 
@@ -160,10 +164,10 @@ export default function AudioRecorder({ onUploadSuccess }: AudioRecorderProps) {
             {/* Recording Timer */}
             {isRecording && (
               <div className="text-center">
-                <div className="text-3xl font-mono font-medium text-gray-800 dark:text-gray-200">
+                <div style={{ fontFamily: fontSerif }} className="text-3xl font-mono font-medium text-gray-800 dark:text-gray-200">
                   {formatTime(recordingTime)}
                 </div>
-                <div className="text-sm text-red-600 dark:text-red-400 mt-1 flex items-center justify-center gap-2">
+                <div style={{ fontFamily: fontSerif }} className="text-sm text-red-600 dark:text-red-400 mt-1 flex items-center justify-center gap-2">
                   <span className="inline-block w-2 h-2 bg-red-600 dark:bg-red-400 rounded-full animate-pulse"></span>
                   Recording...
                 </div>
@@ -173,7 +177,7 @@ export default function AudioRecorder({ onUploadSuccess }: AudioRecorderProps) {
             {/* Upload Status */}
             {isUploading && (
               <div className="text-center">
-                <div className="text-lg text-[#5AB9B4] dark:text-[#a78bfa]">
+                <div style={{ fontFamily: fontSerif }} className="text-lg text-[#5AB9B4] dark:text-[#a78bfa]">
                   Uploading recording...
                 </div>
               </div>
@@ -183,6 +187,7 @@ export default function AudioRecorder({ onUploadSuccess }: AudioRecorderProps) {
             {!isRecording && !isUploading && (
               <button
                 onClick={startRecording}
+                style={{ fontFamily: fontSerif }}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[20px] bg-[#5AB9B4] dark:bg-[#8B6AAE] text-white text-[13px] font-semibold hover:bg-[#4AA9A4] dark:hover:bg-[#7B5A9E] hover:shadow-[0_4px_16px_rgba(90,185,180,0.35)] dark:hover:shadow-[0_4px_16px_rgba(139,106,174,0.35)] transition-all duration-200"
               >
                 <div className="w-3.5 h-3.5 rounded-full bg-white"></div>
@@ -192,7 +197,7 @@ export default function AudioRecorder({ onUploadSuccess }: AudioRecorderProps) {
 
             {/* Instructions */}
             {!isRecording && !isUploading && (
-              <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-3 leading-relaxed">
+              <div style={{ fontFamily: fontSerif }} className="text-[11px] text-gray-500 dark:text-gray-400 mt-3 leading-relaxed">
                 Recording will automatically<br />upload when you stop.
               </div>
             )}

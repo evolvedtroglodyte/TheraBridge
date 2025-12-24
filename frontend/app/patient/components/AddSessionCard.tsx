@@ -20,6 +20,7 @@ interface AddSessionCardProps {
 }
 
 // Font families - matching SessionCard
+const fontSerif = '"Crimson Pro", Georgia, serif';
 const fontSans = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 // Card dimensions - exact match to SessionCard
@@ -110,10 +111,10 @@ export function AddSessionCard({ id, scale = 1.0 }: AddSessionCardProps) {
       {/* Label */}
       <span
         style={{
-          fontFamily: fontSans,
+          fontFamily: fontSerif,
           color: text,
-          fontSize: '16px',
-          fontWeight: 500,
+          fontSize: '20px',
+          fontWeight: 600,
           textAlign: 'center',
         }}
       >

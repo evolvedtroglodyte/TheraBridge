@@ -4,6 +4,10 @@ import { useState, useCallback } from 'react';
 import { Upload, File, AlertCircle, CheckCircle, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+// Font families - matching SessionCard
+const fontSerif = '"Crimson Pro", Georgia, serif';
+const fontSans = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
 interface FileUploaderProps {
   onUploadSuccess: (sessionId: string, file: File) => void;
 }
@@ -123,7 +127,7 @@ export default function FileUploader({ onUploadSuccess }: FileUploaderProps) {
   return (
     <div className="px-8 py-8">
       {/* Section Title */}
-      <h2 className="text-[18px] font-semibold text-center mb-5 text-gray-800 dark:text-gray-200">
+      <h2 style={{ fontFamily: fontSerif }} className="text-[18px] font-semibold text-center mb-5 text-gray-800 dark:text-gray-200">
         Upload Audio File
       </h2>
 
@@ -162,16 +166,16 @@ export default function FileUploader({ onUploadSuccess }: FileUploaderProps) {
 
             {/* Text */}
             <div>
-              <p className="text-[14px] font-semibold text-gray-800 dark:text-gray-200 mb-1">
+              <p style={{ fontFamily: fontSerif }} className="text-[14px] font-semibold text-gray-800 dark:text-gray-200 mb-1">
                 {isDragging ? 'Drop the file here' : 'Drag & drop audio file'}
               </p>
-              <p className="text-[12px] text-gray-500 dark:text-gray-400">
+              <p style={{ fontFamily: fontSerif }} className="text-[12px] text-gray-500 dark:text-gray-400">
                 or click to browse
               </p>
             </div>
 
             {/* Formats */}
-            <p className="text-[10px] text-gray-400 dark:text-gray-500">
+            <p style={{ fontFamily: fontSerif }} className="text-[10px] text-gray-400 dark:text-gray-500">
               MP3, WAV, M4A, OGG, FLAC, AAC (max 100 MB)
             </p>
           </div>
@@ -181,7 +185,7 @@ export default function FileUploader({ onUploadSuccess }: FileUploaderProps) {
           {validationError && (
             <div className="flex items-start gap-2 p-4 bg-red-50 border border-red-200 rounded-lg">
               <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-800">{validationError}</p>
+              <p style={{ fontFamily: fontSerif }} className="text-sm text-red-800">{validationError}</p>
             </div>
           )}
 
@@ -189,7 +193,7 @@ export default function FileUploader({ onUploadSuccess }: FileUploaderProps) {
           {uploadError && (
             <div className="flex items-start gap-2 p-4 bg-red-50 border border-red-200 rounded-lg">
               <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-800">{uploadError}</p>
+              <p style={{ fontFamily: fontSerif }} className="text-sm text-red-800">{uploadError}</p>
             </div>
           )}
 
@@ -200,9 +204,9 @@ export default function FileUploader({ onUploadSuccess }: FileUploaderProps) {
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <File className="h-4 w-4 text-green-600" />
-                  <p className="font-medium text-green-900">{selectedFile.name}</p>
+                  <p style={{ fontFamily: fontSerif }} className="font-medium text-green-900">{selectedFile.name}</p>
                 </div>
-                <p className="text-sm text-green-700 mt-1">
+                <p style={{ fontFamily: fontSerif }} className="text-sm text-green-700 mt-1">
                   {formatFileSize(selectedFile.size)}
                 </p>
               </div>
@@ -215,6 +219,7 @@ export default function FileUploader({ onUploadSuccess }: FileUploaderProps) {
               <button
                 onClick={handleUpload}
                 disabled={isUploading}
+                style={{ fontFamily: fontSerif }}
                 className="flex-1 px-4 py-2 bg-[#5AB9B4] dark:bg-[#8B6AAE] text-white rounded-lg font-semibold text-[13px] hover:bg-[#4AA9A4] dark:hover:bg-[#7B5A9E] hover:shadow-[0_4px_16px_rgba(90,185,180,0.35)] dark:hover:shadow-[0_4px_16px_rgba(139,106,174,0.35)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
                 {isUploading ? 'Uploading...' : 'Upload & Transcribe'}
@@ -222,6 +227,7 @@ export default function FileUploader({ onUploadSuccess }: FileUploaderProps) {
               <button
                 onClick={handleClear}
                 disabled={isUploading}
+                style={{ fontFamily: fontSerif }}
                 className="px-4 py-2 border border-gray-300 dark:border-[#3a3545] rounded-lg font-medium text-[13px] hover:bg-gray-50 dark:hover:bg-[#252030] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Clear

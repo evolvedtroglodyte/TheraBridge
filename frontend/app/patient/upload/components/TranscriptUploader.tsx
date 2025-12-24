@@ -3,6 +3,10 @@
 import { useState, useCallback } from 'react';
 import { FileText, AlertCircle } from 'lucide-react';
 
+// Font families - matching SessionCard
+const fontSerif = '"Crimson Pro", Georgia, serif';
+const fontSans = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
 interface TranscriptUploaderProps {
   onUploadSuccess?: (file: File) => void;
 }
@@ -105,10 +109,10 @@ export default function TranscriptUploader({ onUploadSuccess }: TranscriptUpload
 
         {/* Content */}
         <div className="flex-1">
-          <div className="text-[13px] font-semibold text-gray-800 dark:text-gray-200 mb-0.5">
+          <div style={{ fontFamily: fontSerif }} className="text-[13px] font-semibold text-gray-800 dark:text-gray-200 mb-0.5">
             {selectedFile ? selectedFile.name : 'Upload Transcript'}
           </div>
-          <div className="text-[11px] text-gray-500 dark:text-gray-400">
+          <div style={{ fontFamily: fontSerif }} className="text-[11px] text-gray-500 dark:text-gray-400">
             {selectedFile
               ? `${formatFileSize(selectedFile.size)} • Ready`
               : 'Drop file or click to browse'
@@ -117,7 +121,7 @@ export default function TranscriptUploader({ onUploadSuccess }: TranscriptUpload
         </div>
 
         {/* Formats */}
-        <div className="text-[10px] text-gray-400 dark:text-gray-500 flex-shrink-0">
+        <div style={{ fontFamily: fontSerif }} className="text-[10px] text-gray-400 dark:text-gray-500 flex-shrink-0">
           TXT, PDF, DOCX
         </div>
       </div>
@@ -126,7 +130,7 @@ export default function TranscriptUploader({ onUploadSuccess }: TranscriptUpload
       {validationError && (
         <div className="flex items-start gap-2 p-3 mt-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
           <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-red-800 dark:text-red-300">{validationError}</p>
+          <p style={{ fontFamily: fontSerif }} className="text-xs text-red-800 dark:text-red-300">{validationError}</p>
         </div>
       )}
     </div>

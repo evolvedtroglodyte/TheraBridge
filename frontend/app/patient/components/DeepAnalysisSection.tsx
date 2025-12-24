@@ -12,7 +12,7 @@
  */
 
 import { Brain, TrendingUp, Lightbulb, Wrench, Heart, CheckCircle2, Target, Sparkles } from 'lucide-react';
-import { DobbyLogoGeometric } from './DobbyLogoGeometric';
+import { DobbyLogo } from './DobbyLogo';
 import { useTheme } from '../contexts/ThemeContext';
 
 // Font families - matching SessionCard (using system-ui throughout)
@@ -91,7 +91,7 @@ export function DeepAnalysisSection({ analysis, confidence }: DeepAnalysisSectio
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 flex items-center justify-center">
-            <DobbyLogoGeometric size={40} color={isDark ? '#a78bfa' : '#5AB9B4'} />
+            <DobbyLogo size={40} color={isDark ? '#a78bfa' : '#5AB9B4'} />
           </div>
           <div>
             <h3 style={{ fontFamily: fontSans }} className="text-xl font-semibold text-gray-800 dark:text-gray-200">

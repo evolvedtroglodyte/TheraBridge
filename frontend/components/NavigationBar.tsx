@@ -7,7 +7,7 @@
  * - Unified layout with TheraBridge icon + theme toggle on left, full logo on right
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { CombinedLogo, BridgeIcon } from './TheraBridgeLogo';
@@ -56,6 +56,12 @@ export function NavigationBar() {
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch by only rendering theme-dependent content after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const isDark = theme === 'dark';
   const toggleTheme = () => setTheme(isDark ? 'light' : 'dark');
@@ -102,6 +108,22 @@ export function NavigationBar() {
   const handleUploadClick = () => {
     router.push('/upload');
   };
+
+  // Don't render theme-dependent content until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <header className="sticky top-0 z-50 bg-[#F8F7F4] border-b border-[#E0DDD8] h-[60px] flex items-center justify-between">
+        <div className="flex items-center gap-3 pl-3 w-[200px]">
+          <div className="w-8 h-8" /> {/* Placeholder for logo */}
+          <div className="w-10 h-10" /> {/* Placeholder for theme toggle */}
+        </div>
+        <div className="flex items-center gap-8">
+          <div className="w-20 h-4" /> {/* Placeholder for nav items */}
+        </div>
+        <div className="w-[200px]" />
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-50 bg-[#F8F7F4] dark:bg-[#1a1625] border-b border-[#E0DDD8] dark:border-[#3d3548] h-[60px] flex items-center justify-between transition-colors duration-300">
