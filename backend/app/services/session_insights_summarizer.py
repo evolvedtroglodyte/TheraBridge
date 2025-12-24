@@ -11,10 +11,11 @@ Cost: ~$0.0006 per session
 """
 
 import json
-from typing import Optional
+import time
+from typing import Optional, Tuple
 from uuid import UUID
 import openai
-from app.config.model_config import get_model_name
+from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
 
 
 class SessionInsightsSummarizer:
@@ -40,7 +41,7 @@ class SessionInsightsSummarizer:
         session_id: UUID,
         deep_analysis: dict,
         confidence_score: float
-    ) -> list[str]:
+    ) -> Tuple[list[str], Optional[GenerationCost]]:
         """
         Generate 3-5 key therapeutic insights from deep_analysis.
 
@@ -50,18 +51,19 @@ class SessionInsightsSummarizer:
             confidence_score: Analysis confidence (0.0-1.0)
 
         Returns:
-            List of 3-5 insight strings (1-2 sentences each)
+            Tuple of (List of 3-5 insight strings, GenerationCost info)
 
         Example output:
-            [
+            ([
                 "Patient identified work stress as primary anxiety trigger during guided reflection",
                 "Successfully practiced 4-7-8 breathing technique independently for first time",
                 "Breakthrough: Connected current avoidance patterns to childhood experiences"
-            ]
+            ], cost_info)
         """
         prompt = self._build_prompt(session_id, deep_analysis, confidence_score)
 
         # Call GPT-5.2
+        start_time = time.time()
         response = self.client.chat.completions.create(
             model=self.model,
             messages=[
@@ -69,6 +71,15 @@ class SessionInsightsSummarizer:
                 {"role": "user", "content": prompt}
             ],
             response_format={"type": "json_object"}
+        )
+
+        # Track cost and timing
+        cost_info = track_generation_cost(
+            response=response,
+            task="session_insights",
+            model=self.model,
+            start_time=start_time,
+            session_id=str(session_id)
         )
 
         # Parse response
@@ -79,7 +90,7 @@ class SessionInsightsSummarizer:
         if not isinstance(insights, list) or len(insights) < 3 or len(insights) > 5:
             print(f"[WARNING] SessionInsightsSummarizer: Expected 3-5 insights, got {len(insights)}")
 
-        return insights
+        return insights, cost_info
 
     def _get_system_prompt(self) -> str:
         """System prompt defining task and output format"""

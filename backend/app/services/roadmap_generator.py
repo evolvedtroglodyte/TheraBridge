@@ -17,11 +17,12 @@ Cost: ~$0.003-0.020 per generation (varies by strategy)
 
 import json
 import os
+import time
 from typing import Optional, Literal
 from uuid import UUID
 from datetime import datetime
 import openai
-from app.config.model_config import get_model_name
+from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
 
 
 CompactionStrategy = Literal["full", "progressive", "hierarchical"]
@@ -85,7 +86,7 @@ class RoadmapGenerator:
                 ]
             }
         """
-        start_time = datetime.now()
+        start_time = time.time()
 
         # Build prompt based on strategy
         prompt = self._build_prompt_for_strategy(
@@ -106,14 +107,21 @@ class RoadmapGenerator:
             response_format={"type": "json_object"}
         )
 
+        # Track cost and timing
+        cost_info = track_generation_cost(
+            response=response,
+            task="roadmap_generation",
+            model=self.model,
+            start_time=start_time,
+            session_id=str(patient_id),
+            metadata={"sessions_analyzed": sessions_analyzed, "strategy": self.strategy}
+        )
+
         # Parse and validate response
         roadmap_data = json.loads(response.choices[0].message.content)
         roadmap_data = self._validate_roadmap_structure(roadmap_data)
 
-        # Calculate generation duration
-        duration_ms = int((datetime.now() - start_time).total_seconds() * 1000)
-
-        # Return roadmap with metadata
+        # Return roadmap with metadata and cost info
         return {
             "roadmap": roadmap_data,
             "metadata": {
@@ -122,8 +130,9 @@ class RoadmapGenerator:
                 "total_sessions": total_sessions,
                 "model_used": self.model,
                 "generation_timestamp": datetime.now().isoformat(),
-                "generation_duration_ms": duration_ms
-            }
+                "generation_duration_ms": cost_info.duration_ms
+            },
+            "cost_info": cost_info.to_dict() if cost_info else None
         }
 
     def _get_system_prompt(self) -> str:
