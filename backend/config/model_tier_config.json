@@ -1,0 +1,49 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "description": "Model tier configurations for cost savings and testing",
+    "available_tiers": [
+      "precision",
+      "balanced",
+      "rapid"
+    ],
+    "cost_comparison": {
+      "precision": {
+        "description": "Highest quality, slowest speed (baseline)",
+        "cost_per_session": 0.0423,
+        "savings": "0%"
+      },
+      "balanced": {
+        "description": "Balanced quality/speed (gpt-5.2 → gpt-5-mini)",
+        "cost_per_session": 0.0116,
+        "savings": "72%"
+      },
+      "rapid": {
+        "description": "Fastest speed, lower quality (all → gpt-5-nano)",
+        "cost_per_session": 0.0034,
+        "savings": "92%"
+      }
+    }
+  },
+  "tier_overrides": {
+    "precision": {},
+    "balanced": {
+      "deep_analysis": "gpt-5-mini",
+      "prose_generation": "gpt-5-mini",
+      "breakthrough_detection": "gpt-5-mini",
+      "roadmap_generation": "gpt-5-mini",
+      "session_insights": "gpt-5-mini"
+    },
+    "rapid": {
+      "mood_analysis": "gpt-5-nano",
+      "topic_extraction": "gpt-5-nano",
+      "action_summary": "gpt-5-nano",
+      "breakthrough_detection": "gpt-5-nano",
+      "deep_analysis": "gpt-5-nano",
+      "prose_generation": "gpt-5-nano",
+      "speaker_labeling": "gpt-5-nano",
+      "session_insights": "gpt-5-nano",
+      "roadmap_generation": "gpt-5-nano"
+    }
+  }
+}

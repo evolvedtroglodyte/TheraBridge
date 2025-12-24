@@ -4,18 +4,142 @@ Model Configuration for AI Analysis Services
 Centralized configuration for OpenAI GPT-5 series model selection.
 Maps each analysis task to the optimal GPT-5 model based on complexity and cost.
 
+Supports MODEL_TIER system for cost optimization:
+- precision: Highest quality (gpt-5.2 for complex tasks) - baseline cost
+- balanced: Good quality (gpt-5 for most tasks) - 72% cost savings
+- rapid: Development/testing mode (gpt-5-mini for all) - 94% cost savings
+
 NOTE: GPT-5 series models do NOT support custom temperature parameters.
 They use internal calibrated randomness - attempting to set temperature causes API errors.
 """
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional, Any
+from typing import Optional, Any, Literal
 from datetime import datetime
 import time
 import logging
+import os
 
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# MODEL_TIER System
+# =============================================================================
+
+class ModelTier(str, Enum):
+    """
+    Model tier for cost vs quality tradeoffs.
+
+    - PRECISION: Highest quality, uses configured models (gpt-5.2 for complex tasks)
+    - BALANCED: Good quality at 72% cost savings (gpt-5 for most tasks)
+    - RAPID: Fast development/testing mode at 94% savings (gpt-5-mini for all)
+    """
+    PRECISION = "precision"
+    BALANCED = "balanced"
+    RAPID = "rapid"
+
+
+# Tier-based model assignments
+# Maps each tier to the models used for each task
+TIER_ASSIGNMENTS = {
+    ModelTier.PRECISION: {
+        # Uses the original task-optimal models
+        "mood_analysis": "gpt-5-nano",
+        "topic_extraction": "gpt-5-mini",
+        "action_summary": "gpt-5-nano",
+        "breakthrough_detection": "gpt-5",
+        "deep_analysis": "gpt-5.2",
+        "prose_generation": "gpt-5.2",
+        "speaker_labeling": "gpt-5-mini",
+        "session_insights": "gpt-5.2",
+        "roadmap_generation": "gpt-5.2",
+        "session_bridge_generation": "gpt-5.2",  # New task
+    },
+    ModelTier.BALANCED: {
+        # Downgrades expensive models to gpt-5 for 72% savings
+        "mood_analysis": "gpt-5-nano",
+        "topic_extraction": "gpt-5-mini",
+        "action_summary": "gpt-5-nano",
+        "breakthrough_detection": "gpt-5-mini",  # Downgraded from gpt-5
+        "deep_analysis": "gpt-5",                # Downgraded from gpt-5.2
+        "prose_generation": "gpt-5",             # Downgraded from gpt-5.2
+        "speaker_labeling": "gpt-5-mini",
+        "session_insights": "gpt-5",             # Downgraded from gpt-5.2
+        "roadmap_generation": "gpt-5",           # Downgraded from gpt-5.2
+        "session_bridge_generation": "gpt-5",    # Downgraded from gpt-5.2
+    },
+    ModelTier.RAPID: {
+        # Uses gpt-5-mini for all tasks for 94% savings
+        "mood_analysis": "gpt-5-nano",
+        "topic_extraction": "gpt-5-mini",
+        "action_summary": "gpt-5-nano",
+        "breakthrough_detection": "gpt-5-mini",
+        "deep_analysis": "gpt-5-mini",
+        "prose_generation": "gpt-5-mini",
+        "speaker_labeling": "gpt-5-mini",
+        "session_insights": "gpt-5-mini",
+        "roadmap_generation": "gpt-5-mini",
+        "session_bridge_generation": "gpt-5-mini",
+    },
+}
+
+
+# Module-level cache for current tier (lazy loaded from environment)
+_cached_tier: Optional[ModelTier] = None
+
+
+def get_current_tier() -> ModelTier:
+    """
+    Get the currently active model tier.
+
+    Reads from MODEL_TIER environment variable, defaults to PRECISION.
+    Result is cached for performance.
+
+    Returns:
+        ModelTier enum value
+
+    Examples:
+        >>> os.environ["MODEL_TIER"] = "balanced"
+        >>> get_current_tier()
+        ModelTier.BALANCED
+    """
+    global _cached_tier
+
+    if _cached_tier is not None:
+        return _cached_tier
+
+    tier_str = os.getenv("MODEL_TIER", "precision").lower()
+
+    try:
+        _cached_tier = ModelTier(tier_str)
+    except ValueError:
+        logger.warning(f"Invalid MODEL_TIER '{tier_str}', defaulting to precision")
+        _cached_tier = ModelTier.PRECISION
+
+    logger.info(f"Model tier initialized: {_cached_tier.value}")
+    return _cached_tier
+
+
+def set_tier(tier: ModelTier) -> None:
+    """
+    Set the current model tier programmatically.
+
+    Useful for testing or runtime tier switching.
+
+    Args:
+        tier: ModelTier to set
+    """
+    global _cached_tier
+    _cached_tier = tier
+    logger.info(f"Model tier set to: {tier.value}")
+
+
+def reset_tier_cache() -> None:
+    """Reset the tier cache to re-read from environment."""
+    global _cached_tier
+    _cached_tier = None
 
 
 class TaskComplexity(Enum):
@@ -85,8 +209,9 @@ MODEL_REGISTRY = {
 }
 
 
-# Task-Based Model Assignments
+# Task-Based Model Assignments (Default - PRECISION tier)
 # Each analysis task is mapped to the optimal GPT-5 model
+# NOTE: These are the defaults; actual model selection respects MODEL_TIER
 TASK_MODEL_ASSIGNMENTS = {
     "mood_analysis": "gpt-5-nano",          # Simple 0-10 scoring with rationale
     "topic_extraction": "gpt-5-mini",       # Structured metadata extraction
@@ -97,6 +222,7 @@ TASK_MODEL_ASSIGNMENTS = {
     "speaker_labeling": "gpt-5-mini",       # Speaker role detection + formatting
     "session_insights": "gpt-5.2",          # Extract key insights from deep_analysis
     "roadmap_generation": "gpt-5.2",        # Generate patient journey roadmap
+    "session_bridge_generation": "gpt-5.2", # Generate session bridge for patient sharing
 }
 
 
@@ -150,6 +276,12 @@ def get_model_name(task: str, override_model: Optional[str] = None) -> str:
             f"Must be one of: {valid_tasks}"
         )
 
+    # Apply MODEL_TIER overrides if tier is not precision
+    current_tier = get_current_tier()
+    if current_tier in TIER_ASSIGNMENTS and task in TIER_ASSIGNMENTS[current_tier]:
+        return TIER_ASSIGNMENTS[current_tier][task]
+
+    # Fallback to default assignment
     return TASK_MODEL_ASSIGNMENTS[task]
 
 
