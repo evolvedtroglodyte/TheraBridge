@@ -144,15 +144,24 @@ Before creating any new file, ask:
 **PR #2 Status:** ✅ COMPLETE - Prose Analysis UI Toggle (2026-01-11) - Awaiting Railway verification
 **PR #3 Status:** 🚧 IN PROGRESS - Your Journey Dynamic Roadmap (2026-01-11)
 
-**PR #3 Progress (Phases 0-2 COMPLETE):**
+**PR #3 Progress (Phases 0-3 COMPLETE):**
 - ✅ Phase 0: LoadingOverlay debug logging added
 - ✅ Phase 1: Backend infrastructure (database, services, model config)
 - ✅ Phase 2: All 3 compaction strategies implemented
-- ⏳ Phase 3: Frontend integration (NEXT)
-- ⏳ Phase 4: Start/Stop/Resume button
+- ✅ Phase 3: Frontend integration (API client, NotesGoalsCard, polling)
+- ⏳ Phase 4: Start/Stop/Resume button (NEXT)
 - ⏳ Phase 5: Orchestration & testing
 
-**Next:** Execute Phases 3-5 in separate Claude window
+**Next:** Execute Phases 4-5 in separate Claude window
+
+**Phase 3 Implementation Complete (2026-01-11):**
+- ✅ API client: Added `getRoadmap(patientId)` method with 404 handling
+- ✅ TypeScript interfaces: RoadmapData, RoadmapMetadata, RoadmapResponse
+- ✅ SessionDataContext: Added `patientId` and `loadingRoadmap` to context
+- ✅ NotesGoalsCard: Complete rewrite with real API fetching + session counter
+- ✅ Polling: Roadmap update detection with 1000ms loading overlay
+- ✅ Backend: Demo status endpoint includes `roadmap_updated_at` timestamp
+- ✅ Git commit: `b993320` (2025-12-23 22:46:22)
 
 **Production Fix Results - BLOCKER #2 FINAL FIX (2026-01-09):**
 - ✅ **BLOCKER #1 FIXED:** Removed all `breakthrough_history` table references - API now returns 200 OK
