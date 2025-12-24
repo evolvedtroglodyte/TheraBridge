@@ -118,14 +118,26 @@ Before creating any new file, ask:
 - ✅ SSE integration with feature flags (disabled by default)
 - ✅ SessionDetail scroll preservation with smooth animation
 - ✅ Test endpoint removed, documentation updated
+- ✅ Fixed card scaling (capped at 1.0 to prevent blown-up cards)
+- ✅ Fixed stuck loading overlays (debouncing bug)
+- ✅ Fixed SessionDetail stale data (updates live while open)
+- ✅ Added "Stop Processing" button to terminate pipeline
 
 **Production Behavior:**
-1. **Demo Init (0-3s)**: Demo initialized, patient ID stored, polling starts at 1s
-2. **Transcripts Loading (0-30s)**: Sessions endpoint may timeout, polling detects sessions
+1. **Demo Init (0-3s)**: Demo initialized, patient ID stored, SSE connects
+2. **Transcripts Loading (0-30s)**: Sessions endpoint may timeout, SSE detects sessions
 3. **Wave 1 Complete (~60s)**: Individual cards show loading overlay as each session completes
-4. **Polling Switch**: Automatically switches to 3s interval after Wave 1 complete
-5. **Wave 2 Complete (~9.6 min)**: Individual cards update with prose analysis, polling stops
-6. **SSE Support**: Real-time events via database queue (enable with `NEXT_PUBLIC_SSE_ENABLED=true`)
+4. **1s delay before refresh**: Allows backend database writes to complete
+5. **Cards update with Wave 1 data**: Topics, summary, mood, technique populate
+6. **Wave 2 Complete (~9.6 min)**: Individual cards update with prose analysis
+7. **Stop button**: Terminates all running processes to save API costs
+
+**Critical Fixes (Jan 3):**
+- **Card scaling**: Changed max scale from 1.5x → 1.0x (cards now correct size on large monitors)
+- **Debounce bug**: Removed clearTimeout() that broke promise resolution (overlays now clear properly)
+- **1s DB delay**: Added delay before refresh to ensure backend writes complete
+- **SessionDetail live updates**: Added effect to update selectedSession when sessions array changes
+- **Stop button**: POST /api/demo/stop terminates transcript/wave1/wave2 processes gracefully
 
 **Feature Flags:**
 - `NEXT_PUBLIC_GRANULAR_UPDATES=true` - Per-session updates enabled
@@ -133,16 +145,19 @@ Before creating any new file, ask:
 - `NEXT_PUBLIC_POLLING_INTERVAL_WAVE1=1000` - 1s during Wave 1
 - `NEXT_PUBLIC_POLLING_INTERVAL_WAVE2=3000` - 3s during Wave 2
 
-**Implementation Commits:**
-- Phase 1: `87ea06d` - Backend delta data enhancement
-- Phase 2: `6e78b5b` - SessionDetail scroll + test endpoint
-- Phase 3: `51ac1fc` - Database-backed SSE event queue
-- Phase 4: (next commit) - SSE integration + documentation + TheraBridge rename
+**API Cost Breakdown (OpenAI GPT-5 series):**
+- **Per Session**: ~$0.042 (4.2¢)
+  - Wave 1: ~$0.0102 (mood + topics + breakthrough)
+  - Wave 2: ~$0.0318 (deep analysis + prose)
+- **Full Demo (10 sessions)**: ~$0.42
+- **With Whisper transcription**: +$3.60 (60-min sessions)
+- **Stop after Wave 1**: Saves ~$0.32
 
 **Next Steps:**
 1. Monitor production logs for granular update behavior
-2. Enable SSE in production once verified (`NEXT_PUBLIC_SSE_ENABLED=true`)
-3. Implement Feature 2: Analytics Dashboard
+2. Verify stop button works in production
+3. Add OpenAI credits for testing
+4. Implement Feature 2: Analytics Dashboard
 
 **Full Documentation:** See `Project MDs/TheraBridge.md`
 **Detailed Session History:** See `.claude/SESSION_LOG.md`

@@ -4,6 +4,83 @@ Detailed history of all development sessions, architectural decisions, and imple
 
 ---
 
+## 2026-01-03 (Evening) - Critical Fixes: Card Scaling, Loading Overlays, SessionDetail, Stop Button ✅
+
+**Context:** User reported three issues after deploying granular updates:
+1. Cards displaying "blown up" (larger than intended)
+2. Loading overlays appearing but staying grey (stuck, not clearing)
+3. Cards still showing "Analyzing..." after overlay clears
+4. Need ability to stop pipeline to save OpenAI API costs
+
+**Critical Fixes Implemented:**
+
+### Fix 1: Card Scaling Bug
+**Issue**: Cards scaled up to 1.5x on large monitors (looking "blown up")
+**Root Cause**: `SessionCardsGrid.tsx` line 78 capped scale at `Math.min(scale, 1.5)` instead of 1.0
+**Fix**: Changed to `Math.min(scale, 1.0)` - cards now only scale DOWN for mobile, never UP
+**Commit**: `8480d80` - "Fix: Cap card scale at 1.0 to prevent blown-up cards on large screens"
+
+### Fix 2: Stuck Loading Overlays
+**Issue**: Loading overlays appeared but never cleared, staying grey forever
+**Root Cause**: Debouncing logic in `WaveCompletionBridge.tsx` had critical bug:
+- First SSE event creates promise with 200ms timeout
+- Second SSE event called `clearTimeout()` destroying the first timeout
+- First event still waiting on old promise reference that never resolves
+- `setSessionLoading(sessionId, false)` never executes
+**Fix**: Removed `clearTimeout()` - multiple events now share same promise
+**Commit**: `3b98d66` - "Critical Fix: Prevent stuck loading overlays in debounced refresh"
+
+### Fix 3: Cards Still Show "Analyzing..." After Overlay Clears
+**Issue**: Overlay clears but cards still show "Analyzing..." for topics/summary
+**Root Cause**: OpenAI API quota exceeded (429 errors) - Wave 1 analysis failing
+**User Action**: Added $5 credits to OpenAI account
+**Additional Fix**: Added 1000ms delay before refresh to allow backend DB writes to complete
+**Commit**: `012e507` - "Fix: Add 1s delay before refresh to allow database writes to complete"
+
+### Fix 4: SessionDetail Shows Stale Data
+**Issue**: When viewing SessionDetail and Wave 1 completes, data doesn't update (shows "Analyzing...") until you close and reopen
+**Root Cause**:
+- `refresh()` updates sessions array with new data
+- SessionCardsGrid's `selectedSession` state still holds OLD session object
+- SessionDetail renders with stale data
+**Fix**: Added `useEffect` that watches sessions array and updates selectedSession with fresh data by ID
+**Commit**: `6232aec` - "Fix: Update SessionDetail with fresh data when sessions refresh"
+
+### Feature: Stop Processing Button
+**Issue**: Need ability to terminate demo pipeline to save API costs when testing
+**Implementation**:
+- **Backend**: Added `/api/demo/stop` endpoint
+  - Tracks running processes in `running_processes` dict
+  - Gracefully terminates (SIGTERM) with 5s timeout
+  - Force kills (SIGKILL) if needed
+  - Returns list of terminated processes
+- **Frontend**: Added red "Stop" button in NavigationBar
+  - Shows "Stopping..." during termination
+  - Alert displays terminated processes
+  - Saves ~$0.32 if stopped after Wave 1
+**Commit**: `5ae5e97` - "Feature: Add 'Stop Processing' button to terminate demo pipeline"
+
+**OpenAI API Cost Analysis:**
+- **Per Session**: ~$0.042 (4.2¢)
+  - Wave 1 (gpt-5-nano + gpt-5-mini + gpt-5): ~$0.0102
+  - Wave 2 (gpt-5.2 × 2): ~$0.0318
+- **Full Demo (10 sessions)**: ~$0.42
+- **With Whisper**: +$3.60 (60-min sessions @ $0.006/min)
+- **Stop after Wave 1**: Saves ~$0.32
+
+**Files Changed:**
+- `frontend/app/patient/components/SessionCardsGrid.tsx` (scaling + selectedSession update)
+- `frontend/app/patient/components/SessionCard.tsx` (whileHover scale fix)
+- `frontend/app/patient/components/WaveCompletionBridge.tsx` (debounce fix + 1s delay)
+- `frontend/app/patient/lib/usePatientSessions.ts` (debug logs + sample data logging)
+- `backend/app/routers/demo.py` (stop endpoint + process tracking)
+- `frontend/lib/demo-api-client.ts` (stop() method)
+- `frontend/components/NavigationBar.tsx` (Stop button UI)
+
+**Current Status:** All fixes deployed to Railway. Awaiting user testing with OpenAI credits added.
+
+---
+
 ## 2026-01-03 - Real-Time Granular Session Updates - Phases 1-2 (Partial) ✅
 
 **Goal:** Implement per-session real-time updates with loading overlays, fix SSE subprocess isolation bug, optimize polling for granular updates.
