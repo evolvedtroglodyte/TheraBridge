@@ -4,6 +4,103 @@ Detailed history of all development sessions, architectural decisions, and imple
 
 ---
 
+## 2026-01-14 - AI Cost Tracking Infrastructure ✅ COMPLETE
+
+**Context:** User requested cost tracking for all AI generations to analyze costs per session and task. Token counts are extracted directly from OpenAI API responses (`response.usage.prompt_tokens` and `response.usage.completion_tokens`), not estimated.
+
+**Session Duration:** ~45 minutes
+
+**Work Completed:**
+
+### Database Migration
+Created `generation_costs` table via Supabase MCP:
+```sql
+CREATE TABLE public.generation_costs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    task VARCHAR(100) NOT NULL,
+    model VARCHAR(100) NOT NULL,
+    input_tokens INTEGER NOT NULL DEFAULT 0,
+    output_tokens INTEGER NOT NULL DEFAULT 0,
+    cost DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+    duration_ms INTEGER NOT NULL DEFAULT 0,
+    session_id UUID REFERENCES therapy_sessions(id) ON DELETE SET NULL,
+    patient_id UUID REFERENCES patients(id) ON DELETE SET NULL,
+    metadata JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+-- Indexes on task, session_id, patient_id, created_at, model
+```
+
+### Cost Tracking Utility (`model_config.py`)
+- Added `GenerationCost` dataclass with fields: task, model, input_tokens, output_tokens, cost, duration_ms, timestamp, session_id, metadata
+- Added `calculate_cost(model_name, input_tokens, output_tokens)` - calculates USD from token counts using `MODEL_REGISTRY` pricing
+- Added `track_generation_cost(response, task, model, start_time, session_id, patient_id, metadata, persist=True)` - extracts tokens from API response, calculates cost, auto-persists to database
+- Added `store_generation_cost_sync(cost_info, patient_id)` - synchronous psycopg2 insert (non-blocking failure)
+
+### Services Updated (9 total)
+Each service now:
+1. Records `start_time = time.time()` before API call
+2. Calls `track_generation_cost()` after API call
+3. Returns cost_info in result object or includes in return dict
+
+| Service | Model | Task Name | Return Field |
+|---------|-------|-----------|--------------|
+| `mood_analyzer.py` | gpt-5-nano | mood_analysis | `MoodAnalysis.cost_info` |
+| `topic_extractor.py` | gpt-5-mini | topic_extraction | `SessionMetadata.cost_info` |
+| `breakthrough_detector.py` | gpt-5 | breakthrough_detection | `SessionBreakthroughAnalysis.cost_info` |
+| `action_items_summarizer.py` | gpt-5-nano | action_summary | `ActionItemsSummary.cost_info` (dict) |
+| `deep_analyzer.py` | gpt-5.2 | deep_analysis | `DeepAnalysis.cost_info` |
+| `prose_generator.py` | gpt-5.2 | prose_generation | `ProseAnalysis.cost_info` |
+| `session_insights_summarizer.py` | gpt-5.2 | session_insights | Returns tuple `(insights, cost_info)` |
+| `roadmap_generator.py` | gpt-5.2 | roadmap_generation | `result["cost_info"]` (dict) |
+| `speaker_labeler.py` | gpt-5-mini | speaker_labeling | `SpeakerLabelingResult.cost_info` (dict) |
+
+### Console Logging
+Every API call now logs:
+```
+[Cost] deep_analysis: 5234 in / 892 out = $0.021568 (48234ms)
+```
+
+### Query Examples
+```sql
+-- Total cost by task
+SELECT task, COUNT(*), SUM(cost) as total_cost, AVG(cost) as avg_cost
+FROM generation_costs GROUP BY task ORDER BY total_cost DESC;
+
+-- Cost per session
+SELECT session_id, SUM(cost) as session_cost
+FROM generation_costs WHERE session_id IS NOT NULL GROUP BY session_id;
+
+-- Cost trend over time
+SELECT DATE(created_at), task, SUM(cost)
+FROM generation_costs GROUP BY DATE(created_at), task ORDER BY DATE(created_at);
+
+-- Deep analysis cost growth (should increase with session number due to cumulative context)
+SELECT session_id, input_tokens, output_tokens, cost, duration_ms
+FROM generation_costs WHERE task = 'deep_analysis' ORDER BY created_at;
+```
+
+**Key Technical Notes:**
+- Token counts come from `response.usage.prompt_tokens` / `response.usage.completion_tokens` (actual usage, not estimates)
+- Cost calculated using `MODEL_REGISTRY` pricing in `model_config.py`
+- Database writes are non-blocking (failures logged but don't break main flow)
+- Pydantic models use `cost_info: Optional[dict]` for compatibility
+- Dataclasses use `cost_info: Optional[GenerationCost]` directly
+
+**Files Modified:**
+- `backend/app/config/model_config.py` - Added GenerationCost, track_generation_cost, store_generation_cost_sync
+- `backend/app/services/mood_analyzer.py`
+- `backend/app/services/topic_extractor.py`
+- `backend/app/services/breakthrough_detector.py`
+- `backend/app/services/action_items_summarizer.py`
+- `backend/app/services/deep_analyzer.py`
+- `backend/app/services/prose_generator.py`
+- `backend/app/services/session_insights_summarizer.py`
+- `backend/app/services/roadmap_generator.py`
+- `backend/app/services/speaker_labeler.py`
+
+---
+
 ## 2026-01-14 - PR #3 Production Bug Fixes (Phase 6) ✅ COMPLETE
 
 **Context:** Production deployment verification and bug fixes for PR #3 "Your Journey" dynamic roadmap. Multiple bugs discovered during full 10-session demo testing.

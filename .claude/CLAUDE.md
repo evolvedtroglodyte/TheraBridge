@@ -549,6 +549,41 @@ python -m pytest  # Run tests
 
 **Full session history:** See `.claude/SESSION_LOG.md`
 
+### 2026-01-14 - AI Cost Tracking Infrastructure ✅ COMPLETE
+**Added database-persisted cost tracking for all OpenAI API calls:**
+
+**Implementation:**
+- Created `generation_costs` table in Supabase (id, task, model, input_tokens, output_tokens, cost, duration_ms, session_id, patient_id, metadata, created_at)
+- Added `GenerationCost` dataclass to `model_config.py` for structured cost tracking
+- Added `track_generation_cost()` function that extracts tokens from API response, calculates cost, and auto-persists to database
+- Added `store_generation_cost_sync()` for synchronous database writes
+
+**Services Updated (9 total):**
+| Service | Model | Task Name |
+|---------|-------|-----------|
+| `mood_analyzer.py` | gpt-5-nano | mood_analysis |
+| `topic_extractor.py` | gpt-5-mini | topic_extraction |
+| `breakthrough_detector.py` | gpt-5 | breakthrough_detection |
+| `action_items_summarizer.py` | gpt-5-nano | action_summary |
+| `deep_analyzer.py` | gpt-5.2 | deep_analysis |
+| `prose_generator.py` | gpt-5.2 | prose_generation |
+| `session_insights_summarizer.py` | gpt-5.2 | session_insights |
+| `roadmap_generator.py` | gpt-5.2 | roadmap_generation |
+| `speaker_labeler.py` | gpt-5-mini | speaker_labeling |
+
+**Query Examples:**
+```sql
+-- Total cost by task
+SELECT task, COUNT(*), SUM(cost) as total_cost FROM generation_costs GROUP BY task;
+
+-- Cost per session
+SELECT session_id, SUM(cost) FROM generation_costs WHERE session_id IS NOT NULL GROUP BY session_id;
+```
+
+**Files Modified:** `model_config.py`, all 9 service files above
+
+---
+
 ### 2026-01-14 - PR #3 Production Bug Fixes (Phase 6) ✅ COMPLETE
 **Production deployment verification and bug fixes for dynamic roadmap feature:**
 
