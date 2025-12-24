@@ -12,7 +12,8 @@ from typing import List, Dict, Optional, Any
 import openai
 import json
 import logging
-from app.config.model_config import get_model_name
+import time
+from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +42,7 @@ class SpeakerLabelingResult(BaseModel):
     detection: SpeakerRoleDetection
     therapist_name: str
     patient_label: str = "You"
+    cost_info: Optional[dict] = None  # Cost tracking (dict for Pydantic compatibility)
 
 # ============================================
 # Speaker Labeling Service
@@ -72,7 +74,7 @@ class SpeakerLabeler:
         """
         try:
             # Step 1: Detect speaker roles using AI
-            detection = self._detect_speaker_roles(raw_segments)
+            detection, cost_info = self._detect_speaker_roles(raw_segments)
 
             # Step 2: Merge consecutive same-speaker segments
             merged_segments = self._merge_consecutive_segments(raw_segments)
@@ -89,14 +91,15 @@ class SpeakerLabeler:
                 labeled_transcript=labeled_segments,
                 detection=detection,
                 therapist_name=therapist_label,
-                patient_label=patient_label
+                patient_label=patient_label,
+                cost_info=cost_info.to_dict() if cost_info else None
             )
 
         except Exception as e:
             logger.error(f"Speaker labeling failed: {e}")
             raise
 
-    def _detect_speaker_roles(self, segments: List[Dict[str, Any]]) -> SpeakerRoleDetection:
+    def _detect_speaker_roles(self, segments: List[Dict[str, Any]]) -> tuple[SpeakerRoleDetection, Optional[GenerationCost]]:
         """
         Use GPT to detect which speaker is therapist vs patient.
 
@@ -110,6 +113,7 @@ class SpeakerLabeler:
         system_prompt = self._get_detection_system_prompt()
         user_prompt = self._create_detection_user_prompt(segments)
 
+        start_time = time.time()
         response = self.client.chat.completions.create(
             model=self.model,
             messages=[
@@ -119,8 +123,16 @@ class SpeakerLabeler:
             response_format={"type": "json_object"}
         )
 
+        # Track cost and timing
+        cost_info = track_generation_cost(
+            response=response,
+            task="speaker_labeling",
+            model=self.model,
+            start_time=start_time
+        )
+
         result = json.loads(response.choices[0].message.content)
-        return SpeakerRoleDetection(**result)
+        return SpeakerRoleDetection(**result), cost_info
 
     def _get_detection_system_prompt(self) -> str:
         """System prompt for speaker role detection"""
