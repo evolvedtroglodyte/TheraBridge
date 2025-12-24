@@ -1,0 +1,96 @@
+NEXT SESSION PROMPT - TherapyBridge Implementation
+=====================================================
+
+CONTEXT:
+You are continuing work on TherapyBridge, an AI-powered therapy session analysis platform.
+The backend (FastAPI + PostgreSQL) and frontend (Next.js 16) are deployed to Railway.
+
+CURRENT STATUS:
+- Wave 1 analysis (mood, topics, breakthrough) ✅ COMPLETE
+- Wave 2 analysis (deep insights + prose) ✅ COMPLETE
+- Demo mode with 10 pre-seeded sessions ✅ COMPLETE
+- Railway deployment experiencing network failures ⚠️ IN PROGRESS
+
+IMMEDIATE ISSUE:
+Commit b477185 fixed SSE CORS header conflicts by removing duplicate headers from sse.py.
+Awaiting Railway deployment to test if this resolves:
+- SSE connection errors (Status code: null)
+- GET request timeouts
+- Network failures on demo initialization
+
+ACTION REQUIRED:
+1. Wait for Railway deployment to complete (~3 minutes from push)
+2. Test the fix by hard refreshing frontend: https://therabridge.up.railway.app
+3. Check browser console for:
+   - [API Request] logs showing full request details
+   - SSE connection success/failure
+   - Any remaining CORS or network errors
+
+IF FIX WORKS:
+Proceed to Phase 2 (Analytics Dashboard) from the implementation plan.
+
+IF FIX FAILS:
+Debug further:
+- Check Railway backend logs for incoming requests
+- Verify CORS middleware config in main.py
+- Consider disabling SSE entirely and using polling-only mode
+- Check if Railway proxy is blocking specific request types
+
+COMPREHENSIVE PLAN:
+See: Project MDs/IMPLEMENTATION_PLAN_NEXT_PHASES.md
+
+This plan covers:
+- Phase 1: Resolve Railway network issues ← YOU ARE HERE
+- Phase 2: Analytics Dashboard (Feature 2)
+- Phase 3: AWS Lambda Deployment
+- Phase 4: GPU Pipeline Integration (Vast.ai)
+
+KEY FILES TO REFERENCE:
+- .claude/CLAUDE.md - Current project status (auto-loads)
+- .claude/SESSION_LOG.md - Detailed debugging history
+- Project MDs/TherapyBridge.md - Master documentation
+- Project MDs/IMPLEMENTATION_PLAN_NEXT_PHASES.md - Full implementation plan
+
+RECENT COMMITS:
+- b477185: Fix SSE CORS by removing duplicate headers + add API request logging
+- 2f0babd: Document SSE CORS investigation
+- fe18a8d: Force Railway rebuild (version bump)
+- 59803fe: Make demo init non-blocking
+- e41eff4: Fix CORS blocking SSE connections
+
+TESTING SEQUENCE:
+1. Check Railway deployment status
+2. Test health endpoint: curl https://therabridge-backend.up.railway.app/health
+3. Open frontend: https://therabridge.up.railway.app
+4. Hard refresh (Cmd+Shift+R) to clear localStorage
+5. Monitor browser console for [API Request] logs
+6. Verify demo initialization completes (should take 2-3 seconds)
+7. Verify SSE connection shows "📡 SSE connected"
+8. Wait 30-40 seconds for analysis to complete
+9. Verify session cards show Wave 1 data (mood, topics, summary)
+
+SUCCESS CRITERIA:
+✅ Demo init completes in <5 seconds
+✅ GET /api/sessions returns 200 with 10 sessions
+✅ SSE connects successfully OR polling fallback works
+✅ No CORS errors in browser console
+✅ No network timeout errors
+✅ Dashboard displays session data correctly
+
+FAILURE SCENARIOS:
+❌ Network errors on POST /api/demo/initialize → Check Railway backend health
+❌ GET requests timeout → Check demo token in localStorage
+❌ SSE CORS errors persist → Disable SSE, use polling only
+❌ 401 errors → Demo token not being sent in headers
+
+REMEMBER:
+- Railway requires ~3 minutes to deploy after git push
+- Hard refresh clears demo token (expected behavior)
+- SSE has polling fallback (5-second interval)
+- Backend logs require print(..., flush=True) for real-time visibility
+- All commits must be backdated to Dec 23, 2025 (see .claude/CLAUDE.md)
+
+START HERE:
+Check if Railway deployment finished, then test the SSE CORS fix.
+If it works, celebrate and move to Phase 2.
+If it fails, we need deeper debugging.

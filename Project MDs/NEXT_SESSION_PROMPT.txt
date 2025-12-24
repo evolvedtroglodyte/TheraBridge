@@ -1,96 +1,140 @@
-NEXT SESSION PROMPT - TherapyBridge Implementation
-=====================================================
+IMPLEMENTATION PROMPT - Hard Refresh SSE Race Condition Fix
+================================================================
 
-CONTEXT:
-You are continuing work on TherapyBridge, an AI-powered therapy session analysis platform.
-The backend (FastAPI + PostgreSQL) and frontend (Next.js 16) are deployed to Railway.
+READ THE FULL IMPLEMENTATION PLAN FIRST:
+Project MDs/2026-01-01-hard-refresh-sse-race-condition-fix.md
 
-CURRENT STATUS:
-- Wave 1 analysis (mood, topics, breakthrough) ✅ COMPLETE
-- Wave 2 analysis (deep insights + prose) ✅ COMPLETE
-- Demo mode with 10 pre-seeded sessions ✅ COMPLETE
-- Railway deployment experiencing network failures ⚠️ IN PROGRESS
+CONTEXT SUMMARY:
+----------------
+We have a race condition on hard refresh where SSE attempts to connect with a stale patient ID before localStorage is cleared, causing CORS/404 errors.
 
-IMMEDIATE ISSUE:
-Commit b477185 fixed SSE CORS header conflicts by removing duplicate headers from sse.py.
-Awaiting Railway deployment to test if this resolves:
-- SSE connection errors (Status code: null)
-- GET request timeouts
-- Network failures on demo initialization
+ROOT CAUSE:
+- Hard refresh clears localStorage but SSE hook mounts with OLD patient ID from React state
+- SSE connects to non-existent patient → backend returns 404 → browser shows "CORS error"
+- Current code redirects to home page, but user wants to stay on current page
 
-ACTION REQUIRED:
-1. Wait for Railway deployment to complete (~3 minutes from push)
-2. Test the fix by hard refreshing frontend: https://therabridge.up.railway.app
-3. Check browser console for:
-   - [API Request] logs showing full request details
-   - SSE connection success/failure
-   - Any remaining CORS or network errors
+THE FIX:
+--------
+Implement the 4-phase plan in the full document:
 
-IF FIX WORKS:
-Proceed to Phase 2 (Analytics Dashboard) from the implementation plan.
+Phase 1: Fix SSE Patient ID Reactivity
+  - File: frontend/hooks/use-pipeline-events.ts
+  - Make SSE hook detect patient ID changes and disconnect/reconnect properly
+  - Add better error handling to distinguish 404 from CORS/network errors
 
-IF FIX FAILS:
-Debug further:
-- Check Railway backend logs for incoming requests
-- Verify CORS middleware config in main.py
-- Consider disabling SSE entirely and using polling-only mode
-- Check if Railway proxy is blocking specific request types
+Phase 2: Remove Hard Refresh Redirect
+  - File: frontend/app/sessions/page.tsx
+  - Remove router.push('/') redirect on hard refresh
+  - Keep user on current page, handle reinitialization in-place
 
-COMPREHENSIVE PLAN:
-See: Project MDs/IMPLEMENTATION_PLAN_NEXT_PHASES.md
+  - File: frontend/app/patient/components/WaveCompletionBridge.tsx
+  - Auto-trigger demo initialization if patient ID missing for >5 seconds
+  - Increase timeout to 120 seconds (demo init takes 30-90s)
 
-This plan covers:
-- Phase 1: Resolve Railway network issues ← YOU ARE HERE
-- Phase 2: Analytics Dashboard (Feature 2)
-- Phase 3: AWS Lambda Deployment
-- Phase 4: GPU Pipeline Integration (Vast.ai)
+Phase 3: Enhanced SSE Error Handling
+  - File: frontend/hooks/use-pipeline-events.ts (additional improvements)
+  - Add errorType return value ('patient_not_found' | 'network' | 'cors' | 'unknown')
+  - Add grouped console logging for easier debugging
 
-KEY FILES TO REFERENCE:
-- .claude/CLAUDE.md - Current project status (auto-loads)
-- .claude/SESSION_LOG.md - Detailed debugging history
-- Project MDs/TherapyBridge.md - Master documentation
-- Project MDs/IMPLEMENTATION_PLAN_NEXT_PHASES.md - Full implementation plan
+  - File: frontend/app/patient/components/WaveCompletionBridge.tsx
+  - Add useEffect to log SSE error state changes
 
-RECENT COMMITS:
-- b477185: Fix SSE CORS by removing duplicate headers + add API request logging
-- 2f0babd: Document SSE CORS investigation
-- fe18a8d: Force Railway rebuild (version bump)
-- 59803fe: Make demo init non-blocking
-- e41eff4: Fix CORS blocking SSE connections
+Phase 4: Remove /auth/login Redirects
+  - File: frontend/lib/api-client.ts
+  - Remove all window.location.href = '/auth/login' redirects (3 places)
+  - Replace with demo token clearing and console logging
+  - Let React components handle missing auth naturally
 
-TESTING SEQUENCE:
-1. Check Railway deployment status
-2. Test health endpoint: curl https://therabridge-backend.up.railway.app/health
-3. Open frontend: https://therabridge.up.railway.app
-4. Hard refresh (Cmd+Shift+R) to clear localStorage
-5. Monitor browser console for [API Request] logs
-6. Verify demo initialization completes (should take 2-3 seconds)
-7. Verify SSE connection shows "📡 SSE connected"
-8. Wait 30-40 seconds for analysis to complete
-9. Verify session cards show Wave 1 data (mood, topics, summary)
+INSTRUCTIONS:
+-------------
+1. Read the FULL implementation plan first
+2. Implement each phase in order
+3. Test each phase before moving to the next
+4. Follow the exact code changes specified in the plan
+5. Create git commits using the backdating rules in .claude/CLAUDE.md
+
+CRITICAL RULES FROM .claude/CLAUDE.md:
+--------------------------------------
+- ALWAYS check last commit timestamp: git log --format="%ci" -n 1
+- Add exactly 30 seconds to that timestamp for next commit
+- Use GIT_COMMITTER_DATE and --date flags with calculated timestamp
+- Email: rohin.agrawal@gmail.com
+- Username: newdldewdl
+- All commits must be on December 23, 2025 (no commits after 11:45 PM)
 
 SUCCESS CRITERIA:
-✅ Demo init completes in <5 seconds
-✅ GET /api/sessions returns 200 with 10 sessions
-✅ SSE connects successfully OR polling fallback works
-✅ No CORS errors in browser console
-✅ No network timeout errors
-✅ Dashboard displays session data correctly
+-----------------
+After implementation, these should work:
 
-FAILURE SCENARIOS:
-❌ Network errors on POST /api/demo/initialize → Check Railway backend health
-❌ GET requests timeout → Check demo token in localStorage
-❌ SSE CORS errors persist → Disable SSE, use polling only
-❌ 401 errors → Demo token not being sent in headers
+✅ Hard refresh (Cmd+Shift+R) on /sessions:
+   - Clears localStorage
+   - Stays on /sessions (no redirect)
+   - Auto-initializes new demo
+   - SSE connects to NEW patient ID
+   - No "CORS request did not succeed" errors
 
-REMEMBER:
-- Railway requires ~3 minutes to deploy after git push
-- Hard refresh clears demo token (expected behavior)
-- SSE has polling fallback (5-second interval)
-- Backend logs require print(..., flush=True) for real-time visibility
-- All commits must be backdated to Dec 23, 2025 (see .claude/CLAUDE.md)
+✅ Simple refresh (Cmd+R):
+   - Preserves localStorage
+   - SSE reconnects automatically
+   - Same patient ID maintained
 
-START HERE:
-Check if Railway deployment finished, then test the SSE CORS fix.
-If it works, celebrate and move to Phase 2.
-If it fails, we need deeper debugging.
+✅ Direct navigation to /sessions with no patient ID:
+   - Auto-triggers demo initialization
+   - Sessions load after init complete
+
+✅ SSE error handling:
+   - Distinguishes 404 from network errors
+   - Clear, actionable error messages
+   - No spam in console
+
+✅ No redirects to /auth/login (page doesn't exist)
+
+TESTING CHECKLIST:
+------------------
+Run all 6 manual tests from the plan:
+- [ ] Test 1: Simple Refresh (Cmd+R)
+- [ ] Test 2: Hard Refresh (Cmd+Shift+R) on Sessions Page
+- [ ] Test 3: Hard Refresh on Home Page
+- [ ] Test 4: Direct Navigation to Sessions (No Patient ID)
+- [ ] Test 5: SSE Error Handling (Patient Not Found)
+- [ ] Test 6: Network Failure Handling
+
+AUTOMATED CHECKS:
+-----------------
+- [ ] TypeScript builds: cd frontend && npm run build
+- [ ] ESLint passes: cd frontend && npm run lint
+- [ ] No console errors on page load
+
+FILES TO MODIFY:
+----------------
+1. frontend/hooks/use-pipeline-events.ts (Phase 1 & 3)
+2. frontend/app/sessions/page.tsx (Phase 2)
+3. frontend/app/patient/components/WaveCompletionBridge.tsx (Phase 2 & 3)
+4. frontend/lib/api-client.ts (Phase 4)
+
+BACKUP FIRST:
+-------------
+Before making ANY changes:
+1. git status
+2. git add -A
+3. git commit -m "Backup before SSE race condition fix"
+4. git push
+
+Then proceed with implementation.
+
+DEPLOYMENT:
+-----------
+After all phases complete and tested:
+1. Build: cd frontend && npm run build
+2. Commit with backdated timestamp
+3. Push to git (Railway auto-deploys)
+4. Monitor Railway logs for any issues
+
+QUESTIONS FOR ME:
+-----------------
+If you encounter any issues or need clarification:
+- The full plan has detailed code snippets for every change
+- The plan explains WHY each change is needed
+- Test after each phase to isolate any problems
+
+Good luck! 🚀
