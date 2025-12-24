@@ -165,6 +165,9 @@ export function usePatientSessions() {
   // NEW: Session loading states (for loading overlays)
   const [loadingSessions, setLoadingSessions] = useState<Set<string>>(new Set());
 
+  // NEW: Roadmap loading state (PR #3)
+  const [loadingRoadmap, setLoadingRoadmap] = useState<boolean>(false);
+
   // Helper to set session loading state
   const setSessionLoading = (sessionId: string, loading: boolean) => {
     console.log(`[LoadingOverlay Debug] ${loading ? 'SHOW' : 'HIDE'} overlay for session ${sessionId}`);
@@ -365,6 +368,25 @@ export function usePatientSessions() {
           refresh();
         }
 
+        // Detect roadmap updates (PR #3)
+        const roadmapTimestamp = (status as any).roadmap_updated_at;
+        const lastRoadmapTimestamp = (sessionStatesRef.current as any)._last_roadmap_timestamp;
+
+        if (roadmapTimestamp && roadmapTimestamp !== lastRoadmapTimestamp) {
+          console.log(`[Polling Debug] Roadmap updated, timestamp changed: ${lastRoadmapTimestamp} → ${roadmapTimestamp}`);
+          setLoadingRoadmap(true);
+
+          // Store new timestamp
+          (sessionStatesRef.current as any)._last_roadmap_timestamp = roadmapTimestamp;
+
+          // Hide loading overlay after 1000ms (same pattern as session cards)
+          setTimeout(() => {
+            setLoadingRoadmap(false);
+            // Trigger refetch of roadmap data in NotesGoalsCard
+            refresh();
+          }, 1000);
+        }
+
         // Update counts
         lastSessionCount.current = status.session_count;
         lastWave1Count.current = status.wave1_complete;
@@ -513,6 +535,8 @@ export function usePatientSessions() {
     isEmpty: !isLoading && sessions.length === 0,
     loadingSessions, // NEW: Set of session IDs with loading overlays
     setSessionLoading, // NEW: Helper to set loading state
+    patientId, // NEW (PR #3): Patient ID for API calls
+    loadingRoadmap, // NEW (PR #3): Whether roadmap is being generated
   };
 }
 

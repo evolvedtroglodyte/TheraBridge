@@ -91,6 +91,7 @@ class DemoStatusResponse(BaseModel):
     wave1_complete: int  # Total sessions with Wave 1 complete
     wave2_complete: int  # Total sessions with Wave 2 complete
     sessions: List[SessionStatus]  # Per-session status
+    roadmap_updated_at: Optional[str] = None  # PR #3: Timestamp of last roadmap update
 
 
 # ============================================================================
@@ -597,6 +598,16 @@ async def get_demo_status(
     expires_at = datetime.fromisoformat(demo_user["demo_expires_at"].replace("Z", "+00:00"))
     is_expired = expires_at < datetime.now(expires_at.tzinfo)
 
+    # Query roadmap for updated_at timestamp (PR #3)
+    roadmap_updated_at = None
+    try:
+        roadmap_response = db.table("patient_roadmap").select("updated_at").eq("patient_id", patient_id).execute()
+        if roadmap_response.data and len(roadmap_response.data) > 0:
+            roadmap_updated_at = roadmap_response.data[0].get("updated_at")
+    except Exception as e:
+        # Roadmap table might not exist yet (Phase 5 not complete)
+        logger.debug(f"Could not query roadmap table: {e}")
+
     return DemoStatusResponse(
         demo_token=demo_user["demo_token"],
         patient_id=patient_id,
@@ -607,7 +618,8 @@ async def get_demo_status(
         analysis_status=analysis_status,
         wave1_complete=wave1_complete_count,
         wave2_complete=wave2_complete_count,
-        sessions=session_statuses
+        sessions=session_statuses,
+        roadmap_updated_at=roadmap_updated_at
     )
 
 

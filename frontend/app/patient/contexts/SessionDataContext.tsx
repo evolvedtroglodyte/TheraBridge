@@ -37,6 +37,10 @@ interface SessionDataContextType {
   loadingSessions: Set<string>;
   /** Set a session as loading */
   setSessionLoading: (sessionId: string, loading: boolean) => void;
+  /** Patient ID for API calls (from demo token or auth) */
+  patientId: string | null;
+  /** Whether roadmap is currently being generated */
+  loadingRoadmap: boolean;
 }
 
 const SessionDataContext = createContext<SessionDataContextType | null>(null);

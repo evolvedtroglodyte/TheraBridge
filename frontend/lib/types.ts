@@ -318,3 +318,45 @@ export interface AutofillResponse {
   readonly missing_fields: Record<string, ReadonlyArray<string>>;
   readonly metadata: Record<string, unknown>;
 }
+
+// ============================================================================
+// Roadmap Types - PR #3: Your Journey Dynamic Roadmap
+// ============================================================================
+
+/**
+ * Individual section in the roadmap (e.g., "Emotional Regulation", "Relationship Patterns")
+ */
+export interface RoadmapSection {
+  readonly title: string;
+  readonly content: string;
+}
+
+/**
+ * Core roadmap data structure
+ */
+export interface RoadmapData {
+  readonly summary: string;              // 2-3 sentence overview
+  readonly achievements: string[];       // Array of 5 achievements
+  readonly currentFocus: string[];       // Array of 3 current focus areas
+  readonly sections: RoadmapSection[];   // Array of 5 detailed sections
+}
+
+/**
+ * Metadata about roadmap generation
+ */
+export interface RoadmapMetadata {
+  readonly compaction_strategy: 'full' | 'progressive' | 'hierarchical';
+  readonly sessions_analyzed: number;    // How many sessions were analyzed
+  readonly total_sessions: number;       // Total number of uploaded sessions
+  readonly model_used: string;           // e.g., "gpt-5.2"
+  readonly generation_timestamp: string; // ISO 8601 timestamp
+  readonly generation_duration_ms: number;
+}
+
+/**
+ * Complete roadmap response from API
+ */
+export interface RoadmapResponse {
+  readonly roadmap: RoadmapData;
+  readonly metadata: RoadmapMetadata;
+}

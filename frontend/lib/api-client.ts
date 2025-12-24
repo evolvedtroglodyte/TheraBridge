@@ -559,6 +559,50 @@ class ApiClient {
       return { success: false, error: result.error };
     }
   }
+
+  /**
+   * Get patient roadmap data
+   *
+   * Fetches the latest roadmap for the given patient ID.
+   * Returns null if no roadmap exists yet (no sessions analyzed).
+   *
+   * @param patientId - The patient's ID
+   * @returns ApiResponse with roadmap data or null
+   *
+   * @example
+   * ```ts
+   * const result = await apiClient.getRoadmap('patient-123');
+   * if (result.success && result.data) {
+   *   console.log(result.data.roadmap.summary);
+   *   console.log(`Based on ${result.data.metadata.sessions_analyzed} sessions`);
+   * }
+   * ```
+   */
+  async getRoadmap(patientId: string): Promise<{
+    success: boolean;
+    data?: any;
+    error?: string;
+  }> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/patients/${patientId}/roadmap`, {
+        headers: this.getHeaders(),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          // Roadmap doesn't exist yet (no sessions analyzed)
+          return { success: true, data: null };
+        }
+        throw new Error(`Failed to fetch roadmap: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return { success: true, data };
+    } catch (error) {
+      console.error('[API] Error fetching roadmap:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+  }
 }
 
 export const apiClient = new ApiClient();
