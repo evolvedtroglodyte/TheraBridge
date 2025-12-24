@@ -424,6 +424,32 @@ async def main(patient_id: str):
             session["deep_analysis"] = deep_analysis
             previous_cumulative_context = cumulative_context
 
+            # PR #3 Phase 5: Generate roadmap after Wave 2 completes
+            print(f"\n[Roadmap] Triggering roadmap generation for session {session['id']}", flush=True)
+            try:
+                # Run generate_roadmap.py as subprocess
+                import subprocess
+                roadmap_script = os.path.join(os.path.dirname(__file__), 'generate_roadmap.py')
+                result = subprocess.run(
+                    [sys.executable, roadmap_script, patient_id, session['id']],
+                    capture_output=True,
+                    text=True,
+                    timeout=60  # 60 second timeout for roadmap generation
+                )
+
+                if result.returncode == 0:
+                    print(f"[Roadmap] ✓ Roadmap generated for session {session['id']}", flush=True)
+                    # Print roadmap script output
+                    if result.stdout:
+                        print(result.stdout, flush=True)
+                else:
+                    print(f"[Roadmap] ✗ Roadmap generation failed: {result.stderr}", flush=True)
+
+            except subprocess.TimeoutExpired:
+                print(f"[Roadmap] ✗ Roadmap generation timeout (60s)", flush=True)
+            except Exception as e:
+                print(f"[Roadmap] ✗ Roadmap generation error: {e}", flush=True)
+
     # Summary
     end_time = datetime.utcnow()
     duration = (end_time - start_time).total_seconds()
