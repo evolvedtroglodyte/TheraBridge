@@ -17,6 +17,9 @@ import { useModalAccessibility } from '../hooks/useModalAccessibility';
 import { useSessionData } from '../contexts/SessionDataContext';
 import { DeepAnalysisSection } from './DeepAnalysisSection';
 import { LoadingOverlay } from './LoadingOverlay';
+import { mapNumericMoodToCategory, formatMoodScore } from '../../../lib/mood-mapper';
+import { renderMoodEmoji } from './SessionIcons';
+import { ThemeToggle } from '../../../components/ui/theme-toggle';
 
 // Font families - matching dashboard standard (Inter + Crimson Pro)
 const TYPOGRAPHY = {
@@ -109,34 +112,28 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
       >
         {/* Top Bar */}
         <div className="h-[60px] border-b border-[#E0DDD8] dark:border-[#3d3548] flex items-center justify-between px-6 flex-shrink-0 bg-[#F8F7F4] dark:bg-[#1a1625]">
-          <button
-            onClick={onClose}
-            className="flex items-center gap-2 text-[#5AB9B4] dark:text-[#a78bfa] hover:opacity-80 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '14px', fontWeight: 500 }}>Back to Dashboard</span>
-          </button>
+          {/* Session Title (Left) */}
+          <h2 id="session-detail-title" style={{ fontFamily: TYPOGRAPHY.serif, fontSize: '24px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200">
+            Session Details
+          </h2>
 
-          <div className="text-center">
-            <h2 id="session-detail-title" style={{ fontFamily: TYPOGRAPHY.serif, fontSize: '18px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200">
-              Session {session.id.replace('s', '')} - {session.date}, 2024
-            </h2>
-            {session.milestone && (
-              <div className="flex items-center justify-center gap-2 mt-1">
-                <Star className="w-4 h-4 text-amber-600 fill-amber-600" />
-                <span style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '13px', fontWeight: 500 }} className="text-amber-900 dark:text-amber-400">
-                  {session.milestone.title}
-                </span>
-              </div>
-            )}
+          {/* Center (Empty - for balance) */}
+          <div></div>
+
+          {/* Controls (Right) */}
+          <div className="flex items-center gap-3">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
+            {/* Close Button (X icon) */}
+            <button
+              onClick={onClose}
+              className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-[#3d3548] transition-colors"
+              aria-label="Close session details"
+            >
+              <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            </button>
           </div>
-
-          <button
-            onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-[#3d3548] transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-          </button>
         </div>
 
         {/* Two-column Content */}
@@ -223,15 +220,59 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
               </ul>
             </div>
 
+            {/* Mood Score Section */}
+            {session.mood_score !== undefined && session.mood_score !== null && (
+              <div className="mb-6 pb-5 border-b border-[#E0DDD8] dark:border-[#3d3548]">
+                <h4 style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} className="text-gray-700 dark:text-gray-300 mb-3">
+                  Session Mood
+                </h4>
+                <div className="flex items-center gap-3">
+                  {/* Custom emoji based on numeric score */}
+                  {renderMoodEmoji(
+                    mapNumericMoodToCategory(session.mood_score),
+                    28,
+                    false // isDark - will be handled by component
+                  )}
+
+                  {/* Numeric score */}
+                  <span style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '18px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200">
+                    {formatMoodScore(session.mood_score)}
+                  </span>
+
+                  {/* Emotional tone (optional) */}
+                  {session.emotional_tone && (
+                    <span style={{ fontFamily: TYPOGRAPHY.serif, fontSize: '14px', fontWeight: 400, fontStyle: 'italic' }} className="text-gray-600 dark:text-gray-400">
+                      ({session.emotional_tone})
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Strategy Used */}
             <div className="mb-6">
               <h4 style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} className="text-gray-700 dark:text-gray-300 mb-3">
                 Strategy Used
               </h4>
-              <p style={{ fontFamily: TYPOGRAPHY.serif, fontSize: '16px', fontWeight: 600 }} className="text-[#5AB9B4] dark:text-[#a78bfa] mb-2">{session.strategy}</p>
-              <p style={{ fontFamily: TYPOGRAPHY.serif, fontSize: '14px', fontWeight: 400, lineHeight: 1.6 }} className="text-gray-600 dark:text-gray-400">
-                This therapeutic approach was applied during the session to address the identified concerns.
+
+              {/* Technique Name */}
+              <p style={{ fontFamily: TYPOGRAPHY.serif, fontSize: '16px', fontWeight: 600 }} className="text-[#5AB9B4] dark:text-[#a78bfa] mb-2">
+                {session.strategy || 'Not specified'}
               </p>
+
+              {/* Technique Definition (NEW) */}
+              {session.technique_definition && (
+                <p style={{ fontFamily: TYPOGRAPHY.serif, fontSize: '14px', fontWeight: 400, lineHeight: 1.6 }} className="text-gray-700 dark:text-gray-300 mt-2">
+                  {session.technique_definition}
+                </p>
+              )}
+
+              {/* Fallback for missing definition */}
+              {!session.technique_definition && session.strategy && (
+                <p style={{ fontFamily: TYPOGRAPHY.serif, fontSize: '14px', fontWeight: 400, lineHeight: 1.6, fontStyle: 'italic' }} className="text-gray-500 dark:text-gray-500 mt-2">
+                  Definition not available for this technique.
+                </p>
+              )}
             </div>
 
             {/* Action Items */}

@@ -138,21 +138,28 @@ Before creating any new file, ask:
 
 # TheraBridge - Project State
 
-## Current Focus: Font Standardization & UI Consistency (PR #1)
+## Current Focus: SessionDetail UI Improvements + Wave 1 Action Summarization (PR #1)
 
-**PR #1 Status:** Phase 1A Complete ✅ | Phase 1B Pending User Approval
+**PR #1 Status:** Phase 1C Planning Complete ✅ | Implementation Pending
 
-**Phase 1A Complete (2026-01-07):**
-- ✅ SessionDetail.tsx - All fonts standardized (Inter + Crimson Pro)
-- ✅ DeepAnalysisSection.tsx - All fonts standardized, badges fixed
-- ✅ Removed all `system-ui` fallbacks and Tailwind font classes
-- ✅ Fixed metadata font mismatch between SessionCard and SessionDetail
-- ✅ Build verified successful, 4 commits pushed to remote
-- ⏳ Awaiting user testing and approval
+**Phase 1C Scope (Extended - 2026-01-07):**
+- [ ] Display numeric mood score next to custom emoji in SessionDetail
+- [ ] Show technique definitions below technique names in SessionDetail
+- [ ] Replace "Back to Dashboard" button with X icon (top-right corner)
+- [ ] Add theme toggle button to SessionDetail header
+- [ ] Create 45-char action items summary via new Wave 1 LLM call
+- [ ] Update SessionCard to display condensed action summary as second bullet
 
-**Phase 1B Next (Pending Approval):**
-- [ ] Header.tsx - Add explicit fonts to navigation buttons
-- [ ] Timeline deprecation - Rename and mark TimelineSidebar.tsx and HorizontalTimeline.tsx
+**Planning Complete (2026-01-07):**
+- ✅ Wave 0 research: Custom emoji logic, data flow verification, Railway logs
+- ✅ Implementation plan: `thoughts/shared/plans/2026-01-07-sessiondetail-ui-improvements-wave1-action-summarization.md`
+- ✅ Architecture design: Sequential action summarization after topic extraction
+- ✅ Cost analysis: +0.7% increase ($0.0003/session)
+- ✅ Technical decisions documented (mood mapping, technique definitions, UI changes)
+
+**Previous Phases:**
+- ✅ Phase 1A Complete (2026-01-07): Font standardization for SessionDetail + DeepAnalysisSection
+- ⏳ Phase 1B Deferred: Header fonts + Timeline deprecation
 
 **Commits (Phase 1A):**
 - `d3f7390` - Feature: PR #1 Phase 1A - Font standardization for SessionDetail and DeepAnalysisSection
@@ -209,11 +216,12 @@ Before creating any new file, ask:
 - [x] ~~Monitor production logs for granular update behavior~~ ✅ COMPLETE
 - [x] ~~Verify stop button works in production~~ ✅ COMPLETE
 - [x] ~~Add OpenAI credits for testing~~ ✅ COMPLETE
-- [ ] **PR #1:** Review Font Standardization plan
-- [ ] **PR #1:** Implement Phase 1A (SessionDetail + DeepAnalysis fonts)
-- [ ] **PR #1:** Test font consistency in light/dark modes
-- [ ] **PR #1:** Implement Phase 1B (Header + Timeline deprecation)
-- [ ] **PR #1:** Merge and update documentation
+- [x] ~~**PR #1 Phase 1A:** Font standardization~~ ✅ COMPLETE
+- [x] ~~**PR #1 Phase 1C:** Planning for UI improvements + Wave 1 action summarization~~ ✅ COMPLETE
+- [ ] **PR #1 Phase 1C:** Execute implementation (backend + frontend + database)
+- [ ] **PR #1 Phase 1C:** Test and verify (Railway logs, UI rendering, data flow)
+- [ ] **PR #1:** Merge all phases and update documentation
+- [ ] **PR #1 Phase 1B:** Header fonts + Timeline deprecation (deferred)
 - [ ] **PR #2:** Implement Prose Analysis UI with Toggle
 - [ ] Implement Feature 2: Analytics Dashboard
 
@@ -439,32 +447,41 @@ python -m pytest  # Run tests
 
 **Full session history:** See `.claude/SESSION_LOG.md`
 
-### 2025-01-06 - Font Standardization Planning (PR #1) 📋
-**Comprehensive planning session for standardizing fonts across SessionDetail, DeepAnalysisSection, and Header:**
+### 2026-01-07 - SessionDetail UI Improvements Planning (PR #1 Phase 1C) 📋
+**Comprehensive planning for SessionDetail enhancements and Wave 1 action summarization:**
 
-**Problem Identified:**
-- SessionDetail and DeepAnalysisSection use `system-ui` instead of dashboard standard (Inter + Crimson Pro)
-- Creates visual inconsistency with SessionCard and dashboard widgets
-- 7 different font combinations in DeepAnalysisSection alone
+**Scope Expansion:**
+- Original PR #1 focused on font standardization (Phase 1A complete)
+- User requested additional SessionDetail improvements (Phase 1C)
+- Combines UI enhancements with backend Wave 1 extension
 
-**Solution Designed:**
-- Apply dashboard font standard: Inter (sans-serif labels), Crimson Pro (serif body text)
-- Use TYPOGRAPHY constants for easy iteration
-- Phased rollout: Phase 1A (SessionDetail + DeepAnalysis) → Test → Phase 1B (Header + deprecations)
+**Features Planned:**
+1. Numeric mood score display (emoji + score like "😊 7.5")
+2. Technique definitions (2-3 sentence explanations)
+3. 45-char action items summary (new Wave 1 LLM call)
+4. X button in top-right corner (replace "Back to Dashboard")
+5. Theme toggle in SessionDetail header
+6. SessionCard update to use condensed action summary
 
-**PR Tracking System Established:**
-- Hybrid approach: SESSION_LOG.md (full narrative) + TheraBridge.md (quick reference)
-- Status lifecycle: Planned → In Progress → Testing → Review → Merged → Deployed
-- Implementation plans preserved in `thoughts/shared/plans/`
+**Research Phase (Wave 0):**
+- ✅ Custom emoji system verified (3 SVG emojis: happy/neutral/sad)
+- ✅ SessionCard data flow traced (backend → API → frontend mapping)
+- ✅ Technique library analyzed (107 techniques in technique_library.json)
+- ✅ Wave 1 architecture documented (3 parallel + sequential summarization)
+
+**Technical Decisions:**
+- Action summarization: Sequential after topic extraction (preserves quality)
+- Mood mapping: Numeric (0-10) → Categorical (sad/neutral/happy)
+- Technique definitions: Included in API response (no extra calls)
+- Cost impact: +0.7% (+$0.0003/session)
 
 **Deliverables:**
-- ✅ TheraBridge.md created with Development Status section
-- ✅ SESSION_LOG.md entry documenting all decisions
-- ✅ CLAUDE.md updated with PR tracking workflow
-- ✅ Comprehensive implementation plan written to file
-- ✅ Handoff prompt for next implementation window
+- ✅ Implementation plan: `thoughts/shared/plans/2026-01-07-sessiondetail-ui-improvements-wave1-action-summarization.md`
+- ✅ Architecture documentation with data flow diagrams
+- ✅ Complete file-by-file change specifications
+- ✅ Testing strategy and rollback plan
 
-**Next:** Implementation in separate Claude window (Phase 1A first, then Phase 1B after testing)
+**Next:** Execute implementation in separate Claude window (full-stack changes)
 
 ---
 

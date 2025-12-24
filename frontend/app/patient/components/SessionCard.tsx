@@ -69,10 +69,10 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
   // Determine if session is still being analyzed (no Wave 1 data yet)
   const isAnalyzing = !session.topics || session.topics.length === 0;
 
-  // Extract 1 strategy + 1 action (show both types)
+  // Extract 1 strategy + 1 condensed action summary (45 chars max)
   const techniquesAndActions = [
     session.strategy,
-    ...(session.actions.slice(0, 1))
+    session.action_items_summary || session.actions[0] || ''  // Use summary if available, fallback to first action
   ].filter(Boolean);
 
   // Check if we have any strategies/actions to display

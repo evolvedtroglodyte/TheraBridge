@@ -29,6 +29,7 @@ from app.services.topic_extractor import TopicExtractor
 from app.services.breakthrough_detector import BreakthroughDetector
 from app.services.deep_analyzer import DeepAnalyzer
 from app.services.prose_generator import ProseGenerator
+from app.services.action_items_summarizer import ActionItemsSummarizer, ActionItemsSummary
 from app.database import get_db
 from supabase import Client
 
@@ -88,6 +89,7 @@ class AnalysisOrchestrator:
         self.topic_extractor = TopicExtractor()
         self.breakthrough_detector = BreakthroughDetector()
         self.deep_analyzer = DeepAnalyzer()
+        self.action_items_summarizer = ActionItemsSummarizer()
 
     async def process_session_full_pipeline(
         self,
@@ -153,7 +155,7 @@ class AnalysisOrchestrator:
         force: bool = False
     ) -> List[AnalysisResult]:
         """
-        Run Wave 1 analyses in parallel (mood, topics, breakthrough)
+        Run Wave 1 analyses in parallel (mood, topics, breakthrough) + action summary (sequential)
 
         Args:
             session_id: Session UUID
@@ -164,7 +166,7 @@ class AnalysisOrchestrator:
         """
         logger.info(f"📊 Running Wave 1 (parallel) for session {session_id}")
 
-        # Run all Wave 1 analyses concurrently
+        # Run mood, topics, breakthrough in parallel (unchanged)
         results = await asyncio.gather(
             self._run_with_retry(session_id, "mood", self._analyze_mood, force),
             self._run_with_retry(session_id, "topics", self._extract_topics, force),
@@ -188,6 +190,26 @@ class AnalysisOrchestrator:
                 ))
             else:
                 processed_results.append(result)
+
+        # Check if core Wave 1 analyses succeeded
+        logger.info(f"✅ Wave 1 core analyses complete for session {session_id}")
+
+        # Run action items summarization SEQUENTIALLY (requires topic extraction to be complete)
+        try:
+            await self._run_with_retry(
+                session_id,
+                "action_summary",
+                self._summarize_action_items,
+                force
+            )
+        except Exception as e:
+            # Don't fail Wave 1 if summarization fails (non-critical)
+            logger.error(
+                f"⚠️  Action items summarization failed for session {session_id}: {str(e)}. "
+                f"Wave 1 will continue without summary."
+            )
+
+        logger.info(f"✅ Wave 1 complete (with summary) for session {session_id}")
 
         return processed_results
 
@@ -396,6 +418,47 @@ class AnalysisOrchestrator:
 
         # No longer storing in breakthrough_history table
         # (we're only keeping 1 breakthrough per session now)
+
+    async def _summarize_action_items(self, session_id: str, force: bool = False):
+        """
+        Generate 45-character summary of action items (runs after topic extraction).
+
+        This runs SEQUENTIALLY after topic extraction to ensure verbose action items
+        are not modified by including summarization in the same LLM call.
+        """
+        session = await self._get_session(session_id)
+
+        # Skip if already summarized
+        if session.get("action_items_summary") and not force:
+            logger.info(f"↩️  Action items already summarized for session {session_id}, skipping")
+            return
+
+        # Skip if no action items yet (topic extraction not complete)
+        if not session.get("action_items") or len(session.get("action_items", [])) < 2:
+            logger.warning(
+                f"⚠️  Cannot summarize action items for session {session_id}: "
+                f"Need 2 action items, found {len(session.get('action_items', []))}"
+            )
+            return
+
+        logger.info(f"📝 Generating action items summary for session {session_id}...")
+
+        # Run summarization
+        summary_result = await self.action_items_summarizer.summarize_action_items(
+            action_items=session["action_items"][:2],  # Use first 2 items
+            session_id=session_id
+        )
+
+        # Update session with summary
+        self.db.table("therapy_sessions").update({
+            "action_items_summary": summary_result.summary,
+            "updated_at": "now()",
+        }).eq("id", session_id).execute()
+
+        logger.info(
+            f"✅ Action items summary stored for session {session_id}: "
+            f"'{summary_result.summary}' ({summary_result.character_count} chars)"
+        )
 
     async def _analyze_deep(self, session_id: str, force: bool = False):
         """Run deep clinical analysis for a session"""
