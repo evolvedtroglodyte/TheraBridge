@@ -236,10 +236,12 @@ Before creating any new file, ask:
 - [x] ~~**PR #1 Phase 1A:** Font standardization~~ ✅ COMPLETE
 - [x] ~~**PR #1 Phase 1C:** Planning for UI improvements + Wave 1 action summarization~~ ✅ COMPLETE
 - [x] ~~**PR #1 Phase 1C:** Execute implementation (backend + frontend + database)~~ ✅ COMPLETE
-- [ ] **PR #1:** Test in production (trigger demo pipeline, verify action summaries, mood scores, technique definitions)
-- [ ] **PR #1:** Monitor Railway logs for sequential action summarization execution
-- [ ] **PR #1:** Verify UI renders correctly (mood emoji + score, technique definitions, X button, theme toggle)
-- [ ] **PR #1:** Merge all phases and update documentation
+- [x] ~~**PR #1 Phase 1C:** Apply database migration via Supabase MCP~~ ✅ COMPLETE
+- [x] ~~**PR #1 Phase 1C:** Update documentation (SESSION_LOG, TheraBridge, CLAUDE)~~ ✅ COMPLETE
+- [ ] **PR #1 Production Testing:** Test in production (trigger demo pipeline, verify new features)
+- [ ] **PR #1 Production Testing:** Monitor Railway logs for sequential action summarization
+- [ ] **PR #1 Production Testing:** Verify UI renders correctly (all 6 features)
+- [ ] **PR #1:** Merge all phases and finalize
 - [ ] **PR #1 Phase 1B:** Header fonts + Timeline deprecation (deferred to future)
 - [ ] **PR #2:** Implement Prose Analysis UI with Toggle
 - [ ] Implement Feature 2: Analytics Dashboard
