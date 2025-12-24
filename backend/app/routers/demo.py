@@ -100,9 +100,15 @@ async def populate_session_transcripts_background(patient_id: str):
             print(f"✅ Step 1/3 Complete: Session transcripts populated", flush=True)
             logger.info(f"✅ Session transcripts populated for patient {patient_id}")
             logger.info(result.stdout)
+            # Show script output in Railway logs
+            if result.stdout:
+                print(f"[Transcript Script Output]:\n{result.stdout}", flush=True)
         else:
             print(f"❌ Step 1/3 Failed: {result.stderr}", flush=True)
             logger.error(f"❌ Transcript population failed: {result.stderr}")
+            # Show error details in Railway logs
+            if result.stderr:
+                print(f"[Transcript Script Error]:\n{result.stderr}", flush=True)
 
     except subprocess.TimeoutExpired:
         logger.error(f"❌ Transcript population timeout for patient {patient_id}")
@@ -136,6 +142,9 @@ async def run_wave1_analysis_background(patient_id: str):
         if result.returncode == 0:
             print(f"✅ Step 2/3 Complete: Wave 1 analysis complete", flush=True)
             logger.info(f"✅ Wave 1 analysis complete for patient {patient_id}")
+            # Show script output in Railway logs
+            if result.stdout:
+                print(f"[Wave 1 Script Output]:\n{result.stdout}", flush=True)
             # Mark Wave 1 as complete
             if patient_id not in analysis_status:
                 analysis_status[patient_id] = {}
@@ -144,6 +153,9 @@ async def run_wave1_analysis_background(patient_id: str):
         else:
             print(f"❌ Step 2/3 Failed: {result.stderr}", flush=True)
             logger.error(f"❌ Wave 1 analysis failed: {result.stderr}")
+            # Show error details in Railway logs
+            if result.stderr:
+                print(f"[Wave 1 Script Error]:\n{result.stderr}", flush=True)
 
     except subprocess.TimeoutExpired:
         logger.error(f"❌ Wave 1 analysis timeout for patient {patient_id}")
