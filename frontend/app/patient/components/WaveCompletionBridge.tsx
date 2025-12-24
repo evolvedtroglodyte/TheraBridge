@@ -12,19 +12,38 @@
  *   - Disconnects when all analysis complete
  */
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSessionData } from "../contexts/SessionDataContext";
 import { usePipelineEvents } from "@/hooks/use-pipeline-events";
-import { useDemoInitialization } from "@/hooks/useDemoInitialization";
+import { demoTokenStorage } from "@/lib/demo-token-storage";
 
 export function WaveCompletionBridge() {
   const { refresh, setSessionLoading } = useSessionData();
-  const { patientId, isReady } = useDemoInitialization();
+  const [patientId, setPatientId] = useState<string | null>(null);
 
-  // Connect to SSE and handle events (only after demo is ready)
+  // Get patient ID from localStorage (populated by SessionDataContext's usePatientSessions)
+  useEffect(() => {
+    const checkPatientId = () => {
+      const id = demoTokenStorage.getPatientId();
+      if (id && id !== patientId) {
+        console.log('[WaveCompletionBridge] Patient ID found:', id);
+        setPatientId(id);
+      }
+    };
+
+    // Check immediately
+    checkPatientId();
+
+    // Poll every 500ms until we have a patient ID
+    const interval = setInterval(checkPatientId, 500);
+
+    return () => clearInterval(interval);
+  }, [patientId]);
+
+  // Connect to SSE and handle events (only after we have patient ID)
   const { isConnected, events } = usePipelineEvents({
     patientId: patientId || "",
-    enabled: isReady && !!patientId,
+    enabled: !!patientId,
 
     onWave1SessionComplete: async (sessionId, sessionDate) => {
       console.log(
