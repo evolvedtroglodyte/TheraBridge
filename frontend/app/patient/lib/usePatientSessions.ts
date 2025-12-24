@@ -391,9 +391,10 @@ export function usePatientSessions() {
     };
   }, [analysisStatus]); // Only re-run if analysisStatus changes
 
-  // Manual refresh function - reloads from API
+  // Manual refresh function - reloads from API without triggering global loading state
   const refresh = () => {
-    setIsLoading(true);
+    // Don't set global loading state - this would cause full page re-render
+    // Individual cards show their own loading overlays via setSessionLoading
     setTimeout(async () => {
       try {
         const result = await apiClient.getAllSessions();
@@ -433,8 +434,6 @@ export function usePatientSessions() {
         }
       } catch (err) {
         console.error('[refresh] Error:', err);
-      } finally {
-        setIsLoading(false);
       }
     }, 300);
   };
