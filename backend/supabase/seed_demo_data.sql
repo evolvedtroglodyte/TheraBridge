@@ -22,8 +22,7 @@ BEGIN
         is_demo,
         demo_token,
         demo_created_at,
-        demo_expires_at,
-        hashed_password
+        demo_expires_at
     ) VALUES (
         'therapist_' || p_demo_token || '@demo.therapybridge.com',
         'Dr. Sarah',
@@ -32,8 +31,7 @@ BEGIN
         TRUE,
         p_demo_token,
         NOW(),
-        NOW() + INTERVAL '24 hours',
-        'demo_no_password'
+        NOW() + INTERVAL '24 hours'
     ) RETURNING id INTO v_therapist_id;
 
     -- Create demo patient
@@ -45,8 +43,7 @@ BEGIN
         is_demo,
         demo_token,
         demo_created_at,
-        demo_expires_at,
-        hashed_password
+        demo_expires_at
     ) VALUES (
         'patient_' || p_demo_token || '@demo.therapybridge.com',
         'Alex',
@@ -55,8 +52,7 @@ BEGIN
         TRUE,
         p_demo_token,
         NOW(),
-        NOW() + INTERVAL '24 hours',
-        'demo_no_password'
+        NOW() + INTERVAL '24 hours'
     ) RETURNING id INTO v_patient_id;
 
     -- Session 1: Crisis Intake (2025-01-10)
