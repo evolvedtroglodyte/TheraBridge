@@ -73,14 +73,14 @@ class ActionItemsSummarizer:
 
         try:
             # Call OpenAI API
+            # Note: gpt-5-nano works with NO parameters (like mood_analyzer)
+            # Adding temperature or max_completion_tokens causes empty responses
             response = await self.client.chat.completions.create(
                 model=self.model,
                 messages=[
                     {"role": "system", "content": self._get_system_prompt()},
                     {"role": "user", "content": prompt}
-                ],
-                temperature=0.3,  # Lower temperature for consistent, concise output (works with gpt-4o-mini)
-                max_completion_tokens=60,    # Increased from 30 to allow model to generate output
+                ]
             )
 
             # Extract summary
