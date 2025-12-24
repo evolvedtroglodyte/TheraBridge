@@ -185,7 +185,9 @@ async def run_wave2_analysis_background(patient_id: str):
 
 async def run_full_initialization_pipeline(patient_id: str):
     """Run complete initialization: transcripts → Wave 1 → Wave 2"""
-    logger.info(f"🎬 Starting full initialization pipeline for patient {patient_id}")
+    logger.info("=" * 80)
+    logger.info(f"🎬 BACKGROUND TASK STARTED: Full initialization pipeline for patient {patient_id}")
+    logger.info("=" * 80)
 
     # Step 1: Populate transcripts from JSON files
     await populate_session_transcripts_background(patient_id)
@@ -242,19 +244,24 @@ async def initialize_demo(
         result = response.data[0]
         patient_id = result["patient_id"]
         session_ids = result["session_ids"]
+        logger.info(f"📝 Extracted patient_id: {patient_id}, session_ids count: {len(session_ids)}")
 
         # Fetch patient record to get user_id, then get expiry from users table
         patient_response = db.table("patients").select("user_id").eq("id", patient_id).single().execute()
         user_id = patient_response.data["user_id"]
+        logger.info(f"📝 Fetched user_id: {user_id}")
 
         user_response = db.table("users").select("demo_expires_at").eq("id", user_id).single().execute()
         expires_at = user_response.data["demo_expires_at"]
+        logger.info(f"📝 Fetched expires_at: {expires_at}")
 
         logger.info(f"✓ Demo user created: {patient_id} with {len(session_ids)} sessions")
 
         # Trigger background initialization pipeline if enabled
         analysis_status = "pending"
+        logger.info(f"📝 run_analysis parameter: {run_analysis}")
         if run_analysis:
+            logger.info(f"📝 Adding background task for patient {patient_id}")
             background_tasks.add_task(run_full_initialization_pipeline, str(patient_id))
             analysis_status = "processing"
             logger.info(f"🎬 Queued full initialization (transcripts + Wave 1 + Wave 2) for patient {patient_id}")
