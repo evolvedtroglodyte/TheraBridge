@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     debug: bool = True
 
     # CORS Settings (will be parsed from comma-separated string)
-    cors_origins: str = "http://localhost:3000,http://localhost:3001"
+    cors_origins: str = "http://localhost:3000,http://localhost:3001,https://therabridge.up.railway.app"
 
     # Breakthrough Detection Settings
     breakthrough_min_confidence: float = 0.6
