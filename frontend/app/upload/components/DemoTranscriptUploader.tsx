@@ -59,64 +59,70 @@ export default function DemoTranscriptUploader({ onUploadSuccess }: DemoTranscri
   const selectedInfo = DEMO_TRANSCRIPTS.find(t => t.filename === selectedTranscript);
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-white dark:bg-[#1a1625] border-2 border-dashed border-[#5AB9B4] dark:border-[#a78bfa] rounded-xl p-8">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-[#5AB9B4]/10 dark:bg-[#a78bfa]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="w-8 h-8 text-[#5AB9B4] dark:text-[#a78bfa]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-              />
-            </svg>
-          </div>
-          <h3 className="text-xl font-light text-gray-900 dark:text-gray-100 mb-2">
-            Upload Demo Session
-          </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Select a pre-loaded therapy transcript to showcase AI analysis
-          </p>
-        </div>
+    <div className="w-full max-w-[500px] text-center">
+      {/* Section Title & Subtitle */}
+      <h2 className="text-[18px] font-semibold text-gray-800 dark:text-gray-200 mb-2">
+        Upload Demo Session
+      </h2>
+      <p className="text-[13px] text-gray-500 dark:text-gray-400 mb-6">
+        Select a pre-loaded therapy transcript to showcase AI analysis
+      </p>
 
-        {/* Transcript Selector */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Select Session
-          </label>
-          <select
-            value={selectedTranscript}
-            onChange={(e) => setSelectedTranscript(e.target.value)}
-            disabled={isUploading}
-            className="w-full px-4 py-3 bg-gray-50 dark:bg-[#2d2438] border border-gray-300 dark:border-[#3d3548] rounded-lg text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-[#5AB9B4] dark:focus:ring-[#a78bfa] focus:border-transparent transition-all disabled:opacity-50"
+      {/* Main Content Area */}
+      <div className="bg-[#F8F8F6] dark:bg-[#252030] rounded-xl px-6 py-7">
+        {/* Upload Icon */}
+        <div className="w-[56px] h-[56px] rounded-full bg-[#5AB9B4]/[0.12] dark:bg-[#a78bfa]/[0.15] flex items-center justify-center mx-auto mb-5">
+          <svg
+            className="w-7 h-7 text-[#5AB9B4] dark:text-[#a78bfa]"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
-            {DEMO_TRANSCRIPTS.map((transcript) => (
-              <option key={transcript.filename} value={transcript.filename}>
-                {transcript.label}
-              </option>
-            ))}
-          </select>
-
-          {/* Description */}
-          {selectedInfo && (
-            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              {selectedInfo.description}
-            </p>
-          )}
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
         </div>
+
+        {/* Dropdown Label */}
+        <label className="block text-[12px] font-semibold text-gray-600 dark:text-gray-400 text-left mb-2">
+          Select Session
+        </label>
+
+        {/* Dropdown */}
+        <select
+          value={selectedTranscript}
+          onChange={(e) => setSelectedTranscript(e.target.value)}
+          disabled={isUploading}
+          className="w-full px-4 py-3 text-[14px] font-medium text-gray-800 dark:text-gray-200 bg-white dark:bg-[#1a1625] border border-gray-300 dark:border-[#3a3545] rounded-[10px] cursor-pointer appearance-none transition-all duration-200 hover:border-[#5AB9B4] dark:hover:border-[#a78bfa] focus:outline-none focus:border-[#5AB9B4] dark:focus:border-[#a78bfa] focus:shadow-[0_0_0_3px_rgba(90,185,180,0.15)] dark:focus:shadow-[0_0_0_3px_rgba(167,139,250,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'right 14px center',
+          }}
+        >
+          {DEMO_TRANSCRIPTS.map((transcript) => (
+            <option key={transcript.filename} value={transcript.filename}>
+              {transcript.label}
+            </option>
+          ))}
+        </select>
+
+        {/* Session Description */}
+        {selectedInfo && (
+          <p className="text-[11px] text-gray-500 dark:text-gray-400 text-left mt-2 mb-5">
+            {selectedInfo.description}
+          </p>
+        )}
 
         {/* Upload Button */}
         <button
           onClick={handleUpload}
           disabled={isUploading}
-          className="w-full py-3 px-6 bg-[#5AB9B4] dark:bg-[#a78bfa] hover:bg-[#4a9a95] dark:hover:bg-[#9370db] text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-3.5 px-6 text-[14px] font-semibold text-white bg-[#5AB9B4] dark:bg-[#8B6AAE] hover:bg-[#4AA9A4] dark:hover:bg-[#7B5A9E] rounded-[10px] transition-all duration-200 hover:shadow-[0_4px_16px_rgba(90,185,180,0.35)] dark:hover:shadow-[0_4px_16px_rgba(139,106,174,0.35)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none disabled:active:scale-100"
         >
           {isUploading ? (
             <span className="flex items-center justify-center gap-2">
@@ -143,10 +149,23 @@ export default function DemoTranscriptUploader({ onUploadSuccess }: DemoTranscri
           )}
         </button>
 
-        {/* Info Banner */}
-        <div className="mt-6 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <p className="text-xs text-blue-700 dark:text-blue-300">
-            <strong>Demo Mode:</strong> This will create a new session and run real AI analysis (mood, topics, breakthroughs). Processing takes ~10 seconds.
+        {/* Info Box */}
+        <div className="flex items-start gap-2.5 bg-[#5AB9B4]/[0.08] dark:bg-[#a78bfa]/[0.1] rounded-lg px-3.5 py-3 mt-4 text-left">
+          <svg
+            className="flex-shrink-0 w-4 h-4 text-[#5AB9B4] dark:text-[#a78bfa] mt-0.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+          <p className="text-[11px] text-[#5AB9B4] dark:text-[#a78bfa] leading-relaxed">
+            <strong className="font-semibold">Demo Mode:</strong> This will create a new session and run real AI analysis (mood, topics, breakthroughs). Processing takes ~10 seconds.
           </p>
         </div>
       </div>
