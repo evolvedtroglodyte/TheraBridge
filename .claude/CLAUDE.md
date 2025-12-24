@@ -108,9 +108,20 @@ Before creating any new file, ask:
 
 # TherapyBridge - Project State
 
-## Current Focus: Phase 5 Complete - Wave 2 Prose Generation Implemented ✅
+## Current Focus: Debugging SSE Connection + Session Loading Issues ⚠️
 
-**Latest:** Sessions now load immediately after transcripts (~30s), Wave 1 + Wave 2 run in background
+**Backend Status:** ✅ Fully functional
+- Non-blocking demo init (~1-2s response)
+- Background transcripts, Wave 1, Wave 2 processing
+- Version 1.0.1 deployed (commits: fe18a8d, 59803fe, e41eff4)
+
+**Frontend Issues:** ⚠️
+- SSE connections failing with CORS error (status: null)
+- GET /api/sessions requests timing out (30s, not reaching backend)
+- GET /api/demo/status polling timing out
+- Only POST /api/demo/initialize works
+
+**Root Cause:** Browser blocking EventSource and fetch GET requests after demo init. Railway logs show NO incoming GET requests, suggesting client-side blocking or proxy issue.
 
 **Full Documentation:** See `Project MDs/TherapyBridge.md`
 **Detailed Session History:** See `.claude/SESSION_LOG.md`

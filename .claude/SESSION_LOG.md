@@ -4,6 +4,66 @@ Detailed history of all development sessions, architectural decisions, and imple
 
 ---
 
+## 2026-01-01 - SSE CORS + Non-Blocking Demo Init (Partial Success) ⚠️
+
+**Goal:** Fix SSE CORS errors and make demo initialization non-blocking to prevent timeouts.
+
+**Commits:**
+- `e41eff4` - Fix CORS blocking SSE connections and demo init timing
+- `59803fe` - Make demo init fully non-blocking to prevent concurrent request timeouts
+- `fe18a8d` - Force Railway rebuild - bump version to verify deployment
+
+**Backend Changes Implemented:**
+
+**Fix 1: SSE CORS Preflight Handler ✅**
+- Added proper CORS headers to OPTIONS `/api/sse/events/{patient_id}`
+- Returns `Access-Control-Allow-Origin`, `Access-Control-Allow-Methods`, `Access-Control-Allow-Headers`
+- Status 200 with 24-hour cache
+- File: `backend/app/routers/sse.py:14-30`
+
+**Fix 2: Non-Blocking Demo Initialization ✅**
+- Moved transcript loading from blocking `await` to `background_tasks.add_task()`
+- Demo init now returns in ~1-2 seconds (was 15-30s)
+- All processing (transcripts + Wave 1 + Wave 2) runs in background
+- File: `backend/app/routers/demo.py:315-323`
+
+**Results:**
+- ✅ Backend deployed successfully (version 1.0.1)
+- ✅ Demo init returns quickly (~2s)
+- ✅ Background tasks execute correctly (transcripts, Wave 1, Wave 2)
+- ❌ SSE connections still fail with CORS error (status: null)
+- ❌ GET /api/sessions requests timeout (30s, never reach backend)
+- ❌ GET /api/demo/status polling times out
+
+**Root Cause Analysis:**
+- Railway logs show NO incoming GET requests after demo init
+- Only POST `/api/demo/initialize` reaches backend
+- Browser error: "CORS request did not succeed" with status `(null)`
+- Status `(null)` indicates connection failed BEFORE reaching server
+- EventSource has stricter CORS requirements than regular fetch()
+
+**Current Hypothesis:**
+1. Railway proxy blocking long-lived EventSource connections
+2. Browser security policy blocking EventSource to different domain
+3. Frontend deployment cached/stale (not picking up latest code)
+4. Connection pooling issue after POST request
+
+**Files Modified:**
+- `backend/app/routers/sse.py` - Added OPTIONS preflight handler
+- `backend/app/routers/demo.py` - Made demo init fully non-blocking
+- `backend/app/main.py` - Bumped version to 1.0.1
+- `.claude/CLAUDE.md` - Updated status
+- `.claude/SESSION_LOG.md` - This entry
+
+**Next Steps:**
+1. Verify Railway frontend deployment is up-to-date
+2. Check if Railway proxy has EventSource restrictions
+3. Consider disabling SSE entirely (polling already works)
+4. Add comprehensive error logging to frontend API client
+5. Test with curl to verify backend endpoints work directly
+
+---
+
 ## 2025-12-31 - Refresh Behavior & SSE Connection Fixes (Phases 1-3 Complete) ✅
 **Implemented comprehensive fix for browser refresh behavior and SSE connection timing:**
 
