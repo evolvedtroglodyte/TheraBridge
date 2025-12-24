@@ -14,17 +14,18 @@ Analyzes:
 Uses GPT-4o for complex reasoning and synthesis.
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta
 import openai
 import os
 import json
 import logging
+import time
 
 from app.database import get_db
 from supabase import Client
-from app.config.model_config import get_model_name
+from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
 
 logger = logging.getLogger(__name__)
 
@@ -93,10 +94,11 @@ class DeepAnalysis:
     recommendations: Recommendations
     confidence_score: float  # 0.0 to 1.0
     analyzed_at: datetime
+    cost_info: Optional[GenerationCost] = None  # Cost tracking for this generation
 
     def to_dict(self) -> dict:
         """Convert to dictionary for JSONB storage"""
-        return {
+        result = {
             "progress_indicators": asdict(self.progress_indicators),
             "therapeutic_insights": asdict(self.therapeutic_insights),
             "coping_skills": asdict(self.coping_skills),
@@ -105,6 +107,9 @@ class DeepAnalysis:
             "confidence_score": self.confidence_score,
             "analyzed_at": self.analyzed_at.isoformat()
         }
+        if self.cost_info:
+            result["cost_info"] = self.cost_info.to_dict()
+        return result
 
 
 class DeepAnalyzer:
@@ -168,6 +173,7 @@ class DeepAnalyzer:
         # Call OpenAI API
         # NOTE: GPT-5 series does NOT support custom temperature - uses internal calibration
         try:
+            start_time = time.time()
             response = openai.chat.completions.create(
                 model=self.model,
                 messages=[
@@ -183,10 +189,22 @@ class DeepAnalyzer:
                 response_format={"type": "json_object"}
             )
 
+            # Track cost and timing
+            cost_info = track_generation_cost(
+                response=response,
+                task="deep_analysis",
+                model=self.model,
+                start_time=start_time,
+                session_id=session_id
+            )
+
             result = json.loads(response.choices[0].message.content)
 
             # Parse and validate result
             analysis = self._parse_analysis_result(session_id, result)
+
+            # Store cost info in analysis for later retrieval
+            analysis.cost_info = cost_info
 
             logger.info(f"✓ Deep analysis complete for session {session_id}")
 

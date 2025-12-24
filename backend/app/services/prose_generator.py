@@ -16,8 +16,9 @@ from datetime import datetime
 import openai
 import os
 import logging
+import time
 
-from app.config.model_config import get_model_name
+from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ class ProseAnalysis:
     paragraph_count: int
     confidence_score: float  # Inherited from deep_analysis
     generated_at: datetime
+    cost_info: Optional[GenerationCost] = None  # Cost tracking for this generation
 
 
 class ProseGenerator:
@@ -81,6 +83,7 @@ class ProseGenerator:
         # Call OpenAI API (GPT-5.2)
         # NOTE: GPT-5 series does NOT support custom temperature
         try:
+            start_time = time.time()
             response = openai.chat.completions.create(
                 model=self.model,
                 messages=[
@@ -93,6 +96,15 @@ class ProseGenerator:
                         "content": prompt
                     }
                 ]
+            )
+
+            # Track cost and timing
+            cost_info = track_generation_cost(
+                response=response,
+                task="prose_generation",
+                model=self.model,
+                start_time=start_time,
+                session_id=session_id
             )
 
             prose_text = response.choices[0].message.content.strip()
@@ -113,7 +125,8 @@ class ProseGenerator:
                 word_count=word_count,
                 paragraph_count=paragraph_count,
                 confidence_score=confidence_score,
-                generated_at=datetime.utcnow()
+                generated_at=datetime.utcnow(),
+                cost_info=cost_info
             )
 
             logger.info(f"✓ Prose generated: {word_count} words, {paragraph_count} paragraphs")
