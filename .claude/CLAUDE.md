@@ -153,6 +153,7 @@ Before creating any new file, ask:
 - ✅ Frontend: SessionDetail displays mood score + emoji, technique definitions, X button, theme toggle
 - ✅ Build verified successful, TypeScript compiles without errors
 - ✅ Git commits pushed (be21ae3 implementation, 6d22548 documentation)
+- ✅ CRITICAL BUG FIX (04fd884): Added missing Wave 1 fields to refresh() transformation
 
 **Implementation Details (2026-01-08):**
 - Wave 0 research: Custom emoji logic, data flow verification, Railway logs
@@ -161,11 +162,20 @@ Before creating any new file, ask:
 - Cost impact: +0.7% increase (+$0.0003/session) - negligible
 - Files modified: 10 total (3 new, 7 modified)
 
+**Critical Bug Fix (2026-01-08):**
+- **Root Cause:** `refresh()` function in `usePatientSessions.ts` was missing 3 critical field mappings
+- **Impact:** After polling refresh, UI would lose mood_score, action_items_summary, technique_definition
+- **Symptoms:** SessionDetail missing mood score/emoji and technique definition; SessionCard missing action summary
+- **Fix:** Added missing field mappings to `refresh()` transformation (lines 450-461)
+- **File:** `frontend/app/patient/lib/usePatientSessions.ts`
+
 **Previous Phases:**
 - ✅ Phase 1A Complete (2026-01-07): Font standardization for SessionDetail + DeepAnalysisSection
 - ⏳ Phase 1B Deferred: Header fonts + Timeline deprecation (non-critical)
 
 **Commits (PR #1):**
+- `04fd884` - fix(pr1-phase1c): Add missing Wave 1 fields to refresh() transformation
+- `eb485d8` - docs: Update CLAUDE.md with Phase 1C completion status
 - `6d22548` - docs: Update SESSION_LOG and TheraBridge.md with Phase 1C completion
 - `be21ae3` - Feature: PR #1 Phase 1C - SessionDetail UI improvements + Wave 1 action summarization
 - `d3f7390` - Feature: PR #1 Phase 1A - Font standardization for SessionDetail and DeepAnalysisSection
