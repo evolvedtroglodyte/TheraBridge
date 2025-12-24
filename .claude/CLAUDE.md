@@ -108,33 +108,30 @@ Before creating any new file, ask:
 
 # TherapyBridge - Project State
 
-## Current Focus: Railway Deployment Network Error - All Endpoints Unreachable ⚠️
+## Current Focus: Status Endpoint Fixed - Testing Hard Refresh Flow ✅
 
-**Critical Issue:** Railway deployment experiencing complete network failure
+**Latest Fix (Commit 9fe5344):**
+- Fixed `/api/demo/status` endpoint returning `total: 0` despite sessions existing
+- Root cause: Endpoint was using USER ID instead of PATIENT ID to query sessions
+- Solution: Added patient lookup `db.table("patients").select("id").eq("user_id", user_id)` before querying sessions
 
-**Symptoms (03:03:40 logs):**
-- ❌ SSE connection fails: "CORS request did not succeed. Status code: (null)"
-- ❌ GET /api/sessions returns 401 (no demo token)
-- ❌ POST /api/demo/initialize fails: "NetworkError when attempting to fetch resource"
-- ❌ Frontend redirects to /auth/login (404)
-- ⚠️ Hard refresh cleared localStorage (expected behavior)
+**Previous Fixes (Commits b477185-9d403a5):**
+- ✅ Fixed SSE race condition on hard refresh (patient ID reactivity)
+- ✅ Removed hard refresh detection from home and sessions pages
+- ✅ Centralized demo initialization in WaveCompletionBridge with continuous polling
+- ✅ Fixed status endpoint returning `wave2_complete` when `session_count == 0`
 
-**Latest Fix Attempt (Commit b477185):**
-- Removed duplicate CORS headers from SSE router (let global middleware handle)
-- Added detailed request logging to frontend api-client.ts
-- Awaiting Railway deployment completion to test
-
-**Root Cause Analysis:**
-- Initial hypothesis: CORS header conflicts between route-level and global middleware
-- New logs show complete network failure - Railway backend may be down or unreachable
-- Demo token not present in GET /api/sessions request (expected after hard refresh)
-- POST /api/demo/initialize network error suggests Railway routing issue
+**Current Behavior:**
+- Hard refresh clears localStorage → triggers demo initialization
+- WaveCompletionBridge polls for patient ID every 500ms
+- SSE connects only after patient ID is available
+- Status endpoint now correctly queries sessions using patient_id
 
 **Next Steps:**
-1. Wait for Railway deployment to complete
-2. Test if SSE CORS fix resolved connection issues
-3. If network errors persist, investigate Railway service health
-4. Verify backend is responding at https://therabridge-backend.up.railway.app/health
+1. Wait for Railway deployment to complete (commit 9fe5344)
+2. Test full hard refresh flow end-to-end
+3. Verify status endpoint returns correct session counts
+4. Verify Wave 1 analysis completes and UI updates via polling
 
 **Full Documentation:** See `Project MDs/TherapyBridge.md`
 **Detailed Session History:** See `.claude/SESSION_LOG.md`

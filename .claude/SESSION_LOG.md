@@ -4,6 +4,61 @@ Detailed history of all development sessions, architectural decisions, and imple
 
 ---
 
+## 2026-01-01 - Status Endpoint Patient ID Fix ✅
+
+**Goal:** Fix `/api/demo/status` returning `total: 0` despite backend processing sessions.
+
+**Commits:**
+- `9fe5344` - Fix demo status endpoint returning total: 0 by querying patients table for patient_id
+- `2e53cba` - Fix demo status endpoint returning wave2_complete when session_count is 0
+- `9d403a5` - Remove hard refresh detection from home page to prevent duplicate demo initialization
+- `d860381` - Remove duplicate hard refresh detection from sessions page
+
+**Root Cause Identified:**
+The `/api/demo/status` endpoint was using the USER ID from `demo_user["id"]` to query therapy sessions, but sessions are linked to the PATIENT ID in the `patients` table. This caused the endpoint to return `total: 0` even though sessions existed.
+
+**Database Schema Understanding:**
+```sql
+-- seed_demo_v4 creates:
+1. users table record (v_user_id) - stores demo_token, is_demo flag
+2. patients table record (v_patient_id, user_id = v_user_id)
+3. therapy_sessions records (patient_id = v_patient_id)
+
+-- The relationship:
+users.id → patients.user_id → therapy_sessions.patient_id
+```
+
+**Fix Implemented:**
+```python
+# Before (WRONG):
+patient_id = demo_user["id"]  # This is the USER ID
+sessions_response = db.table("therapy_sessions").eq("patient_id", patient_id)
+
+# After (CORRECT):
+user_id = demo_user["id"]
+patient_response = db.table("patients").select("id").eq("user_id", user_id).single().execute()
+patient_id = patient_response.data["id"]  # This is the PATIENT ID
+sessions_response = db.table("therapy_sessions").eq("patient_id", patient_id)
+```
+
+**Additional Fix:**
+Fixed status endpoint returning `wave2_complete` when `session_count == 0`:
+```python
+# Added explicit check at start of status logic
+if session_count == 0:
+    analysis_status = "pending"
+```
+
+**Expected Outcome:**
+- Status endpoint now correctly finds sessions using patient_id
+- Frontend polling (`usePatientSessions`) will detect when Wave 1 completes
+- Session cards will show analysis data after ~1 minute
+- No more infinite "pending" state
+
+**Status:** ⏳ Deployed to Railway (commit 9fe5344), awaiting test results
+
+---
+
 ## 2026-01-01 - CORS Header Cleanup + Implementation Planning 📋
 
 **Goal:** Fix duplicate CORS headers causing SSE failures, add debugging, create comprehensive implementation plan for next phases.
