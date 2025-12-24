@@ -6,12 +6,13 @@ Uses GPT-5-nano for efficient, cost-effective summarization.
 
 import os
 import logging
-from typing import List
+import time
+from typing import List, Optional
 from openai import AsyncOpenAI
 from datetime import datetime
 from pydantic import BaseModel
 
-from app.config.model_config import get_model_name
+from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,7 @@ class ActionItemsSummary(BaseModel):
     character_count: int
     original_items: List[str]
     summarized_at: datetime
+    cost_info: Optional[dict] = None  # Cost tracking (dict for Pydantic compatibility)
 
 
 class ActionItemsSummarizer:
@@ -75,12 +77,22 @@ class ActionItemsSummarizer:
             # Call OpenAI API
             # Note: gpt-5-nano works with NO parameters (like mood_analyzer)
             # Adding temperature or max_completion_tokens causes empty responses
+            start_time = time.time()
             response = await self.client.chat.completions.create(
                 model=self.model,
                 messages=[
                     {"role": "system", "content": self._get_system_prompt()},
                     {"role": "user", "content": prompt}
                 ]
+            )
+
+            # Track cost and timing
+            cost_info = track_generation_cost(
+                response=response,
+                task="action_summary",
+                model=self.model,
+                start_time=start_time,
+                session_id=session_id
             )
 
             # Extract summary
@@ -102,7 +114,8 @@ class ActionItemsSummarizer:
                 summary=summary,
                 character_count=char_count,
                 original_items=action_items,
-                summarized_at=datetime.utcnow()
+                summarized_at=datetime.utcnow(),
+                cost_info=cost_info.to_dict() if cost_info else None
             )
 
         except Exception as e:

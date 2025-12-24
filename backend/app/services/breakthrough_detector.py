@@ -12,7 +12,8 @@ from datetime import datetime
 from openai import AsyncOpenAI
 import os
 import json
-from app.config.model_config import get_model_name
+import time
+from app.config.model_config import get_model_name, track_generation_cost, GenerationCost
 from app.config import settings
 
 
@@ -38,6 +39,7 @@ class SessionBreakthroughAnalysis:
     primary_breakthrough: Optional[BreakthroughCandidate]
     session_summary: str
     emotional_trajectory: str  # e.g., "resistant → reflective → insight → relief"
+    cost_info: Optional[GenerationCost] = None  # Cost tracking for this generation
 
 
 class BreakthroughDetector:
@@ -85,7 +87,7 @@ class BreakthroughDetector:
         conversation = self._extract_conversation_turns(transcript)
 
         # Use AI to identify potential breakthrough moment
-        breakthrough_candidates = await self._identify_breakthrough_candidates(
+        breakthrough_candidates, cost_info = await self._identify_breakthrough_candidates(
             conversation,
             session_metadata
         )
@@ -105,7 +107,8 @@ class BreakthroughDetector:
             breakthrough_candidates=breakthrough_candidates,  # List of 0 or 1
             primary_breakthrough=primary_breakthrough,
             session_summary=session_summary,
-            emotional_trajectory=emotional_trajectory
+            emotional_trajectory=emotional_trajectory,
+            cost_info=cost_info
         )
 
     def _extract_conversation_turns(
@@ -167,6 +170,7 @@ class BreakthroughDetector:
         # Call OpenAI API
         # NOTE: GPT-5 series does NOT support custom temperature - uses internal calibration
         try:
+            start_time = time.time()
             response = await self.client.chat.completions.create(
                 model=self.model,
                 messages=[
@@ -176,18 +180,28 @@ class BreakthroughDetector:
                 response_format={"type": "json_object"}
             )
 
+            # Track cost and timing
+            session_id = session_metadata.get("session_id") if session_metadata else None
+            cost_info = track_generation_cost(
+                response=response,
+                task="breakthrough_detection",
+                model=self.model,
+                start_time=start_time,
+                session_id=session_id
+            )
+
             # Parse AI response
             ai_analysis = json.loads(response.choices[0].message.content)
 
             # Convert AI finding to BreakthroughCandidate object
             candidate = self._parse_breakthrough_finding(ai_analysis, conversation)
 
-            # Return list with 0 or 1 element
-            return [candidate] if candidate else []
+            # Return list with 0 or 1 element, and include cost_info in metadata
+            return [candidate] if candidate else [], cost_info
 
         except Exception as e:
             print(f"Error during breakthrough detection: {e}")
-            return []
+            return [], None
 
     def _create_breakthrough_detection_prompt(self) -> str:
         """
