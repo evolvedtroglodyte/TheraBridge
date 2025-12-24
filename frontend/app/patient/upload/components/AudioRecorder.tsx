@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Mic, Square } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface AudioRecorderProps {
   onUploadSuccess: (sessionId: string, file: File) => void;
@@ -131,7 +132,14 @@ export default function AudioRecorder({ onUploadSuccess }: AudioRecorderProps) {
 
       <div className="space-y-4">
         {/* Recording Area */}
-        <div className="min-h-[280px] bg-[#F8F8F6] dark:bg-[#252030] rounded-xl p-7 text-center flex flex-col justify-center">
+        <motion.div
+          initial={{ y: 0 }}
+          whileHover={{
+            y: -2,
+            transition: { duration: 0.2, ease: 'easeOut' }
+          }}
+          className="min-h-[280px] bg-[#F8F8F6] dark:bg-[#252030] rounded-xl p-7 text-center flex flex-col justify-center"
+        >
           <div className="flex flex-col items-center gap-4">
             {/* Mic Button */}
             <button
@@ -189,7 +197,7 @@ export default function AudioRecorder({ onUploadSuccess }: AudioRecorderProps) {
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

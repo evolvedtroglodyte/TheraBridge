@@ -27,10 +27,10 @@ export const sessions: Session[] = [
     strategy: 'Assertiveness training',
     actions: ['Set clear boundaries', 'Practice saying no'],
     transcript: [
-      { speaker: 'Therapist', text: 'How did the boundary-setting go this week?' },
-      { speaker: 'Patient', text: "It was tough but I actually said no to my mom's request to babysit on my work day." },
-      { speaker: 'Therapist', text: 'That\'s a significant step. How did it feel?' },
-      { speaker: 'Patient', text: 'Scary at first, but then relieving. Like a weight lifted.' }
+      { speaker: 'Therapist', text: 'How did the boundary-setting go this week?', timestamp: '01:23' },
+      { speaker: 'Patient', text: "It was tough but I actually said no to my mom's request to babysit on my work day.", timestamp: '01:45' },
+      { speaker: 'Therapist', text: 'That\'s a significant step. How did it feel?', timestamp: '03:12' },
+      { speaker: 'Patient', text: 'Scary at first, but then relieving. Like a weight lifted.', timestamp: '04:08' }
     ],
     patientSummary: 'Made breakthrough progress on setting boundaries with family. Successfully practiced assertiveness techniques learned in previous sessions.'
   },

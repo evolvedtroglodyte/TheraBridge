@@ -6,6 +6,7 @@
  */
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { demoApiClient } from '@/lib/demo-api-client';
 import { useProcessing } from '@/contexts/ProcessingContext';
 
@@ -69,7 +70,14 @@ export default function DemoTranscriptUploader({ onUploadSuccess }: DemoTranscri
       </p>
 
       {/* Main Content Area */}
-      <div className="bg-[#F8F8F6] dark:bg-[#252030] rounded-xl px-6 py-7">
+      <motion.div
+        initial={{ y: 0 }}
+        whileHover={{
+          y: -2,
+          transition: { duration: 0.2, ease: 'easeOut' }
+        }}
+        className="bg-[#F8F8F6] dark:bg-[#252030] rounded-xl px-6 py-7"
+      >
         {/* Upload Icon */}
         <div className="w-[56px] h-[56px] rounded-full bg-[#5AB9B4]/[0.12] dark:bg-[#a78bfa]/[0.15] flex items-center justify-center mx-auto mb-5">
           <svg
@@ -168,7 +176,7 @@ export default function DemoTranscriptUploader({ onUploadSuccess }: DemoTranscri
             <strong className="font-semibold">Demo Mode:</strong> This will create a new session and run real AI analysis (mood, topics, breakthroughs). Processing takes ~10 seconds.
           </p>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

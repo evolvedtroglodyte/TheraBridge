@@ -160,9 +160,6 @@ function ProgressIndicatorsCard({ data }: { data: ProgressIndicator }) {
             {data.skill_development.map((skill, idx) => (
               <div key={idx} className="p-2 bg-white dark:bg-gray-800/50 rounded-lg">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg">
-                    {skill.proficiency === 'beginner' ? '🌱' : skill.proficiency === 'developing' ? '🌿' : '🌳'}
-                  </span>
                   <p style={{ fontFamily: fontSans }} className="text-sm font-medium text-gray-800 dark:text-gray-200">
                     {skill.skill}
                   </p>
@@ -170,7 +167,7 @@ function ProgressIndicatorsCard({ data }: { data: ProgressIndicator }) {
                     {skill.proficiency}
                   </span>
                 </div>
-                <p style={{ fontFamily: fontSerif }} className="text-xs text-gray-600 dark:text-gray-400 pl-7">
+                <p style={{ fontFamily: fontSerif }} className="text-xs text-gray-600 dark:text-gray-400">
                   {skill.evidence}
                 </p>
               </div>
@@ -189,14 +186,14 @@ function ProgressIndicatorsCard({ data }: { data: ProgressIndicator }) {
             {data.goal_progress.map((goal, idx) => (
               <div key={idx} className="p-2 bg-white dark:bg-gray-800/50 rounded-lg">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg">
-                    {goal.status === 'achieved' ? '✅' : goal.status === 'on_track' ? '🔄' : '⚠️'}
-                  </span>
                   <p style={{ fontFamily: fontSans }} className="text-sm font-medium text-gray-800 dark:text-gray-200">
                     {goal.goal}
                   </p>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 capitalize">
+                    {goal.status.replace('_', ' ')}
+                  </span>
                 </div>
-                <p style={{ fontFamily: fontSerif }} className="text-xs text-gray-600 dark:text-gray-400 pl-7">
+                <p style={{ fontFamily: fontSerif }} className="text-xs text-gray-600 dark:text-gray-400">
                   {goal.evidence}
                 </p>
               </div>
@@ -239,7 +236,7 @@ function TherapeuticInsightsCard({ data }: { data: TherapeuticInsights }) {
       {data.key_realizations.length > 0 && (
         <div className="mb-3">
           <p style={{ fontFamily: fontSans }} className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            💡 Realizations
+            Realizations
           </p>
           <ul className="space-y-2">
             {data.key_realizations.map((realization, idx) => (
@@ -257,7 +254,7 @@ function TherapeuticInsightsCard({ data }: { data: TherapeuticInsights }) {
       {data.patterns.length > 0 && (
         <div className="mb-3">
           <p style={{ fontFamily: fontSans }} className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            🔗 Patterns Emerging
+            Patterns Emerging
           </p>
           <ul className="space-y-2">
             {data.patterns.map((pattern, idx) => (
@@ -275,7 +272,7 @@ function TherapeuticInsightsCard({ data }: { data: TherapeuticInsights }) {
       {data.growth_areas.length > 0 && (
         <div className="mb-3">
           <p style={{ fontFamily: fontSans }} className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            🌱 Areas of Growth
+            Areas of Growth
           </p>
           <ul className="space-y-1">
             {data.growth_areas.map((area, idx) => (
@@ -292,7 +289,7 @@ function TherapeuticInsightsCard({ data }: { data: TherapeuticInsights }) {
       {data.strengths.length > 0 && (
         <div>
           <p style={{ fontFamily: fontSans }} className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            💪 Strengths You Demonstrated
+            Strengths You Demonstrated
           </p>
           <ul className="space-y-1">
             {data.strengths.map((strength, idx) => (
@@ -322,7 +319,7 @@ function CopingSkillsCard({ data }: { data: CopingSkills }) {
       {data.learned.length > 0 && (
         <div className="mb-3">
           <p style={{ fontFamily: fontSans }} className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            📚 Skills You're Learning
+            Skills You're Learning
           </p>
           <div className="flex flex-wrap gap-2">
             {data.learned.map((skill, idx) => {
@@ -333,8 +330,8 @@ function CopingSkillsCard({ data }: { data: CopingSkills }) {
                   className="px-3 py-1.5 bg-white dark:bg-gray-800/50 rounded-full text-xs font-medium text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
                 >
                   {skill}
-                  <span className="ml-1 text-[10px] opacity-75">
-                    ({proficiency === 'beginner' ? '🌱' : proficiency === 'developing' ? '🌿' : '🌳'})
+                  <span className="ml-1 text-[10px] opacity-75 capitalize">
+                    ({proficiency})
                   </span>
                 </span>
               );
@@ -378,14 +375,11 @@ function TherapeuticRelationshipCard({ data }: { data: TherapeuticRelationship }
         {/* Engagement */}
         <div className="p-3 bg-white dark:bg-gray-800/50 rounded-lg">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-lg">
-              {data.engagement_level === 'high' ? '🔥' : data.engagement_level === 'moderate' ? '⚡' : '💤'}
-            </span>
             <p style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-800 dark:text-gray-200">
               Engagement: <span className="capitalize">{data.engagement_level}</span>
             </p>
           </div>
-          <p style={{ fontFamily: fontSerif }} className="text-xs text-gray-600 dark:text-gray-400 pl-7">
+          <p style={{ fontFamily: fontSerif }} className="text-xs text-gray-600 dark:text-gray-400">
             {data.engagement_evidence}
           </p>
         </div>
@@ -393,14 +387,11 @@ function TherapeuticRelationshipCard({ data }: { data: TherapeuticRelationship }
         {/* Openness */}
         <div className="p-3 bg-white dark:bg-gray-800/50 rounded-lg">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-lg">
-              {data.openness === 'very_open' ? '🌊' : data.openness === 'somewhat_open' ? '🌤️' : '🛡️'}
-            </span>
             <p style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-800 dark:text-gray-200">
               Openness: <span className="capitalize">{data.openness.replace('_', ' ')}</span>
             </p>
           </div>
-          <p style={{ fontFamily: fontSerif }} className="text-xs text-gray-600 dark:text-gray-400 pl-7">
+          <p style={{ fontFamily: fontSerif }} className="text-xs text-gray-600 dark:text-gray-400">
             {data.openness_evidence}
           </p>
         </div>
@@ -408,14 +399,11 @@ function TherapeuticRelationshipCard({ data }: { data: TherapeuticRelationship }
         {/* Alliance Strength */}
         <div className="p-3 bg-white dark:bg-gray-800/50 rounded-lg">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-lg">
-              {data.alliance_strength === 'strong' ? '💎' : data.alliance_strength === 'developing' ? '🌿' : '🌱'}
-            </span>
             <p style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-800 dark:text-gray-200">
               Alliance: <span className="capitalize">{data.alliance_strength}</span>
             </p>
           </div>
-          <p style={{ fontFamily: fontSerif }} className="text-xs text-gray-600 dark:text-gray-400 pl-7">
+          <p style={{ fontFamily: fontSerif }} className="text-xs text-gray-600 dark:text-gray-400">
             {data.alliance_evidence}
           </p>
         </div>
@@ -438,7 +426,7 @@ function RecommendationsCard({ data }: { data: Recommendations }) {
       {data.practices.length > 0 && (
         <div className="mb-3">
           <p style={{ fontFamily: fontSans }} className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            ✓ Try These Practices
+            Try These Practices
           </p>
           <ul className="space-y-2">
             {data.practices.map((practice, idx) => (
@@ -456,7 +444,7 @@ function RecommendationsCard({ data }: { data: Recommendations }) {
       {data.resources.length > 0 && (
         <div className="mb-3">
           <p style={{ fontFamily: fontSans }} className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            📖 Helpful Resources
+            Helpful Resources
           </p>
           <ul className="space-y-1">
             {data.resources.map((resource, idx) => (
@@ -473,7 +461,7 @@ function RecommendationsCard({ data }: { data: Recommendations }) {
       {data.reflection_prompts.length > 0 && (
         <div>
           <p style={{ fontFamily: fontSans }} className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            💭 Journal Prompts
+            Journal Prompts
           </p>
           <ul className="space-y-2">
             {data.reflection_prompts.map((prompt, idx) => (

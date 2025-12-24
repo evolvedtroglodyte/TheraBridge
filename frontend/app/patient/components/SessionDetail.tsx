@@ -12,9 +12,10 @@ import { useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowLeft, Star } from 'lucide-react';
 import { Session } from '../lib/types';
-import { getMoodEmoji, fullscreenVariants } from '../lib/utils';
+import { fullscreenVariants } from '../lib/utils';
 import { useModalAccessibility } from '../hooks/useModalAccessibility';
 import { DeepAnalysisSection } from './DeepAnalysisSection';
+import { renderMoodEmoji } from './SessionIcons';
 
 // Font families - matching SessionCard (using system-ui throughout)
 const fontSerif = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -42,8 +43,6 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
   if (session.deep_analysis) {
     console.log('[SessionDetail] Deep analysis data:', session.deep_analysis);
   }
-
-  const moodEmoji = getMoodEmoji(session.mood);
 
   return (
     <AnimatePresence>
@@ -95,7 +94,7 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
         <div className="flex-1 grid grid-cols-2 overflow-hidden">
           {/* Left Column - Transcript */}
           <div className="border-r border-[#E0DDD8] dark:border-[#3d3548] overflow-y-auto p-8 bg-[#F8F7F4] dark:bg-[#1a1625]">
-            <h3 style={{ fontFamily: fontSans }} className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">
+            <h3 style={{ fontFamily: fontSans }} className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6 text-center">
               Session Transcript
             </h3>
 
@@ -133,23 +132,23 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
 
           {/* Right Column - Analysis */}
           <div className="overflow-y-auto p-8 bg-gray-50 dark:bg-[#2a2435]">
-            <h3 style={{ fontFamily: fontSans }} className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">
+            <h3 style={{ fontFamily: fontSans }} className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6 text-center">
               Session Analysis
             </h3>
 
             {/* Metadata */}
-            <div className="mb-6 p-4 bg-[#ECEAE5] dark:bg-[#1a1625] rounded-xl border border-[#E0DDD8] dark:border-[#3d3548]">
+            <div className="mb-6">
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p style={{ fontFamily: fontSans }} className="text-gray-500 dark:text-gray-500 mb-1">Duration</p>
-                  <p style={{ fontFamily: fontSerif }} className="text-gray-800 dark:text-gray-200 font-medium">{session.duration}</p>
-                </div>
                 <div>
                   <p style={{ fontFamily: fontSans }} className="text-gray-500 dark:text-gray-500 mb-1">Session Mood</p>
                   <p style={{ fontFamily: fontSerif }} className="text-gray-800 dark:text-gray-200 font-medium flex items-center gap-2">
-                    <span className="text-lg">{moodEmoji}</span>
+                    {renderMoodEmoji(session.mood, 20)}
                     <span className="capitalize">{session.mood}</span>
                   </p>
+                </div>
+                <div className="text-right">
+                  <p style={{ fontFamily: fontSans }} className="text-gray-500 dark:text-gray-500 mb-1">Duration</p>
+                  <p style={{ fontFamily: fontSerif }} className="text-gray-800 dark:text-gray-200 font-medium">{session.duration}</p>
                 </div>
               </div>
             </div>
@@ -204,23 +203,6 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
                 <p style={{ fontFamily: fontSerif }} className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                   {session.summary || session.patientSummary}
                 </p>
-              </div>
-            )}
-
-            {/* Milestone Description */}
-            {session.milestone && (
-              <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-700/50">
-                <div className="flex items-start gap-3">
-                  <Star className="w-5 h-5 text-amber-600 fill-amber-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h4 style={{ fontFamily: fontSans }} className="text-sm font-semibold text-amber-900 dark:text-amber-400 mb-2">
-                      {session.milestone.title}
-                    </h4>
-                    <p style={{ fontFamily: fontSerif }} className="text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
-                      {session.milestone.description}
-                    </p>
-                  </div>
-                </div>
               </div>
             )}
 

@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { Upload, File, AlertCircle, CheckCircle, X } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface FileUploaderProps {
   onUploadSuccess: (sessionId: string, file: File) => void;
@@ -128,7 +129,12 @@ export default function FileUploader({ onUploadSuccess }: FileUploaderProps) {
 
       <div className="space-y-4">
         {/* Dropzone */}
-        <div
+        <motion.div
+          initial={{ y: 0 }}
+          whileHover={{
+            y: -2,
+            transition: { duration: 0.2, ease: 'easeOut' }
+          }}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -169,7 +175,7 @@ export default function FileUploader({ onUploadSuccess }: FileUploaderProps) {
               MP3, WAV, M4A, OGG, FLAC, AAC (max 100 MB)
             </p>
           </div>
-        </div>
+        </motion.div>
 
           {/* Validation Error */}
           {validationError && (

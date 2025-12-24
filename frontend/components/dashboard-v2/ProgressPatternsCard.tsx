@@ -613,7 +613,15 @@ export function ProgressPatternsCard({ className }: ProgressPatternsCardProps) {
     }
   };
 
+  const handleDragStart = (e: MouseEvent | TouchEvent | PointerEvent) => {
+    // Prevent modal from interfering with drag gesture
+    e.stopPropagation();
+  };
+
   const handleDragEnd = (e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    // Prevent modal from closing on drag
+    e.stopPropagation();
+
     if (info.offset.x < -50 && currentPage < pages.length - 1) {
       setDirection(1);
       setCurrentPage((prev) => prev + 1);
@@ -738,6 +746,7 @@ export function ProgressPatternsCard({ className }: ProgressPatternsCardProps) {
                 drag="x"
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.2}
+                onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
               >
                 <CarouselPageContent
