@@ -4,22 +4,13 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { demoApiClient } from '@/lib/demo-api-client'
 import { demoTokenStorage } from '@/lib/demo-token-storage'
-import { refreshDetection } from '@/lib/refresh-detection'
 
 export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
     const initializeDemo = async () => {
-      // STEP 1: Check if this is a hard refresh
-      const isHardRefresh = refreshDetection.isHardRefresh();
-
-      if (isHardRefresh) {
-        console.log('🔥 Hard refresh detected - clearing all demo data');
-        demoTokenStorage.clear();
-      }
-
-      // STEP 2: Check if demo token already exists
+      // STEP 1: Check if demo token already exists
       const existingToken = demoTokenStorage.getToken();
       const existingPatientId = demoTokenStorage.getPatientId();
 
