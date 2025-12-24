@@ -90,6 +90,8 @@ TASK_MODEL_ASSIGNMENTS = {
     "deep_analysis": "gpt-5.2",             # Comprehensive synthesis of all data
     "prose_generation": "gpt-5.2",          # Patient-facing prose narrative
     "speaker_labeling": "gpt-5-mini",       # Speaker role detection + formatting
+    "session_insights": "gpt-5.2",          # Extract key insights from deep_analysis
+    "roadmap_generation": "gpt-5.2",        # Generate patient journey roadmap
 }
 
 
@@ -101,6 +103,8 @@ ESTIMATED_TOKEN_USAGE = {
     "deep_analysis": {"input": 5000, "output": 800},       # ~$0.0200 per session
     "prose_generation": {"input": 2000, "output": 600},    # ~$0.0118 per session
     "speaker_labeling": {"input": 2500, "output": 150},    # ~$0.0009 per session
+    "session_insights": {"input": 1500, "output": 150},    # ~$0.0006 per session
+    "roadmap_generation": {"input": 10000, "output": 1000},  # ~$0.003-0.020 per generation (varies by strategy)
 }
 
 
