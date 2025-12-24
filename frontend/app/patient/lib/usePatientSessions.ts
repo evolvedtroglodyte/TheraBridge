@@ -446,6 +446,20 @@ export function usePatientSessions() {
             transcript: backendSession.transcript || [],
             extraction_confidence: backendSession.extraction_confidence,
             topics_extracted_at: backendSession.topics_extracted_at,
+
+            // Mood analysis fields (Wave 1) - FIXED: These were missing!
+            mood_score: backendSession.mood_score,
+            mood_confidence: backendSession.mood_confidence,
+            mood_rationale: backendSession.mood_rationale,
+            mood_indicators: backendSession.mood_indicators,
+            emotional_tone: backendSession.emotional_tone,
+
+            // Action items summary (Wave 1) - FIXED: This was missing!
+            action_items_summary: backendSession.action_items_summary,
+
+            // Technique definition (API enrichment) - FIXED: This was missing!
+            technique_definition: backendSession.technique_definition,
+
             // Wave 2 fields (prose analysis)
             prose_analysis: backendSession.prose_analysis,
             prose_generated_at: backendSession.prose_generated_at,
