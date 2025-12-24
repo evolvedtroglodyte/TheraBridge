@@ -113,7 +113,7 @@ export function usePipelineEvents(options: UsePipelineEventsOptions) {
 
     // Check if this is a patient ID change (not initial mount)
     const previousPatientId = eventSourceRef.current?.url.split('/').pop();
-    if (previousPatientId && previousPatientId !== patientId) {
+    if (previousPatientId && previousPatientId !== patientId && eventSourceRef.current) {
       console.log(`[SSE] Patient ID changed: ${previousPatientId} → ${patientId}`);
       console.log('[SSE] Disconnecting from old patient...');
       eventSourceRef.current.close();
