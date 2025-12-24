@@ -23,11 +23,12 @@ export function WaveCompletionBridge() {
   const { refresh, setSessionLoading } = useSessionData();
   const [patientId, setPatientId] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(false);
 
-  // Get patient ID from localStorage (populated by demo initialization)
+  // Poll for patient ID - restarts if patient ID is cleared (hard refresh)
   useEffect(() => {
     let attempts = 0;
-    const maxAttempts = 40; // 20 seconds max wait (40 * 500ms)
+    const maxAttempts = 240; // 120 seconds max wait (240 * 500ms)
 
     const checkPatientId = () => {
       attempts++;
@@ -39,19 +40,45 @@ export function WaveCompletionBridge() {
         console.log('[WaveCompletionBridge] ✓ Patient ID found:', id);
         setPatientId(id);
         setIsReady(true);
+        setIsInitializing(false);
         return true; // Stop polling
+      }
+
+      // Check if initialization is in progress
+      if (initStatus === 'pending') {
+        if (!isInitializing) {
+          console.log('[WaveCompletionBridge] Demo initialization in progress...');
+          setIsInitializing(true);
+        }
+        return false; // Keep polling
       }
 
       // Check if initialization failed
       if (initStatus === 'none' && attempts > 10) {
-        console.error('[WaveCompletionBridge] ✗ No patient ID after 5 seconds - initialization may have failed');
+        console.warn('[WaveCompletionBridge] No patient ID after 5 seconds - may need manual initialization');
+
+        // Trigger demo initialization if not started
+        if (attempts === 11) {
+          console.log('[WaveCompletionBridge] Triggering demo initialization...');
+          setIsInitializing(true);
+
+          // Import and call demo initialization
+          import('@/lib/demo-api-client').then(({ demoApiClient }) => {
+            demoApiClient.initialize().catch(err => {
+              console.error('[WaveCompletionBridge] Demo init failed:', err);
+              setIsInitializing(false);
+            });
+          });
+        }
+
         return false; // Keep polling
       }
 
-      // Timeout after 20 seconds
+      // Timeout after 120 seconds
       if (attempts >= maxAttempts) {
-        console.error('[WaveCompletionBridge] ✗ Timeout waiting for patient ID');
+        console.error('[WaveCompletionBridge] ✗ Timeout waiting for patient ID (120s)');
         setIsReady(false);
+        setIsInitializing(false);
         return true; // Stop polling
       }
 
@@ -71,7 +98,7 @@ export function WaveCompletionBridge() {
     }, 500);
 
     return () => clearInterval(interval);
-  }, []); // Run once on mount - don't restart when patientId changes
+  }, [isInitializing]); // Restart effect when initialization state changes
 
   // Connect to SSE and handle events (only after we have patient ID)
   const { isConnected, events } = usePipelineEvents({

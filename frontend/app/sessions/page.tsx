@@ -7,7 +7,6 @@
  */
 
 import { Suspense, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { SessionDataProvider } from '@/app/patient/contexts/SessionDataContext';
 import { ProcessingProvider } from '@/contexts/ProcessingContext';
 import { NavigationBar } from '@/components/NavigationBar';
@@ -19,25 +18,15 @@ import { refreshDetection } from '@/lib/refresh-detection';
 import { demoTokenStorage } from '@/lib/demo-token-storage';
 
 export default function SessionsPage() {
-  const router = useRouter();
-
   // Check for hard refresh and clear localStorage if detected
   useEffect(() => {
     const isHardRefresh = refreshDetection.isHardRefresh();
     if (isHardRefresh) {
-      console.log('🔥 Hard refresh detected on /sessions - clearing demo data and redirecting to home');
+      console.log('🔥 Hard refresh detected on /sessions - clearing demo data (staying on page)');
       demoTokenStorage.clear();
-      router.push('/');
-      return;
+      // Don't redirect - WaveCompletionBridge will detect missing patient ID and handle reinitialization
     }
-
-    // If no demo token exists, redirect to home for initialization
-    if (!demoTokenStorage.isInitialized()) {
-      console.log('⚠️ No demo token found - redirecting to home for initialization');
-      router.push('/');
-      return;
-    }
-  }, [router]);
+  }, []); // Remove router from deps since we're not using it
 
   return (
     <ProcessingProvider>
