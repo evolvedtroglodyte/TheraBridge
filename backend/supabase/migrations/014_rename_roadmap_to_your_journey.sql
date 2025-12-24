@@ -28,10 +28,6 @@ ALTER TABLE your_journey_versions
 RENAME CONSTRAINT roadmap_versions_patient_id_fkey
 TO your_journey_versions_patient_id_fkey;
 
-ALTER TABLE your_journey_versions
-RENAME CONSTRAINT roadmap_versions_roadmap_id_fkey
-TO your_journey_versions_roadmap_id_fkey;
-
 -- ================================================================
 -- VERIFICATION QUERIES (Run after migration to verify data preserved)
 -- ================================================================

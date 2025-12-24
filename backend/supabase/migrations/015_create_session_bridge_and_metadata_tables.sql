@@ -58,7 +58,7 @@ ALTER TABLE patient_session_bridge
 ADD COLUMN current_version_id UUID REFERENCES session_bridge_versions(id);
 
 -- ================================================================
--- STEP 4: Create generation_metadata table (depends on session_bridge_versions, your_journey_versions)
+-- STEP 4: Create generation_metadata table (shared across features)
 -- ================================================================
 CREATE TABLE generation_metadata (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -91,10 +91,10 @@ CREATE TABLE generation_metadata (
 );
 
 -- ================================================================
--- STEP 5: Add generation_metadata_id FK to version tables
+-- STEP 5: Add generation_metadata_id to versions tables
 -- ================================================================
 ALTER TABLE session_bridge_versions
-ADD COLUMN generation_metadata_id UUID REFERENCES generation_metadata(id);
+ADD COLUMN generation_metadata_id UUID REFERENCES generation_metadata(id) ON DELETE SET NULL;
 
 ALTER TABLE your_journey_versions
 ADD COLUMN generation_metadata_id UUID REFERENCES generation_metadata(id) ON DELETE SET NULL;
@@ -129,15 +129,14 @@ ON session_bridge_versions(patient_id, version_number);
 -- ================================================================
 -- COMMENTS
 -- ================================================================
+COMMENT ON TABLE patient_session_bridge IS 'Session Bridge main table (one per patient). Tracks current version of bridge data.';
+COMMENT ON TABLE session_bridge_versions IS 'Session Bridge version history (append-only). New version created after each session.';
+COMMENT ON COLUMN session_bridge_versions.bridge_data IS 'JSONB containing shareConcerns (4 items), shareProgress (4 items), setGoals (4 items) arrays';
+COMMENT ON COLUMN session_bridge_versions.generation_context IS 'Context data used for generation (e.g., tier1_insights, tier2_insights, tier3_insights)';
+COMMENT ON COLUMN session_bridge_versions.cost IS 'Actual cost from track_generation_cost() (not estimated)';
+
 COMMENT ON TABLE generation_metadata IS 'Shared metadata for Your Journey and Session Bridge generations. Editing this table affects both features.';
 COMMENT ON COLUMN generation_metadata.your_journey_version_id IS 'Foreign key to your_journey_versions (mutually exclusive with session_bridge_version_id)';
 COMMENT ON COLUMN generation_metadata.session_bridge_version_id IS 'Foreign key to session_bridge_versions (mutually exclusive with your_journey_version_id)';
 COMMENT ON COLUMN generation_metadata.compaction_strategy IS 'Your Journey only: hierarchical, progressive, or full compaction strategy used';
 COMMENT ON COLUMN generation_metadata.metadata_json IS 'Flexible JSONB field for future extensions without schema changes';
-
-COMMENT ON TABLE patient_session_bridge IS 'Session Bridge main table (one per patient). Tracks current version of bridge data.';
-COMMENT ON TABLE session_bridge_versions IS 'Session Bridge version history (append-only). New version created after each session.';
-
-COMMENT ON COLUMN session_bridge_versions.bridge_data IS 'JSONB containing shareConcerns (4 items), shareProgress (4 items), setGoals (4 items) arrays';
-COMMENT ON COLUMN session_bridge_versions.generation_context IS 'Context data used for generation (e.g., tier1_insights, tier2_insights, tier3_insights)';
-COMMENT ON COLUMN session_bridge_versions.cost IS 'Actual cost from track_generation_cost() (not estimated)';
