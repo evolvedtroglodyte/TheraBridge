@@ -79,7 +79,7 @@ class ActionItemsSummarizer:
                     {"role": "system", "content": self._get_system_prompt()},
                     {"role": "user", "content": prompt}
                 ],
-                # Note: gpt-5-nano only supports temperature=1 (default), cannot customize
+                temperature=0.3,  # Lower temperature for consistent, concise output (works with gpt-4o-mini)
                 max_completion_tokens=60,    # Increased from 30 to allow model to generate output
             )
 

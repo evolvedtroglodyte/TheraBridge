@@ -85,7 +85,7 @@ MODEL_REGISTRY = {
 TASK_MODEL_ASSIGNMENTS = {
     "mood_analysis": "gpt-5-nano",          # Simple 0-10 scoring with rationale
     "topic_extraction": "gpt-5-mini",       # Structured metadata extraction
-    "action_summary": "gpt-5-nano",         # Condense action items to 45 chars
+    "action_summary": "gpt-4o-mini",        # TEMP FIX: Use gpt-4o-mini (GPT-5-nano returns empty)
     "breakthrough_detection": "gpt-5",      # Complex clinical reasoning required
     "deep_analysis": "gpt-5.2",             # Comprehensive synthesis of all data
     "prose_generation": "gpt-5.2",          # Patient-facing prose narrative
