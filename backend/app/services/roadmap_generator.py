@@ -45,16 +45,15 @@ class RoadmapGenerator:
             self.client = openai.OpenAI()  # Uses OPENAI_API_KEY env var
         self.model = get_model_name("roadmap_generation", override_model=override_model)
 
-        # Get compaction strategy from env var
-        self.strategy: CompactionStrategy = os.getenv(
-            "ROADMAP_COMPACTION_STRATEGY",
-            "hierarchical"  # Default to balanced approach
-        ).lower()
+        # Get and validate compaction strategy from env var
+        VALID_STRATEGIES = {"full", "progressive", "hierarchical"}
+        raw_strategy = os.getenv("ROADMAP_COMPACTION_STRATEGY", "hierarchical").lower()
 
-        # Validate strategy
-        if self.strategy not in ["full", "progressive", "hierarchical"]:
-            print(f"[WARNING] Invalid ROADMAP_COMPACTION_STRATEGY '{self.strategy}', defaulting to 'hierarchical'")
-            self.strategy = "hierarchical"
+        if raw_strategy not in VALID_STRATEGIES:
+            print(f"[WARNING] Invalid ROADMAP_COMPACTION_STRATEGY '{raw_strategy}', defaulting to 'hierarchical'")
+            raw_strategy = "hierarchical"
+
+        self.strategy: CompactionStrategy = raw_strategy
 
     def generate_roadmap(
         self,
@@ -187,56 +186,48 @@ Tone: Warm, professional, empowering, hopeful but realistic
 
     def _validate_roadmap_structure(self, roadmap: dict) -> dict:
         """Validate and fix roadmap structure"""
-        # Ensure required fields exist
-        if "summary" not in roadmap:
-            roadmap["summary"] = "Your therapeutic journey is in progress."
+        # Ensure required fields with defaults
+        roadmap.setdefault("summary", "Your therapeutic journey is in progress.")
+        roadmap.setdefault("achievements", [])
+        roadmap.setdefault("currentFocus", [])
+        roadmap.setdefault("sections", [])
 
-        if "achievements" not in roadmap or not isinstance(roadmap["achievements"], list):
+        # Ensure lists are actually lists
+        if not isinstance(roadmap["achievements"], list):
             roadmap["achievements"] = []
-
-        if "currentFocus" not in roadmap or not isinstance(roadmap["currentFocus"], list):
+        if not isinstance(roadmap["currentFocus"], list):
             roadmap["currentFocus"] = []
-
-        if "sections" not in roadmap or not isinstance(roadmap["sections"], list):
+        if not isinstance(roadmap["sections"], list):
             roadmap["sections"] = []
 
-        # Validate achievements count (should be 5)
-        if len(roadmap["achievements"]) < 5:
-            print(f"[WARNING] RoadmapGenerator: Expected 5 achievements, got {len(roadmap['achievements'])}")
-            # Pad with placeholder if needed
-            while len(roadmap["achievements"]) < 5:
-                roadmap["achievements"].append("Continued engagement in therapeutic process")
-        elif len(roadmap["achievements"]) > 5:
-            roadmap["achievements"] = roadmap["achievements"][:5]
-
-        # Validate currentFocus count (should be 3)
-        if len(roadmap["currentFocus"]) < 3:
-            print(f"[WARNING] RoadmapGenerator: Expected 3 focus areas, got {len(roadmap['currentFocus'])}")
-            while len(roadmap["currentFocus"]) < 3:
-                roadmap["currentFocus"].append("Ongoing skill development and practice")
-        elif len(roadmap["currentFocus"]) > 3:
-            roadmap["currentFocus"] = roadmap["currentFocus"][:3]
-
-        # Validate sections (should be 5 with correct titles)
-        expected_sections = [
-            "Clinical Progress",
-            "Therapeutic Strategies",
-            "Identified Patterns",
-            "Current Treatment Focus",
-            "Long-term Goals"
-        ]
+        # Normalize list lengths with padding/truncation
+        roadmap["achievements"] = self._normalize_list(
+            roadmap["achievements"], 5,
+            "Continued engagement in therapeutic process",
+            "achievements"
+        )
+        roadmap["currentFocus"] = self._normalize_list(
+            roadmap["currentFocus"], 3,
+            "Ongoing skill development and practice",
+            "focus areas"
+        )
 
         if len(roadmap["sections"]) != 5:
             print(f"[WARNING] RoadmapGenerator: Expected 5 sections, got {len(roadmap['sections'])}")
 
         # Ensure all sections have title and content
         for section in roadmap["sections"]:
-            if "title" not in section:
-                section["title"] = "Section"
-            if "content" not in section:
-                section["content"] = "Progress is being made in this area."
+            section.setdefault("title", "Section")
+            section.setdefault("content", "Progress is being made in this area.")
 
         return roadmap
+
+    def _normalize_list(self, items: list, expected_count: int, placeholder: str, field_name: str) -> list:
+        """Normalize a list to expected count by padding or truncating"""
+        if len(items) < expected_count:
+            print(f"[WARNING] RoadmapGenerator: Expected {expected_count} {field_name}, got {len(items)}")
+            items.extend([placeholder] * (expected_count - len(items)))
+        return items[:expected_count]
 
     # Strategy-specific prompt building
     def _build_prompt_for_strategy(
@@ -314,6 +305,8 @@ Focus on:
 - Cumulative skill development and progress
 - Emerging patterns visible only across multiple sessions
 - Current state in context of full journey
+
+Return your response as a JSON object with the roadmap structure.
 """
         return prompt
 
@@ -377,6 +370,8 @@ Important:
 - Show progression (how Session {sessions_analyzed} builds on earlier work)
 - Keep the most important historical insights (don't lose key milestones)
 - Emphasize recent progress (Session {sessions_analyzed} should be prominent)
+
+Return your response as a JSON object with the roadmap structure.
 """
         else:
             # Session 1: No previous roadmap
@@ -397,6 +392,8 @@ Focus on:
 - First steps taken in therapy
 - Early insights and rapport building
 - Foundation for future progress
+
+Return your response as a JSON object with the roadmap structure.
 """
 
         return prompt
@@ -500,6 +497,8 @@ Generate an UPDATED "Your Journey" roadmap that synthesizes:
 
 The roadmap should reflect BOTH the big picture AND recent details.
 Show how Session {sessions_analyzed} fits into the larger journey narrative.
+
+Return your response as a JSON object with the roadmap structure.
 """
 
         return prompt

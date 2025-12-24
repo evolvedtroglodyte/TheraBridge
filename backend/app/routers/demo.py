@@ -22,6 +22,50 @@ from supabase import Client
 router = APIRouter(prefix="/api/demo", tags=["demo"])
 logger = logging.getLogger(__name__)
 
+
+# ============================================================================
+# Shared Helper Functions
+# ============================================================================
+
+def register_process(patient_id: str, process_name: str, process: asyncio.subprocess.Process) -> None:
+    """Track a subprocess for potential termination"""
+    if patient_id not in running_processes:
+        running_processes[patient_id] = {}
+    running_processes[patient_id][process_name] = process
+
+
+async def stream_subprocess_output(
+    process: asyncio.subprocess.Process,
+    tag: str,
+    timeout_seconds: int
+) -> bool:
+    """
+    Stream stdout from a subprocess line by line.
+    Returns True if process completed successfully, False otherwise.
+    """
+    async def stream_output():
+        while True:
+            line = await process.stdout.readline()
+            if not line:
+                break
+            line_text = line.decode('utf-8').rstrip()
+            print(f"[{tag}] {line_text}", flush=True)
+            logger.info(f"[{tag}] {line_text}")
+
+    try:
+        await asyncio.wait_for(stream_output(), timeout=timeout_seconds)
+        await process.wait()
+        return process.returncode == 0
+    except asyncio.TimeoutError:
+        process.kill()
+        await process.wait()
+        return False
+
+
+def get_script_path(script_name: str) -> Path:
+    """Get absolute path to a script in the scripts directory"""
+    return Path(__file__).parent.parent.parent / "scripts" / script_name
+
 # In-memory tracking of analysis completion (keyed by patient_id)
 analysis_status = {}
 
@@ -168,62 +212,30 @@ async def run_wave1_analysis_background(patient_id: str):
     logger.info(f"🚀 Starting Wave 1 analysis for patient {patient_id}")
 
     try:
-        # Get Python executable from current environment
-        python_exe = sys.executable
+        script_path = get_script_path("seed_wave1_analysis.py")
+        logger.info(f"Running Wave 1 analysis: {sys.executable} {script_path} {patient_id}")
 
-        # Resolve absolute path to script
-        script_path = Path(__file__).parent.parent.parent / "scripts" / "seed_wave1_analysis.py"
-
-        logger.info(f"Running Wave 1 analysis: {python_exe} {script_path} {patient_id}")
-
-        # Run Wave 1 script with STREAMING output (NON-BLOCKING)
         process = await asyncio.create_subprocess_exec(
-            python_exe, str(script_path), patient_id,
+            sys.executable, str(script_path), patient_id,
             stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.STDOUT,  # Merge stderr into stdout
-            env=os.environ.copy()  # Pass all environment variables
+            stderr=asyncio.subprocess.STDOUT,
+            env=os.environ.copy()
         )
 
-        # Track process for potential termination
-        if patient_id not in running_processes:
-            running_processes[patient_id] = {}
-        running_processes[patient_id]["wave1"] = process
+        register_process(patient_id, "wave1", process)
 
-        # Stream output line by line in real-time (async, non-blocking)
-        try:
-            async def stream_output():
-                """Stream stdout line by line"""
-                while True:
-                    line = await process.stdout.readline()
-                    if not line:
-                        break
-                    line_text = line.decode('utf-8').rstrip()
-                    print(f"[Wave1] {line_text}", flush=True)
-                    logger.info(f"[Wave1] {line_text}")
+        success = await stream_subprocess_output(process, "Wave1", timeout_seconds=600)
 
-            # Wait for streaming to complete with timeout
-            await asyncio.wait_for(stream_output(), timeout=600)  # 10 minute timeout
-
-            # Wait for process to complete
-            await process.wait()
-
-            if process.returncode == 0:
-                print(f"✅ Step 2/3 Complete: Wave 1 analysis complete", flush=True)
-                logger.info(f"✅ Wave 1 analysis complete for patient {patient_id}")
-                # Mark Wave 1 as complete
-                if patient_id not in analysis_status:
-                    analysis_status[patient_id] = {}
-                analysis_status[patient_id]["wave1_complete"] = True
-                analysis_status[patient_id]["wave1_completed_at"] = datetime.now().isoformat()
-            else:
-                print(f"❌ Step 2/3 Failed with return code {process.returncode}", flush=True)
-                logger.error(f"❌ Wave 1 analysis failed with return code {process.returncode}")
-
-        except asyncio.TimeoutError:
-            print(f"❌ Wave 1 analysis TIMEOUT (10 minutes exceeded)", flush=True)
-            logger.error(f"❌ Wave 1 analysis timeout for patient {patient_id}")
-            process.kill()
-            await process.wait()
+        if success:
+            print(f"✅ Step 2/3 Complete: Wave 1 analysis complete", flush=True)
+            logger.info(f"✅ Wave 1 analysis complete for patient {patient_id}")
+            if patient_id not in analysis_status:
+                analysis_status[patient_id] = {}
+            analysis_status[patient_id]["wave1_complete"] = True
+            analysis_status[patient_id]["wave1_completed_at"] = datetime.now().isoformat()
+        else:
+            print(f"❌ Step 2/3 Failed or timed out", flush=True)
+            logger.error(f"❌ Wave 1 analysis failed for patient {patient_id}")
 
     except Exception as e:
         print(f"❌ Wave 1 analysis ERROR: {e}", flush=True)
@@ -236,62 +248,30 @@ async def run_wave2_analysis_background(patient_id: str):
     logger.info(f"🚀 Starting Wave 2 analysis for patient {patient_id}")
 
     try:
-        # Get Python executable from current environment
-        python_exe = sys.executable
+        script_path = get_script_path("seed_wave2_analysis.py")
+        logger.info(f"Running Wave 2 analysis: {sys.executable} {script_path} {patient_id}")
 
-        # Resolve absolute path to script
-        script_path = Path(__file__).parent.parent.parent / "scripts" / "seed_wave2_analysis.py"
-
-        logger.info(f"Running Wave 2 analysis: {python_exe} {script_path} {patient_id}")
-
-        # Run Wave 2 script with STREAMING output (NON-BLOCKING)
         process = await asyncio.create_subprocess_exec(
-            python_exe, str(script_path), patient_id,
+            sys.executable, str(script_path), patient_id,
             stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.STDOUT,  # Merge stderr into stdout
-            env=os.environ.copy()  # Pass all environment variables
+            stderr=asyncio.subprocess.STDOUT,
+            env=os.environ.copy()
         )
 
-        # Track process for potential termination
-        if patient_id not in running_processes:
-            running_processes[patient_id] = {}
-        running_processes[patient_id]["wave2"] = process
+        register_process(patient_id, "wave2", process)
 
-        # Stream output line by line in real-time (async, non-blocking)
-        try:
-            async def stream_output():
-                """Stream stdout line by line"""
-                while True:
-                    line = await process.stdout.readline()
-                    if not line:
-                        break
-                    line_text = line.decode('utf-8').rstrip()
-                    print(f"[Wave2] {line_text}", flush=True)
-                    logger.info(f"[Wave2] {line_text}")
+        success = await stream_subprocess_output(process, "Wave2", timeout_seconds=900)
 
-            # Wait for streaming to complete with timeout
-            await asyncio.wait_for(stream_output(), timeout=900)  # 15 minute timeout
-
-            # Wait for process to complete
-            await process.wait()
-
-            if process.returncode == 0:
-                print(f"✅ Step 3/3 Complete: Wave 2 analysis complete", flush=True)
-                logger.info(f"✅ Wave 2 analysis complete for patient {patient_id}")
-                # Mark Wave 2 as complete
-                if patient_id not in analysis_status:
-                    analysis_status[patient_id] = {}
-                analysis_status[patient_id]["wave2_complete"] = True
-                analysis_status[patient_id]["wave2_completed_at"] = datetime.now().isoformat()
-            else:
-                print(f"❌ Step 3/3 Failed with return code {process.returncode}", flush=True)
-                logger.error(f"❌ Wave 2 analysis failed with return code {process.returncode}")
-
-        except asyncio.TimeoutError:
-            print(f"❌ Wave 2 analysis TIMEOUT (15 minutes exceeded)", flush=True)
-            logger.error(f"❌ Wave 2 analysis timeout for patient {patient_id}")
-            process.kill()
-            await process.wait()
+        if success:
+            print(f"✅ Step 3/3 Complete: Wave 2 analysis complete", flush=True)
+            logger.info(f"✅ Wave 2 analysis complete for patient {patient_id}")
+            if patient_id not in analysis_status:
+                analysis_status[patient_id] = {}
+            analysis_status[patient_id]["wave2_complete"] = True
+            analysis_status[patient_id]["wave2_completed_at"] = datetime.now().isoformat()
+        else:
+            print(f"❌ Step 3/3 Failed or timed out", flush=True)
+            logger.error(f"❌ Wave 2 analysis failed for patient {patient_id}")
 
     except Exception as e:
         print(f"❌ Wave 2 analysis ERROR: {e}", flush=True)
@@ -314,13 +294,9 @@ async def run_full_initialization_pipeline(patient_id: str):
     logger.info(f"✅ Transcripts loaded for patient {patient_id}")
 
     # Step 2 & 3: Run Wave 1 and Wave 2 in background (non-blocking)
-    # Frontend will poll and update when analysis completes
-    import asyncio
-
     async def run_wave1_then_wave2():
         """Run Wave 1, then start Wave 2 when Wave 1 completes"""
         await run_wave1_analysis_background(patient_id)
-        # After Wave 1 completes, start Wave 2
         asyncio.create_task(run_wave2_analysis_background(patient_id))
 
     asyncio.create_task(run_wave1_then_wave2())
@@ -386,14 +362,13 @@ async def initialize_demo(
         logger.info(f"✓ Demo user created: {patient_id} with {len(session_ids)} sessions")
 
         # Initialize demo data if enabled - ALL processing happens in background
-        analysis_status = "pending"
+        init_analysis_status = "pending"
         logger.info(f"📝 run_analysis parameter: {run_analysis}")
         if run_analysis:
             # Use asyncio.create_task() instead of background_tasks to avoid blocking other requests
             # This allows multiple demo initializations to run concurrently without blocking
-            import asyncio
             asyncio.create_task(run_full_initialization_pipeline(str(patient_id)))
-            analysis_status = "processing"
+            init_analysis_status = "processing"
             logger.info(f"🎬 Started full initialization pipeline (transcripts + Wave 1 + Wave 2) for patient {patient_id}")
 
         return DemoInitResponse(
@@ -401,7 +376,7 @@ async def initialize_demo(
             patient_id=str(patient_id),
             session_ids=[str(sid) for sid in session_ids],
             expires_at=expires_at,
-            analysis_status=analysis_status,
+            analysis_status=init_analysis_status,
             message=f"Demo initialized with {len(session_ids)} sessions. Session data loading in background (~30s)." if run_analysis else f"Demo initialized with {len(session_ids)} sessions."
         )
 
@@ -464,7 +439,6 @@ async def reset_demo(
         logger.info(f"✓ Demo reset complete: new patient {new_patient_id} with {len(session_ids)} sessions")
 
         # Re-run initialization pipeline in background
-        import asyncio
         asyncio.create_task(run_full_initialization_pipeline(str(new_patient_id)))
         logger.info(f"🎬 Started initialization pipeline for reset demo (patient {new_patient_id})")
 

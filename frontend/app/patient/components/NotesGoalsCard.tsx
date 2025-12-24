@@ -12,7 +12,7 @@
  * - Accessibility - focus trap, Escape key, focus restoration
  */
 
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { modalVariants, backdropVariants } from '../lib/utils';
@@ -25,6 +25,39 @@ import type { RoadmapData, RoadmapMetadata } from '@/lib/types';
 // Font families - matching SessionCard
 const fontSerif = '"Crimson Pro", Georgia, serif';
 const fontSans = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+// Shared card styles for consistent appearance
+const cardBaseClasses = "bg-gradient-to-br from-white to-[#FFF9F5] dark:from-[#2a2435] dark:to-[#1a1625] rounded-2xl p-6 shadow-lg h-[400px] overflow-hidden transition-colors duration-300 border border-gray-200/50 dark:border-[#3d3548]";
+
+// Reusable bullet component for achievements, focus areas, and sections
+interface BulletListProps {
+  items: string[];
+  bulletSize?: 'small' | 'medium';
+}
+
+function BulletList({ items, bulletSize = 'small' }: BulletListProps): React.ReactElement {
+  const sizeClasses = bulletSize === 'small' ? 'w-1.5 h-1.5' : 'w-2 h-2';
+
+  return (
+    <ul className="space-y-2">
+      {items.map((item, idx) => (
+        <li key={idx} style={{ fontFamily: fontSerif, fontSize: '13px', fontWeight: 300, lineHeight: 1.5 }} className="flex items-start gap-2 text-gray-700 dark:text-gray-300">
+          <span className={`${sizeClasses} rounded-full bg-[#5AB9B4] dark:bg-[#a78bfa] mt-1.5 flex-shrink-0`} />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// Split section content into bullet points
+function splitIntoBullets(content: string): string[] {
+  return content
+    .split('. ')
+    .map(s => s.trim())
+    .filter(s => s.length > 0)
+    .map(s => s.endsWith('.') ? s : s + '.');
+}
 
 export function NotesGoalsCard() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -73,7 +106,7 @@ export function NotesGoalsCard() {
   // Show loading state if initial load or roadmap being generated
   if (isLoading || loadingRoadmap) {
     return (
-      <div className="relative bg-gradient-to-br from-white to-[#FFF9F5] dark:from-[#2a2435] dark:to-[#1a1625] rounded-2xl p-6 shadow-lg h-[400px] overflow-hidden transition-colors duration-300 border border-gray-200/50 dark:border-[#3d3548]">
+      <div className={`relative ${cardBaseClasses}`}>
         <LoadingOverlay visible={true} />
         <div className="flex flex-col items-center justify-center h-full">
           <h2 style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200 mb-4">
@@ -90,7 +123,7 @@ export function NotesGoalsCard() {
   // Show error state if fetch failed
   if (error) {
     return (
-      <div className="bg-gradient-to-br from-white to-[#FFF9F5] dark:from-[#2a2435] dark:to-[#1a1625] rounded-2xl p-6 shadow-lg h-[400px] overflow-hidden transition-colors duration-300 border border-gray-200/50 dark:border-[#3d3548]">
+      <div className={cardBaseClasses}>
         <div className="flex flex-col items-center justify-center h-full">
           <h2 style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200 mb-4">
             Your Journey
@@ -106,7 +139,7 @@ export function NotesGoalsCard() {
   // Show empty state if no roadmap yet (0 sessions analyzed)
   if (!roadmapData || !metadata) {
     return (
-      <div className="bg-gradient-to-br from-white to-[#FFF9F5] dark:from-[#2a2435] dark:to-[#1a1625] rounded-2xl p-6 shadow-lg h-[400px] overflow-hidden transition-colors duration-300 border border-gray-200/50 dark:border-[#3d3548]">
+      <div className={cardBaseClasses}>
         <div className="flex flex-col items-center justify-center h-full text-center">
           <h2 style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200 mb-4">
             Your Journey
@@ -141,25 +174,11 @@ export function NotesGoalsCard() {
 
         <p style={{ fontFamily: fontSerif, fontSize: '14px', fontWeight: 400, lineHeight: 1.6, color: 'var(--text-gray-600)' }} className="dark:text-gray-400 mb-5">{roadmapData.summary}</p>
 
-        <ul className="space-y-2">
-          {roadmapData.achievements.slice(0, 3).map((achievement, idx) => (
-            <li key={idx} style={{ fontFamily: fontSerif, fontSize: '13px', fontWeight: 300, lineHeight: 1.5 }} className="flex items-start gap-2 text-gray-700 dark:text-gray-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#5AB9B4] dark:bg-[#a78bfa] mt-1.5 flex-shrink-0" />
-              <span>{achievement}</span>
-            </li>
-          ))}
-        </ul>
+        <BulletList items={roadmapData.achievements.slice(0, 3)} />
 
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-[#3d3548]">
           <p style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} className="text-gray-500 dark:text-gray-500 mb-2">Current focus:</p>
-          <ul className="space-y-2">
-            {roadmapData.currentFocus.slice(0, 3).map((focus, idx) => (
-              <li key={idx} style={{ fontFamily: fontSerif, fontSize: '13px', fontWeight: 300, lineHeight: 1.5 }} className="flex items-start gap-2 text-gray-700 dark:text-gray-300">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#5AB9B4] dark:bg-[#a78bfa] mt-1.5 flex-shrink-0" />
-                <span>{focus}</span>
-              </li>
-            ))}
-          </ul>
+          <BulletList items={roadmapData.currentFocus.slice(0, 3)} />
         </div>
       </motion.div>
 
@@ -220,55 +239,25 @@ export function NotesGoalsCard() {
                 <h3 style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} className="text-gray-600 dark:text-gray-400 mb-3">
                   Key Achievements
                 </h3>
-                <ul className="space-y-2">
-                  {roadmapData.achievements.map((achievement, idx) => (
-                    <li key={idx} style={{ fontFamily: fontSerif, fontSize: '13px', fontWeight: 300, lineHeight: 1.5 }} className="flex items-start gap-3 text-gray-700 dark:text-gray-300">
-                      <span className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 bg-[#5AB9B4] dark:bg-[#a78bfa]" />
-                      <span>{achievement}</span>
-                    </li>
-                  ))}
-                </ul>
+                <BulletList items={roadmapData.achievements} bulletSize="medium" />
               </div>
 
               <div className="mb-6">
                 <h3 style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} className="text-gray-600 dark:text-gray-400 mb-3">
                   Current Focus Areas
                 </h3>
-                <ul className="space-y-2">
-                  {roadmapData.currentFocus.map((focus, idx) => (
-                    <li key={idx} style={{ fontFamily: fontSerif, fontSize: '13px', fontWeight: 300, lineHeight: 1.5 }} className="flex items-start gap-3 text-gray-700 dark:text-gray-300">
-                      <span className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 bg-[#5AB9B4] dark:bg-[#a78bfa]" />
-                      <span>{focus}</span>
-                    </li>
-                  ))}
-                </ul>
+                <BulletList items={roadmapData.currentFocus} bulletSize="medium" />
               </div>
 
               {/* Additional Sections - Flat Display with Bullets */}
-              {roadmapData.sections.map((section, idx) => {
-                // Split content into sentences for bullet points
-                const bullets = section.content
-                  .split('. ')
-                  .map(s => s.trim())
-                  .filter(s => s.length > 0)
-                  .map(s => s.endsWith('.') ? s : s + '.');
-
-                return (
-                  <div key={idx} className="mb-6">
-                    <h3 style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} className="text-gray-600 dark:text-gray-400 mb-3">
-                      {section.title}
-                    </h3>
-                    <ul className="space-y-2">
-                      {bullets.map((bullet, bulletIdx) => (
-                        <li key={bulletIdx} style={{ fontFamily: fontSerif, fontSize: '13px', fontWeight: 300, lineHeight: 1.5 }} className="flex items-start gap-3 text-gray-700 dark:text-gray-300">
-                          <span className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 bg-[#5AB9B4] dark:bg-[#a78bfa]" />
-                          <span>{bullet}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                );
-              })}
+              {roadmapData.sections.map((section, idx) => (
+                <div key={idx} className="mb-6">
+                  <h3 style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} className="text-gray-600 dark:text-gray-400 mb-3">
+                    {section.title}
+                  </h3>
+                  <BulletList items={splitIntoBullets(section.content)} bulletSize="medium" />
+                </div>
+              ))}
             </motion.div>
           </>
         )}

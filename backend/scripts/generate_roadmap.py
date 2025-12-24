@@ -326,20 +326,13 @@ def build_hierarchical_context(patient_id: str, current_session_id: str, current
 
 
 def estimate_cost(context: dict, roadmap: dict) -> float:
-    """Estimate generation cost based on token counts"""
-    # Rough estimate: ~$0.003-0.020 depending on context size
-    context_size = len(json.dumps(context))
-    roadmap_size = len(json.dumps(roadmap))
+    """Estimate generation cost based on token counts (GPT-5.2 pricing)"""
+    # Token estimation: 1 token ~ 4 characters
+    input_tokens = len(json.dumps(context)) / 4
+    output_tokens = len(json.dumps(roadmap)) / 4
 
-    # Approximate tokens (1 token ≈ 4 characters)
-    input_tokens = context_size / 4
-    output_tokens = roadmap_size / 4
-
-    # GPT-5.2 pricing
-    input_cost = (input_tokens / 1_000_000) * 1.75
-    output_cost = (output_tokens / 1_000_000) * 14.00
-
-    return round(input_cost + output_cost, 6)
+    # GPT-5.2: $1.75/M input, $14.00/M output
+    return round((input_tokens * 1.75 + output_tokens * 14.00) / 1_000_000, 6)
 
 
 if __name__ == "__main__":

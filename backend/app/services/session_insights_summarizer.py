@@ -128,4 +128,6 @@ Deep Analysis Data:
 
 Extract 3-5 key therapeutic insights from this session's deep analysis.
 Focus on the most significant progress, breakthroughs, skills, and patterns.
+
+Return your response as a JSON object with an "insights" array.
 """
