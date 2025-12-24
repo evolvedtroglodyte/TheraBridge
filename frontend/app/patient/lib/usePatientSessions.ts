@@ -85,12 +85,15 @@ export function usePatientSessions() {
         } else {
           // Transform backend session to frontend Session type
           const backendSession = sessionResult.data;
+          const sessionDate = new Date(backendSession.session_date);
+
           session1Data = {
             id: backendSession.id,
-            date: new Date(backendSession.session_date).toLocaleDateString('en-US', {
+            date: sessionDate.toLocaleDateString('en-US', {
               month: 'short',
               day: 'numeric'
-            }),
+            }), // "Jan 10"
+            rawDate: sessionDate, // Date object for sorting
             duration: `${backendSession.duration_minutes || 60} min`,
             therapist: 'Dr. Rodriguez',
             mood: 'neutral' as const, // TODO: Map mood_score to MoodType
@@ -102,14 +105,24 @@ export function usePatientSessions() {
             extraction_confidence: backendSession.extraction_confidence,
             topics_extracted_at: backendSession.topics_extracted_at,
           };
+          console.log('[Session1] ✓ Loaded date:', backendSession.session_date);
           console.log('[Session1] ✓ Loaded summary:', session1Data.summary);
         }
 
         // Step 4: Merge Session 1 (real) + Sessions 2-10 (mock)
-        const hybridSessions = [session1Data, ...mockSessions.slice(1)];
+        const allSessions = [session1Data, ...mockSessions.slice(1)];
 
-        // Step 5: Update state
-        setSessions(hybridSessions);
+        // Step 5: Sort by rawDate in descending order (newest first)
+        const sortedSessions = allSessions.sort((a, b) => {
+          if (!a.rawDate || !b.rawDate) return 0;
+          return b.rawDate.getTime() - a.rawDate.getTime();
+        });
+
+        console.log('[Sessions] ✓ Sorted:', sortedSessions.map((s, i) => `${i}: ${s.date}`).join(', '));
+        console.log('[Session1] ✓ Position:', sortedSessions.findIndex(s => s.id === session1Data.id));
+
+        // Step 6: Update state
+        setSessions(sortedSessions);
         setTasks(mockTasks);
         setTimeline(mockTimeline);
         setUnifiedTimeline(mockUnifiedTimeline);
