@@ -16,6 +16,7 @@ Cost: ~$0.003-0.020 per generation (varies by strategy)
 """
 
 import json
+import logging
 import os
 import time
 from typing import Optional, Literal, Dict, List, Any
@@ -24,6 +25,9 @@ from datetime import datetime
 
 from app.services.base_ai_generator import SyncAIGenerator
 from app.config.model_config import track_generation_cost, GenerationCost
+from app.utils.wave3_logger import Wave3Logger, Wave3Phase, Wave3Event, create_your_journey_logger
+
+logger = logging.getLogger(__name__)
 
 
 CompactionStrategy = Literal["full", "progressive", "hierarchical"]
@@ -73,7 +77,8 @@ class RoadmapGenerator(SyncAIGenerator):
         current_session: dict,  # Current session wave1 + wave2 data
         context: dict,  # Compacted context (structure varies by strategy)
         sessions_analyzed: int,
-        total_sessions: int
+        total_sessions: int,
+        wave3_logger: Optional[Wave3Logger] = None
     ) -> dict:
         """
         Generate roadmap using configured compaction strategy.
@@ -84,6 +89,7 @@ class RoadmapGenerator(SyncAIGenerator):
             context: Previous context (structure depends on strategy)
             sessions_analyzed: Number of sessions analyzed (for counter display)
             total_sessions: Total sessions uploaded (for counter display)
+            wave3_logger: Optional Wave3Logger for event logging (created if not provided)
 
         Returns:
             Roadmap dict matching NotesGoalsCard structure:
@@ -97,54 +103,127 @@ class RoadmapGenerator(SyncAIGenerator):
                 ]
             }
         """
+        # Initialize logger if not provided
+        w3_logger = wave3_logger or create_your_journey_logger(str(patient_id))
+
         start_time = time.time()
 
-        # Build prompt based on strategy
-        prompt = self._build_prompt_for_strategy(
-            patient_id,
-            current_session,
-            context,
-            sessions_analyzed,
-            total_sessions
+        # Log start event
+        w3_logger.log_event(
+            Wave3Event.START,
+            version_number=sessions_analyzed,
+            details={
+                "strategy": self.strategy,
+                "model": self.model,
+                "total_sessions": total_sessions
+            }
         )
 
-        # Call GPT-5.2
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": self._get_system_prompt()},
-                {"role": "user", "content": prompt}
-            ],
-            response_format={"type": "json_object"}
-        )
+        try:
+            # Build prompt based on strategy
+            prompt = self._build_prompt_for_strategy(
+                patient_id,
+                current_session,
+                context,
+                sessions_analyzed,
+                total_sessions
+            )
 
-        # Track cost and timing
-        cost_info = track_generation_cost(
-            response=response,
-            task="roadmap_generation",
-            model=self.model,
-            start_time=start_time,
-            session_id=str(patient_id),
-            metadata={"sessions_analyzed": sessions_analyzed, "strategy": self.strategy}
-        )
+            # Log context build complete
+            w3_logger.log_event(
+                Wave3Event.CONTEXT_BUILD,
+                version_number=sessions_analyzed,
+                details={
+                    "strategy": self.strategy,
+                    "prompt_length": len(prompt)
+                }
+            )
 
-        # Parse and validate response
-        roadmap_data = json.loads(response.choices[0].message.content)
-        roadmap_data = self._validate_roadmap_structure(roadmap_data)
+            # Log roadmap generation start
+            w3_logger.log_event(
+                Wave3Event.ROADMAP_GENERATE,
+                version_number=sessions_analyzed,
+                status="started",
+                details={"model": self.model}
+            )
 
-        # Return roadmap with metadata and cost info
-        return {
-            "roadmap": roadmap_data,
-            "metadata": {
-                "compaction_strategy": self.strategy,
-                "sessions_analyzed": sessions_analyzed,
-                "total_sessions": total_sessions,
-                "model_used": self.model,
-                "generation_timestamp": datetime.now().isoformat(),
-                "generation_duration_ms": cost_info.duration_ms
-            },
-            "cost_info": cost_info.to_dict() if cost_info else None
-        }
+            # Call GPT-5.2
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": self._get_system_prompt()},
+                    {"role": "user", "content": prompt}
+                ],
+                response_format={"type": "json_object"}
+            )
+
+            # Track cost and timing
+            cost_info = track_generation_cost(
+                response=response,
+                task="roadmap_generation",
+                model=self.model,
+                start_time=start_time,
+                session_id=str(patient_id),
+                metadata={"sessions_analyzed": sessions_analyzed, "strategy": self.strategy}
+            )
+
+            # Log cost tracking
+            if cost_info:
+                w3_logger.log_cost(
+                    task="roadmap_generation",
+                    model=self.model,
+                    cost=cost_info.cost,
+                    input_tokens=cost_info.input_tokens,
+                    output_tokens=cost_info.output_tokens,
+                    duration_ms=cost_info.duration_ms
+                )
+
+            # Parse and validate response
+            roadmap_data = json.loads(response.choices[0].message.content)
+            roadmap_data = self._validate_roadmap_structure(roadmap_data)
+
+            duration_ms = (time.time() - start_time) * 1000
+
+            # Log successful completion
+            w3_logger.log_complete(
+                version_number=sessions_analyzed,
+                duration_ms=duration_ms,
+                cost=cost_info.cost if cost_info else None,
+                details={
+                    "strategy": self.strategy,
+                    "sessions_analyzed": sessions_analyzed
+                }
+            )
+
+            # Return roadmap with metadata and cost info
+            return {
+                "roadmap": roadmap_data,
+                "metadata": {
+                    "compaction_strategy": self.strategy,
+                    "sessions_analyzed": sessions_analyzed,
+                    "total_sessions": total_sessions,
+                    "model_used": self.model,
+                    "generation_timestamp": datetime.now().isoformat(),
+                    "generation_duration_ms": cost_info.duration_ms if cost_info else duration_ms
+                },
+                "cost_info": cost_info.to_dict() if cost_info else None
+            }
+
+        except Exception as e:
+            duration_ms = (time.time() - start_time) * 1000
+
+            # Log failure
+            w3_logger.log_failed(
+                error=str(e),
+                version_number=sessions_analyzed,
+                details={
+                    "strategy": self.strategy,
+                    "duration_ms": duration_ms
+                }
+            )
+
+            logger.error(f"Roadmap generation failed for patient {patient_id}: {e}")
+            raise
 
     def _get_system_prompt(self) -> str:
         """System prompt defining roadmap generation task"""
