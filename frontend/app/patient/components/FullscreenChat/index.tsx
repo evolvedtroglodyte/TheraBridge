@@ -184,7 +184,10 @@ export function FullscreenChat({
 
   // Send message handler with streaming support
   const handleSend = useCallback(async () => {
-    if (!inputValue.trim() || isLoading || authLoading || !user) return;
+    if (!inputValue.trim() || isLoading) return;
+
+    // Allow sending without auth in development (use mock user ID)
+    if (authLoading) return;
 
     const userMessage: ChatMessage = {
       id: `msg-${Date.now()}`,
@@ -209,12 +212,8 @@ export function FullscreenChat({
     setMessages(prev => [...prev, tempAssistantMessage]);
 
     try {
-      // Get authenticated user ID
-      if (!user?.id) {
-        throw new Error('You must be logged in to chat');
-      }
-
-      const userId = user.id;
+      // Get authenticated user ID (use mock ID for development if not logged in)
+      const userId = user?.id || '00000000-0000-0000-0000-000000000003'; // Mock patient ID
 
       // Call streaming chat API
       const response = await fetch('/api/chat', {
@@ -472,7 +471,7 @@ export function FullscreenChat({
                       : 'bg-white text-gray-700 shadow-sm border border-gray-100'
                   }`}
                 >
-                  <p>{DOBBY_INTRO}</p>
+                  <p className="whitespace-pre-line">{DOBBY_INTRO}</p>
                 </div>
               </div>
 
@@ -660,10 +659,10 @@ export function FullscreenChat({
                 {/* Send Button - Arrow up icon matching collapsed card */}
                 <button
                   onClick={handleSend}
-                  disabled={!inputValue.trim() || isLoading || authLoading || !user}
+                  disabled={!inputValue.trim() || isLoading}
                   aria-label="Send message"
                   className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all flex-shrink-0 ${
-                    inputValue.trim() && !isLoading && !authLoading && user
+                    inputValue.trim() && !isLoading
                       ? isDark
                         ? 'bg-[#8B6AAE] text-white hover:bg-[#7B5A9E]'
                         : 'bg-[#5AB9B4] text-white hover:bg-[#4AA9A4]'

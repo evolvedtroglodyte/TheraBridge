@@ -234,17 +234,6 @@ export function ToDoCard() {
                   </div>
                 </div>
               )}
-
-              {/* Actions */}
-              <div className="mt-8 pt-6 border-t border-gray-200 dark:border-[#3d3548] flex gap-3">
-                <button className="flex items-center gap-2 px-4 py-2 bg-[#5AB9B4] dark:bg-[#a78bfa] text-white rounded-lg hover:opacity-90 transition-colors">
-                  <Plus className="w-4 h-4" />
-                  <span className="text-sm font-medium">Add New Task</span>
-                </button>
-                <button className="px-4 py-2 border border-gray-300 dark:border-[#3d3548] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-[#3d3548] transition-colors">
-                  <span className="text-sm font-medium">Archive Completed</span>
-                </button>
-              </div>
             </motion.div>
           </>
         )}
