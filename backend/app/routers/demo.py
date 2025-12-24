@@ -87,31 +87,42 @@ async def populate_session_transcripts_background(patient_id: str):
 
         logger.info(f"Running transcript population: {python_exe} {script_path} {patient_id}")
 
-        # Run transcript population script with environment variables
-        result = subprocess.run(
-            [python_exe, str(script_path), patient_id],
-            capture_output=True,
-            text=True,
-            timeout=300,  # 5 minute timeout
+        # Run transcript population script with environment variables (NON-BLOCKING)
+        process = await asyncio.create_subprocess_exec(
+            python_exe, str(script_path), patient_id,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
             env=os.environ.copy()  # Pass all environment variables
         )
 
-        if result.returncode == 0:
-            print(f"✅ Step 1/3 Complete: Session transcripts populated", flush=True)
-            logger.info(f"✅ Session transcripts populated for patient {patient_id}")
-            logger.info(result.stdout)
-            # Show script output in Railway logs
-            if result.stdout:
-                print(f"[Transcript Script Output]:\n{result.stdout}", flush=True)
-        else:
-            print(f"❌ Step 1/3 Failed: {result.stderr}", flush=True)
-            logger.error(f"❌ Transcript population failed: {result.stderr}")
-            # Show error details in Railway logs
-            if result.stderr:
-                print(f"[Transcript Script Error]:\n{result.stderr}", flush=True)
+        # Wait for completion (async, non-blocking)
+        try:
+            stdout, stderr = await asyncio.wait_for(
+                process.communicate(),
+                timeout=300  # 5 minute timeout
+            )
+            stdout_text = stdout.decode('utf-8') if stdout else ''
+            stderr_text = stderr.decode('utf-8') if stderr else ''
 
-    except subprocess.TimeoutExpired:
-        logger.error(f"❌ Transcript population timeout for patient {patient_id}")
+            if process.returncode == 0:
+                print(f"✅ Step 1/3 Complete: Session transcripts populated", flush=True)
+                logger.info(f"✅ Session transcripts populated for patient {patient_id}")
+                logger.info(stdout_text)
+                # Show script output in Railway logs
+                if stdout_text:
+                    print(f"[Transcript Script Output]:\n{stdout_text}", flush=True)
+            else:
+                print(f"❌ Step 1/3 Failed: {stderr_text}", flush=True)
+                logger.error(f"❌ Transcript population failed: {stderr_text}")
+                # Show error details in Railway logs
+                if stderr_text:
+                    print(f"[Transcript Script Error]:\n{stderr_text}", flush=True)
+
+        except asyncio.TimeoutError:
+            logger.error(f"❌ Transcript population timeout for patient {patient_id}")
+            process.kill()
+            await process.wait()
+
     except Exception as e:
         logger.error(f"❌ Transcript population error: {e}")
 
@@ -130,41 +141,50 @@ async def run_wave1_analysis_background(patient_id: str):
 
         logger.info(f"Running Wave 1 analysis: {python_exe} {script_path} {patient_id}")
 
-        # Run Wave 1 script with STREAMING output (not buffered)
-        process = subprocess.Popen(
-            [python_exe, str(script_path), patient_id],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,  # Merge stderr into stdout
-            text=True,
-            bufsize=1,  # Line buffered
+        # Run Wave 1 script with STREAMING output (NON-BLOCKING)
+        process = await asyncio.create_subprocess_exec(
+            python_exe, str(script_path), patient_id,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,  # Merge stderr into stdout
             env=os.environ.copy()  # Pass all environment variables
         )
 
-        # Stream output line by line in real-time
-        for line in process.stdout:
-            print(f"[Wave1] {line.rstrip()}", flush=True)
-            logger.info(f"[Wave1] {line.rstrip()}")
+        # Stream output line by line in real-time (async, non-blocking)
+        try:
+            async def stream_output():
+                """Stream stdout line by line"""
+                while True:
+                    line = await process.stdout.readline()
+                    if not line:
+                        break
+                    line_text = line.decode('utf-8').rstrip()
+                    print(f"[Wave1] {line_text}", flush=True)
+                    logger.info(f"[Wave1] {line_text}")
 
-        # Wait for process to complete
-        returncode = process.wait(timeout=600)  # 10 minute timeout
+            # Wait for streaming to complete with timeout
+            await asyncio.wait_for(stream_output(), timeout=600)  # 10 minute timeout
 
-        if returncode == 0:
-            print(f"✅ Step 2/3 Complete: Wave 1 analysis complete", flush=True)
-            logger.info(f"✅ Wave 1 analysis complete for patient {patient_id}")
-            # Mark Wave 1 as complete
-            if patient_id not in analysis_status:
-                analysis_status[patient_id] = {}
-            analysis_status[patient_id]["wave1_complete"] = True
-            analysis_status[patient_id]["wave1_completed_at"] = datetime.now().isoformat()
-        else:
-            print(f"❌ Step 2/3 Failed with return code {returncode}", flush=True)
-            logger.error(f"❌ Wave 1 analysis failed with return code {returncode}")
+            # Wait for process to complete
+            await process.wait()
 
-    except subprocess.TimeoutExpired:
-        print(f"❌ Wave 1 analysis TIMEOUT (10 minutes exceeded)", flush=True)
-        logger.error(f"❌ Wave 1 analysis timeout for patient {patient_id}")
-        if 'process' in locals():
+            if process.returncode == 0:
+                print(f"✅ Step 2/3 Complete: Wave 1 analysis complete", flush=True)
+                logger.info(f"✅ Wave 1 analysis complete for patient {patient_id}")
+                # Mark Wave 1 as complete
+                if patient_id not in analysis_status:
+                    analysis_status[patient_id] = {}
+                analysis_status[patient_id]["wave1_complete"] = True
+                analysis_status[patient_id]["wave1_completed_at"] = datetime.now().isoformat()
+            else:
+                print(f"❌ Step 2/3 Failed with return code {process.returncode}", flush=True)
+                logger.error(f"❌ Wave 1 analysis failed with return code {process.returncode}")
+
+        except asyncio.TimeoutError:
+            print(f"❌ Wave 1 analysis TIMEOUT (10 minutes exceeded)", flush=True)
+            logger.error(f"❌ Wave 1 analysis timeout for patient {patient_id}")
             process.kill()
+            await process.wait()
+
     except Exception as e:
         print(f"❌ Wave 1 analysis ERROR: {e}", flush=True)
         logger.error(f"❌ Wave 1 analysis error: {e}")
@@ -184,41 +204,50 @@ async def run_wave2_analysis_background(patient_id: str):
 
         logger.info(f"Running Wave 2 analysis: {python_exe} {script_path} {patient_id}")
 
-        # Run Wave 2 script with STREAMING output (not buffered)
-        process = subprocess.Popen(
-            [python_exe, str(script_path), patient_id],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,  # Merge stderr into stdout
-            text=True,
-            bufsize=1,  # Line buffered
+        # Run Wave 2 script with STREAMING output (NON-BLOCKING)
+        process = await asyncio.create_subprocess_exec(
+            python_exe, str(script_path), patient_id,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,  # Merge stderr into stdout
             env=os.environ.copy()  # Pass all environment variables
         )
 
-        # Stream output line by line in real-time
-        for line in process.stdout:
-            print(f"[Wave2] {line.rstrip()}", flush=True)
-            logger.info(f"[Wave2] {line.rstrip()}")
+        # Stream output line by line in real-time (async, non-blocking)
+        try:
+            async def stream_output():
+                """Stream stdout line by line"""
+                while True:
+                    line = await process.stdout.readline()
+                    if not line:
+                        break
+                    line_text = line.decode('utf-8').rstrip()
+                    print(f"[Wave2] {line_text}", flush=True)
+                    logger.info(f"[Wave2] {line_text}")
 
-        # Wait for process to complete
-        returncode = process.wait(timeout=900)  # 15 minute timeout
+            # Wait for streaming to complete with timeout
+            await asyncio.wait_for(stream_output(), timeout=900)  # 15 minute timeout
 
-        if returncode == 0:
-            print(f"✅ Step 3/3 Complete: Wave 2 analysis complete", flush=True)
-            logger.info(f"✅ Wave 2 analysis complete for patient {patient_id}")
-            # Mark Wave 2 as complete
-            if patient_id not in analysis_status:
-                analysis_status[patient_id] = {}
-            analysis_status[patient_id]["wave2_complete"] = True
-            analysis_status[patient_id]["wave2_completed_at"] = datetime.now().isoformat()
-        else:
-            print(f"❌ Step 3/3 Failed with return code {returncode}", flush=True)
-            logger.error(f"❌ Wave 2 analysis failed with return code {returncode}")
+            # Wait for process to complete
+            await process.wait()
 
-    except subprocess.TimeoutExpired:
-        print(f"❌ Wave 2 analysis TIMEOUT (15 minutes exceeded)", flush=True)
-        logger.error(f"❌ Wave 2 analysis timeout for patient {patient_id}")
-        if 'process' in locals():
+            if process.returncode == 0:
+                print(f"✅ Step 3/3 Complete: Wave 2 analysis complete", flush=True)
+                logger.info(f"✅ Wave 2 analysis complete for patient {patient_id}")
+                # Mark Wave 2 as complete
+                if patient_id not in analysis_status:
+                    analysis_status[patient_id] = {}
+                analysis_status[patient_id]["wave2_complete"] = True
+                analysis_status[patient_id]["wave2_completed_at"] = datetime.now().isoformat()
+            else:
+                print(f"❌ Step 3/3 Failed with return code {process.returncode}", flush=True)
+                logger.error(f"❌ Wave 2 analysis failed with return code {process.returncode}")
+
+        except asyncio.TimeoutError:
+            print(f"❌ Wave 2 analysis TIMEOUT (15 minutes exceeded)", flush=True)
+            logger.error(f"❌ Wave 2 analysis timeout for patient {patient_id}")
             process.kill()
+            await process.wait()
+
     except Exception as e:
         print(f"❌ Wave 2 analysis ERROR: {e}", flush=True)
         logger.error(f"❌ Wave 2 analysis error: {e}")
