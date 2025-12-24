@@ -56,6 +56,7 @@ export function NavigationBar() {
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [isStopping, setIsStopping] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   // Prevent hydration mismatch by only rendering theme-dependent content after mount
@@ -65,6 +66,23 @@ export function NavigationBar() {
 
   const isDark = theme === 'dark';
   const toggleTheme = () => setTheme(isDark ? 'light' : 'dark');
+
+  const handleStopProcessing = async () => {
+    setIsStopping(true);
+    try {
+      const result = await demoApiClient.stop();
+      if (result) {
+        alert(`Processing stopped! Terminated: ${result.terminated.join(', ') || 'none'}`);
+      } else {
+        alert('Failed to stop processing. It may have already completed.');
+      }
+    } catch (error) {
+      console.error('Stop processing error:', error);
+      alert('Error stopping processing. Please try again.');
+    } finally {
+      setIsStopping(false);
+    }
+  };
 
   const handleResetDemo = async () => {
     setIsResetting(true);
@@ -214,11 +232,18 @@ export function NavigationBar() {
         </button>
       </nav>
 
-      {/* Right section - Reset Demo Button + TheraBridge Logo */}
-      <div className="flex items-center justify-end gap-3 pr-6 w-[240px]">
+      {/* Right section - Stop/Reset Buttons + TheraBridge Logo */}
+      <div className="flex items-center justify-end gap-2 pr-6 w-[320px]">
+        <button
+          onClick={handleStopProcessing}
+          disabled={isStopping}
+          className="text-[13px] font-medium text-white bg-red-500 dark:bg-red-600 border border-red-500 dark:border-red-600 rounded-[10px] px-[14px] py-[8px] whitespace-nowrap cursor-pointer transition-all duration-200 shadow-[0_0_12px_rgba(239,68,68,0.25)] dark:shadow-[0_0_12px_rgba(220,38,38,0.3)] hover:bg-red-600 dark:hover:bg-red-700 hover:shadow-[0_0_18px_rgba(239,68,68,0.4)] dark:hover:shadow-[0_0_18px_rgba(220,38,38,0.5)] active:bg-red-700 dark:active:bg-red-800 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-red-500 dark:disabled:hover:bg-red-600"
+        >
+          {isStopping ? 'Stopping...' : 'Stop'}
+        </button>
         <button
           onClick={() => setShowResetConfirm(true)}
-          className="text-[13px] font-medium text-[#5AB9B4] dark:text-[#9B7AC4] bg-white dark:bg-[#252030] border border-[#5AB9B4] dark:border-[#9B7AC4] rounded-[10px] px-[18px] py-[10px] whitespace-nowrap cursor-pointer transition-all duration-200 shadow-[0_0_12px_rgba(90,185,180,0.25)] dark:shadow-[0_0_12px_rgba(155,122,196,0.3)] hover:bg-[#5AB9B4]/[0.05] dark:hover:bg-[#9B7AC4]/[0.08] hover:shadow-[0_0_18px_rgba(90,185,180,0.4)] dark:hover:shadow-[0_0_18px_rgba(155,122,196,0.5)] active:bg-[#5AB9B4]/[0.1] dark:active:bg-[#9B7AC4]/[0.15] active:shadow-[0_0_24px_rgba(90,185,180,0.6),0_0_40px_rgba(90,185,180,0.3)] dark:active:shadow-[0_0_24px_rgba(155,122,196,0.7),0_0_40px_rgba(155,122,196,0.4)] active:scale-[0.98]"
+          className="text-[13px] font-medium text-[#5AB9B4] dark:text-[#9B7AC4] bg-white dark:bg-[#252030] border border-[#5AB9B4] dark:border-[#9B7AC4] rounded-[10px] px-[14px] py-[8px] whitespace-nowrap cursor-pointer transition-all duration-200 shadow-[0_0_12px_rgba(90,185,180,0.25)] dark:shadow-[0_0_12px_rgba(155,122,196,0.3)] hover:bg-[#5AB9B4]/[0.05] dark:hover:bg-[#9B7AC4]/[0.08] hover:shadow-[0_0_18px_rgba(90,185,180,0.4)] dark:hover:shadow-[0_0_18px_rgba(155,122,196,0.5)] active:bg-[#5AB9B4]/[0.1] dark:active:bg-[#9B7AC4]/[0.15] active:scale-[0.98]"
         >
           Reset Demo
         </button>

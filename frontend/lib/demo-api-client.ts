@@ -159,4 +159,36 @@ export const demoApiClient = {
       return null;
     }
   },
+
+  /**
+   * Stop all running background processes for the demo
+   * Terminates transcript population, Wave 1, and Wave 2 analysis
+   */
+  async stop(): Promise<{ message: string; terminated: string[] } | null> {
+    const token = demoTokenStorage.getToken();
+    if (!token) {
+      console.error('[Demo API] No demo token found for stop');
+      return null;
+    }
+
+    console.log('[Demo API] Stopping demo processing...');
+
+    const result = await apiClient.post<{ message: string; patient_id: string; terminated: string[] }>(
+      '/api/demo/stop',
+      {},
+      {
+        headers: {
+          'X-Demo-Token': token,
+        },
+      }
+    );
+
+    if (result.success) {
+      console.log('[Demo API] ✓ Demo processing stopped:', result.data);
+      return result.data;
+    } else {
+      console.error('[Demo API] ✗ Stop demo failed:', result.error);
+      return null;
+    }
+  },
 };

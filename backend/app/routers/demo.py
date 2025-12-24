@@ -25,6 +25,10 @@ logger = logging.getLogger(__name__)
 # In-memory tracking of analysis completion (keyed by patient_id)
 analysis_status = {}
 
+# In-memory tracking of running processes (keyed by patient_id)
+# Stores subprocess references so they can be terminated
+running_processes = {}
+
 
 # ============================================================================
 # Request/Response Models
@@ -115,6 +119,11 @@ async def populate_session_transcripts_background(patient_id: str):
             env=os.environ.copy()  # Pass all environment variables
         )
 
+        # Track process for potential termination
+        if patient_id not in running_processes:
+            running_processes[patient_id] = {}
+        running_processes[patient_id]["transcript"] = process
+
         # Wait for completion (async, non-blocking)
         try:
             stdout, stderr = await asyncio.wait_for(
@@ -168,6 +177,11 @@ async def run_wave1_analysis_background(patient_id: str):
             stderr=asyncio.subprocess.STDOUT,  # Merge stderr into stdout
             env=os.environ.copy()  # Pass all environment variables
         )
+
+        # Track process for potential termination
+        if patient_id not in running_processes:
+            running_processes[patient_id] = {}
+        running_processes[patient_id]["wave1"] = process
 
         # Stream output line by line in real-time (async, non-blocking)
         try:
@@ -231,6 +245,11 @@ async def run_wave2_analysis_background(patient_id: str):
             stderr=asyncio.subprocess.STDOUT,  # Merge stderr into stdout
             env=os.environ.copy()  # Pass all environment variables
         )
+
+        # Track process for potential termination
+        if patient_id not in running_processes:
+            running_processes[patient_id] = {}
+        running_processes[patient_id]["wave2"] = process
 
         # Stream output line by line in real-time (async, non-blocking)
         try:
@@ -617,4 +636,66 @@ async def get_pipeline_logs(
         "patient_id": patient_id,
         "log_count": len(logs),
         "logs": logs
+    }
+
+
+@router.post("/stop")
+async def stop_demo_processing(
+    request: Request,
+    demo_user: dict = Depends(get_demo_user)
+):
+    """
+    Stop all running background processes for the current demo.
+    Terminates transcript population, Wave 1, and Wave 2 analysis.
+
+    Returns:
+        Status of terminated processes
+    """
+    patient_id = demo_user["patient_id"]
+
+    print(f"🛑 Stop requested for patient {patient_id}", flush=True)
+    logger.info(f"🛑 Stop requested for patient {patient_id}")
+
+    if patient_id not in running_processes:
+        return {
+            "message": "No running processes found for this demo",
+            "patient_id": patient_id,
+            "terminated": []
+        }
+
+    terminated = []
+    processes = running_processes.get(patient_id, {})
+
+    for process_name, process in processes.items():
+        try:
+            if process and process.returncode is None:  # Process is still running
+                print(f"  🛑 Terminating {process_name} process...", flush=True)
+                logger.info(f"Terminating {process_name} process for patient {patient_id}")
+
+                process.terminate()  # Send SIGTERM
+                try:
+                    # Wait up to 5 seconds for graceful shutdown
+                    await asyncio.wait_for(process.wait(), timeout=5.0)
+                    print(f"  ✓ {process_name} terminated gracefully", flush=True)
+                except asyncio.TimeoutError:
+                    # Force kill if not terminated
+                    process.kill()
+                    await process.wait()
+                    print(f"  ✓ {process_name} force killed", flush=True)
+
+                terminated.append(process_name)
+        except Exception as e:
+            logger.error(f"Error terminating {process_name}: {e}")
+            print(f"  ✗ Error terminating {process_name}: {e}", flush=True)
+
+    # Clear process references
+    running_processes[patient_id] = {}
+
+    print(f"✅ Stopped {len(terminated)} processes: {', '.join(terminated)}", flush=True)
+    logger.info(f"Stopped {len(terminated)} processes for patient {patient_id}")
+
+    return {
+        "message": f"Successfully stopped {len(terminated)} running processes",
+        "patient_id": patient_id,
+        "terminated": terminated
     }
