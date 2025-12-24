@@ -99,11 +99,11 @@ export function WaveCompletionBridge() {
       // Show loading overlay on this session card
       setSessionLoading(sessionId, true);
 
-      // Small delay to ensure loading state is visible
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      // Refresh data to get mood/topics
+      // Refresh data to get mood/topics (now actually waits for completion)
       await refresh();
+
+      // Small delay to ensure user sees the overlay before it disappears
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       // Hide loading overlay
       setSessionLoading(sessionId, false);
@@ -117,11 +117,11 @@ export function WaveCompletionBridge() {
       // Show loading overlay on this session card
       setSessionLoading(sessionId, true);
 
-      // Small delay to ensure loading state is visible
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      // Refresh data to get deep analysis
+      // Refresh data to get deep analysis (now actually waits for completion)
       await refresh();
+
+      // Small delay to ensure user sees the overlay before it disappears
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       // Hide loading overlay
       setSessionLoading(sessionId, false);

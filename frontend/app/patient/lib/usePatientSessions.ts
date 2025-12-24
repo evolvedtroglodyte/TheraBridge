@@ -393,57 +393,49 @@ export function usePatientSessions() {
   }, [analysisStatus]); // Only re-run if analysisStatus changes
 
   // Manual refresh function - reloads from API without triggering global loading state
-  // Debounced to prevent multiple rapid refreshes when multiple SSE events arrive
-  const refresh = () => {
-    // Cancel any pending refresh
-    if (refreshTimeoutRef.current) {
-      clearTimeout(refreshTimeoutRef.current);
-    }
-
-    // Don't set global loading state - this would cause full page re-render
-    // Individual cards show their own loading overlays via setSessionLoading
-    refreshTimeoutRef.current = setTimeout(async () => {
-      try {
-        const result = await apiClient.getAllSessions();
-        if (result.success && result.data) {
-          const transformed = result.data.map((backendSession) => {
-            const sessionDate = new Date(backendSession.session_date);
-            return {
-              id: backendSession.id,
-              date: sessionDate.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-              }),
-              rawDate: sessionDate,
-              duration: `${backendSession.duration_minutes || 60} min`,
-              therapist: 'Dr. Rodriguez',
-              mood: mapMoodScore(backendSession.mood_score),
-              topics: backendSession.topics || [], // Empty array = "Analyzing..." in UI
-              strategy: backendSession.technique || '', // Empty string = "Analyzing..." in UI
-              actions: backendSession.action_items || [],
-              summary: backendSession.summary || '', // Empty string = "Analyzing..." in UI
-              transcript: backendSession.transcript || [],
-              extraction_confidence: backendSession.extraction_confidence,
-              topics_extracted_at: backendSession.topics_extracted_at,
-              // Wave 2 fields (prose analysis)
-              prose_analysis: backendSession.prose_analysis,
-              prose_generated_at: backendSession.prose_generated_at,
-              // Deep analysis (JSONB)
-              deep_analysis: backendSession.deep_analysis,
-              deep_analyzed_at: backendSession.deep_analyzed_at,
-              // Breakthrough data
-              has_breakthrough: backendSession.has_breakthrough,
-              breakthrough_data: backendSession.breakthrough_data,
-              breakthrough_analyzed_at: backendSession.breakthrough_analyzed_at,
-            };
-          });
-          setSessions(transformed);
-        }
-      } catch (err) {
-        console.error('[refresh] Error:', err);
+  // Returns a Promise that resolves when refresh completes
+  const refresh = async (): Promise<void> => {
+    // Don't debounce - just refresh immediately
+    // The SSE callbacks handle their own timing with loading overlays
+    try {
+      const result = await apiClient.getAllSessions();
+      if (result.success && result.data) {
+        const transformed = result.data.map((backendSession) => {
+          const sessionDate = new Date(backendSession.session_date);
+          return {
+            id: backendSession.id,
+            date: sessionDate.toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+            }),
+            rawDate: sessionDate,
+            duration: `${backendSession.duration_minutes || 60} min`,
+            therapist: 'Dr. Rodriguez',
+            mood: mapMoodScore(backendSession.mood_score),
+            topics: backendSession.topics || [], // Empty array = "Analyzing..." in UI
+            strategy: backendSession.technique || '', // Empty string = "Analyzing..." in UI
+            actions: backendSession.action_items || [],
+            summary: backendSession.summary || '', // Empty string = "Analyzing..." in UI
+            transcript: backendSession.transcript || [],
+            extraction_confidence: backendSession.extraction_confidence,
+            topics_extracted_at: backendSession.topics_extracted_at,
+            // Wave 2 fields (prose analysis)
+            prose_analysis: backendSession.prose_analysis,
+            prose_generated_at: backendSession.prose_generated_at,
+            // Deep analysis (JSONB)
+            deep_analysis: backendSession.deep_analysis,
+            deep_analyzed_at: backendSession.deep_analyzed_at,
+            // Breakthrough data
+            has_breakthrough: backendSession.has_breakthrough,
+            breakthrough_data: backendSession.breakthrough_data,
+            breakthrough_analyzed_at: backendSession.breakthrough_analyzed_at,
+          };
+        });
+        setSessions(transformed);
       }
-      refreshTimeoutRef.current = null;
-    }, 500); // Increased to 500ms to better batch rapid SSE events
+    } catch (err) {
+      console.error('[refresh] Error:', err);
+    }
   };
 
   // Update a major event's reflection
