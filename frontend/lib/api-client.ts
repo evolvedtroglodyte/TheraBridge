@@ -256,10 +256,15 @@ class ApiClient {
 
     if (!refreshToken) {
       tokenStorage.clearTokens();
-      // Redirect to login in browser context
+
+      // In demo mode, also clear demo tokens
       if (typeof window !== 'undefined') {
-        window.location.href = '/auth/login';
+        import('./demo-token-storage').then(({ demoTokenStorage }) => {
+          demoTokenStorage.clear();
+          console.log('[API Client] No refresh token - demo data cleared');
+        });
       }
+
       return createFailureResult('No refresh token available', HTTP_STATUS.UNAUTHORIZED);
     }
 
@@ -272,9 +277,14 @@ class ApiClient {
 
       if (!response.ok) {
         tokenStorage.clearTokens();
+
         if (typeof window !== 'undefined') {
-          window.location.href = '/auth/login';
+          import('./demo-token-storage').then(({ demoTokenStorage }) => {
+            demoTokenStorage.clear();
+            console.log('[API Client] Token refresh failed - demo data cleared');
+          });
         }
+
         return createFailureResult('Session expired', HTTP_STATUS.UNAUTHORIZED);
       }
 
@@ -283,9 +293,14 @@ class ApiClient {
       return createSuccessResult(data, HTTP_STATUS.OK);
     } catch (error) {
       tokenStorage.clearTokens();
+
       if (typeof window !== 'undefined') {
-        window.location.href = '/auth/login';
+        import('./demo-token-storage').then(({ demoTokenStorage }) => {
+          demoTokenStorage.clear();
+          console.log('[API Client] Token refresh exception - demo data cleared');
+        });
       }
+
       return createFailureResult(
         error instanceof Error ? error.message : 'Token refresh failed',
         HTTP_STATUS.INTERNAL_SERVER_ERROR
