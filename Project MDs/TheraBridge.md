@@ -1,8 +1,19 @@
 # TheraBridge - Project State
 
-## Current Focus: Font Standardization & UI Consistency (PR #1)
+## Current Focus: SessionDetail UI Improvements + Wave 1 Action Summarization (PR #1)
 
-**PR #1 Status:** Phase 1B Complete ✅ | Ready for User Testing
+**PR #1 Status:** Phase 1C Complete ✅ | Ready for Production Testing
+
+**Phase 1C Complete (2026-01-08):**
+- ✅ Database migration applied - `action_items_summary` TEXT column added
+- ✅ Backend: ActionItemsSummarizer service (gpt-5-nano, 45-char max)
+- ✅ Backend: Sequential action summarization integrated into Wave 1 orchestration
+- ✅ Backend: Sessions API enriched with technique definitions from technique_library.json
+- ✅ Frontend: Mood mapper utility (numeric 0-10 → categorical sad/neutral/happy)
+- ✅ Frontend: Session interface extended with 8 new fields
+- ✅ Frontend: SessionCard uses condensed action summary (45 chars)
+- ✅ Frontend: SessionDetail displays mood score + emoji, technique definitions, X button, theme toggle
+- ✅ Build verified successful, commit `be21ae3` pushed to remote
 
 **Phase 1A Complete (2026-01-07):**
 - ✅ SessionDetail.tsx - All fonts standardized (Inter + Crimson Pro)
@@ -11,16 +22,11 @@
 - ✅ Fixed metadata font mismatch between SessionCard and SessionDetail
 - ✅ Build verified successful, 4 commits pushed to remote
 
-**Phase 1B Complete (2026-01-07):**
-- ✅ Header.tsx - Added Inter font to all 4 navigation buttons (Dashboard, Sessions, Ask AI, Upload)
-- ✅ TimelineSidebar.tsx → TimelineSidebar.DEPRECATED.tsx (marked for future removal)
-- ✅ HorizontalTimeline.tsx → HorizontalTimeline.DEPRECATED.tsx (marked for future removal)
-- ✅ Deprecation comments added to both Timeline components
-- ✅ Build verified successful (no broken imports)
-- ✅ Commit `06d8845` pushed to remote
+**Phase 1B Deferred:**
+- ⏳ Header fonts + Timeline deprecation (non-critical, deferred to future)
 
 **Commits (PR #1):**
-- `06d8845` - Feature: PR #1 Phase 1B - Header font standardization and Timeline deprecation
+- `be21ae3` - Feature: PR #1 Phase 1C - SessionDetail UI improvements + Wave 1 action summarization
 - `d3f7390` - Feature: PR #1 Phase 1A - Font standardization for SessionDetail and DeepAnalysisSection
 - `87098f6` - Fix: Complete Tailwind font class removal in SessionDetail.tsx
 - `c2eea93` - Fix: Add missing fontFamily to badges in DeepAnalysisSection
@@ -56,18 +62,22 @@
 - `NEXT_PUBLIC_POLLING_INTERVAL_WAVE2=3000` - 3s during Wave 2
 
 **API Cost Breakdown (OpenAI GPT-5 series):**
-- **Per Session:** ~$0.042 (4.2¢)
-  - Wave 1: ~$0.0102 (mood + topics + breakthrough)
+- **Per Session:** ~$0.0423 (4.23¢)
+  - Wave 1: ~$0.0105 (mood + topics + action summary + breakthrough)
   - Wave 2: ~$0.0318 (deep analysis + prose)
-- **Full Demo (10 sessions):** ~$0.42
+- **Full Demo (10 sessions):** ~$0.423
 - **With Whisper transcription:** +$3.60 (60-min sessions)
 - **Stop after Wave 1:** Saves ~$0.32
+- **Phase 1C Cost Increase:** +0.7% (+$0.0003/session) - negligible
 
 **Next Steps:**
 - ✅ Review Font Standardization plan (PR #1)
 - ✅ Implement Phase 1A (SessionDetail + DeepAnalysis fonts)
-- ✅ Implement Phase 1B (Header + Timeline deprecation)
-- [ ] Test font consistency in light/dark modes (user testing)
+- ✅ Implement Phase 1C (SessionDetail UI improvements + action summarization)
+- [ ] Test in production: Trigger demo pipeline, verify action summaries, mood scores, technique definitions
+- [ ] Monitor Railway logs for sequential action summarization execution
+- [ ] Verify UI renders correctly (mood emoji + score, technique definitions, X button, theme toggle)
+- [ ] Complete Phase 1B (Header + Timeline deprecation) - deferred
 - [ ] Merge PR #1
 - [ ] Implement PR #2 (Prose Analysis UI with Toggle)
 - [ ] Implement Feature 2: Analytics Dashboard
@@ -79,13 +89,16 @@
 ## Development Status
 
 ### Active PRs
-- **PR #1:** Font Standardization - SessionDetail & DeepAnalysis & Header
-  - Status: Ready for Testing (Phase 1A & 1B complete)
-  - Plan: `thoughts/shared/plans/2025-01-06-font-standardization-sessiondetail.md`
-  - Sessions: SESSION_LOG.md (2025-01-06, 2026-01-07 Phase 1A, 2026-01-07 Phase 1B)
-  - Scope: 3 files modified (SessionDetail.tsx, DeepAnalysisSection.tsx, Header.tsx) + 2 deprecations
+- **PR #1:** SessionDetail UI Improvements + Wave 1 Action Summarization
+  - Status: Ready for Production Testing (Phase 1A & 1C complete)
+  - Plans:
+    - `thoughts/shared/plans/2025-01-06-font-standardization-sessiondetail.md`
+    - `thoughts/shared/plans/2026-01-07-sessiondetail-ui-improvements-wave1-action-summarization.md`
+  - Sessions: SESSION_LOG.md (2025-01-06, 2026-01-07 Phase 1A, 2026-01-07 Phase 1C Planning, 2026-01-08 Phase 1C Implementation)
+  - Scope: 10 files modified (3 new, 7 modified)
   - Phase 1A: ✅ Complete (commits d3f7390, 87098f6, c2eea93, e7f8e6a)
-  - Phase 1B: ✅ Complete (commit 06d8845)
+  - Phase 1B: ⏳ Deferred (Header fonts + Timeline deprecation)
+  - Phase 1C: ✅ Complete (commit be21ae3)
 
 ### Completed PRs
 - None yet
