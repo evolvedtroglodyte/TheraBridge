@@ -11,12 +11,12 @@
 
 import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useSessionData } from '../contexts/SessionDataContext';
-import { SessionCard } from './SessionCard';
-import { AddSessionCard } from './AddSessionCard';
-import { SessionDetail } from './SessionDetail';
-import { Session } from '../lib/types';
-import { CardSkeleton } from './DashboardSkeleton';
+import { useSessionData } from '@/app/patient/contexts/SessionDataContext';
+import { SessionCard } from '@/app/patient/components/SessionCard';
+import { AddSessionCard } from '@/app/patient/components/AddSessionCard';
+import { SessionDetail } from '@/app/patient/components/SessionDetail';
+import { Session } from '@/app/patient/lib/types';
+import { CardSkeleton } from '@/app/patient/components/DashboardSkeleton';
 
 interface SessionCardsGridProps {
   /** Session ID to open in fullscreen (controlled externally, e.g., from Timeline) */
@@ -184,11 +184,10 @@ export function SessionCardsGrid({
   if (isEmpty) {
     return (
       <div className="h-full flex flex-col">
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 flex items-center justify-center">
           <div
             ref={containerRef}
-            style={{ gap: '20px' }}
-            className="grid grid-cols-3 grid-rows-2 h-full"
+            className="inline-grid grid-cols-3 grid-rows-2 gap-[20px]"
           >
             {/* Single AddSessionCard in position 1 */}
             <AddSessionCard
@@ -209,15 +208,14 @@ export function SessionCardsGrid({
     <>
       {/* Container uses full height with flex layout - overflow-anchor:none prevents scroll jumping */}
       <div ref={swipeRef} className="h-full flex flex-col" style={{ overflowAnchor: 'none' }}>
-        {/* Grid area - fixed 3x2 grid with invisible placeholders for empty cells */}
-        <div ref={containerRef} className="flex-1 min-h-0">
+        {/* Grid area - fixed 3x2 grid with tighter spacing */}
+        <div ref={containerRef} className="flex-1 min-h-0 flex items-center justify-center">
           <motion.div
             key={currentPage}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
-            style={{ gap: '20px' }}
-            className="grid grid-cols-3 grid-rows-2 h-full"
+            className="inline-grid grid-cols-3 grid-rows-2 gap-[20px]"
           >
             {/* Page 1: AddSessionCard + 5 sessions, Page 2+: 6 sessions only */}
             {Array.from({ length: 6 }).map((_, idx) => {
@@ -254,30 +252,35 @@ export function SessionCardsGrid({
           </motion.div>
         </div>
 
-        {/* Pagination - Always at bottom, never shifts */}
+        {/* Pagination - Centered on viewport */}
         {totalPages > 1 && (
-          <nav aria-label="Session pages" className="flex justify-center items-center gap-3 h-12 flex-shrink-0">
-            {Array.from({ length: totalPages }).map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => {
-                  // Save scroll position before page change to restore after render
-                  savedScrollY.current = window.scrollY;
-                  setCurrentPage(idx);
-                }}
-                aria-label={`Go to page ${idx + 1}`}
-                aria-current={idx === currentPage ? 'page' : undefined}
-                className="w-6 h-2 flex items-center justify-center"
-              >
-                <span
-                  className={`transition-all duration-300 rounded-full h-2 ${
-                    idx === currentPage
-                      ? 'bg-[#5AB9B4] dark:bg-[#a78bfa] w-6'
-                      : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 w-2'
-                  }`}
-                />
-              </button>
-            ))}
+          <nav
+            aria-label="Session pages"
+            className="flex justify-center items-center gap-3 h-16 flex-shrink-0 relative"
+          >
+            <div className="flex items-center gap-3">
+              {Array.from({ length: totalPages }).map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    // Save scroll position before page change to restore after render
+                    savedScrollY.current = window.scrollY;
+                    setCurrentPage(idx);
+                  }}
+                  aria-label={`Go to page ${idx + 1}`}
+                  aria-current={idx === currentPage ? 'page' : undefined}
+                  className="w-6 h-2 flex items-center justify-center"
+                >
+                  <span
+                    className={`transition-all duration-300 rounded-full h-2 ${
+                      idx === currentPage
+                        ? 'bg-[#5AB9B4] dark:bg-[#a78bfa] w-6'
+                        : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 w-2'
+                    }`}
+                  />
+                </button>
+              ))}
+            </div>
           </nav>
         )}
       </div>
