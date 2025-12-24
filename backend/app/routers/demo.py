@@ -588,15 +588,15 @@ async def get_demo_status(
     # Determine overall analysis status
     if session_count == 0:
         # No sessions yet - still pending
-        analysis_status = "pending"
+        overall_analysis_status = "pending"
     elif wave2_complete_count == session_count:
-        analysis_status = "wave2_complete"
+        overall_analysis_status = "wave2_complete"
     elif wave1_complete_count == session_count:
-        analysis_status = "wave1_complete"
+        overall_analysis_status = "wave1_complete"
     elif wave1_complete_count > 0 or wave2_complete_count > 0:
-        analysis_status = "processing"
+        overall_analysis_status = "processing"
     else:
-        analysis_status = "pending"
+        overall_analysis_status = "pending"
 
     # Check if expired
     from datetime import datetime
@@ -659,7 +659,7 @@ async def get_demo_status(
         created_at=demo_user.get("created_at", ""),
         expires_at=demo_user["demo_expires_at"],
         is_expired=is_expired,
-        analysis_status=analysis_status,
+        analysis_status=overall_analysis_status,
         wave1_complete=wave1_complete_count,
         wave2_complete=wave2_complete_count,
         sessions=session_statuses,
