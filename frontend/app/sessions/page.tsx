@@ -12,6 +12,7 @@ import { ProcessingProvider } from '@/contexts/ProcessingContext';
 import { NavigationBar } from '@/components/NavigationBar';
 import { SessionCardsGrid } from '@/app/patient/components/SessionCardsGrid';
 import { ProcessingRefreshBridge } from '@/app/patient/components/ProcessingRefreshBridge';
+import { WaveCompletionBridge } from '@/app/patient/components/WaveCompletionBridge';
 import { DashboardSkeleton } from '@/app/patient/components/DashboardSkeleton';
 
 export default function SessionsPage() {
@@ -19,6 +20,7 @@ export default function SessionsPage() {
     <ProcessingProvider>
       <SessionDataProvider>
         <ProcessingRefreshBridge />
+        <WaveCompletionBridge />
         <Suspense fallback={<DashboardSkeleton />}>
           <div className="min-h-screen bg-[#ECEAE5] dark:bg-[#1a1625] transition-colors duration-300">
             <NavigationBar />
