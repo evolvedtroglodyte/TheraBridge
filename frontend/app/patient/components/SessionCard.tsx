@@ -121,7 +121,7 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
             borderRadius: '16px',
             padding: isStarHovered ? '15px 19px 19px 19px' : '16px 20px 20px 20px', // Adjust for thicker border
             position: 'relative',
-            overflow: 'visible', // Changed to visible for tooltip
+            overflow: isLoading ? 'hidden' : 'visible', // Hidden when loading to contain overlay, visible for tooltip
             boxSizing: 'border-box',
             display: 'flex',
             flexDirection: 'column',
