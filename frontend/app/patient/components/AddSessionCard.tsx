@@ -30,13 +30,13 @@ export function AddSessionCard({ id, scale = 1.0 }: AddSessionCardProps) {
   const { isDark } = useTheme();
   const router = useRouter();
 
-  // Color system matching SessionCard
+  // Color system matching SessionCard and "Your Journey" card
   const colors = {
     teal: '#4ECDC4',
     purple: '#7882E7',
-    cardDark: '#1e2025',
+    cardDark: '#221e2d',      // Matches "Your Journey" gradient midpoint (from-[#2a2435] to-[#1a1625])
     cardLight: '#FFFFFF',
-    borderDark: '#2c2e33',
+    borderDark: '#3d3548',    // Matches "Your Journey" border
     borderLight: '#E8E8E8',
   };
 

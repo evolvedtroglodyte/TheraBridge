@@ -38,13 +38,13 @@ const cardHeight = 290.5;
 export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardProps) {
   const { isDark } = useTheme();
 
-  // Color system matching your exact design
+  // Color system - matching "Your Journey" card for consistency
   const colors = {
     teal: '#4ECDC4',
     purple: '#7882E7',
-    cardDark: '#1e2025',
+    cardDark: '#221e2d',      // Matches "Your Journey" gradient midpoint (from-[#2a2435] to-[#1a1625])
     cardLight: '#FFFFFF',
-    borderDark: '#2c2e33',
+    borderDark: '#3d3548',    // Matches "Your Journey" border
     borderLight: '#E8E8E8',
     goldLight: '#FFCA00',
     goldDark: '#FFE066',

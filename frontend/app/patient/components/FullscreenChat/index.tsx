@@ -211,6 +211,22 @@ export function FullscreenChat({
 
     setMessages(prev => [...prev, tempAssistantMessage]);
 
+    // Check if in therapist mode - show work-in-progress message
+    if (mode === 'therapist') {
+      // Simulate a brief delay for better UX
+      setTimeout(() => {
+        setMessages(prev =>
+          prev.map(msg =>
+            msg.id === tempAssistantId
+              ? { ...msg, content: "Hello, unfortunately this feature is still being worked on. Stay tuned for future updates!" }
+              : msg
+          )
+        );
+        setIsLoading(false);
+      }, 500);
+      return;
+    }
+
     try {
       // Get authenticated user ID (use mock ID for development if not logged in)
       const userId = user?.id || '00000000-0000-0000-0000-000000000003'; // Mock patient ID

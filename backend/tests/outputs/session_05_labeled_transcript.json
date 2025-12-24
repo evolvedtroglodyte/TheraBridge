@@ -1,0 +1,293 @@
+{
+  "session_id": "session_05_family_conflict",
+  "session_type": "Family Conflict",
+  "duration_minutes": 55.0,
+  "therapist_name": "Dr. Emily Chen",
+  "patient_label": "You",
+  "ai_detection": {
+    "therapist_speaker_id": "SPEAKER_00",
+    "patient_speaker_id": "SPEAKER_01",
+    "confidence": 0.97,
+    "reasoning": "SPEAKER_00 opens the session with a standard therapist greeting and structure ('Hi Alex. Come on in, have a seat. How are you doing today? I know last week was pretty intense.') and uses clinical/therapeutic language (validation: 'That sounds really stressful,' reflective prompts: 'What I'm hearing is...,' psychoeducation/diagnostic labeling: 'You're dealing with anxiety and depression'), asks open-ended and assessment-style questions, and guides the session flow. SPEAKER_01 provides personal history, emotional reactions, and detailed narrative about family conflict, consistent with a patient role. Speaking-time proportions (SPEAKER_00 ~43%, SPEAKER_01 ~57%) also align with therapist facilitation and patient disclosure."
+  },
+  "speaking_statistics": {
+    "SPEAKER_00": {
+      "total_time_seconds": 1420.7,
+      "total_time_minutes": 23.7,
+      "segment_count": 26,
+      "percentage": 43.2
+    },
+    "SPEAKER_01": {
+      "total_time_seconds": 1869.3,
+      "total_time_minutes": 31.2,
+      "segment_count": 25,
+      "percentage": 56.8
+    }
+  },
+  "original_segments": 51,
+  "labeled_segments": 51,
+  "reduction_percentage": 0.0,
+  "labeled_transcript": [
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "Hi Alex. Come on in, have a seat. How are you doing today? I know last week was pretty intense.",
+      "timestamp": "00:00"
+    },
+    {
+      "speaker": "You",
+      "text": "Um... not great, honestly. Something really bad happened this week. Like, I've been kind of freaking out about it. I don't even know where to start.",
+      "timestamp": "00:18"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "Okay, that sounds really stressful. Take your time. What happened? Just start wherever feels right.",
+      "timestamp": "01:08"
+    },
+    {
+      "speaker": "You",
+      "text": "So... my mom found my insurance statements. The explanation of benefits thing. She opened my mail because she was looking for something and she saw all these charges for mental health services. And she completely flipped out.",
+      "timestamp": "01:32"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "Oh wow. So your family found out you're in therapy. That's a really significant breach of your privacy. How are you feeling about that?",
+      "timestamp": "02:58"
+    },
+    {
+      "speaker": "You",
+      "text": "I'm just... I'm so angry and scared and guilty all at the same time. Like, I knew they wouldn't react well, but I didn't think it would be this bad. She called my dad and they both confronted me on a video call. It was like, the worst conversation of my life.",
+      "timestamp": "03:23"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "That sounds really overwhelming. Can you walk me through what happened in that conversation? What did they say?",
+      "timestamp": "04:48"
+    },
+    {
+      "speaker": "You",
+      "text": "My mom was crying, which like, she never cries. She kept saying I was wasting money, that therapy is for weak people who can't handle their problems. My dad was just angry. He said I was being dramatic and self-indulgent. That in their generation, people just dealt with their problems instead of paying strangers to listen to them complain.",
+      "timestamp": "05:13"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "Those are really painful things to hear from your parents. How did you respond to them in that moment?",
+      "timestamp": "07:12"
+    },
+    {
+      "speaker": "You",
+      "text": "I tried to explain that I was really struggling, that I needed help. But they just kept shutting me down. My mom said, you know, in Chinese, like, we don't air our problems to strangers. We handle things within the family. And I wanted to scream because like, I can't talk to them about this stuff. They don't get it.",
+      "timestamp": "07:38"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "That must have felt really invalidating. You're trying to take care of your mental health, and instead of support, you're getting criticism and shame. That's incredibly difficult.",
+      "timestamp": "09:08"
+    },
+    {
+      "speaker": "You",
+      "text": "Yeah. And the worst part is my dad said if I'm going to waste their money on this, then maybe I shouldn't be in grad school at all. Like, maybe I should just come home and work instead. Which is like, his way of saying I'm a disappointment.",
+      "timestamp": "09:48"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "I hear you making that interpretation. When your dad said that, how did that land for you? What thoughts came up?",
+      "timestamp": "11:12"
+    },
+    {
+      "speaker": "You",
+      "text": "I just felt like... like I'm this huge burden. Like I can't do anything right. They sacrificed so much to give me opportunities and I'm just throwing it all away by being mentally ill. God, I hate saying that. Mentally ill. It sounds so dramatic.",
+      "timestamp": "11:48"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "You're dealing with anxiety and depression, Alex. Those are real medical conditions. There's nothing dramatic about acknowledging that. Do you really believe you're throwing away their sacrifices?",
+      "timestamp": "13:09"
+    },
+    {
+      "speaker": "You",
+      "text": "I don't know. Logically, no. Like, I'm still in my program. I'm still getting my PhD. But emotionally, yeah, I feel like a complete failure. Like, they came to this country with nothing and built these successful careers, and here I am, can't even function without therapy and medication.",
+      "timestamp": "14:02"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "I want you to notice something. You just said you feel like a failure, and then immediately gave evidence that you're not. You're pursuing a PhD in a competitive field while managing your mental health. That's actually remarkable.",
+      "timestamp": "15:24"
+    },
+    {
+      "speaker": "You",
+      "text": "I guess. It doesn't feel remarkable. It feels like I'm barely holding it together. And now my parents think I'm weak and broken, which just confirms what I already thought about myself.",
+      "timestamp": "16:22"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "Let's pause there. I'm hearing this thought: I'm weak and broken. Where does that thought come from? Is it really your thought, or is it something you've internalized from your parents or your culture?",
+      "timestamp": "17:27"
+    },
+    {
+      "speaker": "You",
+      "text": "I mean... both? I've always felt like something was wrong with me. But yeah, my parents definitely reinforced that. Like, any time I struggled with something, it was because I wasn't trying hard enough or I was being too sensitive. They never acknowledged that things could just be... hard.",
+      "timestamp": "18:32"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "Okay. So we have this thought: I'm weak and broken. And you can see that it comes partly from old messages you received as a child. In ACT, we call this cognitive fusion. You're fused with this thought, treating it as an absolute truth. Does that make sense?",
+      "timestamp": "20:05"
+    },
+    {
+      "speaker": "You",
+      "text": "Yeah, I think so. Like, I believe it so strongly that it feels like a fact.",
+      "timestamp": "21:18"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "Exactly. What we want to practice is cognitive defusion. That means creating some distance from the thought so you can observe it without being controlled by it. So instead of I am weak and broken, you might notice: I'm having the thought that I'm weak and broken.",
+      "timestamp": "21:42"
+    },
+    {
+      "speaker": "You",
+      "text": "Okay. That feels different. Like, it's just a thought, not necessarily true.",
+      "timestamp": "23:04"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "Right. And when you create that space, you can ask: Is this thought helpful? Does it move me toward the life I want to live? Or is it just old programming that's keeping me stuck?",
+      "timestamp": "23:43"
+    },
+    {
+      "speaker": "You",
+      "text": "It's definitely not helpful. It just makes me feel like shit. Sorry. It makes me feel really bad about myself. And it makes me want to give up on therapy and school and everything.",
+      "timestamp": "24:47"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "So when you're fused with that thought, it drives behavior that actually makes your life worse. That's really important to notice. What do you think would happen if you could hold that thought more lightly?",
+      "timestamp": "25:49"
+    },
+    {
+      "speaker": "You",
+      "text": "I guess I'd be able to like, keep doing the things that actually help me. Like coming to therapy and taking my meds and trying to take care of myself. Even if my parents don't approve.",
+      "timestamp": "26:53"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "Yes. And that brings us to values. What matters to you, Alex? What kind of life do you want to build, regardless of what your parents think?",
+      "timestamp": "28:07"
+    },
+    {
+      "speaker": "You",
+      "text": "Um... I want to be authentic, I guess. Like, I want to be able to be myself without hiding. I want to do work that matters. I want to have relationships where I can be vulnerable and not constantly scared people will leave. I want to be, like, whole. Not perfect, just... whole.",
+      "timestamp": "29:04"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "Those are beautiful values. Authenticity, meaningful work, secure relationships, wholeness. And I'm curious, does pursuing therapy align with those values?",
+      "timestamp": "30:58"
+    },
+    {
+      "speaker": "You",
+      "text": "Yeah. Yeah, it does. Like, therapy is how I'm working toward being whole. It's how I'm learning to be more authentic.",
+      "timestamp": "31:58"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "So your parents think you're being weak, but actually, you're living in alignment with your deepest values. That takes tremendous courage.",
+      "timestamp": "32:48"
+    },
+    {
+      "speaker": "You",
+      "text": "I never thought about it like that. I've just been so focused on disappointing them. But you're right. Like, I'm choosing myself, even though it's really hard.",
+      "timestamp": "33:44"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "You are. And that choice comes with pain. There's no way around that. But it's clean pain versus dirty pain, you know what I mean?",
+      "timestamp": "34:57"
+    },
+    {
+      "speaker": "You",
+      "text": "Not really. What's the difference?",
+      "timestamp": "35:48"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "Clean pain is the natural pain of living according to your values. Like, it hurts that your parents don't understand, but you're being true to yourself. Dirty pain is the suffering you add on top. All the self-blame, the I'm a terrible daughter, I'm broken, all of that.",
+      "timestamp": "36:12"
+    },
+    {
+      "speaker": "You",
+      "text": "Okay, yeah. So the clean pain is just like, sadness that they don't get it. But the dirty pain is me beating myself up about it and deciding I'm worthless because of it.",
+      "timestamp": "37:48"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "Exactly. We can't eliminate the clean pain. But we can work on letting go of the dirty pain. And that's where the defusion practice comes in.",
+      "timestamp": "39:03"
+    },
+    {
+      "speaker": "You",
+      "text": "This is really helpful. I still feel terrible about the situation, but at least I understand it better. Like, I can see that the thoughts are just thoughts. They're not the truth about who I am.",
+      "timestamp": "39:58"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "That's great insight. Now I want to ask about something you mentioned earlier. You said you almost said something during that conversation with your parents. What was that about?",
+      "timestamp": "41:27"
+    },
+    {
+      "speaker": "You",
+      "text": "Oh god. Um... so they were going off about me being too Americanized and not respecting family values. And I just... I got so angry. I almost came out to them. About being non-binary. Like, I literally had the words in my mouth and then I just... stopped. I couldn't do it.",
+      "timestamp": "42:29"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "Wow. That's huge. How do you feel about stopping yourself? Do you feel relieved, or disappointed, or...?",
+      "timestamp": "44:38"
+    },
+    {
+      "speaker": "You",
+      "text": "Both? I'm relieved because I know it would have been a disaster. Like, they can barely handle therapy. Coming out as non-binary would have been like... nuclear. But I'm also disappointed in myself. Like, when am I ever going to be brave enough to tell them?",
+      "timestamp": "45:24"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "I want to challenge that disappointment in yourself. You made a choice in a really charged moment. That doesn't mean you're a coward. It means you were protecting yourself. There's nothing wrong with that.",
+      "timestamp": "47:14"
+    },
+    {
+      "speaker": "You",
+      "text": "I guess. But I just keep thinking about what you said about authenticity. How can I be authentic if I'm hiding this massive part of myself from my family?",
+      "timestamp": "48:32"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "That's a really important question. Authenticity doesn't mean you have to share everything with everyone all the time. Sometimes authenticity means honoring your own timeline and boundaries. You get to decide when and how to share that part of yourself.",
+      "timestamp": "49:38"
+    },
+    {
+      "speaker": "You",
+      "text": "Okay. That helps. I think I just feel this pressure, like I have to come out to prove I'm really non-binary or something. But that's probably just another unhelpful thought.",
+      "timestamp": "51:08"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "It is. Your identity is valid regardless of who knows about it. Coming out is a personal decision that should be based on what feels safe and right for you, not on some arbitrary timeline or standard of bravery.",
+      "timestamp": "52:12"
+    },
+    {
+      "speaker": "You",
+      "text": "Thank you. I needed to hear that. I've been so hard on myself about this.",
+      "timestamp": "53:18"
+    },
+    {
+      "speaker": "Dr. Emily Chen",
+      "text": "I know you have. Before we wrap up, I want to give you some homework. I want you to practice a loving-kindness meditation this week. One for yourself, and one that includes your family. Just sending compassion to everyone involved, including you.",
+      "timestamp": "54:03"
+    }
+  ],
+  "metadata": {
+    "processing_date": "2025-12-23",
+    "model_used": "gpt-5-mini",
+    "algorithm_version": "1.0",
+    "cost_estimate_usd": 0.0009
+  }
+}

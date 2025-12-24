@@ -4,7 +4,7 @@ Handles session management, transcript upload, and breakthrough detection
 """
 
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, BackgroundTasks, Request
-from typing import List, Optional
+from typing import List, Optional, Dict
 from pydantic import BaseModel, field_validator
 from datetime import datetime, timedelta
 import json
@@ -17,6 +17,7 @@ from app.services.topic_extractor import TopicExtractor
 from app.services.prose_generator import ProseGenerator
 from app.services.analysis_orchestrator import AnalysisOrchestrator, analyze_session_full_pipeline
 from app.services.technique_library import get_technique_library
+from app.services.speaker_labeler import label_session_transcript, SpeakerLabelingResult
 from app.middleware.demo_auth import get_demo_user
 from app.config import settings
 from supabase import Client
@@ -118,6 +119,15 @@ class TechniqueDefinitionResponse(BaseModel):
     """Response model for technique definition lookup"""
     technique: str  # Formatted name: "MODALITY - TECHNIQUE"
     definition: str  # Clinical definition
+
+
+class SpeakerLabelingResponse(BaseModel):
+    """Response model for speaker labeling"""
+    session_id: str
+    labeled_transcript: List[Dict[str, str]]  # [{speaker, text, timestamp}]
+    therapist_name: str
+    confidence: float
+    detected_roles: Dict[str, str]  # {therapist_speaker_id, patient_speaker_id}
 
 
 # ============================================================================
@@ -799,6 +809,92 @@ async def get_patient_mood_history(
     )
 
     return response.data
+
+
+# ============================================================================
+# Speaker Labeling Endpoints
+# ============================================================================
+
+@router.post("/sessions/{session_id}/label-speakers", response_model=SpeakerLabelingResponse)
+async def label_session_speakers(
+    session_id: str,
+    override_model: Optional[str] = None,
+    db: Client = Depends(get_db)
+) -> SpeakerLabelingResponse:
+    """
+    Label session transcript with speaker labels and format for patient-facing view.
+
+    Returns:
+    - Merged consecutive same-speaker segments
+    - Therapist identified as "Therapist"
+    - Patient identified as "You"
+    - Timestamps in MM:SS format
+
+    Example response:
+    {
+      "session_id": "uuid",
+      "labeled_transcript": [
+        {"speaker": "Therapist", "text": "...", "timestamp": "00:00"},
+        {"speaker": "You", "text": "...", "timestamp": "00:28"}
+      ],
+      "therapist_name": "Therapist",
+      "confidence": 0.92,
+      "detected_roles": {
+        "therapist_speaker_id": "SPEAKER_00",
+        "patient_speaker_id": "SPEAKER_01"
+      }
+    }
+    """
+    try:
+        # Step 1: Get session from database
+        session_response = (
+            db.table("therapy_sessions")
+            .select("id, transcript")
+            .eq("id", session_id)
+            .single()
+            .execute()
+        )
+
+        if not session_response.data:
+            raise HTTPException(status_code=404, detail="Session not found")
+
+        session = session_response.data
+
+        # Validate transcript exists
+        if not session.get("transcript"):
+            raise HTTPException(
+                status_code=400,
+                detail="Session has no transcript to label"
+            )
+
+        # Step 2: Call speaker labeling service
+        result: SpeakerLabelingResult = label_session_transcript(
+            session_id=session_id,
+            raw_segments=session["transcript"],
+            openai_api_key=settings.OPENAI_API_KEY,
+            override_model=override_model
+        )
+
+        # Step 3: Format response
+        return SpeakerLabelingResponse(
+            session_id=session_id,
+            labeled_transcript=[seg.model_dump() for seg in result.labeled_transcript],
+            therapist_name=result.therapist_name,
+            confidence=result.detection.confidence,
+            detected_roles={
+                "therapist_speaker_id": result.detection.therapist_speaker_id,
+                "patient_speaker_id": result.detection.patient_speaker_id
+            }
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Speaker labeling failed for session {session_id}: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Speaker labeling failed: {str(e)}"
+        )
 
 
 # ============================================================================

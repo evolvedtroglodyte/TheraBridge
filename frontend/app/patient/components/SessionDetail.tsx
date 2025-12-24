@@ -6,16 +6,18 @@
  * - Top bar with navigation
  * - FIXED: Dark mode support + gray border
  * - FIXED: Accessibility - focus trap, Escape key, focus restoration
+ * - TEST: AI-labeled transcript integration
  */
 
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowLeft, Star } from 'lucide-react';
-import { Session } from '../lib/types';
+import { X, ArrowLeft, Star, Sparkles } from 'lucide-react';
+import { Session, TranscriptEntry } from '../lib/types';
 import { fullscreenVariants } from '../lib/utils';
 import { useModalAccessibility } from '../hooks/useModalAccessibility';
 import { DeepAnalysisSection } from './DeepAnalysisSection';
 import { renderMoodEmoji } from './SessionIcons';
+import { useTheme } from '../contexts/ThemeContext';
 
 // Font families - matching SessionCard (using system-ui throughout)
 const fontSerif = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -28,6 +30,9 @@ interface SessionDetailProps {
 
 export function SessionDetail({ session, onClose }: SessionDetailProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const { isDark } = useTheme();
+  const [labeledTranscript, setLabeledTranscript] = useState<TranscriptEntry[] | null>(null);
+  const [loadingTranscript, setLoadingTranscript] = useState(false);
 
   // Accessibility: focus trap, Escape key, scroll lock
   useModalAccessibility({
@@ -36,7 +41,30 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
     modalRef,
   });
 
+  // TEST: Load AI-labeled transcript
+  const loadLabeledTranscript = async () => {
+    setLoadingTranscript(true);
+    try {
+      const response = await fetch('/api/test-labeled-transcript');
+      const data = await response.json();
+      setLabeledTranscript(data.transcript);
+      console.log('[SessionDetail] Loaded AI-labeled transcript:', data.metadata);
+    } catch (error) {
+      console.error('[SessionDetail] Failed to load labeled transcript:', error);
+    } finally {
+      setLoadingTranscript(false);
+    }
+  };
+
+  // Reset labeled transcript when session changes
+  useEffect(() => {
+    setLabeledTranscript(null);
+  }, [session?.id]);
+
   if (!session) return null;
+
+  // Use labeled transcript if loaded, otherwise use session transcript
+  const displayTranscript = labeledTranscript || session.transcript;
 
   // Debug: Check if deep_analysis exists
   console.log('[SessionDetail] Session:', session.id, 'has deep_analysis:', !!session.deep_analysis);
@@ -94,13 +122,34 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
         <div className="flex-1 grid grid-cols-2 overflow-hidden">
           {/* Left Column - Transcript */}
           <div className="border-r border-[#E0DDD8] dark:border-[#3d3548] overflow-y-auto p-8 bg-[#F8F7F4] dark:bg-[#1a1625]">
-            <h3 style={{ fontFamily: fontSans }} className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6 text-center">
-              Session Transcript
-            </h3>
+            <div className="flex items-center justify-between mb-6">
+              <h3 style={{ fontFamily: fontSans }} className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                Session Transcript
+              </h3>
 
-            {session.transcript && session.transcript.length > 0 ? (
+              {/* TEST: Button to load AI-labeled transcript */}
+              {!labeledTranscript && (
+                <button
+                  onClick={loadLabeledTranscript}
+                  disabled={loadingTranscript}
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  {loadingTranscript ? 'Loading AI Labels...' : 'Load AI Labels (TEST)'}
+                </button>
+              )}
+
+              {labeledTranscript && (
+                <div className="flex items-center gap-2 text-sm text-purple-600 dark:text-purple-400">
+                  <Sparkles className="w-4 h-4" />
+                  <span className="font-medium">AI-Labeled Transcript Active</span>
+                </div>
+              )}
+            </div>
+
+            {displayTranscript && displayTranscript.length > 0 ? (
               <div className="space-y-6">
-                {session.transcript.map((entry, idx) => (
+                {displayTranscript.map((entry, idx) => (
                   <div key={idx} className="flex gap-4">
                     {/* Timestamp on the left */}
                     <div className="flex-shrink-0 w-[50px] pt-0.5">
@@ -142,7 +191,7 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
                 <div>
                   <p style={{ fontFamily: fontSans }} className="text-gray-500 dark:text-gray-500 mb-1">Session Mood</p>
                   <p style={{ fontFamily: fontSerif }} className="text-gray-800 dark:text-gray-200 font-medium flex items-center gap-2">
-                    {renderMoodEmoji(session.mood, 20)}
+                    {renderMoodEmoji(session.mood, 20, isDark)}
                     <span className="capitalize">{session.mood}</span>
                   </p>
                 </div>

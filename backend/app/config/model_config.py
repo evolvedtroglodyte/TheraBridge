@@ -88,6 +88,7 @@ TASK_MODEL_ASSIGNMENTS = {
     "breakthrough_detection": "gpt-5",      # Complex clinical reasoning required
     "deep_analysis": "gpt-5.2",             # Comprehensive synthesis of all data
     "prose_generation": "gpt-5.2",          # Patient-facing prose narrative
+    "speaker_labeling": "gpt-5-mini",       # Speaker role detection + formatting
 }
 
 
@@ -98,6 +99,7 @@ ESTIMATED_TOKEN_USAGE = {
     "breakthrough_detection": {"input": 3500, "output": 400}, # ~$0.0084 per session
     "deep_analysis": {"input": 5000, "output": 800},       # ~$0.0200 per session
     "prose_generation": {"input": 2000, "output": 600},    # ~$0.0118 per session
+    "speaker_labeling": {"input": 2500, "output": 150},    # ~$0.0009 per session
 }
 
 

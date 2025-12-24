@@ -47,7 +47,7 @@ flowchart TB
     UPLOAD_CHECK -->|No 5xx| ERROR_UPLOAD_SERVER[❌ Server Error 5xx<br/>Retry eligible]
 
     ERROR_UPLOAD_SERVER --> RETRY_UPLOAD{🔄 Retry Count < 3?}
-    RETRY_UPLOAD -->|Yes| BACKOFF_CALC[⏱️ Calculate Backoff<br/>2^retry * 1000ms<br/>Max 8000ms]
+    RETRY_UPLOAD -->|Yes| BACKOFF_CALC[⏱️ Calculate Backoff<br/>Power of 2 times 1000ms<br/>Max 8000ms]
     BACKOFF_CALC --> WAIT_BACKOFF[⏸️ Wait Backoff Period]
     WAIT_BACKOFF --> INCREMENT_RETRY[🔢 Increment Retry Count]
     INCREMENT_RETRY --> STORAGE_UPLOAD
@@ -245,11 +245,11 @@ flowchart TB
 
     CALC_STATS --> CALC_SPEAKING_TIME[⏱️ Calculate Speaking Time<br/>Sum duration per speaker]
 
-    CALC_SPEAKING_TIME --> CALC_RATIO[📊 Calculate Speaking Ratio<br/>ratio = time / total_duration]
+    CALC_SPEAKING_TIME --> CALC_RATIO[📊 Calculate Speaking Ratio<br/>ratio equals time divided by total_duration]
 
     CALC_RATIO --> CALC_SEGMENTS[🔢 Count Segments<br/>segments_count per speaker]
 
-    CALC_SEGMENTS --> CALC_AVG_LENGTH[📏 Avg Segment Length<br/>avg = time / segments_count]
+    CALC_SEGMENTS --> CALC_AVG_LENGTH[📏 Avg Segment Length<br/>avg equals time divided by segments_count]
 
     CALC_AVG_LENGTH --> IDENTIFY_FIRST[👤 Identify First Speaker<br/>min start timestamp]
 
@@ -361,7 +361,7 @@ flowchart TB
     MOOD_API_RESPONSE -->|429 Rate Limited| MOOD_RATE_LIMIT[⏱️ Rate Limited<br/>Retry after delay]
     MOOD_RATE_LIMIT --> MOOD_RETRY_COUNT{🔢 Retries < 3?}
     MOOD_RETRY_COUNT -->|No| MOOD_FAILED[❌ Mood Analysis Failed<br/>Rate limit exhausted]
-    MOOD_RETRY_COUNT -->|Yes| MOOD_BACKOFF[⏸️ Backoff: 2^retry seconds]
+    MOOD_RETRY_COUNT -->|Yes| MOOD_BACKOFF[⏸️ Backoff: exponential delay seconds]
     MOOD_BACKOFF --> MOOD_API_CALL
 
     MOOD_API_RESPONSE -->|401/403 Auth| ERROR_MOOD_AUTH[❌ API Auth Error<br/>Invalid OpenAI key]
@@ -372,7 +372,7 @@ flowchart TB
     MOOD_VALIDATE_SCORE -->|No| MOOD_CLAMP[⚖️ Clamp to Valid Range<br/>If < 0: 0.0<br/>If > 10: 10.0]
     MOOD_VALIDATE_SCORE -->|Yes| MOOD_ROUND
 
-    MOOD_CLAMP --> MOOD_ROUND[🔢 Round to Nearest 0.5<br/>Math: round(score * 2) / 2]
+    MOOD_CLAMP --> MOOD_ROUND[🔢 Round to Nearest 0.5<br/>Formula: round score times 2 divided by 2]
 
     MOOD_ROUND --> MOOD_VALIDATE_CONFIDENCE{✅ Validate confidence?<br/>0.0 ≤ conf ≤ 1.0?}
     MOOD_VALIDATE_CONFIDENCE -->|No| MOOD_DEFAULT_CONF[⚙️ Default Confidence = 0.7]
