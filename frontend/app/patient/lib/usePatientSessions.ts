@@ -64,6 +64,7 @@ export function usePatientSessions() {
         }
 
         // Step 3: Transform ALL backend sessions to frontend Session type
+        // Store raw backend session_date for sorting, then transform
         const transformedSessions: Session[] = result.data.map((backendSession) => {
           const sessionDate = new Date(backendSession.session_date);
 
@@ -73,7 +74,6 @@ export function usePatientSessions() {
               month: 'short',
               day: 'numeric',
             }), // "Jan 10"
-            rawDate: sessionDate,
             duration: `${backendSession.duration_minutes || 60} min`,
             therapist: 'Dr. Rodriguez',
             mood: mapMoodScore(backendSession.mood_score), // Map 0-10 score to MoodType
@@ -87,10 +87,13 @@ export function usePatientSessions() {
           };
         });
 
-        // Step 4: Sort by date (newest first) - backend already sorts, but ensure
+        // Step 4: Sort by date (newest first)
+        // Use backend session_date for accurate sorting
         const sortedSessions = transformedSessions.sort((a, b) => {
-          if (!a.rawDate || !b.rawDate) return 0;
-          return b.rawDate.getTime() - a.rawDate.getTime();
+          const dateA = result.data.find(s => s.id === a.id)?.session_date;
+          const dateB = result.data.find(s => s.id === b.id)?.session_date;
+          if (!dateA || !dateB) return 0;
+          return new Date(dateB).getTime() - new Date(dateA).getTime();
         });
 
         console.log('[Sessions] ✓ Loaded:', sortedSessions.length, 'sessions');
