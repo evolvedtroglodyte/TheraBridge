@@ -157,7 +157,7 @@ async def initialize_demo(
 
     try:
         # Call SQL function to seed demo data
-        response = db.rpc("seed_demo_user_sessions", {"p_demo_token": demo_token}).execute()
+        response = db.rpc("seed_demo_v2", {"p_demo_token": demo_token}).execute()
 
         if not response.data or len(response.data) == 0:
             raise HTTPException(
@@ -166,7 +166,7 @@ async def initialize_demo(
             )
 
         result = response.data[0]
-        patient_id = result["user_id"]
+        patient_id = result["patient_id"]
         session_ids = result["session_ids"]
 
         # Fetch demo user to get expiry
