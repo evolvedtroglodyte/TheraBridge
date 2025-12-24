@@ -489,6 +489,40 @@ class ApiClient {
       return { success: false, error: result.error };
     }
   }
+
+  /**
+   * Fetch ALL sessions for the current demo patient
+   *
+   * This endpoint is designed for fully dynamic session loading.
+   * It fetches all sessions from the database and returns them
+   * sorted by date (newest first).
+   *
+   * **Requires:** Demo-Token header (automatically added by request method)
+   *
+   * @returns ApiResult with array of sessions
+   *
+   * @example
+   * ```ts
+   * const result = await apiClient.getAllSessions();
+   * if (result.success) {
+   *   console.log(`Loaded ${result.data.length} sessions`);
+   *   result.data.forEach(session => console.log(session.session_date));
+   * }
+   * ```
+   */
+  async getAllSessions(): Promise<{
+    success: boolean;
+    data?: any[];
+    error?: string;
+  }> {
+    const result = await this.get<any[]>('/api/sessions/');
+
+    if (result.success) {
+      return { success: true, data: result.data };
+    } else {
+      return { success: false, error: result.error };
+    }
+  }
 }
 
 export const apiClient = new ApiClient();
