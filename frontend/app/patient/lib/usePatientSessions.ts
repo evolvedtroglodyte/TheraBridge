@@ -3,11 +3,8 @@
 /**
  * Patient Sessions Hook for Dashboard-v3
  *
- * Uses MOCK DATA for frontend development and testing.
- * This allows you to see visual changes immediately without needing
- * backend authentication or API calls.
- *
- * When ready for production, set USE_MOCK_DATA = false to use real API.
+ * Fetches real session data from backend API using demo patient ID.
+ * Falls back to MOCK DATA if demo token is not available.
  */
 
 import { useState, useEffect } from 'react';
@@ -19,12 +16,14 @@ import {
   majorEvents as mockMajorEvents,
 } from './mockData';
 import { Session, Task, TimelineEntry, TimelineEvent, MajorEventEntry } from './types';
+import { apiClient } from '@/lib/api-client';
+import { demoTokenStorage } from '@/lib/demo-token-storage';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TOGGLE THIS TO SWITCH BETWEEN MOCK AND REAL DATA
 // Set to `false` when you have a working authenticated backend
 // ═══════════════════════════════════════════════════════════════════════════
-const USE_MOCK_DATA = true;
+const USE_MOCK_DATA = true;  // Using mock data for development
 
 /**
  * Hook to provide session data for the dashboard.
@@ -56,8 +55,43 @@ export function usePatientSessions() {
       return () => clearTimeout(timer);
     }
 
-    // TODO: When USE_MOCK_DATA is false, fetch from real API here
-    setIsLoading(false);
+    // Fetch real data from API
+    const fetchSessions = async () => {
+      // Get demo patient ID
+      const patientId = demoTokenStorage.getPatientId();
+      if (!patientId) {
+        console.error('[SessionData] No patient ID found');
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('[SessionData] Fetching sessions for patient:', patientId);
+
+      try {
+        // Fetch sessions from API
+        const result = await apiClient.get<{ sessions: Session[] }>(
+          `/api/sessions/patient/${patientId}`
+        );
+
+        if (result.success) {
+          console.log('[SessionData] ✓ Loaded sessions:', result.data.sessions.length);
+          setSessions(result.data.sessions);
+          // TODO: Fetch tasks from API when endpoint is ready
+          setTasks([]);
+          setTimeline([]);
+          setUnifiedTimeline([]);
+          setMajorEvents([]);
+        } else {
+          console.error('[SessionData] ✗ Failed to fetch sessions:', result.error);
+        }
+      } catch (error) {
+        console.error('[SessionData] Error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSessions();
   }, []);
 
   // Manual refresh function - reloads mock data
