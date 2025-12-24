@@ -1,10 +1,13 @@
-import type { Metadata } from "next";
+'use client';
+
+import { useEffect } from "react";
 import { Geist, Geist_Mono, Inter, Crimson_Pro, Plus_Jakarta_Sans, DM_Sans, Nunito } from "next/font/google";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ToasterProvider } from "@/components/providers/toaster-provider";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { EnvValidator } from "@/components/env-validator";
+import { refreshDetection } from "@/lib/refresh-detection";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -48,16 +51,24 @@ const inter = Inter({
   weight: ["300", "400", "500", "600"],
 });
 
-export const metadata: Metadata = {
-  title: "TherapyBridge - Session Management",
-  description: "AI-powered therapy session transcription and note extraction",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Detect hard refresh keyboard shortcut
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (refreshDetection.isHardRefreshKeyCombo(event)) {
+        console.log('[Hard Refresh] Detected Cmd+Shift+R - marking for hard refresh');
+        refreshDetection.markHardRefresh();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
