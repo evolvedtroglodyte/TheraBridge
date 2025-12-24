@@ -20,12 +20,14 @@ import { ProgressPatternsCard } from '@/app/patient/components/ProgressPatternsC
 import { TherapistBridgeCard } from '@/app/patient/components/TherapistBridgeCard';
 import { DashboardSkeleton } from '@/app/patient/components/DashboardSkeleton';
 import { ProcessingRefreshBridge } from '@/app/patient/components/ProcessingRefreshBridge';
+import { WaveCompletionBridge } from '@/app/patient/components/WaveCompletionBridge';
 
 export default function DashboardPage() {
   return (
     <ProcessingProvider>
       <SessionDataProvider>
         <ProcessingRefreshBridge />
+        <WaveCompletionBridge />
         <Suspense fallback={<DashboardSkeleton />}>
           <div className="min-h-screen bg-[#ECEAE5] dark:bg-[#1a1625] transition-colors duration-300 relative">
             <NavigationBar />

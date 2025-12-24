@@ -247,11 +247,21 @@ async def main(patient_id: str):
         logger.error("No sessions found for patient")
         return
 
-    # Process each session
+    # Process all sessions in parallel (Wave 1 has no inter-session dependencies)
     start_time = datetime.utcnow()
 
-    for i, session in enumerate(sessions):
-        await process_session(session, i, len(sessions))
+    logger.info(f"🚀 Starting parallel processing of {len(sessions)} sessions...")
+    logger.info(f"Concurrency: {len(sessions)} parallel operations")
+    logger.info()
+
+    # Create tasks for all sessions
+    tasks = [
+        process_session(session, i, len(sessions))
+        for i, session in enumerate(sessions)
+    ]
+
+    # Run all tasks concurrently
+    await asyncio.gather(*tasks)
 
     # Summary
     end_time = datetime.utcnow()

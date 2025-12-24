@@ -20,6 +20,9 @@ from supabase import Client
 router = APIRouter(prefix="/api/demo", tags=["demo"])
 logger = logging.getLogger(__name__)
 
+# In-memory tracking of analysis completion (keyed by patient_id)
+analysis_status = {}
+
 
 # ============================================================================
 # Request/Response Models
@@ -115,6 +118,11 @@ async def run_wave1_analysis_background(patient_id: str):
 
         if result.returncode == 0:
             logger.info(f"✅ Wave 1 analysis complete for patient {patient_id}")
+            # Mark Wave 1 as complete
+            if patient_id not in analysis_status:
+                analysis_status[patient_id] = {}
+            analysis_status[patient_id]["wave1_complete"] = True
+            analysis_status[patient_id]["wave1_completed_at"] = datetime.now().isoformat()
         else:
             logger.error(f"❌ Wave 1 analysis failed: {result.stderr}")
 
@@ -147,6 +155,11 @@ async def run_wave2_analysis_background(patient_id: str):
 
         if result.returncode == 0:
             logger.info(f"✅ Wave 2 analysis complete for patient {patient_id}")
+            # Mark Wave 2 as complete
+            if patient_id not in analysis_status:
+                analysis_status[patient_id] = {}
+            analysis_status[patient_id]["wave2_complete"] = True
+            analysis_status[patient_id]["wave2_completed_at"] = datetime.now().isoformat()
         else:
             logger.error(f"❌ Wave 2 analysis failed: {result.stderr}")
 
