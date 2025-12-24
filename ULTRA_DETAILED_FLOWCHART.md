@@ -343,7 +343,7 @@ flowchart TB
     MOOD_FILTER --> MOOD_CHECK_SEGMENTS{✅ Patient Segments > 0?}
     MOOD_CHECK_SEGMENTS -->|No| MOOD_ERROR[❌ Error: No patient dialogue<br/>Cannot analyze mood]
 
-    MOOD_CHECK_SEGMENTS -->|Yes| MOOD_FORMAT[📝 Format Patient Dialogue<br/>For each segment:<br/>[MM:SS] text\n]
+    MOOD_CHECK_SEGMENTS -->|Yes| MOOD_FORMAT[📝 Format Patient Dialogue<br/>For each segment:<br/>MM:SS text newline]
 
     MOOD_FORMAT --> MOOD_COUNT_WORDS{📏 Word Count ≥ 50?}
     MOOD_COUNT_WORDS -->|No| MOOD_WARN_SHORT[⚠️ Warning: Very short dialogue<br/>Mood may be unreliable<br/>Continue anyway]
@@ -399,7 +399,7 @@ flowchart TB
 
     TOPIC_FETCH --> TOPIC_PARSE_TRANSCRIPT[📊 Parse Transcript JSONB]
 
-    TOPIC_PARSE_TRANSCRIPT --> TOPIC_FORMAT[📝 Format Full Conversation<br/>Include BOTH Therapist + Client<br/>Format: [MM:SS] Speaker: text\n]
+    TOPIC_PARSE_TRANSCRIPT --> TOPIC_FORMAT[📝 Format Full Conversation<br/>Include BOTH Therapist + Client<br/>Format: MM:SS Speaker: text newline]
 
     TOPIC_FORMAT --> TOPIC_VALIDATE_LENGTH{📏 Conversation<br/>Word Count ≥ 100?}
     TOPIC_VALIDATE_LENGTH -->|No| TOPIC_WARN[⚠️ Warning: Short conversation<br/>Topics may be generic]
