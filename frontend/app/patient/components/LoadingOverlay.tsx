@@ -25,7 +25,7 @@ export function LoadingOverlay({ visible }: LoadingOverlayProps) {
 
           {/* Spinner */}
           <div className="relative z-10">
-            <div className="w-8 h-8 border-3 border-gray-300 dark:border-gray-600 border-t-gray-700 dark:border-t-gray-300 rounded-full animate-spin" />
+            <div className="w-8 h-8 border-[3px] border-gray-300 dark:border-gray-600 border-t-gray-700 dark:border-t-gray-300 rounded-full animate-spin" />
           </div>
         </motion.div>
       )}

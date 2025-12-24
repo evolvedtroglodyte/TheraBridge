@@ -113,6 +113,7 @@ export function NotesGoalsCard() {
   const [roadmapData, setRoadmapData] = useState<RoadmapData | null>(null);
   const [metadata, setMetadata] = useState<RoadmapMetadata | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false); // Loading overlay on existing card
   const [error, setError] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -124,12 +125,22 @@ export function NotesGoalsCard() {
 
     async function fetchRoadmap(): Promise<void> {
       if (!patientId) return; // Guard for TypeScript (already checked in outer scope)
-      setIsLoading(true);
+
+      // Determine if this is a refresh (we already have data) or initial load
+      const hasExistingData = roadmapData !== null;
+
+      if (hasExistingData) {
+        setIsRefreshing(true); // Show overlay on existing card
+      } else {
+        setIsLoading(true); // Replace with placeholder card
+      }
+
       const result = await apiClient.getRoadmap(patientId);
 
       if (!result.success) {
         setError(result.error || 'Failed to load roadmap');
         setIsLoading(false);
+        setIsRefreshing(false);
         return;
       }
 
@@ -137,10 +148,15 @@ export function NotesGoalsCard() {
       setMetadata(result.data?.metadata ?? null);
       setError(null);
       setIsLoading(false);
+
+      // Keep refresh overlay visible briefly for visual feedback
+      if (hasExistingData) {
+        setTimeout(() => setIsRefreshing(false), 500);
+      }
     }
 
     fetchRoadmap();
-  }, [patientId, roadmapRefreshTrigger]);
+  }, [patientId, roadmapRefreshTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Accessibility hook
   useModalAccessibility({
@@ -149,9 +165,10 @@ export function NotesGoalsCard() {
     modalRef,
   });
 
-  // Show loading state if initial load or roadmap being generated
-  if (isLoading || loadingRoadmap) {
-    const message = isLoading ? 'Loading roadmap...' : 'Generating roadmap...';
+  // Show loading state ONLY for initial load (no data yet) or roadmap being generated
+  const isInitialLoad = isLoading && !roadmapData;
+  if (isInitialLoad || loadingRoadmap) {
+    const message = isInitialLoad ? 'Loading roadmap...' : 'Generating roadmap...';
     return <PlaceholderCard message={message} showOverlay />;
   }
 
@@ -175,10 +192,12 @@ export function NotesGoalsCard() {
       {/* Compact Card */}
       <motion.div
         onClick={() => setIsExpanded(true)}
-        className="bg-gradient-to-br from-white to-[#FFF9F5] dark:from-[#2a2435] dark:to-[#1a1625] rounded-2xl p-6 shadow-lg cursor-pointer h-[400px] overflow-hidden transition-colors duration-300 border border-gray-200/50 dark:border-[#3d3548]"
+        className="relative bg-gradient-to-br from-white to-[#FFF9F5] dark:from-[#2a2435] dark:to-[#1a1625] rounded-2xl p-6 shadow-lg cursor-pointer h-[400px] overflow-hidden transition-colors duration-300 border border-gray-200/50 dark:border-[#3d3548]"
         whileHover={{ scale: 1.01, boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}
         transition={{ duration: 0.2 }}
       >
+        {/* Loading overlay for refresh (shows on top of existing content) */}
+        <LoadingOverlay visible={isRefreshing} />
         <div className="flex flex-col mb-5 text-center">
           <h2 style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200">Your Journey</h2>
           {/* Session Counter */}
