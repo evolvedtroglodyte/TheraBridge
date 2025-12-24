@@ -76,10 +76,24 @@ Creating a standalone GitHub repository for the parallel orchestration system, p
   - Gallery of successful orchestrations
 
 ### Visual Assets
-- **ASCII art banner** (priority)
-- **Architecture diagrams** (priority)
+- **ASCII art banner** ✅ PRIORITY
+- **Architecture diagrams** ✅ PRIORITY
 - Logo/icon (later)
 - GIF demos (later)
+
+### README Tone Balance
+- **Tagline/Header**: Edgy/rebellious ("Ship Fast As Fuck - The Nuclear Option for Parallel AI Development")
+- **Main Content**: Professional but bold (credible, marketable, serious value prop)
+- **Code/Technical**: Technical/academic (well-documented, rigorous)
+- **Examples**: Meme-heavy where appropriate (engaging, relatable)
+
+### Distribution Strategy
+- **All package managers**:
+  - npm (Node.js developers)
+  - pip (Python developers)
+  - Homebrew (Mac users)
+  - Direct install script (universal)
+- **Primary**: Determine based on research (likely install script for simplicity)
 
 ---
 
