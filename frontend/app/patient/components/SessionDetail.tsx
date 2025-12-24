@@ -37,6 +37,12 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
 
   if (!session) return null;
 
+  // Debug: Check if deep_analysis exists
+  console.log('[SessionDetail] Session:', session.id, 'has deep_analysis:', !!session.deep_analysis);
+  if (session.deep_analysis) {
+    console.log('[SessionDetail] Deep analysis data:', session.deep_analysis);
+  }
+
   const moodEmoji = getMoodEmoji(session.mood);
 
   return (

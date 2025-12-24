@@ -383,7 +383,13 @@ export function FullscreenChat({
           userName={USER.name}
           isDark={isDark}
           onHomeClick={enableHomeNavigation ? () => {
-            onClose();
+            // If embedded (overlay), close the modal
+            // If standalone page (/ask-ai), navigate to dashboard
+            if (isEmbedded) {
+              onClose();
+            } else {
+              router.push('/dashboard');
+            }
           } : undefined}
           onThemeToggle={toggleTheme}
         />
