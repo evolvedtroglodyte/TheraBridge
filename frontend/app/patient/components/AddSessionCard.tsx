@@ -46,7 +46,7 @@ export function AddSessionCard({ id, scale = 1.0 }: AddSessionCardProps) {
   const accent = isDark ? colors.purple : colors.teal;
 
   const handleClick = () => {
-    router.push('/patient/upload');
+    router.push('/upload');
   };
 
   return (
