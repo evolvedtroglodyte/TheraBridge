@@ -102,13 +102,25 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
             {session.transcript && session.transcript.length > 0 ? (
               <div className="space-y-6">
                 {session.transcript.map((entry, idx) => (
-                  <div key={idx}>
-                    <p style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      {entry.speaker}:
-                    </p>
-                    <p style={{ fontFamily: fontSerif }} className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed pl-4 border-l-2 border-gray-200 dark:border-[#3d3548]">
-                      {entry.text}
-                    </p>
+                  <div key={idx} className="flex gap-4">
+                    {/* Timestamp on the left */}
+                    <div className="flex-shrink-0 w-[50px] pt-0.5">
+                      {entry.timestamp && (
+                        <span style={{ fontFamily: fontSans }} className="text-xs font-medium text-gray-400 dark:text-gray-500">
+                          {entry.timestamp}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Speaker and text */}
+                    <div className="flex-1">
+                      <p style={{ fontFamily: fontSans }} className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        {entry.speaker}:
+                      </p>
+                      <p style={{ fontFamily: fontSerif }} className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed pl-4 border-l-2 border-gray-200 dark:border-[#3d3548]">
+                        {entry.text}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>

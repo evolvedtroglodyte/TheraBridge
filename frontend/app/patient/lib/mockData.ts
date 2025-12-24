@@ -48,10 +48,10 @@ export const sessions: Session[] = [
       description: 'Patient achieved major insight connecting childhood experiences to current self-worth patterns'
     },
     transcript: [
-      { speaker: 'Therapist', text: 'Tell me about the compassion exercise you tried.' },
-      { speaker: 'Patient', text: 'I wrote that letter to my younger self. I cried for an hour but it helped me realize I was never the problem.' },
-      { speaker: 'Therapist', text: 'That\'s a profound realization. How does that shift how you see yourself now?' },
-      { speaker: 'Patient', text: 'I think... I think I deserve kindness. Even from myself.' }
+      { speaker: 'Therapist', text: 'Tell me about the compassion exercise you tried.', timestamp: '02:15' },
+      { speaker: 'Patient', text: 'I wrote that letter to my younger self. I cried for an hour but it helped me realize I was never the problem.', timestamp: '02:42' },
+      { speaker: 'Therapist', text: 'That\'s a profound realization. How does that shift how you see yourself now?', timestamp: '05:18' },
+      { speaker: 'Patient', text: 'I think... I think I deserve kindness. Even from myself.', timestamp: '07:33' }
     ],
     patientSummary: 'Breakthrough session with emotional release. Patient connected childhood neglect to adult self-worth issues and demonstrated genuine self-compassion.',
     deep_analysis: {

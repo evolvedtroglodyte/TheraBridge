@@ -95,6 +95,7 @@ export interface Milestone {
 export interface TranscriptEntry {
   speaker: 'Therapist' | 'Patient';
   text: string;
+  timestamp?: string; // Format: "MM:SS" (e.g., "02:15")
 }
 
 export interface Task {
