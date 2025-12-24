@@ -196,11 +196,11 @@ export function SessionDetail({ session, onClose }: SessionDetailProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '11px', fontWeight: 500 }} className="text-gray-500 dark:text-gray-500 mb-1">Duration</p>
-                  <p style={{ fontFamily: TYPOGRAPHY.serif, fontSize: '13px', fontWeight: 500 }} className="text-gray-800 dark:text-gray-200">{session.duration}</p>
+                  <p style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '13px', fontWeight: 500 }} className="text-gray-800 dark:text-gray-200">{session.duration}</p>
                 </div>
                 <div>
                   <p style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '11px', fontWeight: 500 }} className="text-gray-500 dark:text-gray-500 mb-1">Session Mood</p>
-                  <p style={{ fontFamily: TYPOGRAPHY.serif, fontSize: '13px', fontWeight: 500 }} className="text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                  <p style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '13px', fontWeight: 500 }} className="text-gray-800 dark:text-gray-200 flex items-center gap-2">
                     <span style={{ fontSize: '18px' }}>{moodEmoji}</span>
                     <span className="capitalize">{session.mood}</span>
                   </p>
