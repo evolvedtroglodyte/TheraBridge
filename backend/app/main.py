@@ -3,12 +3,14 @@ TherapyBridge Backend API
 FastAPI application with Supabase + Breakthrough Detection
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 from app.config import settings
 from app.routers import sessions, demo, debug, sse
+from app.database import get_db
+from supabase import Client
 
 # Configure logging
 logging.basicConfig(
@@ -60,6 +62,47 @@ async def health_check():
         "environment": settings.environment,
         "breakthrough_detection": "enabled" if settings.openai_api_key else "disabled"
     }
+
+
+@app.get("/api/patients/{patient_id}/roadmap")
+async def get_patient_roadmap(
+    patient_id: str,
+    db: Client = Depends(get_db)
+):
+    """
+    Get patient's latest roadmap data (PR #3: Your Journey Dynamic Roadmap)
+
+    Fetches the current roadmap from patient_roadmap table.
+    Returns 404 if no roadmap exists yet (0 sessions analyzed).
+    """
+    try:
+        # Query patient_roadmap table
+        result = db.table("patient_roadmap") \
+            .select("roadmap_data, metadata") \
+            .eq("patient_id", patient_id) \
+            .execute()
+
+        if not result.data or len(result.data) == 0:
+            raise HTTPException(
+                status_code=404,
+                detail="No roadmap found for this patient. Sessions need to be analyzed first."
+            )
+
+        roadmap_record = result.data[0]
+
+        return {
+            "roadmap": roadmap_record["roadmap_data"],
+            "metadata": roadmap_record["metadata"]
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to fetch roadmap for patient {patient_id}: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch roadmap: {str(e)}"
+        )
 
 
 # Startup event

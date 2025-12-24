@@ -188,17 +188,13 @@ Tone: Warm, professional, empowering, hopeful but realistic
         """Validate and fix roadmap structure"""
         # Ensure required fields with defaults
         roadmap.setdefault("summary", "Your therapeutic journey is in progress.")
-        roadmap.setdefault("achievements", [])
-        roadmap.setdefault("currentFocus", [])
-        roadmap.setdefault("sections", [])
 
-        # Ensure lists are actually lists
-        if not isinstance(roadmap["achievements"], list):
-            roadmap["achievements"] = []
-        if not isinstance(roadmap["currentFocus"], list):
-            roadmap["currentFocus"] = []
-        if not isinstance(roadmap["sections"], list):
-            roadmap["sections"] = []
+        # Ensure list fields are actually lists
+        list_fields = ["achievements", "currentFocus", "sections"]
+        for field in list_fields:
+            roadmap.setdefault(field, [])
+            if not isinstance(roadmap[field], list):
+                roadmap[field] = []
 
         # Normalize list lengths with padding/truncation
         roadmap["achievements"] = self._normalize_list(
@@ -229,7 +225,6 @@ Tone: Warm, professional, empowering, hopeful but realistic
             items.extend([placeholder] * (expected_count - len(items)))
         return items[:expected_count]
 
-    # Strategy-specific prompt building
     def _build_prompt_for_strategy(
         self,
         patient_id: UUID,
@@ -239,20 +234,17 @@ Tone: Warm, professional, empowering, hopeful but realistic
         total_sessions: int
     ) -> str:
         """Build prompt based on selected compaction strategy"""
-        if self.strategy == "full":
-            return self._build_full_context_prompt(
-                patient_id, current_session, context, sessions_analyzed, total_sessions
-            )
-        elif self.strategy == "progressive":
-            return self._build_progressive_prompt(
-                patient_id, current_session, context, sessions_analyzed, total_sessions
-            )
-        elif self.strategy == "hierarchical":
-            return self._build_hierarchical_prompt(
-                patient_id, current_session, context, sessions_analyzed, total_sessions
-            )
-        else:
+        prompt_builders = {
+            "full": self._build_full_context_prompt,
+            "progressive": self._build_progressive_prompt,
+            "hierarchical": self._build_hierarchical_prompt,
+        }
+
+        builder = prompt_builders.get(self.strategy)
+        if not builder:
             raise ValueError(f"Unknown compaction strategy: {self.strategy}")
+
+        return builder(patient_id, current_session, context, sessions_analyzed, total_sessions)
 
     def _build_full_context_prompt(
         self,

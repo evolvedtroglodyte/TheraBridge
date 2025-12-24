@@ -1646,60 +1646,8 @@ async def get_patient_progress_metrics(
 # ============================================================================
 # Demo Mode - Transcript Upload
 # ============================================================================
-
-@router.get("/../patients/{patient_id}/roadmap")
-async def get_patient_roadmap(
-    patient_id: str,
-    db: Client = Depends(get_db)
-):
-    """
-    Get patient's latest roadmap data (PR #3: Your Journey Dynamic Roadmap)
-
-    Full path: /api/patients/{patient_id}/roadmap
-    (Using ../ to escape /api/sessions prefix)
-
-    Fetches the current roadmap from patient_roadmap table.
-    Returns 404 if no roadmap exists yet (0 sessions analyzed).
-
-    Args:
-        patient_id: Patient UUID
-
-    Returns:
-        {
-            "roadmap": RoadmapData,
-            "metadata": RoadmapMetadata
-        }
-    """
-    try:
-        # Query patient_roadmap table
-        result = db.table("patient_roadmap") \
-            .select("roadmap_data, metadata") \
-            .eq("patient_id", patient_id) \
-            .execute()
-
-        if not result.data or len(result.data) == 0:
-            # No roadmap yet (0 sessions analyzed)
-            raise HTTPException(
-                status_code=404,
-                detail="No roadmap found for this patient. Sessions need to be analyzed first."
-            )
-
-        roadmap_record = result.data[0]
-
-        return {
-            "roadmap": roadmap_record["roadmap_data"],
-            "metadata": roadmap_record["metadata"]
-        }
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Failed to fetch roadmap for patient {patient_id}: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to fetch roadmap: {str(e)}"
-        )
-
+# NOTE: Roadmap endpoint moved to main.py as /api/patients/{patient_id}/roadmap
+# (FastAPI doesn't support ../ path traversal in router route definitions)
 
 @router.post("/upload-demo-transcript")
 async def upload_demo_transcript(

@@ -59,6 +59,12 @@ function splitIntoBullets(content: string): string[] {
     .map(s => s.endsWith('.') ? s : s + '.');
 }
 
+// Generate session counter text
+function getSessionCounterText(sessionsAnalyzed: number, totalSessions: number): string {
+  const plural = totalSessions !== 1 ? 's' : '';
+  return `Based on ${sessionsAnalyzed} out of ${totalSessions} uploaded session${plural}`;
+}
+
 export function NotesGoalsCard() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [roadmapData, setRoadmapData] = useState<RoadmapData | null>(null);
@@ -73,25 +79,25 @@ export function NotesGoalsCard() {
   useEffect(() => {
     if (!patientId) return;
 
-    const fetchRoadmap = async () => {
-      setIsLoading(true);
-      const result = await apiClient.getRoadmap(patientId);
+    // Capture non-null patientId for async closure
+    const currentPatientId = patientId;
 
-      if (result.success && result.data) {
-        setRoadmapData(result.data.roadmap);
-        setMetadata(result.data.metadata);
-        setError(null);
-      } else if (result.success && !result.data) {
-        // No roadmap yet (0 sessions analyzed)
-        setRoadmapData(null);
-        setMetadata(null);
-        setError(null);
-      } else {
+    async function fetchRoadmap(): Promise<void> {
+      setIsLoading(true);
+      const result = await apiClient.getRoadmap(currentPatientId);
+
+      if (!result.success) {
         setError(result.error || 'Failed to load roadmap');
+        setIsLoading(false);
+        return;
       }
 
+      // Success - either with data or null (no roadmap yet)
+      setRoadmapData(result.data?.roadmap ?? null);
+      setMetadata(result.data?.metadata ?? null);
+      setError(null);
       setIsLoading(false);
-    };
+    }
 
     fetchRoadmap();
   }, [patientId, roadmapRefreshTrigger]);
@@ -168,7 +174,7 @@ export function NotesGoalsCard() {
           <h2 style={{ fontFamily: fontSerif, fontSize: '20px', fontWeight: 600 }} className="text-gray-800 dark:text-gray-200">Your Journey</h2>
           {/* Session Counter */}
           <p style={{ fontFamily: fontSans, fontSize: '11px', fontWeight: 500 }} className="text-gray-500 dark:text-gray-500 mt-1">
-            Based on {metadata.sessions_analyzed} out of {metadata.total_sessions} uploaded session{metadata.total_sessions !== 1 ? 's' : ''}
+            {getSessionCounterText(metadata.sessions_analyzed, metadata.total_sessions)}
           </p>
         </div>
 
@@ -228,7 +234,7 @@ export function NotesGoalsCard() {
 
               {/* Session Counter in Modal */}
               <p style={{ fontFamily: fontSans, fontSize: '12px', fontWeight: 500 }} className="text-gray-500 dark:text-gray-500 mb-6 text-center">
-                Based on {metadata.sessions_analyzed} out of {metadata.total_sessions} uploaded session{metadata.total_sessions !== 1 ? 's' : ''}
+                {getSessionCounterText(metadata.sessions_analyzed, metadata.total_sessions)}
               </p>
 
               <p style={{ fontFamily: fontSerif, fontSize: '14px', fontWeight: 400, lineHeight: 1.6 }} className="text-gray-700 dark:text-gray-300 mb-8">

@@ -510,8 +510,7 @@ async def get_demo_status(
     for session in sessions:
         # Determine Wave 1/Wave 2 completion
         has_transcript = bool(session.get("transcript"))
-        wave1_complete = (session.get("topics") is not None or
-                         session.get("mood_score") is not None)
+        wave1_complete = session.get("topics") is not None or session.get("mood_score") is not None
         wave2_complete = session.get("prose_analysis") is not None
 
         if wave1_complete:
@@ -519,18 +518,9 @@ async def get_demo_status(
         if wave2_complete:
             wave2_complete_count += 1
 
-        # Get timestamps (ISO format)
-        last_wave1_update = None
-        if session.get("topics_extracted_at"):
-            last_wave1_update = session["topics_extracted_at"]
-        elif session.get("mood_analyzed_at"):
-            last_wave1_update = session["mood_analyzed_at"]
-
-        last_wave2_update = None
-        if session.get("prose_generated_at"):
-            last_wave2_update = session["prose_generated_at"]
-        elif session.get("deep_analyzed_at"):
-            last_wave2_update = session["deep_analyzed_at"]
+        # Get timestamps (ISO format) - prefer first available
+        last_wave1_update = session.get("topics_extracted_at") or session.get("mood_analyzed_at")
+        last_wave2_update = session.get("prose_generated_at") or session.get("deep_analyzed_at")
 
         # Build enhanced SessionStatus
         session_statuses.append(SessionStatus(
@@ -560,20 +550,16 @@ async def get_demo_status(
         ))
 
     # Determine overall analysis status
-    if session_count == 0:
-        # No sessions yet - still pending
+    if session_count == 0 or (wave1_complete_count == 0 and wave2_complete_count == 0):
         overall_analysis_status = "pending"
     elif wave2_complete_count == session_count:
         overall_analysis_status = "wave2_complete"
     elif wave1_complete_count == session_count:
         overall_analysis_status = "wave1_complete"
-    elif wave1_complete_count > 0 or wave2_complete_count > 0:
-        overall_analysis_status = "processing"
     else:
-        overall_analysis_status = "pending"
+        overall_analysis_status = "processing"
 
     # Check if expired
-    from datetime import datetime
     expires_at = datetime.fromisoformat(demo_user["demo_expires_at"].replace("Z", "+00:00"))
     is_expired = expires_at < datetime.now(expires_at.tzinfo)
 
@@ -581,50 +567,42 @@ async def get_demo_status(
     roadmap_updated_at = None
     try:
         roadmap_response = db.table("patient_roadmap").select("updated_at").eq("patient_id", patient_id).execute()
-        if roadmap_response.data and len(roadmap_response.data) > 0:
-            # Handle case where response is a dict or a string
+        if roadmap_response.data:
             first_row = roadmap_response.data[0]
-            if isinstance(first_row, dict):
-                roadmap_updated_at = first_row.get("updated_at")
-            else:
-                # If it's a string, it's already the updated_at value
-                roadmap_updated_at = first_row
+            # Handle both dict and string response formats
+            roadmap_updated_at = first_row.get("updated_at") if isinstance(first_row, dict) else first_row
     except Exception as e:
         # Roadmap table might not exist yet (Phase 5 not complete)
         logger.debug(f"Could not query roadmap table: {e}")
 
     # PR #3 Phase 4: Determine processing state
-    processing_state = "not_started"
     stopped_at_session_id = None
     can_resume = False
 
-    # Check if processing is currently running (check running_processes dict)
+    # Check if processing is currently running
     is_running = patient_id in running_processes and any(
         proc.returncode is None for proc in running_processes[patient_id].values() if proc
     )
 
     # Check if stopped (stopped flag in analysis_status dict)
     analysis_status_dict = analysis_status.get(patient_id, {})
-    wave1_stopped = analysis_status_dict.get("wave1_stopped", False)
-    wave2_stopped = analysis_status_dict.get("wave2_stopped", False)
+    is_stopped = analysis_status_dict.get("wave1_stopped", False) or analysis_status_dict.get("wave2_stopped", False)
 
-    if is_running:
-        processing_state = "running"
-    elif wave2_complete_count == session_count:
+    # Determine processing state using clear priority order
+    if wave2_complete_count == session_count:
         processing_state = "complete"
-    elif wave1_stopped or wave2_stopped:
+    elif is_running or (wave1_complete_count > 0 and not is_stopped):
+        processing_state = "running"
+    elif is_stopped:
         processing_state = "stopped"
         can_resume = True
-
-        # Find which session was being processed when stopped
-        for session in sessions:
-            if session.get("topics") and not session.get("prose_analysis"):
-                # Wave 1 complete but Wave 2 incomplete - this is where we stopped
-                stopped_at_session_id = session["id"]
-                break
-    elif wave1_complete_count > 0 or wave2_complete_count > 0:
-        # Some sessions analyzed but not stopped - still processing
-        processing_state = "running"
+        # Find first session with Wave 1 complete but Wave 2 incomplete
+        stopped_at_session_id = next(
+            (s["id"] for s in sessions if s.get("topics") and not s.get("prose_analysis")),
+            None
+        )
+    else:
+        processing_state = "not_started"
 
     return DemoStatusResponse(
         demo_token=demo_user["demo_token"],
@@ -812,35 +790,27 @@ async def resume_demo_processing(
         .execute()
 
     sessions = sessions_result.data
-    incomplete_session = None
-    next_sessions = []
 
-    for session in sessions:
-        if session.get("topics") and not session.get("prose_analysis"):
-            # Wave 1 complete but Wave 2 incomplete - this is the stopped session
-            if not incomplete_session:
-                incomplete_session = session
-        elif not session.get("topics"):
-            # Wave 1 not started - these are next sessions
-            next_sessions.append(session)
+    # Categorize sessions by completion state
+    incomplete_session = next(
+        (s for s in sessions if s.get("topics") and not s.get("prose_analysis")),
+        None
+    )
+    next_sessions = [s for s in sessions if not s.get("topics")]
 
     # Schedule resume tasks
     if incomplete_session:
-        # Re-run Wave 2 for incomplete session
         print(f"[RESUME] Re-running Wave 2 for Session {incomplete_session['id']}", flush=True)
         asyncio.create_task(run_wave2_analysis_background(patient_id))
 
-    # Continue with remaining sessions (Wave 1 → Wave 2 → Roadmap)
     if next_sessions:
         print(f"[RESUME] Continuing with {len(next_sessions)} remaining sessions", flush=True)
 
-        async def run_wave1_then_wave2_resume():
-            """Run Wave 1, then start Wave 2 when Wave 1 completes"""
+        async def run_wave1_then_wave2():
             await run_wave1_analysis_background(patient_id)
-            # After Wave 1 completes, start Wave 2
             asyncio.create_task(run_wave2_analysis_background(patient_id))
 
-        asyncio.create_task(run_wave1_then_wave2_resume())
+        asyncio.create_task(run_wave1_then_wave2())
 
     return {
         "message": "Processing resumed",

@@ -25,6 +25,21 @@ from app.services.roadmap_generator import RoadmapGenerator
 from app.database import get_supabase_admin
 
 
+def log_step(step: str, message: str) -> None:
+    """Print a formatted step message with flush for Railway logs."""
+    print(f"[{step}] {message}", flush=True)
+
+
+def log_success(message: str) -> None:
+    """Print a success message with flush for Railway logs."""
+    print(f"  ✓ {message}", flush=True)
+
+
+def log_error(message: str) -> None:
+    """Print an error message with flush for Railway logs."""
+    print(f"[ERROR] {message}", flush=True)
+
+
 def generate_roadmap_for_session(patient_id: str, session_id: str):
     """
     Generate roadmap after a session's Wave 2 completes.
@@ -42,27 +57,27 @@ def generate_roadmap_for_session(patient_id: str, session_id: str):
     print(f"{'='*60}\n", flush=True)
 
     # Step 1: Get session data
-    print("[Step 1/5] Fetching session data...", flush=True)
+    log_step("Step 1/5", "Fetching session data...")
     session_result = supabase.table("therapy_sessions") \
         .select("*") \
         .eq("id", session_id) \
         .execute()
 
     if not session_result.data:
-        print(f"[ERROR] Session {session_id} not found", flush=True)
+        log_error(f"Session {session_id} not found")
         return
 
     current_session = session_result.data[0]
 
     # Verify Wave 2 complete
     if not current_session.get("prose_analysis"):
-        print(f"[ERROR] Session {session_id} Wave 2 not complete (no prose_analysis)", flush=True)
+        log_error(f"Session {session_id} Wave 2 not complete (no prose_analysis)")
         return
 
-    print(f"  ✓ Session fetched: {current_session.get('session_date')}", flush=True)
+    log_success(f"Session fetched: {current_session.get('session_date')}")
 
     # Step 2: Generate session insights
-    print("\n[Step 2/5] Generating session insights (GPT-5.2)...", flush=True)
+    log_step("Step 2/5", "Generating session insights (GPT-5.2)...")
     summarizer = SessionInsightsSummarizer()
 
     insights = summarizer.generate_insights(
@@ -71,20 +86,20 @@ def generate_roadmap_for_session(patient_id: str, session_id: str):
         confidence_score=current_session.get("analysis_confidence", 0.85)
     )
 
-    print(f"  ✓ Generated {len(insights)} insights", flush=True)
+    log_success(f"Generated {len(insights)} insights")
     for i, insight in enumerate(insights, 1):
         print(f"    {i}. {insight[:80]}...", flush=True)
 
     # Step 3: Build context based on compaction strategy
     strategy = os.getenv("ROADMAP_COMPACTION_STRATEGY", "hierarchical").lower()
-    print(f"\n[Step 3/5] Building context (compaction strategy: {strategy})...", flush=True)
+    log_step("Step 3/5", f"Building context (compaction strategy: {strategy})...")
 
     context = build_context(patient_id, session_id, insights, supabase)
 
-    print(f"  ✓ Context built ({len(json.dumps(context))} characters)", flush=True)
+    log_success(f"Context built ({len(json.dumps(context))} characters)")
 
     # Step 4: Generate roadmap
-    print("\n[Step 4/5] Generating roadmap (GPT-5.2)...", flush=True)
+    log_step("Step 4/5", "Generating roadmap (GPT-5.2)...")
 
     # Count sessions analyzed
     all_sessions_result = supabase.table("therapy_sessions") \
@@ -124,14 +139,14 @@ def generate_roadmap_for_session(patient_id: str, session_id: str):
     roadmap_data = result["roadmap"]
     metadata = result["metadata"]
 
-    print(f"  ✓ Roadmap generated", flush=True)
+    log_success("Roadmap generated")
     print(f"    Summary: {roadmap_data['summary'][:80]}...", flush=True)
     print(f"    Achievements: {len(roadmap_data['achievements'])} items", flush=True)
     print(f"    Current Focus: {len(roadmap_data['currentFocus'])} items", flush=True)
     print(f"    Sections: {len(roadmap_data['sections'])} sections", flush=True)
 
     # Step 5: Update database
-    print("\n[Step 5/5] Updating database...", flush=True)
+    log_step("Step 5/5", "Updating database...")
 
     # Get current version number
     versions_result = supabase.table("roadmap_versions") \
@@ -150,12 +165,12 @@ def generate_roadmap_for_session(patient_id: str, session_id: str):
         "version": new_version,
         "roadmap_data": roadmap_data,
         "metadata": metadata,
-        "generation_context": context,  # Store for debugging
-        "cost": estimate_cost(context, roadmap_data),  # Estimate based on tokens
+        "generation_context": context,
+        "cost": estimate_cost(context, roadmap_data),
         "generation_duration_ms": metadata["generation_duration_ms"]
     }).execute()
 
-    print(f"  ✓ Version {new_version} saved to roadmap_versions", flush=True)
+    log_success(f"Version {new_version} saved to roadmap_versions")
 
     # Upsert to patient_roadmap (latest version)
     supabase.table("patient_roadmap").upsert({
@@ -165,7 +180,7 @@ def generate_roadmap_for_session(patient_id: str, session_id: str):
         "updated_at": datetime.now().isoformat()
     }, on_conflict="patient_id").execute()
 
-    print(f"  ✓ Latest roadmap updated in patient_roadmap", flush=True)
+    log_success("Latest roadmap updated in patient_roadmap")
 
     print(f"\n{'='*60}", flush=True)
     print(f"ROADMAP GENERATION COMPLETE", flush=True)
@@ -185,14 +200,16 @@ def build_context(patient_id: str, current_session_id: str, current_insights: li
     """
     strategy = os.getenv("ROADMAP_COMPACTION_STRATEGY", "hierarchical").lower()
 
-    if strategy == "full":
-        return build_full_context(patient_id, current_session_id, supabase)
-    elif strategy == "progressive":
-        return build_progressive_context(patient_id, current_session_id, supabase)
-    elif strategy == "hierarchical":
-        return build_hierarchical_context(patient_id, current_session_id, current_insights, supabase)
-    else:
+    strategy_builders = {
+        "full": lambda: build_full_context(patient_id, current_session_id, supabase),
+        "progressive": lambda: build_progressive_context(patient_id, current_session_id, supabase),
+        "hierarchical": lambda: build_hierarchical_context(patient_id, current_session_id, current_insights, supabase),
+    }
+
+    if strategy not in strategy_builders:
         raise ValueError(f"Unknown compaction strategy: {strategy}")
+
+    return strategy_builders[strategy]()
 
 
 def build_full_context(patient_id: str, current_session_id: str, supabase) -> dict:
@@ -230,16 +247,15 @@ def build_full_context(patient_id: str, current_session_id: str, supabase) -> di
 
 def build_progressive_context(patient_id: str, current_session_id: str, supabase) -> dict:
     """Build progressive context (previous roadmap only)"""
-    # Get previous roadmap
     roadmap_result = supabase.table("patient_roadmap") \
         .select("roadmap_data") \
         .eq("patient_id", patient_id) \
         .execute()
 
-    if roadmap_result.data:
-        return {"previous_roadmap": roadmap_result.data[0]["roadmap_data"]}
-    else:
+    if not roadmap_result.data:
         return {}  # First roadmap, no previous context
+
+    return {"previous_roadmap": roadmap_result.data[0]["roadmap_data"]}
 
 
 def build_hierarchical_context(patient_id: str, current_session_id: str, current_insights: list[str], supabase) -> dict:
