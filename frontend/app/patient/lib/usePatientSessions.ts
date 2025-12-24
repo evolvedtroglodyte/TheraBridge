@@ -167,12 +167,15 @@ export function usePatientSessions() {
 
   // Helper to set session loading state
   const setSessionLoading = (sessionId: string, loading: boolean) => {
+    console.log(`[LoadingOverlay Debug] ${loading ? 'SHOW' : 'HIDE'} overlay for session ${sessionId}`);
     setLoadingSessions(prev => {
       const next = new Set(prev);
       if (loading) {
         next.add(sessionId);
+        console.log(`[LoadingOverlay Debug] loadingSessions Set now has ${next.size} sessions`);
       } else {
         next.delete(sessionId);
+        console.log(`[LoadingOverlay Debug] loadingSessions Set now has ${next.size} sessions`);
       }
       return next;
     });
@@ -347,6 +350,7 @@ export function usePatientSessions() {
 
         // Detect which sessions changed
         const changedSessions = detectChangedSessions(status.sessions, sessionStatesRef.current);
+        console.log(`[LoadingOverlay Debug] Detected ${changedSessions.length} changed sessions:`, changedSessions.map(s => s.session_id));
 
         if (changedSessions.length > 0) {
           logPolling(`Progress detected: ${changedSessions.length} session(s) changed`);

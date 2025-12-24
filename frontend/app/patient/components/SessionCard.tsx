@@ -41,6 +41,7 @@ export function SessionCard({ session, onClick, id, scale = 1.0 }: SessionCardPr
   const { isDark } = useTheme();
   const { loadingSessions } = useSessionData();
   const isLoading = loadingSessions.has(session.id);
+  console.log(`[SessionCard Debug] Session ${session.id} isLoading:`, isLoading, 'loadingSessions size:', loadingSessions.size);
 
   // Color system - matching "Your Journey" card for consistency
   const colors = {
