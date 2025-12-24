@@ -15,6 +15,10 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useRouter, usePathname } from 'next/navigation';
 import { CombinedLogo } from '@/components/TheraBridgeLogo';
 
+const TYPOGRAPHY = {
+  sans: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+} as const;
+
 // Custom Home Icon with glow effect (matches fullscreen chat)
 function HomeIcon({ isDark }: { isDark: boolean }) {
   const stroke = isDark ? '#9B7AC4' : '#5AB9B4';
@@ -186,7 +190,8 @@ export function Header({ onAskAIClick }: HeaderProps) {
         <nav className="flex items-center gap-8">
           <button
             onClick={handleDashboardClick}
-            className={`text-sm font-medium transition-colors pb-1 ${
+            style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '14px', fontWeight: 500 }}
+            className={`transition-colors pb-1 ${
               isDashboardPage
                 ? 'text-[#5AB9B4] dark:text-[#a78bfa] border-b-2 border-[#5AB9B4] dark:border-[#a78bfa]'
                 : 'text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa]'
@@ -196,7 +201,8 @@ export function Header({ onAskAIClick }: HeaderProps) {
           </button>
           <button
             onClick={handleSessionsClick}
-            className={`text-sm font-medium transition-colors pb-1 ${
+            style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '14px', fontWeight: 500 }}
+            className={`transition-colors pb-1 ${
               isSessionsPage
                 ? 'text-[#5AB9B4] dark:text-[#a78bfa] border-b-2 border-[#5AB9B4] dark:border-[#a78bfa]'
                 : 'text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa]'
@@ -206,13 +212,15 @@ export function Header({ onAskAIClick }: HeaderProps) {
           </button>
           <button
             onClick={onAskAIClick}
-            className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa] transition-colors pb-1"
+            style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '14px', fontWeight: 500 }}
+            className="text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa] transition-colors pb-1"
           >
             Ask AI
           </button>
           <button
             onClick={handleUploadClick}
-            className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa] transition-colors pb-1"
+            style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '14px', fontWeight: 500 }}
+            className="text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa] transition-colors pb-1"
           >
             Upload
           </button>
@@ -257,7 +265,8 @@ export function Header({ onAskAIClick }: HeaderProps) {
       <nav className="flex items-center gap-8">
         <button
           onClick={handleDashboardClick}
-          className={`text-sm font-medium transition-colors pb-1 ${
+          style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '14px', fontWeight: 500 }}
+          className={`transition-colors pb-1 ${
             isDashboardPage
               ? 'text-[#5AB9B4] dark:text-[#a78bfa] border-b-2 border-[#5AB9B4] dark:border-[#a78bfa]'
               : 'text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa]'
@@ -267,7 +276,8 @@ export function Header({ onAskAIClick }: HeaderProps) {
         </button>
         <button
           onClick={handleSessionsClick}
-          className={`text-sm font-medium transition-colors pb-1 ${
+          style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '14px', fontWeight: 500 }}
+          className={`transition-colors pb-1 ${
             isSessionsPage
               ? 'text-[#5AB9B4] dark:text-[#a78bfa] border-b-2 border-[#5AB9B4] dark:border-[#a78bfa]'
               : 'text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa]'
@@ -277,13 +287,15 @@ export function Header({ onAskAIClick }: HeaderProps) {
         </button>
         <button
           onClick={onAskAIClick}
-          className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa] transition-colors pb-1"
+          style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '14px', fontWeight: 500 }}
+          className="text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa] transition-colors pb-1"
         >
           Ask AI
         </button>
         <button
           onClick={handleUploadClick}
-          className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa] transition-colors pb-1"
+          style={{ fontFamily: TYPOGRAPHY.sans, fontSize: '14px', fontWeight: 500 }}
+          className="text-gray-500 dark:text-gray-400 hover:text-[#5AB9B4] dark:hover:text-[#a78bfa] transition-colors pb-1"
         >
           Upload
         </button>
