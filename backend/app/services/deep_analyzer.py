@@ -524,18 +524,7 @@ Your task is to generate a deep clinical analysis with the following dimensions:
 8. Provide actionable recommendations (build on previous homework)
 9. Assign confidence score based on data quality and clarity
 
-**REQUIRED OUTPUT FORMAT:**
-Return your analysis as a JSON object with the following structure:
-{
-  "progress_indicators": {...},
-  "therapeutic_insights": {...},
-  "coping_skills": {...},
-  "therapeutic_relationship": {...},
-  "recommendations": {...},
-  "confidence_score": 0.0-1.0
-}
-
-Be compassionate, specific, and empowering."""
+Return your analysis as JSON following the specified format. Be compassionate, specific, and empowering."""
 
     def _parse_analysis_result(self, session_id: str, result: Dict[str, Any]) -> DeepAnalysis:
         """Parse and validate AI response into DeepAnalysis object."""
