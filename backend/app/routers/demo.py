@@ -66,51 +66,6 @@ def get_script_path(script_name: str) -> Path:
     """Get absolute path to a script in the scripts directory"""
     return Path(__file__).parent.parent.parent / "scripts" / script_name
 
-
-async def get_patient_id_for_user(user_id: str, db: Client) -> Optional[str]:
-    """Look up patient ID for a given user ID. Returns None if not found."""
-    patient_response = db.table("patients").select("id").eq("user_id", user_id).single().execute()
-    return patient_response.data["id"] if patient_response.data else None
-
-
-def determine_processing_state(
-    patient_id: str,
-    wave1_complete_count: int,
-    wave2_complete_count: int,
-    session_count: int,
-    sessions: list
-) -> tuple[str, Optional[str], bool]:
-    """
-    Determine processing state based on completion counts and process status.
-
-    Returns tuple of (processing_state, stopped_at_session_id, can_resume)
-    """
-    # Check if all sessions complete
-    if wave2_complete_count == session_count:
-        return ("complete", None, False)
-
-    # Check if processing is currently running
-    is_running = patient_id in running_processes and any(
-        proc.returncode is None for proc in running_processes[patient_id].values() if proc
-    )
-
-    # Check if stopped (stopped flag in analysis_status dict)
-    analysis_status_dict = analysis_status.get(patient_id, {})
-    is_stopped = analysis_status_dict.get("wave1_stopped", False) or analysis_status_dict.get("wave2_stopped", False)
-
-    if is_running or (wave1_complete_count > 0 and not is_stopped):
-        return ("running", None, False)
-
-    if is_stopped:
-        # Find first session with Wave 1 complete but Wave 2 incomplete
-        stopped_at = next(
-            (s["id"] for s in sessions if s.get("topics") and not s.get("prose_analysis")),
-            None
-        )
-        return ("stopped", stopped_at, True)
-
-    return ("not_started", None, False)
-
 # In-memory tracking of analysis completion (keyed by patient_id)
 analysis_status = {}
 
@@ -340,9 +295,9 @@ async def run_full_initialization_pipeline(patient_id: str):
 
     # Step 2 & 3: Run Wave 1 and Wave 2 in background (non-blocking)
     async def run_wave1_then_wave2():
-        """Run Wave 1, then Wave 2 sequentially"""
+        """Run Wave 1, then start Wave 2 when Wave 1 completes"""
         await run_wave1_analysis_background(patient_id)
-        await run_wave2_analysis_background(patient_id)
+        asyncio.create_task(run_wave2_analysis_background(patient_id))
 
     asyncio.create_task(run_wave1_then_wave2())
 
@@ -513,9 +468,18 @@ async def get_demo_status(
     Returns:
         DemoStatusResponse with user info, session count, and per-session completion
     """
-    patient_id = await get_patient_id_for_user(demo_user["id"], db)
-    if not patient_id:
-        raise HTTPException(status_code=404, detail="Patient record not found for demo user")
+    user_id = demo_user["id"]
+
+    # Look up the patient record to get patient_id
+    patient_response = db.table("patients").select("id").eq("user_id", user_id).single().execute()
+
+    if not patient_response.data:
+        raise HTTPException(
+            status_code=404,
+            detail="Patient record not found for demo user"
+        )
+
+    patient_id = patient_response.data["id"]
 
     # Fetch all sessions with analysis data (enhanced for delta updates)
     sessions_response = db.table("therapy_sessions").select("""
@@ -612,9 +576,33 @@ async def get_demo_status(
         logger.debug(f"Could not query roadmap table: {e}")
 
     # PR #3 Phase 4: Determine processing state
-    processing_state, stopped_at_session_id, can_resume = determine_processing_state(
-        patient_id, wave1_complete_count, wave2_complete_count, session_count, sessions
+    stopped_at_session_id = None
+    can_resume = False
+
+    # Check if processing is currently running
+    is_running = patient_id in running_processes and any(
+        proc.returncode is None for proc in running_processes[patient_id].values() if proc
     )
+
+    # Check if stopped (stopped flag in analysis_status dict)
+    analysis_status_dict = analysis_status.get(patient_id, {})
+    is_stopped = analysis_status_dict.get("wave1_stopped", False) or analysis_status_dict.get("wave2_stopped", False)
+
+    # Determine processing state using clear priority order
+    if wave2_complete_count == session_count:
+        processing_state = "complete"
+    elif is_running or (wave1_complete_count > 0 and not is_stopped):
+        processing_state = "running"
+    elif is_stopped:
+        processing_state = "stopped"
+        can_resume = True
+        # Find first session with Wave 1 complete but Wave 2 incomplete
+        stopped_at_session_id = next(
+            (s["id"] for s in sessions if s.get("topics") and not s.get("prose_analysis")),
+            None
+        )
+    else:
+        processing_state = "not_started"
 
     return DemoStatusResponse(
         demo_token=demo_user["demo_token"],
@@ -689,9 +677,18 @@ async def stop_demo_processing(
     Returns:
         Status of terminated processes
     """
-    patient_id = await get_patient_id_for_user(demo_user["id"], db)
-    if not patient_id:
-        raise HTTPException(status_code=404, detail="Patient record not found for demo user")
+    user_id = demo_user["id"]
+
+    # Look up the patient record to get patient_id
+    patient_response = db.table("patients").select("id").eq("user_id", user_id).single().execute()
+
+    if not patient_response.data:
+        raise HTTPException(
+            status_code=404,
+            detail="Patient record not found for demo user"
+        )
+
+    patient_id = patient_response.data["id"]
 
     print(f"🛑 Stop requested for patient {patient_id}", flush=True)
     logger.info(f"🛑 Stop requested for patient {patient_id}")
@@ -759,13 +756,22 @@ async def resume_demo_processing(
     Smart resume logic:
     1. Find incomplete sessions (Wave 1 complete but Wave 2 incomplete)
     2. Re-run Wave 2 for incomplete session
-    3. Continue with remaining sessions (Wave 1 -> Wave 2 -> Roadmap)
+    3. Continue with remaining sessions (Wave 1 → Wave 2 → Roadmap)
 
     Returns immediately after scheduling background tasks.
     """
-    patient_id = await get_patient_id_for_user(demo_user["id"], db)
-    if not patient_id:
-        raise HTTPException(status_code=404, detail="Patient record not found for demo user")
+    user_id = demo_user["id"]
+
+    # Look up the patient record to get patient_id
+    patient_response = db.table("patients").select("id").eq("user_id", user_id).single().execute()
+
+    if not patient_response.data:
+        raise HTTPException(
+            status_code=404,
+            detail="Patient record not found for demo user"
+        )
+
+    patient_id = patient_response.data["id"]
 
     print(f"▶️ Resume requested for patient {patient_id}", flush=True)
     logger.info(f"▶️ Resume requested for patient {patient_id}")
